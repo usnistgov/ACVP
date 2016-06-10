@@ -1,2 +1,2 @@
 # ACVP
-Industry Working Group on Automated Algorithm Validation
+Industry Working Group on Automated Cryptographic Algorithm Validation
