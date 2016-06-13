@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-ietf-acvp-subsym-00" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the
+         full title is longer than 39 characters -->
+
+    <title abbrev="Sym Cipher JSON">ACVP Symmetric Cipher JSON Specification</title>
+
+    <!-- add 'role="editor"' below for the editors if appropriate -->
+
+    <!-- Another author who claims to be an editor -->
+
+    <author fullname="John Foley" initials="J.F." role="editor"
+            surname="Foley">
+      <organization>Cisco Systems, Inc.</organization>
+
+      <address>
+        <postal>
+          <street>170 West Tasman Dr.</street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95134</code>
+
+          <country>USA</country>
+        </postal>
+
+        <email>foleyj@cisco.com</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+
+    <date month="June" year="2016" />
+
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+         in the current day for you. If only the current year is specified, xml2rfc will fill
+	 in the current day and month for you. If the year is not the current one, it is
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+	 specify just the year. -->
+
+    <!-- Meta-data Declarations -->
+
+    <area>General</area>
+
+    <workgroup>TBD</workgroup>
+
+    <!-- WG name at the upperleft corner of the doc,
+         IETF is fine for individual submissions.
+	 If this element is not present, the default is "Network Working Group",
+         which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+    <keyword>acvp</keyword>
+    <keyword>crypto</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+      <t>This document defines the JSON schema for using symmetric ciphers with the ACVP specification.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to autmatically
+              verify the cryptographic implementation of a software or hardware crypto module.
+              The ACVP specification defines how a crypto module communicates with an ACVP
+              server, including crypto capabilities negotiation, session management, authentication,
+	      vector processing and more.  The ACVP specification does not define algorithm specific 
+	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications 
+	      define the constructs for testing individual crypto algorithms.  Each sub-specification 
+	      addresses a specific class of crypto algorithms.  This sub-specifcation defines the JSON
+	      constructs for testing symmetric crypto algorithms using ACVP.</t>
+
+      <section title="Requirements Language">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+	document are to be interpreted in 
+	<xref target="RFC2119">RFC 2119</xref>.</t>
+      </section>
+    </section>
+
+<section anchor="caps_reg" title="Capabilities Registration">
+    <t>ACVP requires crypto modules to register their capablities.  This allows the crypto
+	module to advertise support for specific algorithms, notifying the ACVP server which
+	algorithms need test vectors generated for the validation process.  This section 
+    describes the constructs for advertising support of symmetric ciphers to the ACVP server.</t>
+    <t>The following symmetric ciphers may be advertised by the ACVP crypto module:</t>
+    <t><list style="symbols">
+	    <t>AES</t>
+	    <t>DES</t>
+	    <t>TBD...</t>
+    </list></t>
+
+    <t>The symmetric cipher capabilities are advertised as JSON objects within the 'algorithms' 
+	value of the ACVP registration message.  The 'algorithms' value is an array, where each 
+	array element is an individual JSON object defined in this section.  The 'algorithms' 
+	value is part of the 'capability_exchange' element of the ACVP JSON registration message.  
+	See the ACVP specification for details on the registration message.   
+
+	Each symmetric cipher capablity advertised is a self-contained JSON object.  The following 
+	JSON values are used for symmetric cipher capabilities:</t>
+
+        <texttable anchor="caps_table" title="Symmetric Cipher Capabilities JSON Values">
+          <preamble>These values are used within the capabilities advertisement JSON object.
+          </preamble>
+          <ttcol align="center">JSON Value</ttcol>
+          <ttcol align="center">Description</ttcol>
+          <ttcol align="center">JSON type</ttcol>
+          <ttcol align="center">Valid Values</ttcol>
+          <ttcol align="center">Optional</ttcol>
+
+          <c>algorithm</c>
+	  <c>The symmetric cipher and mode to be validated.</c>
+          <c>value</c>
+          <c>AES-EBC, AES-CBC, AES-CTR, AES-GCM, AES-CCM, AES-WRAP, DES-EBC, DES-DBC</c>
+          <c>No</c>
+
+          <c>direction</c>
+	  <c>The crypto operation direction</c>
+          <c>array</c>
+          <c>encrypt, decrypt</c>
+          <c>No</c>
+
+          <c>ptlen</c>
+	  <c>The supported plaintext lengths in bits</c>
+          <c>array</c>
+          <c>0-1024</c>
+          <c>No</c>
+
+          <c>ivlen</c>
+          <c>The supported IV lengths in bits</c>
+          <c>array</c>
+          <c>0-128</c>
+          <c>No</c>
+
+          <c>ivgen</c>
+          <c>IV generation method for AEAD ciphers</c>
+          <c>value</c>
+          <c>internal, external</c>
+          <c>Yes</c>
+
+          <c>ivgenmode</c>
+          <c>IV generation mode for AEAD ciphers</c>
+          <c>value</c>
+          <c>8.2.1</c>
+          <c>Yes</c>
+
+          <c>aadlen</c>
+          <c>The supported AAD lengths in bits for AEAD ciphers</c>
+          <c>array</c>
+          <c>0-264</c>
+          <c>Yes</c>
+
+          <c>taglen</c>
+          <c>The supported Tag lengths in bits for AEAD ciphers</c>
+          <c>array</c>
+          <c>0-264</c>
+          <c>Yes</c>
+        </texttable>
+
+    </section>
+
+    <section anchor="test_vectors" title="Test Vectors">
+	<t>TBD</t>
+    </section>
+
+    <section anchor="vector_responses" title="Test Vector Responses">
+	<t>TBD</t>
+    </section>
+
+    <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>TBD...</t>
+    </section>
+
+    <!-- Possibly a 'Contributors' section ... -->
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This memo includes no request to IANA.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Security considerations are addressed by the ACVP specification.</t>
+    </section>
+  </middle>
+
+  <!--  *****BACK MATTER ***** -->
+
+  <back>
+    <references title="Normative References">
+      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+      &RFC2119;
+
+      <reference anchor="ACVP">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>ACVP Specification</title>
+
+          <author initials="authInitials" surname="authSurName">
+            <organization>NIST</organization>
+          </author>
+
+          <date year="2016" />
+        </front>
+      </reference>
+    </references>
+
+    <section anchor="app-reg-ex" title="Example Capabilities JSON Object">
+      <t>The following is a example JSON object advertising support for AES-GCM.</t>
+      <figure>
+        <artwork><![CDATA[
+
+
+            {
+                "algorithm": "AES-GCM",
+                "direction": [
+                    "encrypt",
+                    "decrypt"
+                ],
+                "ivgen": "internal",
+                "ivgenmode": "8.2.1",
+                "keylen": [
+                    128,
+                    192,
+                    256
+                ],
+                "taglen": [
+                    96,
+                    128
+                ],
+                "ivlen": [
+                    96
+                ],
+                "ptlen": [
+                    0,
+                    128,
+                    136,
+                    256,
+                    264
+                ],
+                "aadlen": [
+                    128,
+                    136,
+                    256,
+                    264
+                ]
+            }
+            ]]></artwork>
+    </figure>
+    </section>
+    <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
+      <t>The following is a example JSON object for test vectors sent from the ACVP server to the crypto module.</t>
+    </section>
+    <section anchor="app-results-ex" title="Example Test Results JSON Object">
+      <t>The following is a example JSON object for test results sent from the crypto module to the ACVP server.</t>
+    </section>
+
+  </back>
+</rfc>
