@@ -39,7 +39,7 @@
     <!-- The abbreviated title is used in the page header - it is only necessary if the
          full title is longer than 39 characters -->
 
-    <title abbrev="Sym Cipher JSON">ACVP Symmetric Cipher JSON Specification</title>
+    <title abbrev="Sym Alg JSON">ACVP Symmetric Algorithm JSON Specification</title>
 
     <!-- add 'role="editor"' below for the editors if appropriate -->
 
@@ -99,7 +99,7 @@
          keywords will be used for the search engine. -->
 
     <abstract>
-      <t>This document defines the JSON schema for using symmetric ciphers with the ACVP specification.</t>
+      <t>This document defines the JSON schema for using symmetric algorithms with the ACVP specification.</t>
     </abstract>
   </front>
 
@@ -127,26 +127,18 @@
     <t>ACVP requires crypto modules to register their capabilities.  This allows the crypto
 	module to advertise support for specific algorithms, notifying the ACVP server which
 	algorithms need test vectors generated for the validation process.  This section
-    describes the constructs for advertising support of symmetric ciphers to the ACVP server.</t>
-    <t>The following symmetric ciphers may be advertised by the ACVP crypto module:</t>
-    <t><list style="symbols">
-	    <t>AES</t>
-	    <t>DES</t>
-	    <t>TBD...</t>
-    </list></t>
+    describes the constructs for advertising support of symmetric algorithms to the ACVP server.</t>
 
-    <t>The symmetric cipher capabilities are advertised as JSON objects within the 'algorithms'
+    <t>The symmetric algorithm capabilities are advertised as JSON objects within the 'algorithms'
 	value of the ACVP registration message.  The 'algorithms' value is an array, where each
 	array element is an individual JSON object defined in this section.  The 'algorithms'
 	value is part of the 'capability_exchange' element of the ACVP JSON registration message.
 	See the ACVP specification for details on the registration message.
 
-	Each symmetric cipher capability advertised is a self-contained JSON object.  The following
-	JSON values are used for symmetric cipher capabilities:</t>
+	Each symmetric algorithm capability advertised is a self-contained JSON object.  The following
+	JSON values are used for symmetric algorithm capabilities:</t>
 
-        <texttable anchor="caps_table" title="Symmetric Cipher Capabilities JSON Values">
-          <preamble>These values are used within the capabilities advertisement JSON object.
-          </preamble>
+        <texttable anchor="caps_table" title="Symmetric Algorithm Capabilities JSON Values">
           <ttcol align="left">JSON Value</ttcol>
           <ttcol align="left">Description</ttcol>
           <ttcol align="left">JSON type</ttcol>
@@ -154,9 +146,9 @@
           <ttcol align="left">Optional</ttcol>
 
           <c>algorithm</c>
-	  <c>The symmetric cipher and mode to be validated.</c>
+	  <c>The symmetric algorithm and mode to be validated.</c>
           <c>value</c>
-          <c>AES-EBC, AES-CBC, AES-CTR, AES-GCM, AES-CCM, AES-WRAP, DES-EBC, DES-DBC</c>
+          <c>See <xref target="supported_algs" /></c>
           <c>No</c>
 
           <c>direction</c>
@@ -178,29 +170,44 @@
           <c>No</c>
 
           <c>ivgen</c>
-          <c>IV generation method for AEAD ciphers</c>
+          <c>IV generation method for AEAD algorithms</c>
           <c>value</c>
           <c>internal, external</c>
           <c>Yes</c>
 
           <c>ivgenmode</c>
-          <c>IV generation mode for AEAD ciphers</c>
+          <c>IV generation mode for AEAD algorithms</c>
           <c>value</c>
           <c>8.2.1</c>
           <c>Yes</c>
 
           <c>aadlen</c>
-          <c>The supported AAD lengths in bits for AEAD ciphers</c>
+          <c>The supported AAD lengths in bits for AEAD algorithms</c>
           <c>array</c>
           <c>0-264</c>
           <c>Yes</c>
 
           <c>taglen</c>
-          <c>The supported Tag lengths in bits for AEAD ciphers</c>
+          <c>The supported Tag lengths in bits for AEAD algorithms</c>
           <c>array</c>
           <c>0-264</c>
           <c>Yes</c>
         </texttable>
+
+	<section anchor="supported_algs" title="Supported Symmetric Algorithms">
+	    <t>The following symmetric algorithms may be advertised by the ACVP compliant crypto module:</t>
+	    <t><list style="symbols">
+		<t>AES-EBC</t>
+		<t>AES-CBC</t>
+		<t>AES-CTR</t>
+		<t>AES-GCM</t>
+		<t>AES-CCM</t>
+		<t>AES-WRAP</t>
+		<t>DES-EBC</t>
+		<t>DES-CTR</t>
+		<t>TBD</t>
+	    </list></t>
+	</section>
 
     </section>
 
@@ -216,7 +223,6 @@
 	describes the JSON elements at the top level of the hierarchy.
 	</t>
 	<texttable anchor="vs_top_table" title="Vector Set JSON Object">
-          <preamble>Top-level JSON elements in vector set.</preamble>
           <ttcol align="left">JSON Value</ttcol>
           <ttcol align="left">Description</ttcol>
           <ttcol align="left">JSON type</ttcol>
@@ -230,7 +236,7 @@
           <c>value</c>
 
 	  <c>algorithm</c>
-	  <c>The symmetric cipher and mode used for the test vectors</c>
+	  <c>The symmetric algorithm and mode used for the test vectors.  See <xref target="supported_algs" /> for possible values.</c>
           <c>value</c>
 
 	  <c>direction</c>
@@ -238,18 +244,17 @@
           <c>value</c>
 
 	  <c>test_groups</c>
-	  <c>Array of JSON objects that represent each group of test vectors</c>
+	  <c>Array of test group JSON objects, which are defined in <xref target="tgjs" /></c>
           <c>array</c>
 	</texttable>
 
-	<section title="Test Groups JSON Schema">
+	<section title="Test Groups JSON Schema" anchor="tgjs">
 	    <t>The test_groups element at the top level in the test vector JSON object is an array of test
 		groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
 	        in the vector set.  For instance, all test vectors that use the same key size would be grouped
 	        together.  The Test Group JSON object contains meta data that applies to all test vectors within
 	        the group.  The following table describes the JSON elements of the Test Group JSON object.</t>
 	    <texttable anchor="vs_tg_table" title="Test Group JSON Object">
-		<preamble>Test Group JSON elements</preamble>
 		<ttcol align="left">JSON Value</ttcol>
 		<ttcol align="left">Description</ttcol>
 		<ttcol align="left">JSON type</ttcol>
@@ -281,18 +286,17 @@
 		<c>Yes</c>
 
 		<c>tests</c>
-		<c>Array of individual test vector JSON objects</c>
+		<c>Array of individual test vector JSON objects, which are defined in <xref target="tvjs" /></c>
 		<c>array</c>
 		<c>No</c>
 	    </texttable>
 	</section>
 
-	<section title="Test Vectors JSON Schema">
+	<section title="Test Vectors JSON Schema" anchor="tvjs">
 	    <t>Each test group contains an array of one or more test vectors.  Each test vector is a JSON object
 		that represents a single test case to be processed by the ACVP client.  The following table describes
 	    the JSON elements for each test vector.</t>
 	    <texttable anchor="vs_tc_table" title="Test Case JSON Object">
-		<preamble>Test Case JSON elements</preamble>
 		<ttcol align="left">JSON Value</ttcol>
 		<ttcol align="left">Description</ttcol>
 		<ttcol align="left">JSON type</ttcol>
@@ -316,10 +320,20 @@
 		<c>pt</c>
 		<c>Plaintext to use</c>
 		<c>value</c>
-		<c>No</c>
+		<c>Yes</c>
+
+		<c>ct</c>
+		<c>Ciphertext to use</c>
+		<c>value</c>
+		<c>Yes</c>
 
 		<c>aad</c>
 		<c>AAD to use for AEAD algorithms</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>tag</c>
+		<c>Tag to use for AEAD algorithms</c>
 		<c>value</c>
 		<c>Yes</c>
 	    </texttable>
@@ -327,7 +341,30 @@
     </section>
 
     <section anchor="vector_responses" title="Test Vector Responses">
-	<t>TBD</t>
+	<t>After the ACVP client downloads and processes a vector set, it must send the resonse vectors
+	back to the ACVP server.  The following table describes the JSON object that represents a vector set response.</t>
+
+	<texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+
+	  <c>acv_version</c>
+	  <c>Protocol version identifier</c>
+          <c>value</c>
+
+	  <c>vs_id</c>
+	  <c>Unique numeric identifier for the vector set</c>
+          <c>value</c>
+
+	  <c>test_results</c>
+	  <c>Array of JSON objects that represent each test vector result, which uses the same
+	      JSON schema as defined in <xref target="tvjs" /> </c>
+          <c>array</c>
+	</texttable>
+
+
+
     </section>
 
     <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->

@@ -8,12 +8,12 @@ Intended status: Informational                             June 17, 2016
 Expires: December 19, 2016
 
 
-                ACVP Symmetric Cipher JSON Specification
+              ACVP Symmetric Algorithm JSON Specification
                        draft-ietf-acvp-subsym-00
 
 Abstract
 
-   This document defines the JSON schema for using symmetric ciphers
+   This document defines the JSON schema for using symmetric algorithms
    with the ACVP specification.
 
 Status of This Memo
@@ -55,7 +55,7 @@ Copyright Notice
 
 Foley                   Expires December 19, 2016               [Page 1]
 
-Internet-Draft               Sym Cipher JSON                   June 2016
+Internet-Draft                Sym Alg JSON                     June 2016
 
 
 Table of Contents
@@ -63,13 +63,14 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
+     2.1.  Supported Symmetric Algorithms  . . . . . . . . . . . . .   3
    3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
      3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
-     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   6
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   5
    4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   6
    5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   6
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
    8.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
    Appendix A.  Example Capabilities JSON Object . . . . . . . . . .   7
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   8
@@ -103,109 +104,89 @@ Table of Contents
    allows the crypto module to advertise support for specific
    algorithms, notifying the ACVP server which algorithms need test
    vectors generated for the validation process.  This section describes
-   the constructs for advertising support of symmetric ciphers to the
+   the constructs for advertising support of symmetric algorithms to the
    ACVP server.
-
 
 
 
 Foley                   Expires December 19, 2016               [Page 2]
 
-Internet-Draft               Sym Cipher JSON                   June 2016
+Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   The following symmetric ciphers may be advertised by the ACVP crypto
-   module:
-
-   o  AES
-
-   o  DES
-
-   o  TBD...
-
-   The symmetric cipher capabilities are advertised as JSON objects
+   The symmetric algorithm capabilities are advertised as JSON objects
    within the 'algorithms' value of the ACVP registration message.  The
    'algorithms' value is an array, where each array element is an
    individual JSON object defined in this section.  The 'algorithms'
    value is part of the 'capability_exchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
-   registration message.  Each symmetric cipher capability advertised is
-   a self-contained JSON object.  The following JSON values are used for
-   symmetric cipher capabilities:
+   registration message.  Each symmetric algorithm capability advertised
+   is a self-contained JSON object.  The following JSON values are used
+   for symmetric algorithm capabilities:
 
-     These values are used within the capabilities advertisement JSON
-                                  object.
+   +-------------+-------------------+--------+-------------+----------+
+   | JSON Value  | Description       | JSON   | Valid       | Optional |
+   |             |                   | type   | Values      |          |
+   +-------------+-------------------+--------+-------------+----------+
+   | algorithm   | The symmetric     | value  | See Section | No       |
+   |             | algorithm and     |        | 2.1         |          |
+   |             | mode to be        |        |             |          |
+   |             | validated.        |        |             |          |
+   | direction   | The crypto        | array  | encrypt,    | No       |
+   |             | operation         |        | decrypt     |          |
+   |             | direction         |        |             |          |
+   | ptlen       | The supported     | array  | 0-1024      | No       |
+   |             | plaintext lengths |        |             |          |
+   |             | in bits           |        |             |          |
+   | ivlen       | The supported IV  | array  | 0-128       | No       |
+   |             | lengths in bits   |        |             |          |
+   | ivgen       | IV generation     | value  | internal,   | Yes      |
+   |             | method for AEAD   |        | external    |          |
+   |             | algorithms        |        |             |          |
+   | ivgenmode   | IV generation     | value  | 8.2.1       | Yes      |
+   |             | mode for AEAD     |        |             |          |
+   |             | algorithms        |        |             |          |
+   | aadlen      | The supported AAD | array  | 0-264       | Yes      |
+   |             | lengths in bits   |        |             |          |
+   |             | for AEAD          |        |             |          |
+   |             | algorithms        |        |             |          |
+   | taglen      | The supported Tag | array  | 0-264       | Yes      |
+   |             | lengths in bits   |        |             |          |
+   |             | for AEAD          |        |             |          |
+   |             | algorithms        |        |             |          |
+   +-------------+-------------------+--------+-------------+----------+
 
+           Table 1: Symmetric Algorithm Capabilities JSON Values
 
+2.1.  Supported Symmetric Algorithms
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   The following symmetric algorithms may be advertised by the ACVP
+   compliant crypto module:
 
 
 
 Foley                   Expires December 19, 2016               [Page 3]
 
-Internet-Draft               Sym Cipher JSON                   June 2016
+Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +-----------+-----------------+--------+-----------------+----------+
-   | JSON      | Description     | JSON   | Valid Values    | Optional |
-   | Value     |                 | type   |                 |          |
-   +-----------+-----------------+--------+-----------------+----------+
-   | algorithm | The symmetric   | value  | AES-EBC, AES-   | No       |
-   |           | cipher and mode |        | CBC, AES-CTR,   |          |
-   |           | to be           |        | AES-GCM, AES-   |          |
-   |           | validated.      |        | CCM, AES-WRAP,  |          |
-   |           |                 |        | DES-EBC, DES-   |          |
-   |           |                 |        | DBC             |          |
-   | direction | The crypto      | array  | encrypt,        | No       |
-   |           | operation       |        | decrypt         |          |
-   |           | direction       |        |                 |          |
-   | ptlen     | The supported   | array  | 0-1024          | No       |
-   |           | plaintext       |        |                 |          |
-   |           | lengths in bits |        |                 |          |
-   | ivlen     | The supported   | array  | 0-128           | No       |
-   |           | IV lengths in   |        |                 |          |
-   |           | bits            |        |                 |          |
-   | ivgen     | IV generation   | value  | internal,       | Yes      |
-   |           | method for AEAD |        | external        |          |
-   |           | ciphers         |        |                 |          |
-   | ivgenmode | IV generation   | value  | 8.2.1           | Yes      |
-   |           | mode for AEAD   |        |                 |          |
-   |           | ciphers         |        |                 |          |
-   | aadlen    | The supported   | array  | 0-264           | Yes      |
-   |           | AAD lengths in  |        |                 |          |
-   |           | bits for AEAD   |        |                 |          |
-   |           | ciphers         |        |                 |          |
-   | taglen    | The supported   | array  | 0-264           | Yes      |
-   |           | Tag lengths in  |        |                 |          |
-   |           | bits for AEAD   |        |                 |          |
-   |           | ciphers         |        |                 |          |
-   +-----------+-----------------+--------+-----------------+----------+
+   o  AES-EBC
 
-            Table 1: Symmetric Cipher Capabilities JSON Values
+   o  AES-CBC
+
+   o  AES-CTR
+
+   o  AES-GCM
+
+   o  AES-CCM
+
+   o  AES-WRAP
+
+   o  DES-EBC
+
+   o  DES-CTR
+
+   o  TBD
 
 3.  Test Vectors
 
@@ -218,35 +199,34 @@ Internet-Draft               Sym Cipher JSON                   June 2016
    describes the JSON schema for a test vector set used with symmetric
    crypto algorithms.
 
-
-
-
-Foley                   Expires December 19, 2016               [Page 4]
-
-Internet-Draft               Sym Cipher JSON                   June 2016
-
-
    The test vector set JSON schema is a multi-level hierarchy that
    contains meta data for the entire vector set as well as individual
    test vectors to be processed by the ACVP client.  The following table
    describes the JSON elements at the top level of the hierarchy.
 
-                  Top-level JSON elements in vector set.
+   +-----------------+---------------------------------------+---------+
+   | JSON Value      | Description                           | JSON    |
+   |                 |                                       | type    |
+   +-----------------+---------------------------------------+---------+
+   | acv_version     | Protocol version identifier           | value   |
+   | vs_id           | Unique numeric identifier for the     | value   |
+   |                 | vector set                            |         |
+   | algorithm       | The symmetric algorithm and mode used | value   |
+   |                 | for the test vectors.  See Section    |         |
+   |                 | 2.1 for possible values.              |         |
+   | direction       | The encryption direction: encrypt or  | value   |
+   |                 | decrypt                               |         |
+   | test_groups     | Array of test group JSON objects,     | array   |
+   |                 | which are defined in Section 3.1      |         |
 
-   +-----------------+-------------------------------------+-----------+
-   | JSON Value      | Description                         | JSON type |
-   +-----------------+-------------------------------------+-----------+
-   | acv_version     | Protocol version identifier         | value     |
-   | vs_id           | Unique numeric identifier for the   | value     |
-   |                 | vector set                          |           |
-   | algorithm       | The symmetric cipher and mode used  | value     |
-   |                 | for the test vectors                |           |
-   | direction       | The encryption direction: encrypt   | value     |
-   |                 | or decrypt                          |           |
-   | test_groups     | Array of JSON objects that          | array     |
-   |                 | represent each group of test        |           |
-   |                 | vectors                             |           |
-   +-----------------+-------------------------------------+-----------+
+
+
+Foley                   Expires December 19, 2016               [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +-----------------+---------------------------------------+---------+
 
                       Table 2: Vector Set JSON Object
 
@@ -261,42 +241,20 @@ Internet-Draft               Sym Cipher JSON                   June 2016
    following table describes the JSON elements of the Test Group JSON
    object.
 
-                         Test Group JSON elements
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Foley                   Expires December 19, 2016               [Page 5]
-
-Internet-Draft               Sym Cipher JSON                   June 2016
-
-
-   +------------+-----------------------------+-----------+------------+
-   | JSON Value | Description                 | JSON type | Optional   |
-   +------------+-----------------------------+-----------+------------+
-   | keylen     | Length of key in bits to    | value     | No         |
-   |            | use                         |           |            |
-   | ivlen      | Length of IV in bits to use | value     | No         |
-   | ptlen      | Length of plaintext in bits | value     | No         |
-   |            | to                          |           |            |
-   | aadlen     | Length of AAD in bits to    | value     | Yes        |
-   |            | use                         |           |            |
-   | taglen     | Length of AEAD tag in bits  | value     | Yes        |
-   |            | to use                      |           |            |
-   | tests      | Array of individual test    | array     | No         |
-   |            | vector JSON objects         |           |            |
-   +------------+-----------------------------+-----------+------------+
+   +----------+---------------------------------+---------+------------+
+   | JSON     | Description                     | JSON    | Optional   |
+   | Value    |                                 | type    |            |
+   +----------+---------------------------------+---------+------------+
+   | keylen   | Length of key in bits to use    | value   | No         |
+   | ivlen    | Length of IV in bits to use     | value   | No         |
+   | ptlen    | Length of plaintext in bits to  | value   | No         |
+   | aadlen   | Length of AAD in bits to use    | value   | Yes        |
+   | taglen   | Length of AEAD tag in bits to   | value   | Yes        |
+   |          | use                             |         |            |
+   | tests    | Array of individual test vector | array   | No         |
+   |          | JSON objects, which are defined |         |            |
+   |          | in Section 3.2                  |         |            |
+   +----------+---------------------------------+---------+------------+
 
                       Table 3: Test Group JSON Object
 
@@ -307,8 +265,6 @@ Internet-Draft               Sym Cipher JSON                   June 2016
    processed by the ACVP client.  The following table describes the JSON
    elements for each test vector.
 
-                          Test Case JSON elements
-
    +-----------+-----------------------------+-----------+-------------+
    | JSON      | Description                 | JSON type | Optional    |
    | Value     |                             |           |             |
@@ -317,8 +273,19 @@ Internet-Draft               Sym Cipher JSON                   June 2016
    |           | for the test case           |           |             |
    | key       | Encryption key to use       | value     | No          |
    | iv        | IV to use                   | value     | Yes         |
-   | pt        | Plaintext to use            | value     | No          |
+   | pt        | Plaintext to use            | value     | Yes         |
+
+
+
+Foley                   Expires December 19, 2016               [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   | ct        | Ciphertext to use           | value     | Yes         |
    | aad       | AAD to use for AEAD         | value     | Yes         |
+   |           | algorithms                  |           |             |
+   | tag       | Tag to use for AEAD         | value     | Yes         |
    |           | algorithms                  |           |             |
    +-----------+-----------------------------+-----------+-------------+
 
@@ -326,17 +293,27 @@ Internet-Draft               Sym Cipher JSON                   June 2016
 
 4.  Test Vector Responses
 
-   TBD
+   After the ACVP client downloads and processes a vector set, it must
+   send the resonse vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +----------------+---------------------------------------+----------+
+   | JSON Value     | Description                           | JSON     |
+   |                |                                       | type     |
+   +----------------+---------------------------------------+----------+
+   | acv_version    | Protocol version identifier           | value    |
+   | vs_id          | Unique numeric identifier for the     | value    |
+   |                | vector set                            |          |
+   | test_results   | Array of JSON objects that represent  | array    |
+   |                | each test vector result, which uses   |          |
+   |                | the same JSON schema as defined in    |          |
+   |                | Section 3.2                           |          |
+   +----------------+---------------------------------------+----------+
+
+                 Table 5: Vector Set Response JSON Object
 
 5.  Acknowledgements
-
-
-
-
-Foley                   Expires December 19, 2016               [Page 6]
-
-Internet-Draft               Sym Cipher JSON                   June 2016
-
 
    TBD...
 
@@ -347,6 +324,19 @@ Internet-Draft               Sym Cipher JSON                   June 2016
 7.  Security Considerations
 
    Security considerations are addressed by the ACVP specification.
+
+
+
+
+
+
+
+
+
+Foley                   Expires December 19, 2016               [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
 8.  Normative References
 
@@ -386,14 +376,6 @@ Appendix A.  Example Capabilities JSON Object
                    ],
                    "ptlen": [
                        0,
-
-
-
-Foley                   Expires December 19, 2016               [Page 7]
-
-Internet-Draft               Sym Cipher JSON                   June 2016
-
-
                        128,
                        136,
                        256,
@@ -404,6 +386,14 @@ Internet-Draft               Sym Cipher JSON                   June 2016
                        136,
                        256,
                        264
+
+
+
+Foley                   Expires December 19, 2016               [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
                    ]
                }
 
@@ -442,14 +432,6 @@ Appendix B.  Example Test Vectors JSON Object
                           "key": "FE965F164600CE5C5B9C2391892C6FC9",
                           "pt": "",
                           "aad": "B35A23FFD2F7BF0BA6762829B7B2D63D"
-
-
-
-Foley                   Expires December 19, 2016               [Page 8]
-
-Internet-Draft               Sym Cipher JSON                   June 2016
-
-
                         },
                         {
                           "tc_id": 2174,
@@ -460,6 +442,14 @@ Internet-Draft               Sym Cipher JSON                   June 2016
                       ]
                     },
                     {
+
+
+
+Foley                   Expires December 19, 2016               [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
                       "keylen": 128,
                       "ivlen": 96,
                       "ptlen": 0,
@@ -498,14 +488,6 @@ Internet-Draft               Sym Cipher JSON                   June 2016
                           "key": "F448466CA1CA62A9B47B60A26EFA5AAA",
                           "pt": "FAD8882B53C70384083F0EF69692C468",
                           "aad": "292C7C9C55C062C0D1661BE6E629C449"
-
-
-
-Foley                   Expires December 19, 2016               [Page 9]
-
-Internet-Draft               Sym Cipher JSON                   June 2016
-
-
                         },
                         {
                           "tc_id": 2203,
@@ -516,6 +498,14 @@ Internet-Draft               Sym Cipher JSON                   June 2016
                         {
                           "tc_id": 2204,
                           "key": "5FF01D9CF8D84F1CCC67C50928C8105B",
+
+
+
+Foley                   Expires December 19, 2016               [Page 9]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
                           "pt": "547CC5A970ABC938CF5703C7FD48A3BD",
                           "aad": "EABED39EE5B56F81CE5C858E507EAB13"
                         },
@@ -550,6 +540,16 @@ Author's Address
    USA
 
    Email: foleyj@cisco.com
+
+
+
+
+
+
+
+
+
+
 
 
 
