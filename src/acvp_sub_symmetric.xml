@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="US-ASCII"?>
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -105,28 +105,28 @@
 
   <middle>
     <section title="Introduction">
-      <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to autmatically
+      <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically
               verify the cryptographic implementation of a software or hardware crypto module.
               The ACVP specification defines how a crypto module communicates with an ACVP
               server, including crypto capabilities negotiation, session management, authentication,
-	      vector processing and more.  The ACVP specification does not define algorithm specific 
-	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications 
-	      define the constructs for testing individual crypto algorithms.  Each sub-specification 
-	      addresses a specific class of crypto algorithms.  This sub-specifcation defines the JSON
+	      vector processing and more.  The ACVP specification does not define algorithm specific
+	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications
+	      define the constructs for testing individual crypto algorithms.  Each sub-specification
+	      addresses a specific class of crypto algorithms.  This sub-specification defines the JSON
 	      constructs for testing symmetric crypto algorithms using ACVP.</t>
 
       <section title="Requirements Language">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
         "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-	document are to be interpreted in 
+	document are to be interpreted in
 	<xref target="RFC2119">RFC 2119</xref>.</t>
       </section>
     </section>
 
 <section anchor="caps_reg" title="Capabilities Registration">
-    <t>ACVP requires crypto modules to register their capablities.  This allows the crypto
+    <t>ACVP requires crypto modules to register their capabilities.  This allows the crypto
 	module to advertise support for specific algorithms, notifying the ACVP server which
-	algorithms need test vectors generated for the validation process.  This section 
+	algorithms need test vectors generated for the validation process.  This section
     describes the constructs for advertising support of symmetric ciphers to the ACVP server.</t>
     <t>The following symmetric ciphers may be advertised by the ACVP crypto module:</t>
     <t><list style="symbols">
@@ -135,23 +135,23 @@
 	    <t>TBD...</t>
     </list></t>
 
-    <t>The symmetric cipher capabilities are advertised as JSON objects within the 'algorithms' 
-	value of the ACVP registration message.  The 'algorithms' value is an array, where each 
-	array element is an individual JSON object defined in this section.  The 'algorithms' 
-	value is part of the 'capability_exchange' element of the ACVP JSON registration message.  
-	See the ACVP specification for details on the registration message.   
+    <t>The symmetric cipher capabilities are advertised as JSON objects within the 'algorithms'
+	value of the ACVP registration message.  The 'algorithms' value is an array, where each
+	array element is an individual JSON object defined in this section.  The 'algorithms'
+	value is part of the 'capability_exchange' element of the ACVP JSON registration message.
+	See the ACVP specification for details on the registration message.
 
-	Each symmetric cipher capablity advertised is a self-contained JSON object.  The following 
+	Each symmetric cipher capability advertised is a self-contained JSON object.  The following
 	JSON values are used for symmetric cipher capabilities:</t>
 
         <texttable anchor="caps_table" title="Symmetric Cipher Capabilities JSON Values">
           <preamble>These values are used within the capabilities advertisement JSON object.
           </preamble>
-          <ttcol align="center">JSON Value</ttcol>
-          <ttcol align="center">Description</ttcol>
-          <ttcol align="center">JSON type</ttcol>
-          <ttcol align="center">Valid Values</ttcol>
-          <ttcol align="center">Optional</ttcol>
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+          <ttcol align="left">Valid Values</ttcol>
+          <ttcol align="left">Optional</ttcol>
 
           <c>algorithm</c>
 	  <c>The symmetric cipher and mode to be validated.</c>
@@ -205,7 +205,125 @@
     </section>
 
     <section anchor="test_vectors" title="Test Vectors">
-	<t>TBD</t>
+	<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
+	    the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
+	    sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
+	    crypto algorithm, such as AES-EBC, AES-CBC, AES-CTR, AES-GCM, DES-CBC, DES-CTR, etc.  This section
+	describes the JSON schema for a test vector set used with symmetric crypto algorithms.</t>
+
+	<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
+	vector set as well as individual test vectors to be processed by the ACVP client.  The following table
+	describes the JSON elements at the top level of the hierarchy.
+	</t>
+	<texttable anchor="vs_top_table" title="Vector Set JSON Object">
+          <preamble>Top-level JSON elements in vector set.</preamble>
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+
+	  <c>acv_version</c>
+	  <c>Protocol version identifier</c>
+          <c>value</c>
+
+	  <c>vs_id</c>
+	  <c>Unique numeric identifier for the vector set</c>
+          <c>value</c>
+
+	  <c>algorithm</c>
+	  <c>The symmetric cipher and mode used for the test vectors</c>
+          <c>value</c>
+
+	  <c>direction</c>
+	  <c>The encryption direction: encrypt or decrypt</c>
+          <c>value</c>
+
+	  <c>test_groups</c>
+	  <c>Array of JSON objects that represent each group of test vectors</c>
+          <c>array</c>
+	</texttable>
+
+	<section title="Test Groups JSON Schema">
+	    <t>The test_groups element at the top level in the test vector JSON object is an array of test
+		groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
+	        in the vector set.  For instance, all test vectors that use the same key size would be grouped
+	        together.  The Test Group JSON object contains meta data that applies to all test vectors within
+	        the group.  The following table describes the JSON elements of the Test Group JSON object.</t>
+	    <texttable anchor="vs_tg_table" title="Test Group JSON Object">
+		<preamble>Test Group JSON elements</preamble>
+		<ttcol align="left">JSON Value</ttcol>
+		<ttcol align="left">Description</ttcol>
+		<ttcol align="left">JSON type</ttcol>
+		<ttcol align="left">Optional</ttcol>
+
+		<c>keylen</c>
+		<c>Length of key in bits to use</c>
+		<c>value</c>
+		<c>No</c>
+
+		<c>ivlen</c>
+		<c>Length of IV in bits to use</c>
+		<c>value</c>
+		<c>No</c>
+
+		<c>ptlen</c>
+		<c>Length of plaintext in bits to</c>
+		<c>value</c>
+		<c>No</c>
+
+		<c>aadlen</c>
+		<c>Length of AAD in bits to use</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>taglen</c>
+		<c>Length of AEAD tag in bits to use</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>tests</c>
+		<c>Array of individual test vector JSON objects</c>
+		<c>array</c>
+		<c>No</c>
+	    </texttable>
+	</section>
+
+	<section title="Test Vectors JSON Schema">
+	    <t>Each test group contains an array of one or more test vectors.  Each test vector is a JSON object
+		that represents a single test case to be processed by the ACVP client.  The following table describes
+	    the JSON elements for each test vector.</t>
+	    <texttable anchor="vs_tc_table" title="Test Case JSON Object">
+		<preamble>Test Case JSON elements</preamble>
+		<ttcol align="left">JSON Value</ttcol>
+		<ttcol align="left">Description</ttcol>
+		<ttcol align="left">JSON type</ttcol>
+		<ttcol align="left">Optional</ttcol>
+
+		<c>tc_id</c>
+		<c>Unique numeric identifier for the test case</c>
+		<c>value</c>
+		<c>No</c>
+
+		<c>key</c>
+		<c>Encryption key to use</c>
+		<c>value</c>
+		<c>No</c>
+
+		<c>iv</c>
+		<c>IV to use</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>pt</c>
+		<c>Plaintext to use</c>
+		<c>value</c>
+		<c>No</c>
+
+		<c>aad</c>
+		<c>AAD to use for AEAD algorithms</c>
+		<c>value</c>
+		<c>Yes</c>
+	    </texttable>
+	</section>
     </section>
 
     <section anchor="vector_responses" title="Test Vector Responses">
@@ -296,6 +414,117 @@
     </section>
     <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
       <t>The following is a example JSON object for test vectors sent from the ACVP server to the crypto module.</t>
+      <figure>
+        <artwork><![CDATA[
+                {
+                  "acv_version": "0.2",
+                  "vs_id": 1564,
+                  "algorithm": "AES-GCM",
+                  "direction": "encrypt",
+                  "test_groups": [
+                    {
+                      "keylen": 128,
+                      "ivlen": 96,
+                      "ptlen": 0,
+                      "aadlen": 128,
+                      "taglen": 128,
+                      "tests": [
+                        {
+                          "tc_id": 2171,
+                          "key": "1529BAC6229586F057FAA59353851686",
+                          "pt": "",
+                          "aad": "4B11160620475D8EE440C3795CF62D26"
+                        },
+                        {
+                          "tc_id": 2172,
+                          "key": "FAD522CCB38D35E1C99553E365EEFDFB",
+                          "pt": "",
+                          "aad": "956BFE7469A028EEED645866042B942D"
+                        },
+                        {
+                          "tc_id": 2173,
+                          "key": "FE965F164600CE5C5B9C2391892C6FC9",
+                          "pt": "",
+                          "aad": "B35A23FFD2F7BF0BA6762829B7B2D63D"
+                        },
+                        {
+                          "tc_id": 2174,
+                          "key": "8A4DB9F30362EF235947B888B887CBDE",
+                          "pt": "",
+                          "aad": "94246F216E1C0DABEA5EEA02038956CF"
+                        }
+                      ]
+                    },
+                    {
+                      "keylen": 128,
+                      "ivlen": 96,
+                      "ptlen": 0,
+                      "aadlen": 136,
+                      "taglen": 128,
+                      "tests": [
+                        {
+                          "tc_id": 2186,
+                          "key": "5E296F244BB0A92BF0FF5F2C50FA7443",
+                          "pt": "",
+                          "aad": "B414F4DA8203C31815FF117B0553DBF618"
+                        },
+                        {
+                          "tc_id": 2187,
+                          "key": "DAE8E9A248931962FDB03F4C3B227801",
+                          "pt": "",
+                          "aad": "FFDBB1801C99C87C6782CAA36E4F0BDDD0"
+                        }
+                      ]
+                    },
+                    {
+                      "keylen": 128,
+                      "ivlen": 96,
+                      "ptlen": 128,
+                      "aadlen": 128,
+                      "taglen": 128,
+                      "tests": [
+                        {
+                          "tc_id": 2201,
+                          "key": "3581AC6E264E869DD56E1DEA2E09244E",
+                          "pt": "38FFABB895A04BA5AA33B63ECD3238B8",
+                          "aad": "446D19353144014B04271BCBB125B617"
+                        },
+                        {
+                          "tc_id": 2202,
+                          "key": "F448466CA1CA62A9B47B60A26EFA5AAA",
+                          "pt": "FAD8882B53C70384083F0EF69692C468",
+                          "aad": "292C7C9C55C062C0D1661BE6E629C449"
+                        },
+                        {
+                          "tc_id": 2203,
+                          "key": "27B3C4CAFD6222FEE08403BC222DCBFD",
+                          "pt": "2F75708AD2F1ADE3786885DEDDFC9B78",
+                          "aad": "2AB6426DCFEB6909DF99D19063CCF88D"
+                        },
+                        {
+                          "tc_id": 2204,
+                          "key": "5FF01D9CF8D84F1CCC67C50928C8105B",
+                          "pt": "547CC5A970ABC938CF5703C7FD48A3BD",
+                          "aad": "EABED39EE5B56F81CE5C858E507EAB13"
+                        },
+                        {
+                          "tc_id": 2205,
+                          "key": "CE1D8C9E3AB2F46B01E3F110B3BC6E05",
+                          "pt": "3DD9EEFA5C6E89C43D460907E8946B9C",
+                          "aad": "DBE62172F439956FF21A67A379324100"
+                        },
+                        {
+                          "tc_id": 2206,
+                          "key": "962574476C8D12E6487C6CDDA952E8C8",
+                          "pt": "DFF4D0CFF9D8628FA51EB8E533A68C32",
+                          "aad": "AEF2547382355E157E15DBECB64A8C77"
+                        }
+                      ]
+                    }
+                  ]
+                }
+            ]]></artwork>
+    </figure>
     </section>
     <section anchor="app-results-ex" title="Example Test Results JSON Object">
       <t>The following is a example JSON object for test results sent from the crypto module to the ACVP server.</t>

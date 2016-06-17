@@ -1,0 +1,560 @@
+
+
+
+
+TBD                                                        J. Foley, Ed.
+Internet-Draft                                       Cisco Systems, Inc.
+Intended status: Informational                             June 17, 2016
+Expires: December 19, 2016
+
+
+                ACVP Symmetric Cipher JSON Specification
+                       draft-ietf-acvp-subsym-00
+
+Abstract
+
+   This document defines the JSON schema for using symmetric ciphers
+   with the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on December 19, 2016.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Foley                   Expires December 19, 2016               [Page 1]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   6
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   6
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   6
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Example Capabilities JSON Object . . . . . . . . . .   7
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   8
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing symmetric
+   crypto algorithms using ACVP.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
+
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of symmetric ciphers to the
+   ACVP server.
+
+
+
+
+Foley                   Expires December 19, 2016               [Page 2]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+   The following symmetric ciphers may be advertised by the ACVP crypto
+   module:
+
+   o  AES
+
+   o  DES
+
+   o  TBD...
+
+   The symmetric cipher capabilities are advertised as JSON objects
+   within the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each symmetric cipher capability advertised is
+   a self-contained JSON object.  The following JSON values are used for
+   symmetric cipher capabilities:
+
+     These values are used within the capabilities advertisement JSON
+                                  object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Foley                   Expires December 19, 2016               [Page 3]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+   +-----------+-----------------+--------+-----------------+----------+
+   | JSON      | Description     | JSON   | Valid Values    | Optional |
+   | Value     |                 | type   |                 |          |
+   +-----------+-----------------+--------+-----------------+----------+
+   | algorithm | The symmetric   | value  | AES-EBC, AES-   | No       |
+   |           | cipher and mode |        | CBC, AES-CTR,   |          |
+   |           | to be           |        | AES-GCM, AES-   |          |
+   |           | validated.      |        | CCM, AES-WRAP,  |          |
+   |           |                 |        | DES-EBC, DES-   |          |
+   |           |                 |        | DBC             |          |
+   | direction | The crypto      | array  | encrypt,        | No       |
+   |           | operation       |        | decrypt         |          |
+   |           | direction       |        |                 |          |
+   | ptlen     | The supported   | array  | 0-1024          | No       |
+   |           | plaintext       |        |                 |          |
+   |           | lengths in bits |        |                 |          |
+   | ivlen     | The supported   | array  | 0-128           | No       |
+   |           | IV lengths in   |        |                 |          |
+   |           | bits            |        |                 |          |
+   | ivgen     | IV generation   | value  | internal,       | Yes      |
+   |           | method for AEAD |        | external        |          |
+   |           | ciphers         |        |                 |          |
+   | ivgenmode | IV generation   | value  | 8.2.1           | Yes      |
+   |           | mode for AEAD   |        |                 |          |
+   |           | ciphers         |        |                 |          |
+   | aadlen    | The supported   | array  | 0-264           | Yes      |
+   |           | AAD lengths in  |        |                 |          |
+   |           | bits for AEAD   |        |                 |          |
+   |           | ciphers         |        |                 |          |
+   | taglen    | The supported   | array  | 0-264           | Yes      |
+   |           | Tag lengths in  |        |                 |          |
+   |           | bits for AEAD   |        |                 |          |
+   |           | ciphers         |        |                 |          |
+   +-----------+-----------------+--------+-----------------+----------+
+
+            Table 1: Symmetric Cipher Capabilities JSON Values
+
+3.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual crypto algorithm, such as AES-
+   EBC, AES-CBC, AES-CTR, AES-GCM, DES-CBC, DES-CTR, etc.  This section
+   describes the JSON schema for a test vector set used with symmetric
+   crypto algorithms.
+
+
+
+
+Foley                   Expires December 19, 2016               [Page 4]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+                  Top-level JSON elements in vector set.
+
+   +-----------------+-------------------------------------+-----------+
+   | JSON Value      | Description                         | JSON type |
+   +-----------------+-------------------------------------+-----------+
+   | acv_version     | Protocol version identifier         | value     |
+   | vs_id           | Unique numeric identifier for the   | value     |
+   |                 | vector set                          |           |
+   | algorithm       | The symmetric cipher and mode used  | value     |
+   |                 | for the test vectors                |           |
+   | direction       | The encryption direction: encrypt   | value     |
+   |                 | or decrypt                          |           |
+   | test_groups     | Array of JSON objects that          | array     |
+   |                 | represent each group of test        |           |
+   |                 | vectors                             |           |
+   +-----------------+-------------------------------------+-----------+
+
+                      Table 2: Vector Set JSON Object
+
+3.1.  Test Groups JSON Schema
+
+   The test_groups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the JSON elements of the Test Group JSON
+   object.
+
+                         Test Group JSON elements
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Foley                   Expires December 19, 2016               [Page 5]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+   +------------+-----------------------------+-----------+------------+
+   | JSON Value | Description                 | JSON type | Optional   |
+   +------------+-----------------------------+-----------+------------+
+   | keylen     | Length of key in bits to    | value     | No         |
+   |            | use                         |           |            |
+   | ivlen      | Length of IV in bits to use | value     | No         |
+   | ptlen      | Length of plaintext in bits | value     | No         |
+   |            | to                          |           |            |
+   | aadlen     | Length of AAD in bits to    | value     | Yes        |
+   |            | use                         |           |            |
+   | taglen     | Length of AEAD tag in bits  | value     | Yes        |
+   |            | to use                      |           |            |
+   | tests      | Array of individual test    | array     | No         |
+   |            | vector JSON objects         |           |            |
+   +------------+-----------------------------+-----------+------------+
+
+                      Table 3: Test Group JSON Object
+
+3.2.  Test Vectors JSON Schema
+
+   Each test group contains an array of one or more test vectors.  Each
+   test vector is a JSON object that represents a single test case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each test vector.
+
+                          Test Case JSON elements
+
+   +-----------+-----------------------------+-----------+-------------+
+   | JSON      | Description                 | JSON type | Optional    |
+   | Value     |                             |           |             |
+   +-----------+-----------------------------+-----------+-------------+
+   | tc_id     | Unique numeric identifier   | value     | No          |
+   |           | for the test case           |           |             |
+   | key       | Encryption key to use       | value     | No          |
+   | iv        | IV to use                   | value     | Yes         |
+   | pt        | Plaintext to use            | value     | No          |
+   | aad       | AAD to use for AEAD         | value     | Yes         |
+   |           | algorithms                  |           |             |
+   +-----------+-----------------------------+-----------+-------------+
+
+                      Table 4: Test Case JSON Object
+
+4.  Test Vector Responses
+
+   TBD
+
+5.  Acknowledgements
+
+
+
+
+Foley                   Expires December 19, 2016               [Page 6]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+   TBD...
+
+6.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+7.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+8.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+Appendix A.  Example Capabilities JSON Object
+
+   The following is a example JSON object advertising support for AES-
+   GCM.
+
+
+
+               {
+                   "algorithm": "AES-GCM",
+                   "direction": [
+                       "encrypt",
+                       "decrypt"
+                   ],
+                   "ivgen": "internal",
+                   "ivgenmode": "8.2.1",
+                   "keylen": [
+                       128,
+                       192,
+                       256
+                   ],
+                   "taglen": [
+                       96,
+                       128
+                   ],
+                   "ivlen": [
+                       96
+                   ],
+                   "ptlen": [
+                       0,
+
+
+
+Foley                   Expires December 19, 2016               [Page 7]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+                       128,
+                       136,
+                       256,
+                       264
+                   ],
+                   "aadlen": [
+                       128,
+                       136,
+                       256,
+                       264
+                   ]
+               }
+
+Appendix B.  Example Test Vectors JSON Object
+
+   The following is a example JSON object for test vectors sent from the
+   ACVP server to the crypto module.
+
+                {
+                  "acv_version": "0.2",
+                  "vs_id": 1564,
+                  "algorithm": "AES-GCM",
+                  "direction": "encrypt",
+                  "test_groups": [
+                    {
+                      "keylen": 128,
+                      "ivlen": 96,
+                      "ptlen": 0,
+                      "aadlen": 128,
+                      "taglen": 128,
+                      "tests": [
+                        {
+                          "tc_id": 2171,
+                          "key": "1529BAC6229586F057FAA59353851686",
+                          "pt": "",
+                          "aad": "4B11160620475D8EE440C3795CF62D26"
+                        },
+                        {
+                          "tc_id": 2172,
+                          "key": "FAD522CCB38D35E1C99553E365EEFDFB",
+                          "pt": "",
+                          "aad": "956BFE7469A028EEED645866042B942D"
+                        },
+                        {
+                          "tc_id": 2173,
+                          "key": "FE965F164600CE5C5B9C2391892C6FC9",
+                          "pt": "",
+                          "aad": "B35A23FFD2F7BF0BA6762829B7B2D63D"
+
+
+
+Foley                   Expires December 19, 2016               [Page 8]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+                        },
+                        {
+                          "tc_id": 2174,
+                          "key": "8A4DB9F30362EF235947B888B887CBDE",
+                          "pt": "",
+                          "aad": "94246F216E1C0DABEA5EEA02038956CF"
+                        }
+                      ]
+                    },
+                    {
+                      "keylen": 128,
+                      "ivlen": 96,
+                      "ptlen": 0,
+                      "aadlen": 136,
+                      "taglen": 128,
+                      "tests": [
+                        {
+                          "tc_id": 2186,
+                          "key": "5E296F244BB0A92BF0FF5F2C50FA7443",
+                          "pt": "",
+                          "aad": "B414F4DA8203C31815FF117B0553DBF618"
+                        },
+                        {
+                          "tc_id": 2187,
+                          "key": "DAE8E9A248931962FDB03F4C3B227801",
+                          "pt": "",
+                          "aad": "FFDBB1801C99C87C6782CAA36E4F0BDDD0"
+                        }
+                      ]
+                    },
+                    {
+                      "keylen": 128,
+                      "ivlen": 96,
+                      "ptlen": 128,
+                      "aadlen": 128,
+                      "taglen": 128,
+                      "tests": [
+                        {
+                          "tc_id": 2201,
+                          "key": "3581AC6E264E869DD56E1DEA2E09244E",
+                          "pt": "38FFABB895A04BA5AA33B63ECD3238B8",
+                          "aad": "446D19353144014B04271BCBB125B617"
+                        },
+                        {
+                          "tc_id": 2202,
+                          "key": "F448466CA1CA62A9B47B60A26EFA5AAA",
+                          "pt": "FAD8882B53C70384083F0EF69692C468",
+                          "aad": "292C7C9C55C062C0D1661BE6E629C449"
+
+
+
+Foley                   Expires December 19, 2016               [Page 9]
+
+Internet-Draft               Sym Cipher JSON                   June 2016
+
+
+                        },
+                        {
+                          "tc_id": 2203,
+                          "key": "27B3C4CAFD6222FEE08403BC222DCBFD",
+                          "pt": "2F75708AD2F1ADE3786885DEDDFC9B78",
+                          "aad": "2AB6426DCFEB6909DF99D19063CCF88D"
+                        },
+                        {
+                          "tc_id": 2204,
+                          "key": "5FF01D9CF8D84F1CCC67C50928C8105B",
+                          "pt": "547CC5A970ABC938CF5703C7FD48A3BD",
+                          "aad": "EABED39EE5B56F81CE5C858E507EAB13"
+                        },
+                        {
+                          "tc_id": 2205,
+                          "key": "CE1D8C9E3AB2F46B01E3F110B3BC6E05",
+                          "pt": "3DD9EEFA5C6E89C43D460907E8946B9C",
+                          "aad": "DBE62172F439956FF21A67A379324100"
+                        },
+                        {
+                          "tc_id": 2206,
+                          "key": "962574476C8D12E6487C6CDDA952E8C8",
+                          "pt": "DFF4D0CFF9D8628FA51EB8E533A68C32",
+                          "aad": "AEF2547382355E157E15DBECB64A8C77"
+                        }
+                      ]
+                    }
+                  ]
+                }
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for test results sent from the
+   crypto module to the ACVP server.
+
+Author's Address
+
+   John Foley (editor)
+   Cisco Systems, Inc.
+   170 West Tasman Dr.
+   San Jose, CA  95134
+   USA
+
+   Email: foleyj@cisco.com
+
+
+
+
+
+
+
+Foley                   Expires December 19, 2016              [Page 10]
