@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs), 
+    please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+    (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space 
+    (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-ietf-acvp-protocol-00" ipr="trust200902">
+ <!-- category values: std, bcp, info, exp, and historic
+    ipr values: trust200902, noModificationTrust200902, noDerivativesTrust200902,
+       or pre5378Trust200902
+    you can add the attributes updates="NNNN" and obsoletes="NNNN" 
+    they will automatically be output with "(if approved)" -->
+
+ <!-- ***** FRONT MATTER ***** -->
+
+ <front>
+   <!-- The abbreviated title is used in the page header - it is only necessary if the 
+        full title is longer than 39 characters -->
+
+   <title abbrev="Abbreviated Title">Automated Cryptographic Validation Protocol
+   </title>
+
+   <!-- add 'role="editor"' below for the editors if appropriate -->
+
+   <!-- Another author who claims to be an editor -->
+
+   <author fullname="Barry Fussell" initials="B.F." role="editor"
+           surname="Fussell">
+     <organization>Cisco Systems</organization>
+
+  <address>
+        <postal>
+          <street>170 West Tasman Dr.</street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95134</code>
+
+          <country>USA</country>
+        </postal>
+
+        <email>bfussell@cisco.com</email>
+
+       <!-- uri and facsimile elements may also be added -->
+     </address>
+   </author>
+
+   <date year="2016" />
+
+   <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
+        in the current day for you. If only the current year is specified, xml2rfc will fill 
+	 in the current day and month for you. If the year is not the current one, it is 
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to 
+	 specify just the year. -->
+
+   <!-- Meta-data Declarations -->
+
+   <area>General</area>
+
+   <workgroup>Internet Engineering Task Force</workgroup>
+
+   <!-- WG name at the upperleft corner of the doc,
+        IETF is fine for individual submissions.  
+	 If this element is not present, the default is "Network Working Group",
+        which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+   <keyword>template</keyword>
+
+   <!-- Keywords will be incorporated into HTML output
+        files in a meta tag but they have no effect on text or nroff
+        output. If you submit your draft to the RFC Editor, the
+        keywords will be used for the search engine. -->
+
+   <abstract>
+     <t>This document defines the Automated Cryptographic Validation Protocol(ACVP).</t>
+   </abstract>
+ </front>
+
+ <middle>
+   <section title="Introduction">
+     <t>ACVP enables communication between a cryptographic module that is embedded inside of a device or otherwise running on a platform accessible via computer network, and an external testing system, using standard network communication interfaces and protocols.  This communication protocol can also be used to validate the correctness of the implementations of the algorithms in the cryptographic module with a validation authority.
+This document describes how ACVP is structured with respect to the client-server model, the messaging protocol, optional features and flows.</t>
+
+     <section title="Requirements Language">
+       <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+       "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+       document are to be interpreted as described in <xref
+       target="RFC2119">RFC 2119</xref>.</t>
+     </section>
+   </section>
+
+   <section anchor="caps_reg" title="Overview">
+	    <t>ACVP has the following goals:</t>
+	    <t><list style="symbols">
+<t>	To work in situations where the testing system is remote from the cryptographic module, e.g. running as a process on a separate device.</t>
+<t>	To enable automated testing that can take place with a minimum of human interaction.</t>
+<t>	To enable the testing system to discover the capabilities of the module being tested; that is, the particular algorithms and parameters that the module supports.</t>
+<t>	To provide extensibility that can be used to introduce tests for new algorithms, and new tests for existing algorithms.</t>
+<t>	To be compatible with emerging automated validation systems wherever possible, especially the FIPS-140 Cryptographic Algorithm Validation Program.</t>
+<t>	To provide a standard communication method so that vendors can utilize the same testing service for FIPS-140, 3rd party crypto verification and product FCS readiness testing.</t>
+	   </list></t>
+
+<t>ACVP defines how to communicate a request (to execute a cryptographic operation) to a cryptographic module, and how to communicate the corresponding response (containing the output of that operation) back to a testing system.  It defines a transport (based on HTTP or HTTPS), an encoding and message format (which is negotiated), and a set of message exchanges.  Each vector test set corresponds to a single message exchange driven from the client associated with the module under test.
+ACVP does not define the cryptographic algorithms, nor does it detail the precise conditions for a response to be acceptable.  Instead, it references existing specifications for those algorithms, and defines a mapping between the data on the wire and the algorithm testing specification.
+ACVP does not define detailed conformance criteria, such as those in FIPS-140.  Instead, it aims to be independent of particular conformance criteria, so that it can be used in multiple domains with different (even potentially conflicting) conformance criteria.
+ACVP does not define an interface that can be used to manage or control a cryptographic module.</t>
+        <section title="Audience">
+	<t>This document is written to address multiple audiences:</t>
+	    <t><list style="symbols">
+<t>	Crypto module developers who require validation testing</t>
+<t>	Crypto validation organizations who will perform validation testing</t>
+<t>	Crypto module customers that desire validation testing results or verifiable artifacts of testing</t>
+	   </list></t>
+	 </section>
+
+        <section title="Goals">
+	<t>The goals for this document are to provide a messaging protocol that can be used with existing authentication and communication protocols to provide a way to test crypto modules.
+The following functions are outside the scope of this document:</t>
+	    <t><list style="symbols">
+<t>	How the KATs are generated</t>
+<t>	How the results/artifacts are stored or managed</t>
+<t>	Authentication used</t>
+<t>	Scalability</t>
+<t>	Management interface</t>
+	   </list></t>
+	 </section>
+
+        <section title="Terminology">
+	<t> TBD </t>
+	</section>
+   </section>
+
+
+   <section title="Architecture">
+     <figure align="center" anchor="xml_figure1">
+       <preamble>Server/Client Architecture</preamble>
+
+       <artwork align="left"><![CDATA[
+
+                           +----------------------------------------+
+                           |                    +-----------------+ |
++----------+               | Entropy ---------->| DRBG----Encrypt | |
+| ACV      |               |                    |         Auth    | |
+| Server   |<=============>| +--------+         |                 | |
++----------+               | | ACV    |<------->| PKI-----Key Est | |
+                           | | Client |         |         Sign    | |
+                           | +--------+         |                 | |
+                           |                    | Crypto Module   | |
+                           |                    +-----------------+ |
+                           |                                        |
+                           |        Device Under Test (DUT)         |
+                           +----------------------------------------+
+
+
+           ]]></artwork>
+
+       <postamble> <xref
+       target="min_ref" />.</postamble>
+     </figure>
+
+         <section title="Server/Client Architecture">
+         <t>A server client model is used where the roles are defined as:</t>
+	    <t><list style="symbols">
+<t>	ACV Client - resides in, or accessible from, the device under test and communicates with the ACV server using Java Script Object Notation (JSON) as well as the crypto module using product specific methods.</t>
+<t>	ACV Server - Sends JSON formatted messaging and KATs to the ACV client and processes KAT responses.</t>
+<t>	ACV Proxy - Resides between the ACV server and ACV client to proxy the connection for the client.  This is particularly useful when the client does not support TLS, key management or have signature capabilities and they are required by the server.  An example architecture is provided in Figure 2.</t>
+	   </list></t> 
+	   </section>
+
+     <section title="Server/Proxy Architecture">
+     <figure align="center" anchor="xml_figure2">
+       <preamble>Server/Proxy Architecture</preamble>
+
+       <artwork align="left"><![CDATA[
+
+
+                           
+                                          +-------------------------+
++----------+          +----------+        |                         |
+| ACV      |          | ACV      |        |                         |
+| Server   |<========>| Proxy    |<======>| +--------+   +--------+ |
++----------+          +----------+        | | ACV    |<->| Crypto | |
+                                          | | Client |   | Module | |
+                                          | +--------+   +--------+ |
+                                          |                         |
+                                          |      DUT                |
+                                          +-------------------------+
+
+           ]]></artwork>
+
+       <postamble> <xref
+       target="min_ref" />.</postamble>
+     </figure>
+     </section>
+    </section>
+
+        <section title="ACV Protocol">
+	   <t>The ACV protocol will utilize existing mechanisms for transport coordinated with JSON formatted messaging.</t>
+    <figure align="center" anchor="xml_figure3">
+       <preamble>Protocol Layering</preamble>
+
+       <artwork align="left"><![CDATA[
++-----------------------------------------------+
+| JSON Formatted ACVP request/response messages |
++-----------------------------------------------+
+| HTTP[S] message transfer and signaling        |
++-----------------------------------------------+
+| TLS for transport security(optional)          |
++-----------------------------------------------+
+| TCP for transport                             |
+|_______________________________________________|
+
+           ]]></artwork>
+
+       <postamble> <xref
+       target="min_ref" />.</postamble>
+     </figure>
+     </section>
+
+       <section title="Security">
+           <t>It is recommended that HTTPS is used in order to enforce a secure communication method.  Not all environments will have TLS so HTTP with some level of authentication may be the only option.</t>
+       </section>
+
+       <section title="Authentication">
+           <t>It is recommended that an authentication scheme be used.  Depending on the target environment that can be as weak as basic HTTP authentication or as strong as TLS mutual certificate authentication. Definition of an authentication scheme will not be discussed here, but should be agreed upon between the client and server owning entities including the servers owned by the validation authorities. 
+For the purposes of the message flow examples, no authentication will be used.</t>
+       </section>
+
+	<section title="Traceability">
+	    <t> TBD</t>
+       </section>
+
+	<section title="Encoding">
+	    <t>The encoding used for the request/response messaging will be JSON. The data will be identified by:
+Content-type: application/json
+In order to allow environment specific extensions to a particular version of the ACV protocol, a top-level JSON keyword, ?extensions? will be used to extend the OE description and/or the capabilities.  Extensions may be ignored by the ACV server.
+Vector and vector response data will be JSON encoded.</t>
+       </section>
+
+	<section title="Versioning">
+	    <t>The version of the ACVP protocol will be carried with each message and will contain a simple major.minor format.  Major version changes will not be backward compatible, however additions and enhancements that do not disrupt compatibility will be indicated with a minor version change.
+A server may accept a down-level version from the client if it can process at a lower level.  If not, it will reject the session.  All subsequent messages will carry the negotiated version value.</t>
+       </section>
+
+     <section title="Messaging">
+
+	<section title="Product Registration/Capabilities Exchange">
+	  <t>The product registration message will include many of the normal cryptographic algorithm identification line items that are found when filling out a testing form. This pre-test message will carry the Company name, primary contact (OE information) as well as a detailed list of the supported cryptographic algorithms to be tested during a session.  The server will return the vector test list to the client.  It will consist of a list of vector set IDs (vs_id) each of which represent a set of test vectors which can be used to request the test vectors at a later time.</t>
+
+       </section>
+
+       <section title="KAT Exchange">
+         <t>The KAT exchange consists of the ACV client requesting a particular set of vectors selected from the vector test list.  The server responds with the test vectors.  Once the client has run the vectors the response data will be returned to the server for processing.  The client will repeat this process until all of the tests in the session test list have been processed.  The client may request results from the server at any time, however if test sets have not been completed the overall status will be incomplete.</t>
+       </section>
+     </section>
+
+     <section title="Message Formats">
+
+    <figure align="center" anchor="xml_figure4">
+       <preamble>URI Hierarchy</preamble>
+
+       <artwork align="left"><![CDATA[
+
+        +-------------------------------------------+
+             server        service path       
+        +---------------------------------+---+---+----+
+  www://my-acpserver.com:123/validation/acvp/vectors?vs_id=1
+  +-+   +---------------++-++----------++--------------+ 
+ scheme      server      port  service     vector file 1
+
+           ]]></artwork>
+
+       <postamble> <xref
+       target="min_ref" />.</postamble>
+     </figure>
+
+
+       <t>Servers may require a contextual path in the URI prior to the service section and clients/proxies must be able to support it.</t>
+<t>Additional URI paths include:</t>
+             <t><list style="symbols">
+
+<t> /validation/acvp/register</t>
+<t> /validation/acvp/results</t>
+<t> /validation/acvp/cancel</t>
+<t> /validation/acvp/vectors</t>
+	   </list></t> 
+
+<t>Unique variable definitions to identify the vector set, device and session include:</t>
+	    <t><list style="symbols">
+<t>	Session - represented by a JSON Web Token(JWT).  Within the JWT, the JWT ID(JTI) will be a unique identifier that will be generated by the server and can be used as a session ID.</t>
+<t>	Vector Set - represented by the VS-ID which represents a specific CAVS vector request file, e.g. gcmEncryptIntIV128.req. Passed to the client as part of the capabilities exchange.</t>
+	   </list></t> 
+<t>JWT example:
+{
+"alg" : "none"
+}
+{
+      "iss" : "nist.org",
+"exp" : 1426420800,
+"company" : "MyCompany",
+"jti" : 0987654321
+}
+{
+Empty octet string (since alg is none).
+}</t>
+    
+<t>The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values.  Key agreement would follow RFC7518.
+</t>
+
+
+     <section title="Establish Connection HTTPS GET/200 OK">
+     <t>Establish the connection, send POST and receive 200 OK response with JWT from server.</t>
+
+<t>POST /validation/acvp/register HTTP1.1</t>
+<t>User Agent: acvp-client/0.2</t>
+<t>Host: www.my-acvpserver.com</t>
+<t>Capabilities information(see next section)</t>
+
+<t>..authentication happens here..</t>
+
+<t>HTTP 1.1 200 OK</t>
+<t>Status: 200 OK</t>
+<t>Content-Type: application/json</t>
+<t>Content-Length: (length of JWT)</t>
+<t>{access_token : eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB,
+}</t>
+
+<t>Once the session is established the client must include the JWT with each message.</t>
+<t>GET /validation/acvp/ vectors?vs_id=1  HTTP1.1</t>
+<t>User Agent: acvp-client/0.2</t>
+<t>Host: www.my-acvpserver.com</t>
+<t>Authorization: Bearer JWT</t>
+
+<t>The authentication mechanism will be defined by the server.</t>
+ 
+
+
+     </section>
+
+     <section title="Product Registration with Capabilities">
+     <t>POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions.</t>
+
+
+
+
+
+     </section>
+
+    </section>
+
+
+
+
+
+
+   <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+
+   <?rfc needLines="8" ?>
+
+   <section title="Error Codes">
+   <t>Errors will follow HTTP[S] numbering scheme.  In addition errors as well as 200 messages may carry JSON encoded information that describes in detail the error and any associated troubleshooting information.  A non-exhaustive list of JSON encoded error messages are in Appendix 2.</t>
+   </section>
+
+   <section title="Other Considerations">
+   <t>When an ACVP client is attached to a cryptographic module that is in use, access to ACVP MUST be controlled so that only an administrator or other authorized user can send and receive ACVP messages.  This is because an attacker that has access to ACVP can potentially use it to probe for weaknesses in the cryptographic module.</t>
+   </section>
+
+   <section anchor="Acknowledgements" title="Acknowledgements">
+     <t>Original ACVP created by David Mcgrew, Bill Hudson and 
+        Anthony Grieco of Cisco Systems.</t>
+   </section>
+
+   <!-- Possibly a 'Contributors' section ... -->
+
+   <section anchor="IANA" title="IANA Considerations">
+     <t>This memo includes no request to IANA.</t>
+   </section>
+
+ </middle>
+
+ <!--  *****BACK MATTER ***** -->
+
+ <back>
+   <!-- References split into informative and normative -->
+
+   <!-- There are 2 ways to insert reference entries from the citation libraries:
+    1. define an ENTITY at the top, and use "ampersand character"RFC2629; here (as shown)
+    2. simply use a PI "less than character"?rfc include="reference.RFC.2119.xml"?> here
+       (for I-Ds: include="reference.I-D.narten-iana-considerations-rfc2434bis.xml")
+
+    Both are cited textually in the same manner: by using xref elements.
+    If you use the PI option, xml2rfc will, by default, try to find included files in the same
+    directory as the including file. You can also define the XML_LIBRARY environment variable
+    with a value containing a set of directories to search.  These can be either in the local
+    filing system or remote ones accessed by http (http://domain/dir/... ).-->
+
+   <references title="Normative References">
+     <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+     &RFC2119;
+
+     <reference anchor="min_ref">
+       <!-- the following is the minimum to make xml2rfc happy -->
+
+       <front>
+         <title>Minimal Reference</title>
+
+         <author initials="authInitials" surname="authSurName">
+           <organization></organization>
+         </author>
+
+         <date year="2006" />
+       </front>
+     </reference>
+   </references>
+
+
+   <!-- Change Log
+
+v00 2006-03-15  EBD   Initial version
+
+v01 2006-04-03  EBD   Moved PI location back to position 1 -
+                     v3.1 of XMLmind is better with them at this location.
+v02 2007-03-07  AH    removed extraneous nested_list attribute,
+                     other minor corrections
+v03 2007-03-09  EBD   Added comments on null IANA sections and fixed heading capitalization.
+                     Modified comments around figure to reflect non-implementation of
+                     figure indent control.  Put in reference using anchor="DOMINATION".
+                     Fixed up the date specification comments to reflect current truth.
+v04 2007-03-09 AH     Major changes: shortened discussion of PIs,
+                     added discussion of rfc include.
+v05 2007-03-10 EBD    Added preamble to C program example to tell about ABNF and alternative 
+                     images. Removed meta-characters from comments (causes problems).
+
+v06 2010-04-01 TT     Changed ipr attribute values to latest ones. Changed date to
+                     year only, to be consistent with the comments. Updated the 
+                     IANA guidelines reference from the I-D to the finished RFC.  -->
+ </back>
+</rfc>
