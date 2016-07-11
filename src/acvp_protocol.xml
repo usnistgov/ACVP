@@ -182,8 +182,6 @@ The following functions are outside the scope of this document:</t>
 
            ]]></artwork>
 
-       <postamble> <xref
-       target="min_ref" />.</postamble>
      </figure>
 
          <section title="Server/Client Architecture">
@@ -192,6 +190,7 @@ The following functions are outside the scope of this document:</t>
 <t>	ACV Client - resides in, or accessible from, the device under test and communicates with the ACV server using Java Script Object Notation (JSON) as well as the crypto module using product specific methods.</t>
 <t>	ACV Server - Sends JSON formatted messaging and KATs to the ACV client and processes KAT responses.</t>
 <t>	ACV Proxy - Resides between the ACV server and ACV client to proxy the connection for the client.  This is particularly useful when the client does not support TLS, key management or have signature capabilities and they are required by the server.  An example architecture is provided in Figure 2.</t>
+<t> Device Under Test - contains the ACV client and the crypto module under test which can include various algorithms and functions that encrypt/decrypt, generate keys, signatures, perform varifications and DRBG functions.</t>
 	   </list></t> 
 	   </section>
 
@@ -202,22 +201,22 @@ The following functions are outside the scope of this document:</t>
        <artwork align="left"><![CDATA[
 
 
-                           
-                                          +-------------------------+
-+----------+          +----------+        |                         |
-| ACV      |          | ACV      |        |                         |
-| Server   |<========>| Proxy    |<======>| +--------+   +--------+ |
-+----------+          +----------+        | | ACV    |<->| Crypto | |
-                                          | | Client |   | Module | |
-                                          | +--------+   +--------+ |
-                                          |                         |
-                                          |      DUT                |
-                                          +-------------------------+
+                +-----------------------------------------------------+                           
+                |                         +-------------------------+ |
++----------+    |     +----------+        |                         | |
+| ACV      |    |     | ACV      |        |                         | |
+| Server   |<========>| Proxy    |<======>| +--------+   +--------+ | |
++----------+    |     +----------+        | | ACV    |<->| Crypto | | |
+                |                         | | Client |   | Module | | |
+                |                         | +--------+   +--------+ | |
+                |                         |                         | |
+                |                         |      DUT                | |
+                |                         +-------------------------+ |
+                | Vendor/Customer Premise                             |
+                +-----------------------------------------------------+
 
            ]]></artwork>
 
-       <postamble> <xref
-       target="min_ref" />.</postamble>
      </figure>
      </section>
     </section>
@@ -240,8 +239,6 @@ The following functions are outside the scope of this document:</t>
 
            ]]></artwork>
 
-       <postamble> <xref
-       target="min_ref" />.</postamble>
      </figure>
      </section>
 
@@ -261,7 +258,7 @@ For the purposes of the message flow examples, no authentication will be used.</
 	<section title="Encoding">
 	    <t>The encoding used for the request/response messaging will be JSON. The data will be identified by:
 Content-type: application/json
-In order to allow environment specific extensions to a particular version of the ACV protocol, a top-level JSON keyword, ?extensions? will be used to extend the OE description and/or the capabilities.  Extensions may be ignored by the ACV server.
+In order to allow environment specific extensions to a particular version of the ACV protocol, a top-level JSON keyword, extensions will be used to extend the OE description and/or the capabilities.  Extensions may be ignored by the ACV server.
 Vector and vector response data will be JSON encoded.</t>
        </section>
 
@@ -291,15 +288,13 @@ A server may accept a down-level version from the client if it can process at a 
 
         +-------------------------------------------+
              server        service path       
-        +---------------------------------+---+---+----+
+        +---------------+------------------------------+
   www://my-acpserver.com:123/validation/acvp/vectors?vs_id=1
   +-+   +---------------++-++----------++--------------+ 
  scheme      server      port  service     vector file 1
 
            ]]></artwork>
 
-       <postamble> <xref
-       target="min_ref" />.</postamble>
      </figure>
 
 
@@ -318,46 +313,58 @@ A server may accept a down-level version from the client if it can process at a 
 <t>	Session - represented by a JSON Web Token(JWT).  Within the JWT, the JWT ID(JTI) will be a unique identifier that will be generated by the server and can be used as a session ID.</t>
 <t>	Vector Set - represented by the VS-ID which represents a specific CAVS vector request file, e.g. gcmEncryptIntIV128.req. Passed to the client as part of the capabilities exchange.</t>
 	   </list></t> 
-<t>JWT example:
+<t>JWT example:</t>
+     <figure align="center" anchor="xml_json1">
+       <artwork align="left"><![CDATA[
 {
 "alg" : "none"
 }
-{
+   {
       "iss" : "nist.org",
-"exp" : 1426420800,
-"company" : "MyCompany",
-"jti" : 0987654321
-}
-{
-Empty octet string (since alg is none).
-}</t>
+      "exp" : 1426420800,
+      "company" : "MyCompany",
+      "jti" : 0987654321
+   }
+   {
+   Empty octet string (since alg is none).
+   }
+           ]]></artwork>
+     </figure>
     
 <t>The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values.  Key agreement would follow RFC7518.
 </t>
 
 
      <section title="Establish Connection HTTPS GET/200 OK">
-     <t>Establish the connection, send POST and receive 200 OK response with JWT from server.</t>
+<t>Establish the connection, send POST and receive 200 OK response with JWT from server.</t>
 
-<t>POST /validation/acvp/register HTTP1.1</t>
-<t>User Agent: acvp-client/0.2</t>
-<t>Host: www.my-acvpserver.com</t>
-<t>Capabilities information(see next section)</t>
+     <figure align="center" anchor="xml_json2">
+       <artwork align="left"><![CDATA[
+POST /validation/acvp/register HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Capabilities information(see next section)
 
-<t>..authentication happens here..</t>
+..authentication happens here..
 
-<t>HTTP 1.1 200 OK</t>
-<t>Status: 200 OK</t>
-<t>Content-Type: application/json</t>
-<t>Content-Length: (length of JWT)</t>
-<t>{access_token : eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB,
-}</t>
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: (length of JWT)
+{
+access_token : 
+eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB,
+}
 
-<t>Once the session is established the client must include the JWT with each message.</t>
-<t>GET /validation/acvp/ vectors?vs_id=1  HTTP1.1</t>
-<t>User Agent: acvp-client/0.2</t>
-<t>Host: www.my-acvpserver.com</t>
-<t>Authorization: Bearer JWT</t>
+Once the session is established the client must include the JWT with 
+each message.
+
+GET /validation/acvp/ vectors?vs_id=1  HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Authorization: Bearer JWT
+           ]]></artwork>
+     </figure>
 
 <t>The authentication mechanism will be defined by the server.</t>
  
@@ -365,19 +372,189 @@ Empty octet string (since alg is none).
 
      </section>
 
+
      <section title="Product Registration with Capabilities">
      <t>POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions.</t>
 
+     <figure align="center" anchor="xml_json3">
+       <artwork align="left"><![CDATA[
+
+POST /validation/acvp/register HTTP1.1
+User Agent:
+Host: www.my-acvpserver.com
+Accept: 
+{
+"operation" : "register",
+"acv_version" : "0.2",
+"oe_information" : {
+"vendor_name" : "Cisco",
+"vendor_url" : "www.cisco.com",
+"contact" : "John Doe",
+"contact_email" : "johndoe@cisco.com",
+"module_name" : "Cisco ACV Test Module 1.0",
+"module_type" : "Software",
+"operational_environment" : {
+"module_version" : "1.0",
+"processor" : "Intel Woodcrest",
+"operating_system" : "Linux 3.1
+     },
+     "implementation_description" : 
+          "Sample crypto module for demonstrating ACV protocol."
+     },
+"capability_exchange" : {
+"algorithms" : [
+         {
+"algorithm" : "AES-GCM",
+"mode" : "both",
+"iv_gen" : "internal",
+"iv_gen_mode" : "8.2.1",
+"key_lens" : [
+            128,
+            256
+             ],
+"tag_lens" : [
+            96
+               ],
+"iv_lens" : [
+            96
+               ],
+"pt_lens" : [
+            0,
+            128,
+            136
+               ],
+"aad_lens" : [
+            128,
+            136
+               ]
+          }
+       ]
+   }
+}
+           ]]></artwork>
+     </figure>
+
+<t>Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.  A full JSON representation of the algorithm sheet information will be added as an appendix.</t>
+
+     <figure align="center" anchor="xml_json4">
+       <artwork align="left"><![CDATA[
+200 OK Response:
+{ 
+"version" : "0.2", 
+"capability_response" : { "vector_sets" : [
+                        {"vs_id":1437},
+                        {"vs_id":1438}] } , 
+"test_session" :        {"test_id":458} , 
+"access_token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ" 
+}
+           ]]></artwork>
+     </figure>
 
 
+	</section>
 
+     <section title="Registration/Capabilities Exchange response">
+     <t>POST response is 200 OK with json data.</t>
+
+     <figure align="center" anchor="xml_json5">
+       <artwork align="left"><![CDATA[
+{
+"version" : "0.2",
+"capability_response" : {          
+       "vector_sets" :[{"vs_id" :930}],
+       "test_session" :{"test_id" :183}, 
+"access_token" :eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxMjMwMTIwLCJjb21wYW55IjogIkNpc2NvIiwianRpIjoxODN9.h1tQALiupn_Jx4UWPPTjFNeY9Wu7DI8bWkbh8Xt0GCr3DYf2J_FzoGwlPnUBuPR63kIN0HmKPrlv6r8Ykb1JeA
+    }
+}
+
+           ]]></artwork>
+     </figure>
+     <t>Specific JSON formatted vectors and their responses are documented in
+        the protocol sub-douments.  These include coverage for symmetric,
+        asymmetric, digests, KDFs, etc.</t>
+
+     <t>Vector sets can expire.  For example, in terms of a validation authority use, the vector sets are one-time use only.  Old vector sets can never be reused to obtain a new validation certificate for an algorithm implementation or to update an existing certificate. Expiration is a server specific definition which depends on database costs, need for artifacts, etc. If the vector set has expired the server will reply:</t>
+
+     <figure align="center" anchor="xml_json6">
+       <artwork align="left"><![CDATA[
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+"version" : "0.2",
+"vector" : <vs-id>,
+"status" : "expired"
+}
+           ]]></artwork>
+     </figure>
 
      </section>
 
+     <section title="Test Results Request">
+
+     <figure align="center" anchor="xml_json7">
+       <artwork align="left"><![CDATA[
+GET /validation/acvp/results HTTP1.1
+User Agent:
+Host: www.my-acvpserver.com
+Accept: /
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+"version" : "0.2",
+"results" : {
+"disposition" : "incomplete",
+12340 : "passed", 
+12341 : "passed",      
+12342 : "passed",
+12343 : "incomplete",
+12344 : "passed"
+   }
+} 
+           ]]></artwork>
+     </figure>
+
+<t>The results request is an optional flow since some clients may not require success/fail information. Another possibility is to provide an out of band management session on the server may provide access to algorithm test results.</t>
+<t>Since the results may take a significant amount of time to process, the server may reply:</t>
+     <figure align="center" anchor="xml_json8">
+       <artwork align="left"><![CDATA[
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+version : 0.2,
+retry : 10
+}
+           ]]></artwork>
+     </figure>
+
+<t>Where the retry valid represents the number of seconds for the client to wait before retrying.</t>
+<t>Disposition is defined as:</t>
+	    <t><list style="symbols">
+<t>FAIL indicates that at least on test has failed.</t>
+<t>INCOMPLETE indicates not all tests have run, however none have failed thus far.</t>
+<t>PASSED indicates all tests have been run and have passed.</t>
+
+	   </list></t> 
+      </section>
+
+     <section title="Optional Flows">
+<t>The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</t>
+     <figure align="center" anchor="xml_json9">
+       <artwork align="left"><![CDATA[
+POST /validation/acvp/cancel HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Authorization: Bearer JWT
+           ]]></artwork>
+     </figure>
+<t>The server response will always be 200 OK.</t>
+      </section>
     </section>
-
-
-
 
 
 
@@ -394,7 +571,7 @@ Empty octet string (since alg is none).
    </section>
 
    <section anchor="Acknowledgements" title="Acknowledgements">
-     <t>Original ACVP created by David Mcgrew, Bill Hudson and 
+     <t>Original ACVP created by David McGrew, Bill Hudson and 
         Anthony Grieco of Cisco Systems.</t>
    </section>
 
@@ -426,19 +603,6 @@ Empty octet string (since alg is none).
      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
      &RFC2119;
 
-     <reference anchor="min_ref">
-       <!-- the following is the minimum to make xml2rfc happy -->
-
-       <front>
-         <title>Minimal Reference</title>
-
-         <author initials="authInitials" surname="authSurName">
-           <organization></organization>
-         </author>
-
-         <date year="2006" />
-       </front>
-     </reference>
    </references>
 
 
