@@ -1,0 +1,616 @@
+
+
+
+
+Internet Engineering Task Force                          B. Fussell, Ed.
+Internet-Draft                                             Cisco Systems
+Intended status: Informational                              July 7, 2016
+Expires: January 8, 2017
+
+
+              Automated Cryptographic Validation Protocol
+                      draft-ietf-acvp-protocol-00
+
+Abstract
+
+   This document defines the Automated Cryptographic Validation
+   Protocol(ACVP).
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on January 8, 2017.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Fussell                  Expires January 8, 2017                [Page 1]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     2.1.  Audience  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     2.2.  Goals . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     2.3.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
+   3.  Architecture  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Server/Client Architecture  . . . . . . . . . . . . . . .   5
+     3.2.  Server/Proxy Architecture . . . . . . . . . . . . . . . .   5
+   4.  ACV Protocol  . . . . . . . . . . . . . . . . . . . . . . . .   6
+   5.  Security  . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+   6.  Authentication  . . . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Traceability  . . . . . . . . . . . . . . . . . . . . . . . .   7
+   8.  Encoding  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+   9.  Versioning  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+   10. Messaging . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     10.1.  Product Registration/Capabilities Exchange . . . . . . .   7
+     10.2.  KAT Exchange . . . . . . . . . . . . . . . . . . . . . .   8
+   11. Message Formats . . . . . . . . . . . . . . . . . . . . . . .   8
+     11.1.  Establish Connection HTTPS GET/200 OK  . . . . . . . . .   9
+     11.2.  Product Registration with Capabilities . . . . . . . . .  10
+   12. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  10
+   13. Other Considerations  . . . . . . . . . . . . . . . . . . . .  10
+   14. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  10
+   15. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   16. Normative References  . . . . . . . . . . . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
+
+1.  Introduction
+
+   ACVP enables communication between a cryptographic module that is
+   embedded inside of a device or otherwise running on a platform
+   accessible via computer network, and an external testing system,
+   using standard network communication interfaces and protocols.  This
+   communication protocol can also be used to validate the correctness
+   of the implementations of the algorithms in the cryptographic module
+   with a validation authority.  This document describes how ACVP is
+   structured with respect to the client-server model, the messaging
+   protocol, optional features and flows.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119 [RFC2119].
+
+
+
+
+Fussell                  Expires January 8, 2017                [Page 2]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+2.  Overview
+
+   ACVP has the following goals:
+
+   o  To work in situations where the testing system is remote from the
+      cryptographic module, e.g. running as a process on a separate
+      device.
+
+   o  To enable automated testing that can take place with a minimum of
+      human interaction.
+
+   o  To enable the testing system to discover the capabilities of the
+      module being tested; that is, the particular algorithms and
+      parameters that the module supports.
+
+   o  To provide extensibility that can be used to introduce tests for
+      new algorithms, and new tests for existing algorithms.
+
+   o  To be compatible with emerging automated validation systems
+      wherever possible, especially the FIPS-140 Cryptographic Algorithm
+      Validation Program.
+
+   o  To provide a standard communication method so that vendors can
+      utilize the same testing service for FIPS-140, 3rd party crypto
+      verification and product FCS readiness testing.
+
+   ACVP defines how to communicate a request (to execute a cryptographic
+   operation) to a cryptographic module, and how to communicate the
+   corresponding response (containing the output of that operation) back
+   to a testing system.  It defines a transport (based on HTTP or
+   HTTPS), an encoding and message format (which is negotiated), and a
+   set of message exchanges.  Each vector test set corresponds to a
+   single message exchange driven from the client associated with the
+   module under test.  ACVP does not define the cryptographic
+   algorithms, nor does it detail the precise conditions for a response
+   to be acceptable.  Instead, it references existing specifications for
+   those algorithms, and defines a mapping between the data on the wire
+   and the algorithm testing specification.  ACVP does not define
+   detailed conformance criteria, such as those in FIPS-140.  Instead,
+   it aims to be independent of particular conformance criteria, so that
+   it can be used in multiple domains with different (even potentially
+   conflicting) conformance criteria.  ACVP does not define an interface
+   that can be used to manage or control a cryptographic module.
+
+
+
+
+
+
+
+
+Fussell                  Expires January 8, 2017                [Page 3]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+2.1.  Audience
+
+   This document is written to address multiple audiences:
+
+   o  Crypto module developers who require validation testing
+
+   o  Crypto validation organizations who will perform validation
+      testing
+
+   o  Crypto module customers that desire validation testing results or
+      verifiable artifacts of testing
+
+2.2.  Goals
+
+   The goals for this document are to provide a messaging protocol that
+   can be used with existing authentication and communication protocols
+   to provide a way to test crypto modules.  The following functions are
+   outside the scope of this document:
+
+   o  How the KATs are generated
+
+   o  How the results/artifacts are stored or managed
+
+   o  Authentication used
+
+   o  Scalability
+
+   o  Management interface
+
+2.3.  Terminology
+
+   TBD
+
+3.  Architecture
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                  Expires January 8, 2017                [Page 4]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+                        Server/Client Architecture
+
+
+                              +----------------------------------------+
+                              |                    +-----------------+ |
+   +----------+               | Entropy ---------->| DRBG----Encrypt | |
+   | ACV      |               |                    |         Auth    | |
+   | Server   |<=============>| +--------+         |                 | |
+   +----------+               | | ACV    |<------->| PKI-----Key Est | |
+                              | | Client |         |         Sign    | |
+                              | +--------+         |                 | |
+                              |                    | Crypto Module   | |
+                              |                    +-----------------+ |
+                              |                                        |
+                              |        Device Under Test (DUT)         |
+                              +----------------------------------------+
+
+
+
+                                [min_ref].
+
+                                 Figure 1
+
+3.1.  Server/Client Architecture
+
+   A server client model is used where the roles are defined as:
+
+   o  ACV Client - resides in, or accessible from, the device under test
+      and communicates with the ACV server using Java Script Object
+      Notation (JSON) as well as the crypto module using product
+      specific methods.
+
+   o  ACV Server - Sends JSON formatted messaging and KATs to the ACV
+      client and processes KAT responses.
+
+   o  ACV Proxy - Resides between the ACV server and ACV client to proxy
+      the connection for the client.  This is particularly useful when
+      the client does not support TLS, key management or have signature
+      capabilities and they are required by the server.  An example
+      architecture is provided in Figure 2.
+
+3.2.  Server/Proxy Architecture
+
+
+
+
+
+
+
+
+
+Fussell                  Expires January 8, 2017                [Page 5]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+                         Server/Proxy Architecture
+
+
+
+
+                                             +-------------------------+
+   +----------+          +----------+        |                         |
+   | ACV      |          | ACV      |        |                         |
+   | Server   |<========>| Proxy    |<======>| +--------+   +--------+ |
+   +----------+          +----------+        | | ACV    |<->| Crypto | |
+                                             | | Client |   | Module | |
+                                             | +--------+   +--------+ |
+                                             |                         |
+                                             |      DUT                |
+                                             +-------------------------+
+
+
+                                [min_ref].
+
+                                 Figure 2
+
+4.  ACV Protocol
+
+   The ACV protocol will utilize existing mechanisms for transport
+   coordinated with JSON formatted messaging.
+
+                             Protocol Layering
+
+   +-----------------------------------------------+
+   | JSON Formatted ACVP request/response messages |
+   +-----------------------------------------------+
+   | HTTP[S] message transfer and signaling        |
+   +-----------------------------------------------+
+   | TLS for transport security(optional)          |
+   +-----------------------------------------------+
+   | TCP for transport                             |
+   |_______________________________________________|
+
+
+                                [min_ref].
+
+                                 Figure 3
+
+5.  Security
+
+   It is recommended that HTTPS is used in order to enforce a secure
+   communication method.  Not all environments will have TLS so HTTP
+   with some level of authentication may be the only option.
+
+
+
+Fussell                  Expires January 8, 2017                [Page 6]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+6.  Authentication
+
+   It is recommended that an authentication scheme be used.  Depending
+   on the target environment that can be as weak as basic HTTP
+   authentication or as strong as TLS mutual certificate authentication.
+   Definition of an authentication scheme will not be discussed here,
+   but should be agreed upon between the client and server owning
+   entities including the servers owned by the validation authorities.
+   For the purposes of the message flow examples, no authentication will
+   be used.
+
+7.  Traceability
+
+   TBD
+
+8.  Encoding
+
+   The encoding used for the request/response messaging will be JSON.
+   The data will be identified by: Content-type: application/json In
+   order to allow environment specific extensions to a particular
+   version of the ACV protocol, a top-level JSON keyword, ?extensions?
+   will be used to extend the OE description and/or the capabilities.
+   Extensions may be ignored by the ACV server.  Vector and vector
+   response data will be JSON encoded.
+
+9.  Versioning
+
+   The version of the ACVP protocol will be carried with each message
+   and will contain a simple major.minor format.  Major version changes
+   will not be backward compatible, however additions and enhancements
+   that do not disrupt compatibility will be indicated with a minor
+   version change.  A server may accept a down-level version from the
+   client if it can process at a lower level.  If not, it will reject
+   the session.  All subsequent messages will carry the negotiated
+   version value.
+
+10.  Messaging
+
+10.1.  Product Registration/Capabilities Exchange
+
+   The product registration message will include many of the normal
+   cryptographic algorithm identification line items that are found when
+   filling out a testing form.  This pre-test message will carry the
+   Company name, primary contact (OE information) as well as a detailed
+   list of the supported cryptographic algorithms to be tested during a
+   session.  The server will return the vector test list to the client.
+   It will consist of a list of vector set IDs (vs_id) each of which
+
+
+
+
+Fussell                  Expires January 8, 2017                [Page 7]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+   represent a set of test vectors which can be used to request the test
+   vectors at a later time.
+
+10.2.  KAT Exchange
+
+   The KAT exchange consists of the ACV client requesting a particular
+   set of vectors selected from the vector test list.  The server
+   responds with the test vectors.  Once the client has run the vectors
+   the response data will be returned to the server for processing.  The
+   client will repeat this process until all of the tests in the session
+   test list have been processed.  The client may request results from
+   the server at any time, however if test sets have not been completed
+   the overall status will be incomplete.
+
+11.  Message Formats
+
+                               URI Hierarchy
+
+
+           +-------------------------------------------+
+                server        service path
+           +---------------------------------+---+---+----+
+     www://my-acpserver.com:123/validation/acvp/vectors?vs_id=1
+     +-+   +---------------++-++----------++--------------+
+    scheme      server      port  service     vector file 1
+
+
+                                [min_ref].
+
+                                 Figure 4
+
+   Servers may require a contextual path in the URI prior to the service
+   section and clients/proxies must be able to support it.
+
+   Additional URI paths include:
+
+   o  /validation/acvp/register
+
+   o  /validation/acvp/results
+
+   o  /validation/acvp/cancel
+
+   o  /validation/acvp/vectors
+
+   Unique variable definitions to identify the vector set, device and
+   session include:
+
+
+
+
+
+Fussell                  Expires January 8, 2017                [Page 8]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+   o  Session - represented by a JSON Web Token(JWT).  Within the JWT,
+      the JWT ID(JTI) will be a unique identifier that will be generated
+      by the server and can be used as a session ID.
+
+   o  Vector Set - represented by the VS-ID which represents a specific
+      CAVS vector request file, e.g. gcmEncryptIntIV128.req.  Passed to
+      the client as part of the capabilities exchange.
+
+   JWT example: { "alg" : "none" } { "iss" : "nist.org", "exp" :
+   1426420800, "company" : "MyCompany", "jti" : 0987654321 } { Empty
+   octet string (since alg is none).  }
+
+   The JWT can be secured if desired using the header encryption "alg"
+   value defined to HS256(HMAC-SHA256) or one of the other secure
+   values.  Key agreement would follow RFC7518.
+
+11.1.  Establish Connection HTTPS GET/200 OK
+
+   Establish the connection, send POST and receive 200 OK response with
+   JWT from server.
+
+   POST /validation/acvp/register HTTP1.1
+
+   User Agent: acvp-client/0.2
+
+   Host: www.my-acvpserver.com
+
+   Capabilities information(see next section)
+
+   ..authentication happens here..
+
+   HTTP 1.1 200 OK
+
+   Status: 200 OK
+
+   Content-Type: application/json
+
+   Content-Length: (length of JWT)
+
+   {access_token : eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3
+   Zo8eaSNcxiNfvRh9dqKP4F1cB, }
+
+   Once the session is established the client must include the JWT with
+   each message.
+
+   GET /validation/acvp/ vectors?vs_id=1 HTTP1.1
+
+   User Agent: acvp-client/0.2
+
+
+
+Fussell                  Expires January 8, 2017                [Page 9]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+   Host: www.my-acvpserver.com
+
+   Authorization: Bearer JWT
+
+   The authentication mechanism will be defined by the server.
+
+11.2.  Product Registration with Capabilities
+
+   POST the registration to the server consisting of the ACVP version,
+   Operating Environment (OE), vector encoding, capabilities and any
+   extensions.
+
+12.  Error Codes
+
+   Errors will follow HTTP[S] numbering scheme.  In addition errors as
+   well as 200 messages may carry JSON encoded information that
+   describes in detail the error and any associated troubleshooting
+   information.  A non-exhaustive list of JSON encoded error messages
+   are in Appendix 2.
+
+13.  Other Considerations
+
+   When an ACVP client is attached to a cryptographic module that is in
+   use, access to ACVP MUST be controlled so that only an administrator
+   or other authorized user can send and receive ACVP messages.  This is
+   because an attacker that has access to ACVP can potentially use it to
+   probe for weaknesses in the cryptographic module.
+
+14.  Acknowledgements
+
+   Original ACVP created by David Mcgrew, Bill Hudson and Anthony Grieco
+   of Cisco Systems.
+
+15.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+16.  Normative References
+
+   [min_ref]  authSurName, authInitials., "Minimal Reference", 2006.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+Fussell                  Expires January 8, 2017               [Page 10]
+
+Internet-Draft              Abbreviated Title                  July 2016
+
+
+Author's Address
+
+   Barry Fussell (editor)
+   Cisco Systems
+   170 West Tasman Dr.
+   San Jose, CA  95134
+   USA
+
+   Email: bfussell@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                  Expires January 8, 2017               [Page 11]
