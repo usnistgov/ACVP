@@ -395,6 +395,9 @@
 <link href="#rfc.section.11" rel="Chapter" title="11 Message Formats"/>
 <link href="#rfc.section.11.1" rel="Chapter" title="11.1 Establish Connection HTTPS GET/200 OK"/>
 <link href="#rfc.section.11.2" rel="Chapter" title="11.2 Product Registration with Capabilities"/>
+<link href="#rfc.section.11.3" rel="Chapter" title="11.3 Registration/Capabilities Exchange response"/>
+<link href="#rfc.section.11.4" rel="Chapter" title="11.4 Test Results Request"/>
+<link href="#rfc.section.11.5" rel="Chapter" title="11.5 Optional Flows"/>
 <link href="#rfc.section.12" rel="Chapter" title="12 Error Codes"/>
 <link href="#rfc.section.13" rel="Chapter" title="13 Other Considerations"/>
 <link href="#rfc.section.14" rel="Chapter" title="14 Acknowledgements"/>
@@ -408,7 +411,7 @@
 
   <meta name="dct.creator" content="Fussell, B., Ed." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-acvp-protocol-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2016-7-7" />
+  <meta name="dct.issued" scheme="ISO8601" content="2016-7-22" />
   <meta name="dct.abstract" content="This document defines the Automated Cryptographic Validation Protocol(ACVP)." />
   <meta name="description" content="This document defines the Automated Cryptographic Validation Protocol(ACVP)." />
 
@@ -429,10 +432,10 @@
 </tr>
 <tr>
   <td class="left">Intended status: Informational</td>
-  <td class="right">July 7, 2016</td>
+  <td class="right">July 22, 2016</td>
 </tr>
 <tr>
-  <td class="left">Expires: January 8, 2017</td>
+  <td class="left">Expires: January 23, 2017</td>
   <td class="right"></td>
 </tr>
 
@@ -453,7 +456,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on January 8, 2017.</p>
+<p>This Internet-Draft will expire on January 23, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -486,6 +489,9 @@
 </ul><li>11.   <a href="#rfc.section.11">Message Formats</a></li>
 <ul><li>11.1.   <a href="#rfc.section.11.1">Establish Connection HTTPS GET/200 OK</a></li>
 <li>11.2.   <a href="#rfc.section.11.2">Product Registration with Capabilities</a></li>
+<li>11.3.   <a href="#rfc.section.11.3">Registration/Capabilities Exchange response</a></li>
+<li>11.4.   <a href="#rfc.section.11.4">Test Results Request</a></li>
+<li>11.5.   <a href="#rfc.section.11.5">Optional Flows</a></li>
 </ul><li>12.   <a href="#rfc.section.12">Error Codes</a></li>
 <li>13.   <a href="#rfc.section.13">Other Considerations</a></li>
 <li>14.   <a href="#rfc.section.14">Acknowledgements</a></li>
@@ -527,6 +533,7 @@
 <p/>
 
 <ul>
+  <li>The API to the cryptographic module</li>
   <li>How the KATs are generated</li>
   <li>How the results/artifacts are stored or managed</li>
   <li>Authentication used</li>
@@ -547,17 +554,17 @@
 | ACV      |               |                    |         Auth    | |
 | Server   |&lt;=============&gt;| +--------+         |                 | |
 +----------+               | | ACV    |&lt;-------&gt;| PKI-----Key Est | |
-                           | | Client |         |         Sign    | |
-                           | +--------+         |                 | |
-                           |                    | Crypto Module   | |
-                           |                    +-----------------+ |
+                           | | Client |    ^    |         Sign    | |
+                           | +--------+    |    |                 | |
+                           |            Crypto  | Crypto Module   | |
+                           |            Module  +-----------------+ |
+                           |              API                       |
                            |                                        |
                            |        Device Under Test (DUT)         |
                            +----------------------------------------+
 
 
            </pre>
-<p><a href="#min_ref">[min_ref]</a>.</p>
 <p class="figure">Figure 1</p>
 <h1 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a> Server/Client Architecture</h1>
 <p id="rfc.section.3.1.p.1">A server client model is used where the roles are defined as:</p>
@@ -567,6 +574,8 @@
   <li>ACV Client - resides in, or accessible from, the device under test and communicates with the ACV server using Java Script Object Notation (JSON) as well as the crypto module using product specific methods.</li>
   <li>ACV Server - Sends JSON formatted messaging and KATs to the ACV client and processes KAT responses.</li>
   <li>ACV Proxy - Resides between the ACV server and ACV client to proxy the connection for the client.  This is particularly useful when the client does not support TLS, key management or have signature capabilities and they are required by the server.  An example architecture is provided in Figure 2.</li>
+  <li>Device Under Test - contains the ACV client and the crypto module under test which can include various algorithms and functions that encrypt/decrypt, generate keys, signatures, perform varifications and DRBG functions.</li>
+  <li>Crpyographic Module API - This is the interface to the crypto module from the ACV Client.  This interface is environment specific and will vary depending on the API available on the crypto module.</li>
 </ul>
 <h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> Server/Proxy Architecture</h1>
 <div id="rfc.figure.2"/>
@@ -575,20 +584,21 @@
 <pre>
 
 
-                           
-                                          +-------------------------+
-+----------+          +----------+        |                         |
-| ACV      |          | ACV      |        |                         |
-| Server   |&lt;========&gt;| Proxy    |&lt;======&gt;| +--------+   +--------+ |
-+----------+          +----------+        | | ACV    |&lt;-&gt;| Crypto | |
-                                          | | Client |   | Module | |
-                                          | +--------+   +--------+ |
-                                          |                         |
-                                          |      DUT                |
-                                          +-------------------------+
+                +-----------------------------------------------------+                           
+                |                         +-------------------------+ |
++----------+    |     +----------+        |                         | |
+| ACV      |    |     | ACV      |        |                         | |
+| Server   |&lt;========&gt;| Proxy    |&lt;======&gt;| +--------+   +--------+ | |
++----------+    |     +----------+        | | ACV    |&lt;-&gt;| Crypto | | |
+                |                         | | Client |   | Module | | |
+                |                         | +--------+   +--------+ | |
+                |                         |                         | |
+                |                         |      DUT                | |
+                |                         +-------------------------+ |
+                | Vendor/Customer Premise                             |
+                +-----------------------------------------------------+
 
            </pre>
-<p><a href="#min_ref">[min_ref]</a>.</p>
 <p class="figure">Figure 2</p>
 <h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> ACV Protocol</h1>
 <p id="rfc.section.4.p.1">The ACV protocol will utilize existing mechanisms for transport coordinated with JSON formatted messaging.</p>
@@ -607,7 +617,6 @@
 |_______________________________________________|
 
            </pre>
-<p><a href="#min_ref">[min_ref]</a>.</p>
 <p class="figure">Figure 3</p>
 <h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> Security</h1>
 <p id="rfc.section.5.p.1">It is recommended that HTTPS is used in order to enforce a secure communication method.  Not all environments will have TLS so HTTP with some level of authentication may be the only option.</p>
@@ -616,7 +625,7 @@
 <h1 id="rfc.section.7"><a href="#rfc.section.7">7.</a> Traceability</h1>
 <p id="rfc.section.7.p.1">TBD</p>
 <h1 id="rfc.section.8"><a href="#rfc.section.8">8.</a> Encoding</h1>
-<p id="rfc.section.8.p.1">The encoding used for the request/response messaging will be JSON. The data will be identified by: Content-type: application/json In order to allow environment specific extensions to a particular version of the ACV protocol, a top-level JSON keyword, ?extensions? will be used to extend the OE description and/or the capabilities.  Extensions may be ignored by the ACV server.  Vector and vector response data will be JSON encoded.</p>
+<p id="rfc.section.8.p.1">The encoding used for the request/response messaging will be JSON. The data will be identified by: Content-type: application/json In order to allow environment specific extensions to a particular version of the ACV protocol, a top-level JSON keyword, extensions will be used to extend the OE description and/or the capabilities.  Extensions may be ignored by the ACV server.  Vector and vector response data will be JSON encoded.</p>
 <h1 id="rfc.section.9"><a href="#rfc.section.9">9.</a> Versioning</h1>
 <p id="rfc.section.9.p.1">The version of the ACVP protocol will be carried with each message and will contain a simple major.minor format.  Major version changes will not be backward compatible, however additions and enhancements that do not disrupt compatibility will be indicated with a minor version change.  A server may accept a down-level version from the client if it can process at a lower level.  If not, it will reject the session.  All subsequent messages will carry the negotiated version value.</p>
 <h1 id="rfc.section.10"><a href="#rfc.section.10">10.</a> Messaging</h1>
@@ -632,13 +641,12 @@
 
         +-------------------------------------------+
              server        service path       
-        +---------------------------------+---+---+----+
+        +---------------+------------------------------+
   www://my-acpserver.com:123/validation/acvp/vectors?vs_id=1
   +-+   +---------------++-++----------++--------------+ 
  scheme      server      port  service     vector file 1
 
            </pre>
-<p><a href="#min_ref">[min_ref]</a>.</p>
 <p class="figure">Figure 4</p>
 <p id="rfc.section.11.p.1">Servers may require a contextual path in the URI prior to the service section and clients/proxies must be able to support it.</p>
 <p id="rfc.section.11.p.2">Additional URI paths include:</p>
@@ -657,45 +665,235 @@
   <li>Session - represented by a JSON Web Token(JWT).  Within the JWT, the JWT ID(JTI) will be a unique identifier that will be generated by the server and can be used as a session ID.</li>
   <li>Vector Set - represented by the VS-ID which represents a specific CAVS vector request file, e.g. gcmEncryptIntIV128.req. Passed to the client as part of the capabilities exchange.</li>
 </ul>
-<p id="rfc.section.11.p.6">JWT example: { "alg" : "none" } { "iss" : "nist.org", "exp" : 1426420800, "company" : "MyCompany", "jti" : 0987654321 } { Empty octet string (since alg is none).  }</p>
+<p id="rfc.section.11.p.6">JWT example:</p>
+<div id="rfc.figure.5"/>
+<div id="xml_json1"/>
+<pre>
+{
+"alg" : "none"
+}
+   {
+      "iss" : "nist.org",
+      "exp" : 1426420800,
+      "company" : "MyCompany",
+      "jti" : 0987654321
+   }
+   {
+   Empty octet string (since alg is none).
+   }
+           </pre>
+<p class="figure">Figure 5</p>
 <p id="rfc.section.11.p.7">The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values.  Key agreement would follow RFC7518.  </p>
 <h1 id="rfc.section.11.1"><a href="#rfc.section.11.1">11.1.</a> Establish Connection HTTPS GET/200 OK</h1>
 <p id="rfc.section.11.1.p.1">Establish the connection, send POST and receive 200 OK response with JWT from server.</p>
-<p id="rfc.section.11.1.p.2">POST /validation/acvp/register HTTP1.1</p>
-<p id="rfc.section.11.1.p.3">User Agent: acvp-client/0.2</p>
-<p id="rfc.section.11.1.p.4">Host: www.my-acvpserver.com</p>
-<p id="rfc.section.11.1.p.5">Capabilities information(see next section)</p>
-<p id="rfc.section.11.1.p.6">..authentication happens here..</p>
-<p id="rfc.section.11.1.p.7">HTTP 1.1 200 OK</p>
-<p id="rfc.section.11.1.p.8">Status: 200 OK</p>
-<p id="rfc.section.11.1.p.9">Content-Type: application/json</p>
-<p id="rfc.section.11.1.p.10">Content-Length: (length of JWT)</p>
-<p id="rfc.section.11.1.p.11">{access_token : eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB, }</p>
-<p id="rfc.section.11.1.p.12">Once the session is established the client must include the JWT with each message.</p>
-<p id="rfc.section.11.1.p.13">GET /validation/acvp/ vectors?vs_id=1  HTTP1.1</p>
-<p id="rfc.section.11.1.p.14">User Agent: acvp-client/0.2</p>
-<p id="rfc.section.11.1.p.15">Host: www.my-acvpserver.com</p>
-<p id="rfc.section.11.1.p.16">Authorization: Bearer JWT</p>
-<p id="rfc.section.11.1.p.17">The authentication mechanism will be defined by the server.</p>
+<div id="rfc.figure.6"/>
+<div id="xml_json2"/>
+<pre>
+POST /validation/acvp/register HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Capabilities information(see next section)
+
+..authentication happens here..
+
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: (length of JWT)
+{
+access_token : 
+eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB,
+}
+
+Once the session is established the client must include the JWT with 
+each message.
+
+GET /validation/acvp/ vectors?vs_id=1  HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Authorization: Bearer JWT
+           </pre>
+<p class="figure">Figure 6</p>
+<p id="rfc.section.11.1.p.2">The authentication mechanism will be defined by the server.</p>
 <h1 id="rfc.section.11.2"><a href="#rfc.section.11.2">11.2.</a> Product Registration with Capabilities</h1>
 <p id="rfc.section.11.2.p.1">POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions.</p>
+<div id="rfc.figure.7"/>
+<div id="xml_json3"/>
+<pre>
+
+POST /validation/acvp/register HTTP1.1
+User Agent:
+Host: www.my-acvpserver.com
+Accept: 
+{
+"operation" : "register",
+"acv_version" : "0.2",
+"oe_information" : {
+"vendor_name" : "Cisco",
+"vendor_url" : "www.cisco.com",
+"contact" : "John Doe",
+"contact_email" : "johndoe@cisco.com",
+"module_name" : "Cisco ACV Test Module 1.0",
+"module_type" : "Software",
+"operational_environment" : {
+"module_version" : "1.0",
+"processor" : "Intel Woodcrest",
+"operating_system" : "Linux 3.1
+     },
+     "implementation_description" : 
+          "Sample crypto module for demonstrating ACV protocol."
+     },
+"capability_exchange" : {
+"algorithms" : [
+         {
+"algorithm" : "AES-GCM",
+"mode" : "both",
+"iv_gen" : "internal",
+"iv_gen_mode" : "8.2.1",
+"key_lens" : [
+            128,
+            256
+             ],
+"tag_lens" : [
+            96
+               ],
+"iv_lens" : [
+            96
+               ],
+"pt_lens" : [
+            0,
+            128,
+            136
+               ],
+"aad_lens" : [
+            128,
+            136
+               ]
+          }
+       ]
+   }
+}
+           </pre>
+<p class="figure">Figure 7</p>
+<p id="rfc.section.11.2.p.2">Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.  A full JSON representation of the algorithm sheet information will be added as an appendix.</p>
+<div id="rfc.figure.8"/>
+<div id="xml_json4"/>
+<pre>
+200 OK Response:
+{ 
+"version" : "0.2", 
+"capability_response" : { "vector_sets" : [
+                        {"vs_id":1437},
+                        {"vs_id":1438}] } , 
+"test_session" :        {"test_id":458} , 
+"access_token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ" 
+}
+           </pre>
+<p class="figure">Figure 8</p>
+<h1 id="rfc.section.11.3"><a href="#rfc.section.11.3">11.3.</a> Registration/Capabilities Exchange response</h1>
+<p id="rfc.section.11.3.p.1">POST response is 200 OK with json data.</p>
+<div id="rfc.figure.9"/>
+<div id="xml_json5"/>
+<pre>
+{
+"version" : "0.2",
+"capability_response" : {          
+       "vector_sets" :[{"vs_id" :930}],
+       "test_session" :{"test_id" :183}, 
+"access_token" :eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxMjMwMTIwLCJjb21wYW55IjogIkNpc2NvIiwianRpIjoxODN9.h1tQALiupn_Jx4UWPPTjFNeY9Wu7DI8bWkbh8Xt0GCr3DYf2J_FzoGwlPnUBuPR63kIN0HmKPrlv6r8Ykb1JeA
+    }
+}
+
+           </pre>
+<p class="figure">Figure 9</p>
+<p id="rfc.section.11.3.p.2">Specific JSON formatted vectors and their responses are documented in the protocol sub-douments.  These include coverage for symmetric, asymmetric, digests, KDFs, etc.</p>
+<p id="rfc.section.11.3.p.3">Vector sets can expire.  For example, in terms of a validation authority use, the vector sets are one-time use only.  Old vector sets can never be reused to obtain a new validation certificate for an algorithm implementation or to update an existing certificate. Expiration is a server specific definition which depends on database costs, need for artifacts, etc. If the vector set has expired the server will reply:</p>
+<div id="rfc.figure.10"/>
+<div id="xml_json6"/>
+<pre>
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: &lt;length of results&gt;
+{
+"version" : "0.2",
+"vector" : &lt;vs-id&gt;,
+"status" : "expired"
+}
+           </pre>
+<p class="figure">Figure 10</p>
+<h1 id="rfc.section.11.4"><a href="#rfc.section.11.4">11.4.</a> Test Results Request</h1>
+<div id="rfc.figure.11"/>
+<div id="xml_json7"/>
+<pre>
+GET /validation/acvp/results HTTP1.1
+User Agent:
+Host: www.my-acvpserver.com
+Accept: /
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: &lt;length of results&gt;
+{
+"version" : "0.2",
+"results" : {
+"disposition" : "incomplete",
+12340 : "passed", 
+12341 : "passed",      
+12342 : "passed",
+12343 : "incomplete",
+12344 : "passed"
+   }
+} 
+           </pre>
+<p class="figure">Figure 11</p>
+<p id="rfc.section.11.4.p.1">The results request is an optional flow since some clients may not require success/fail information. Another possibility is to provide an out of band management session on the server may provide access to algorithm test results.</p>
+<p id="rfc.section.11.4.p.2">Since the results may take a significant amount of time to process, the server may reply:</p>
+<div id="rfc.figure.12"/>
+<div id="xml_json8"/>
+<pre>
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: &lt;length of results&gt;
+{
+version : 0.2,
+retry : 10
+}
+           </pre>
+<p class="figure">Figure 12</p>
+<p id="rfc.section.11.4.p.3">Where the retry valid represents the number of seconds for the client to wait before retrying.</p>
+<p id="rfc.section.11.4.p.4">Disposition is defined as:</p>
+<p/>
+
+<ul>
+  <li>FAIL indicates that at least on test has failed.</li>
+  <li>INCOMPLETE indicates not all tests have run, however none have failed thus far.</li>
+  <li>PASSED indicates all tests have been run and have passed.</li>
+</ul>
+<h1 id="rfc.section.11.5"><a href="#rfc.section.11.5">11.5.</a> Optional Flows</h1>
+<p id="rfc.section.11.5.p.1">The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</p>
+<div id="rfc.figure.13"/>
+<div id="xml_json9"/>
+<pre>
+POST /validation/acvp/cancel HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Authorization: Bearer JWT
+           </pre>
+<p class="figure">Figure 13</p>
+<p id="rfc.section.11.5.p.2">The server response will always be 200 OK.</p>
 <h1 id="rfc.section.12"><a href="#rfc.section.12">12.</a> Error Codes</h1>
 <p id="rfc.section.12.p.1">Errors will follow HTTP[S] numbering scheme.  In addition errors as well as 200 messages may carry JSON encoded information that describes in detail the error and any associated troubleshooting information.  A non-exhaustive list of JSON encoded error messages are in Appendix 2.</p>
 <h1 id="rfc.section.13"><a href="#rfc.section.13">13.</a> Other Considerations</h1>
 <p id="rfc.section.13.p.1">When an ACVP client is attached to a cryptographic module that is in use, access to ACVP MUST be controlled so that only an administrator or other authorized user can send and receive ACVP messages.  This is because an attacker that has access to ACVP can potentially use it to probe for weaknesses in the cryptographic module.</p>
 <h1 id="rfc.section.14"><a href="#rfc.section.14">14.</a> <a href="#Acknowledgements" id="Acknowledgements">Acknowledgements</a></h1>
-<p id="rfc.section.14.p.1">Original ACVP created by David Mcgrew, Bill Hudson and Anthony Grieco of Cisco Systems.</p>
+<p id="rfc.section.14.p.1">Original ACVP created by David McGrew, Bill Hudson and Anthony Grieco of Cisco Systems.</p>
 <h1 id="rfc.section.15"><a href="#rfc.section.15">15.</a> <a href="#IANA" id="IANA">IANA Considerations</a></h1>
 <p id="rfc.section.15.p.1">This memo includes no request to IANA.</p>
 <h1 id="rfc.references"><a href="#rfc.references">16.</a> Normative References</h1>
 <table>
   <tbody>
-    <tr>
-      <td class="reference">
-        <b id="min_ref">[min_ref]</b>
-      </td>
-      <td class="top"><a>authSurName, authInitials.</a>, "<a>Minimal Reference</a>", 2006.</td>
-    </tr>
     <tr>
       <td class="reference">
         <b id="RFC2119">[RFC2119]</b>
