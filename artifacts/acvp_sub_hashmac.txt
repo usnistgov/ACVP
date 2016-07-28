@@ -63,20 +63,20 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported Hash Algorithms . . . . . . . . . . . . . . . .   4
+     2.1.  Supported Hash Algorithms . . . . . . . . . . . . . . . .   5
      2.2.  Supported HMAC Algorithms . . . . . . . . . . . . . . . .   5
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   6
      3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
      3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   7
    4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   8
    5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   8
-   Appendix A.  Example Secure Hash Capabilities JSON Object . . . .   8
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
+   Appendix A.  Example Secure Hash Capabilities JSON Object . . . .   9
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   9
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  10
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  11
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
 
 1.  Introduction
 
@@ -141,6 +141,9 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |           | not accept Null      |       |             |          |
    |           | (zero-length)        |       |             |          |
    |           | messages             |       |             |          |
+   | outbyte   | Implementation only  | value | yes, no     | Yes      |
+   |           | outputs  byte-       |       |             |          |
+   |           | oriented messages    |       |             |          |
    | inlen     | Minimum input length | value | 0-65536     | Yes      |
    | outlen    | Maximum output       | value | 0-65536     | Yes      |
    |           | length               |       |             |          |
@@ -151,9 +154,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    Each HMAC algorithm capability advertised is a self-contained JSON
    object.  The following JSON values are used for HMAC algorithm
    capabilities:
-
-
-
 
 
 
@@ -177,17 +177,29 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | algorithm | The HMAC algorithm   | value | See Section | No       |
    |           | and mode to be       |       | 2.2         |          |
    |           | validated.           |       |             |          |
-   | keysize1  | If IUT supports key  | array | 0-65536     | No       |
+   | keyrange1 | If IUT supports key  | array | 0-65536     | Yes      |
    |           | sizes(KS) less than  |       |             |          |
    |           | Block size(BS),      |       |             |          |
    |           | enter 2 distinct key |       |             |          |
-   |           | sizes (in Bytes).    |       |             |          |
-   | keysize2  | If IUT supports key  | array | 0-65536     | No       |
+   |           | sizes (in Bytes). If |       |             |          |
+   |           | IUT only supports    |       |             |          |
+   |           | one KS less than BS, |       |             |          |
+   |           | enter a single size  |       |             |          |
+   |           | in the array and do  |       |             |          |
+   |           | not pass keyrange2   |       |             |          |
+   |           | or keyblock field.   |       |             |          |
+   | keyrange2 | If IUT supports key  | array | 0-65536     | Yes      |
    |           | sizes(KS) greater    |       |             |          |
    |           | than Block size(BS), |       |             |          |
    |           | enter 2 distinct key |       |             |          |
-   |           | sizes (in Bytes).    |       |             |          |
-   | keyblock  | Implementation       | value | yes, no     | No       |
+   |           | sizes (in Bytes). If |       |             |          |
+   |           | IUT only supports    |       |             |          |
+   |           | one KS greater than  |       |             |          |
+   |           | BS, enter the size   |       |             |          |
+   |           | in the array and do  |       |             |          |
+   |           | not pass keyrange1   |       |             |          |
+   |           | or keyblock field.   |       |             |          |
+   | keyblock  | Implementation       | value | yes, no     | Yes      |
    |           | supports keysize     |       |             |          |
    |           | equal blocksize      |       |             |          |
    | maclen    | The supported mac    | array | 10, 12, 16, | No       |
@@ -203,6 +215,17 @@ Internet-Draft                Sym Alg JSON                     June 2016
    Failure to provide these values will result in the ACVP server
    returning an error to the ACVP client during registration.
 
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
 2.1.  Supported Hash Algorithms
 
    The following hash algorithms may be advertised by the ACVP compliant
@@ -217,14 +240,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    o  SHA-384
 
    o  SHA-512
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 4]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
    o  SHA-512-224
 
@@ -257,6 +272,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  HMAC-SHA-512
 
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
 3.  Test Vectors
 
    The ACVP server provides test vectors to the ACVP client, which are
@@ -271,16 +296,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    contains meta data for the entire vector set as well as individual
    test vectors to be processed by the ACVP client.  The following table
    describes the JSON elements at the top level of the hierarchy.
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -309,21 +324,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    following table describes the secure hash JSON elements of the Test
    Group JSON object.
 
-   +-------+----------------------------------------+-------+----------+
-   | JSON  | Description                            | JSON  | Optional |
-   | Value |                                        | type  |          |
-   +-------+----------------------------------------+-------+----------+
-   | mlen  | Length of message or seed to hash      | value | Yes      |
-   | Msg   | Message or Seed to hash                | value | No       |
-   | tests | Array of individual test vector JSON   | array | No       |
-   |       | objects, which are defined in Section  |       |          |
-   |       | 3.2                                    |       |          |
-   +-------+----------------------------------------+-------+----------+
-
-                      Table 4: Test Group JSON Object
-
-   The following table describes the message authentication JSON
-   elements of the Test Group JSON object.
 
 
 
@@ -337,6 +337,22 @@ Fussell                 Expires December 3, 2016                [Page 6]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   +-------+----------------------------------------+-------+----------+
+   | JSON  | Description                            | JSON  | Optional |
+   | Value |                                        | type  |          |
+   +-------+----------------------------------------+-------+----------+
+   | type  | Type of test: short, long or           | value | No       |
+   |       | MonteCarlo                             |       |          |
+   | tests | Array of individual test vector JSON   | array | No       |
+   |       | objects, which are defined in Section  |       |          |
+   |       | 3.2                                    |       |          |
+   +-------+----------------------------------------+-------+----------+
+
+                      Table 4: Test Group JSON Object
+
+   The following table describes the message authentication JSON
+   elements of the Test Group JSON object.
 
    +-------+----------------------------------------+-------+----------+
    | JSON  | Description                            | JSON  | Optional |
@@ -364,11 +380,19 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | tc_id    | Unique numeric identifier for the | value   | No       |
    |          | test case                         |         |          |
    | len      | Length of the message or seed     | value   | No       |
-   | msg      | Value of the message              | value   | No       |
+   | msg      | Value of the message or seed      | value   | No       |
    | md       | Hash value generated              | value   | Yes      |
    +----------+-----------------------------------+---------+----------+
 
                       Table 6: Test Case JSON Object
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    The following table describes the JSON elements for each message
    authentication test vector.
@@ -386,13 +410,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    +----------+-----------------------------------+---------+----------+
 
                       Table 7: Test Case JSON Object
-
-
-
-Fussell                 Expires December 3, 2016                [Page 7]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
 4.  Test Vector Responses
 
@@ -423,6 +440,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    This memo includes no request to IANA.
 
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
 7.  Security Considerations
 
    Security considerations are addressed by the ACVP specification.
@@ -441,13 +468,6 @@ Appendix A.  Example Secure Hash Capabilities JSON Object
    The following is a example JSON object advertising support for SHA-
    256.
 
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 8]
-
-Internet-Draft                Sym Alg JSON                     June 2016
 
 
                {
@@ -474,6 +494,18 @@ Appendix B.  Example Test Vectors JSON Object
    The following is a example JSON object for secure hash test vectors
    sent from the ACVP server to the crypto module.
 
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 9]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
                 {
                   "acv_version": "0.2",
                   "vs_id": 1564,
@@ -497,17 +529,38 @@ Appendix B.  Example Test Vectors JSON Object
                   ]
                 }
 
+   The following is a example JSON object for message authentication
+   test vectors sent from the ACVP server to the crypto module.
 
 
 
 
-Fussell                 Expires December 3, 2016                [Page 9]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 10]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
-
-   The following is a example JSON object for message authentication
-   test vectors sent from the ACVP server to the crypto module.
 
                 {
                   "acv_version": "0.2",
@@ -555,15 +608,15 @@ Appendix C.  Example Test Results JSON Object
                 }
 
 
+   The following is a example JSON object for message authentication
+   test results sent from the crypto module to the ACVP server.
 
 
-Fussell                 Expires December 3, 2016               [Page 10]
+
+Fussell                 Expires December 3, 2016               [Page 11]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
-
-   The following is a example JSON object for message authentication
-   test results sent from the crypto module to the ACVP server.
 
                 {
                     "acv_version": "0.2",
@@ -613,4 +666,7 @@ Author's Address
 
 
 
-Fussell                 Expires December 3, 2016               [Page 11]
+
+
+
+Fussell                 Expires December 3, 2016               [Page 12]
