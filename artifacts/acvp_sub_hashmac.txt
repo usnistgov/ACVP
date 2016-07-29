@@ -13,7 +13,7 @@ ACVP Secure Hash and Message Authentication Algorithm JSON Specification
 
 Abstract
 
-   This document defines the JSON schema for using hash and HMAC
+   This document defines the JSON schema for using hash and MAC
    algorithms with the ACVP specification.
 
 Status of This Memo
@@ -64,19 +64,19 @@ Table of Contents
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
      2.1.  Supported Hash Algorithms . . . . . . . . . . . . . . . .   5
-     2.2.  Supported HMAC Algorithms . . . . . . . . . . . . . . . .   5
+     2.2.  Supported MAC Algorithms  . . . . . . . . . . . . . . . .   6
    3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
-     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   7
-   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   8
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
-   Appendix A.  Example Secure Hash Capabilities JSON Object . . . .   9
-   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   9
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  11
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   7
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   8
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   9
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   9
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  10
+   Appendix A.  Example Secure Hash Capabilities JSON Object . . . .  10
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  11
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  13
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
 
 1.  Introduction
 
@@ -91,7 +91,7 @@ Table of Contents
    constructs for testing individual crypto algorithms.  Each sub-
    specification addresses a specific class of crypto algorithms.  This
    sub-specification defines the JSON constructs for testing hash and
-   HMAC crypto algorithms using ACVP.
+   MAC crypto algorithms using ACVP.
 
 1.1.  Requirements Language
 
@@ -151,8 +151,8 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
              Table 1: Hash Algorithm Capabilities JSON Values
 
-   Each HMAC algorithm capability advertised is a self-contained JSON
-   object.  The following JSON values are used for HMAC algorithm
+   Each MAC algorithm capability advertised is a self-contained JSON
+   object.  The following JSON values are used for MAC algorithm
    capabilities:
 
 
@@ -174,7 +174,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | JSON      | Description          | JSON  | Valid       | Optional |
    | Value     |                      | type  | Values      |          |
    +-----------+----------------------+-------+-------------+----------+
-   | algorithm | The HMAC algorithm   | value | See Section | No       |
+   | algorithm | The MAC algorithm    | value | See Section | No       |
    |           | and mode to be       |       | 2.2         |          |
    |           | validated.           |       |             |          |
    | keyrange1 | If IUT supports key  | array | 0-65536     | Yes      |
@@ -202,22 +202,22 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | keyblock  | Implementation       | value | yes, no     | Yes      |
    |           | supports keysize     |       |             |          |
    |           | equal blocksize      |       |             |          |
-   | maclen    | The supported mac    | array | 10, 12, 16, | No       |
-   |           | sizes in bytes.      |       | 20, 24, 32, |          |
-   |           | (range dependent on  |       | 40, 48, 56, |          |
-   |           | SHA size)            |       | 64          |          |
+   | maclen    | The supported mac    | array | 0-65536     | No       |
+   |           | sizes in bytes.      |       |             |          |
+   |           | (range dependent on  |       |             |          |
+   |           | SHA size)            |       |             |          |
+   | inempty   | Implementation does  | value | yes, no     | Yes      |
+   |           | not accept Null      |       |             |          |
+   |           | (zero-length)        |       |             |          |
+   |           | messages             |       |             |          |
+   | msglen    | The CMAC message     | array | 0-65536     | Yes      |
+   |           | lengths supported    |       |             |          |
    +-----------+----------------------+-------+-------------+----------+
 
-             Table 2: HMAC Algorithm Capabilities JSON Values
+              Table 2: MAC Algorithm Capabilities JSON Values
 
    Note: Some optional values are required depending on the algorithm.
    For example, SHA-1 requires inbyte, inempty, inlen, and outlen.
-   Failure to provide these values will result in the ACVP server
-   returning an error to the ACVP client during registration.
-
-
-
-
 
 
 
@@ -225,6 +225,25 @@ Fussell                 Expires December 3, 2016                [Page 4]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
+
+   Maclen for CMAC contains an array of 3 values defined by these rules:
+
+   o  The smallest CMAC length supported
+
+   o  A second CMAC length supported
+
+   o  The largest CMAC length supported
+
+   Msglen for CMAC contains an array of 5 values defined by these rules:
+
+   o  Two message lengths divisible by block size
+
+   o  Two message lengths NOT divisible by block size
+
+   o  The largest message length supported
 
 2.1.  Supported Hash Algorithms
 
@@ -255,9 +274,17 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  SHAKE-128
 
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    o  SHAKE-256
 
-2.2.  Supported HMAC Algorithms
+2.2.  Supported MAC Algorithms
 
    The following hash algorithms may be advertised by the ACVP compliant
    crypto module:
@@ -272,15 +299,13 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  HMAC-SHA-512
 
+   o  CMAC-AES-128
 
+   o  CMAC-AES-192
 
+   o  CMAC-AES-256
 
-
-
-Fussell                 Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
+   o  CMAC-TDES
 
 3.  Test Vectors
 
@@ -296,6 +321,22 @@ Internet-Draft                Sym Alg JSON                     June 2016
    contains meta data for the entire vector set as well as individual
    test vectors to be processed by the ACVP client.  The following table
    describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -324,20 +365,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    following table describes the secure hash JSON elements of the Test
    Group JSON object.
 
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 6]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    +-------+----------------------------------------+-------+----------+
    | JSON  | Description                            | JSON  | Optional |
    | Value |                                        | type  |          |
@@ -353,6 +380,19 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    The following table describes the message authentication JSON
    elements of the Test Group JSON object.
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    +-------+----------------------------------------+-------+----------+
    | JSON  | Description                            | JSON  | Optional |
@@ -386,16 +426,29 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
                       Table 6: Test Case JSON Object
 
+   The following table describes the JSON elements for each message
+   authentication test vector.
 
 
 
-Fussell                 Expires December 3, 2016                [Page 7]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
-
-   The following table describes the JSON elements for each message
-   authentication test vector.
 
    +----------+-----------------------------------+---------+----------+
    | JSON     | Description                       | JSON    | Optional |
@@ -403,8 +456,12 @@ Internet-Draft                Sym Alg JSON                     June 2016
    +----------+-----------------------------------+---------+----------+
    | tc_id    | Unique numeric identifier for the | value   | No       |
    |          | test case                         |         |          |
+   | type     | CMAC type of test, generation or  | value   | Yes      |
+   |          | verification                      |         |          |
    | keylen   | Length of key in bytes to use     | value   | No       |
    | key      | Value of the key                  | value   | No       |
+   | key2     | Value of the key                  | value   | Yes      |
+   | key3     | Value of the key                  | value   | Yes      |
    | msg      | Value of the message              | value   | No       |
    | mac      | MAC value generated               | value   | Yes      |
    +----------+-----------------------------------+---------+----------+
@@ -444,8 +501,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-
-Fussell                 Expires December 3, 2016                [Page 8]
+Fussell                 Expires December 3, 2016                [Page 9]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -489,22 +545,34 @@ Appendix A.  Example Secure Hash Capabilities JSON Object
                    "maclen": [20],
                }
 
+   The following is a example JSON object advertising support for CMAC-
+   TDES.
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 10]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+               {
+                   "algorithm": "CMAC-TDES",
+                   "inempty": "yes",
+                   "maclen" : [0, 8],
+                   "msglen" : [0, 32, 15, 31, 40]
+               }
+
 Appendix B.  Example Test Vectors JSON Object
 
    The following is a example JSON object for secure hash test vectors
    sent from the ACVP server to the crypto module.
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 9]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
                 {
                   "acv_version": "0.2",
@@ -529,8 +597,8 @@ Internet-Draft                Sym Alg JSON                     June 2016
                   ]
                 }
 
-   The following is a example JSON object for message authentication
-   test vectors sent from the ACVP server to the crypto module.
+   The following is a example JSON object for HMAC test vectors sent
+   from the ACVP server to the crypto module.
 
 
 
@@ -545,19 +613,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016               [Page 10]
+Fussell                 Expires December 3, 2016               [Page 11]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -587,10 +643,92 @@ Internet-Draft                Sym Alg JSON                     June 2016
                   ]
                 }
 
+   The following is a example JSON object for CMAC test vectors sent
+   from the ACVP server to the crypto module.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 12]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+                   {
+                     "acv_version": "0.2",
+                     "vs_id": 1566,
+                     "algorithm": "CMAC-TDES",
+                     "test_groups": [
+                       {
+                         "type": "gen",
+                         "tests": [
+                           {
+                             "tc_id": 2175,
+                             "keylen": 3,
+                             "maclen" : 5,
+                             "key": "c479f813ad1a45d5",
+                             "key2": "dc43459da4c85e85",
+                             "key3": "1cda518af886bf1f",
+                             "msg": "00"
+                           },
+                           {
+                             "tc_id": 2176,
+                             "keylen": 3,
+                             "maclen" : 5,
+                             "key": "731331866754588f",
+                             "key2": "d332ef51e0ce1925",
+                             "key3": "d586cba70440f44f",
+                             "msg": "00"
+                           }
+                         ]
+                       },
+                     ]
+                   }
+
 Appendix C.  Example Test Results JSON Object
 
    The following is a example JSON object for secure hash test results
    sent from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 13]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
                 {
                     "acv_version": "0.2",
@@ -608,15 +746,8 @@ Appendix C.  Example Test Results JSON Object
                 }
 
 
-   The following is a example JSON object for message authentication
-   test results sent from the crypto module to the ACVP server.
-
-
-
-Fussell                 Expires December 3, 2016               [Page 11]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
+   The following is a example JSON object for HMAC test results sent
+   from the crypto module to the ACVP server.
 
                 {
                     "acv_version": "0.2",
@@ -632,6 +763,43 @@ Internet-Draft                Sym Alg JSON                     June 2016
                        }
                     ]
                 }
+
+   The following is a example JSON object for CMAC test results sent
+   from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 14]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+                   {
+                       "acv_version": "0.2",
+                       "vs_id": 1566,
+                       "test_results": [
+                           {
+                               "tc_id": 2175,
+                               "mac": "fea01c84a7"
+                           },
+                          {
+                               "tc_id": 2176,
+                               "mac": "164bdb8582"
+                          }
+                       ]
+                   }
 
 Author's Address
 
@@ -669,4 +837,4 @@ Author's Address
 
 
 
-Fussell                 Expires December 3, 2016               [Page 12]
+Fussell                 Expires December 3, 2016               [Page 15]

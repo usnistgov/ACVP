@@ -99,7 +99,7 @@
          keywords will be used for the search engine. -->
 
     <abstract>
-      <t>This document defines the JSON schema for using hash and HMAC algorithms with the ACVP specification.</t>
+      <t>This document defines the JSON schema for using hash and MAC algorithms with the ACVP specification.</t>
     </abstract>
   </front>
 
@@ -113,7 +113,7 @@
 	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications
 	      define the constructs for testing individual crypto algorithms.  Each sub-specification
 	      addresses a specific class of crypto algorithms.  This sub-specification defines the JSON
-	      constructs for testing hash and HMAC crypto algorithms using ACVP.</t>
+	      constructs for testing hash and MAC crypto algorithms using ACVP.</t>
 
       <section title="Requirements Language">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -184,10 +184,10 @@
         </texttable>
 
 
-	<t>Each HMAC algorithm capability advertised is a self-contained JSON object.  The following
-	JSON values are used for HMAC algorithm capabilities:</t>
+	<t>Each MAC algorithm capability advertised is a self-contained JSON object.  The following
+	JSON values are used for MAC algorithm capabilities:</t>
 
-        <texttable anchor="caps_table2" title="HMAC Algorithm Capabilities JSON Values">
+        <texttable anchor="caps_table2" title="MAC Algorithm Capabilities JSON Values">
           <ttcol align="left">JSON Value</ttcol>
           <ttcol align="left">Description</ttcol>
           <ttcol align="left">JSON type</ttcol>
@@ -195,7 +195,7 @@
           <ttcol align="left">Optional</ttcol>
 
           <c>algorithm</c>
-	  <c>The HMAC algorithm and mode to be validated.</c>
+	  <c>The MAC algorithm and mode to be validated.</c>
           <c>value</c>
           <c>See <xref target="supported_algs2" /></c>
           <c>No</c>
@@ -221,9 +221,20 @@
           <c>maclen</c>
 	  <c>The supported mac sizes in bytes. (range dependent on SHA size)</c>
           <c>array</c>
-          <c>10, 12, 16, 20, 24, 32, 40, 48, 56, 64</c>
+          <c>0-65536</c>
           <c>No</c>
 
+          <c>inempty</c>
+          <c>Implementation does not accept Null (zero-length) messages</c>
+          <c>value</c>
+          <c>yes, no</c>
+          <c>Yes</c>
+
+          <c>msglen</c>
+	  <c>The CMAC message lengths supported</c>
+          <c>array</c>
+          <c>0-65536</c>
+          <c>Yes</c>
 
         </texttable>
 
@@ -233,6 +244,20 @@
 	<t>Note: Some optional values are required depending on the algorithm.  For example, SHA-1
 	    requires inbyte, inempty, inlen, and outlen.  Failure to provide these values will
 	result in the ACVP server returning an error to the ACVP client during registration.</t>
+
+        <t>Maclen for CMAC contains an array of 3 values defined by these rules:</t>
+	    <t><list style="symbols">
+		<t>The smallest CMAC length supported</t>
+		<t>A second CMAC length supported</t>
+		<t>The largest CMAC length supported</t>
+	    </list></t>
+
+        <t>Msglen for CMAC contains an array of 5 values defined by these rules:</t>
+	    <t><list style="symbols">
+		<t>Two message lengths divisible by block size</t>
+		<t>Two message lengths NOT divisible by block size</t>
+		<t>The largest message length supported</t>
+	    </list></t>
 
 	<section anchor="supported_algs" title="Supported Hash Algorithms">
 	    <t>The following hash algorithms may be advertised by the ACVP compliant crypto module:</t>
@@ -253,7 +278,7 @@
 	    </list></t>
 	</section>
 
-	<section anchor="supported_algs2" title="Supported HMAC Algorithms">
+	<section anchor="supported_algs2" title="Supported MAC Algorithms">
 	    <t>The following hash algorithms may be advertised by the ACVP compliant crypto module:</t>
 	    <t><list style="symbols">
 		<t>HMAC-SHA-1</t>
@@ -261,6 +286,10 @@
 		<t>HMAC-SHA-256</t>
 		<t>HMAC-SHA-384</t>
 		<t>HMAC-SHA-512</t>
+		<t>CMAC-AES-128</t>
+		<t>CMAC-AES-192</t>
+		<t>CMAC-AES-256</t>
+		<t>CMAC-TDES</t>
 	    </list></t>
 	</section>
 
@@ -386,6 +415,11 @@
 		<c>value</c>
 		<c>No</c>
 
+		<c>type</c>
+		<c>CMAC type of test, generation or verification</c>
+		<c>value</c>
+		<c>Yes</c>
+
 		<c>keylen</c>
 		<c>Length of key in bytes to use</c>
 		<c>value</c>
@@ -395,6 +429,16 @@
 		<c>Value of the key</c>
 		<c>value</c>
 		<c>No</c>
+
+		<c>key2</c>
+		<c>Value of the key</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>key3</c>
+		<c>Value of the key</c>
+		<c>value</c>
+		<c>Yes</c>
 
 		<c>msg</c>
 		<c>Value of the message</c>
@@ -499,6 +543,19 @@
             }
             ]]></artwork>
     </figure>
+      <t>The following is a example JSON object advertising support for CMAC-TDES.</t>
+      <figure>
+        <artwork><![CDATA[
+
+
+            {
+                "algorithm": "CMAC-TDES",
+                "inempty": "yes",
+		"maclen" : [0, 8],
+		"msglen" : [0, 32, 15, 31, 40]
+            }
+            ]]></artwork>
+    </figure>
     </section>
     <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
       <t>The following is a example JSON object for secure hash test vectors sent from the ACVP server to the crypto module.</t>
@@ -528,7 +585,7 @@
                 }
             ]]></artwork>
     </figure>
-      <t>The following is a example JSON object for message authentication test vectors sent from the ACVP server to the crypto module.</t>
+      <t>The following is a example JSON object for HMAC test vectors sent from the ACVP server to the crypto module.</t>
       <figure>
         <artwork><![CDATA[
                 {
@@ -550,6 +607,41 @@
                           "keylen": 32,
                           "key": "c9ba74509181091ccf2159d9cada77e4be00384cca4f36ce097f1b0400181cd9",
                           "msg": "e249dbff751ef43598aab6fb642eb1b18731a33148729a5fc52059027f4dfdd219a1e0d15d4bbedf803d1689a799d323a9662c161788c97a7aef27e8db0e3d89898f607316456436a36204b15dea832b4867949f3cdf78562d0366bbafa92f6cb87c228da8f22d61887f461b8f0909f1eb9ba373be5dee1b66c4dd2501061ba0"
+                        }
+                      ]
+                    },
+                  ]
+                }
+            ]]></artwork>
+       </figure>
+      <t>The following is a example JSON object for CMAC test vectors sent from the ACVP server to the crypto module.</t>
+      <figure>
+        <artwork><![CDATA[
+                {
+                  "acv_version": "0.2",
+                  "vs_id": 1566,
+                  "algorithm": "CMAC-TDES",
+                  "test_groups": [
+                    {
+                      "type": "gen",
+                      "tests": [
+                        {
+                          "tc_id": 2175,
+                          "keylen": 3,
+			  "maclen" : 5,
+                          "key": "c479f813ad1a45d5",
+                          "key2": "dc43459da4c85e85",
+                          "key3": "1cda518af886bf1f",
+                          "msg": "00"
+                        },
+                        {
+                          "tc_id": 2176,
+                          "keylen": 3,
+			  "maclen" : 5,
+                          "key": "731331866754588f",
+                          "key2": "d332ef51e0ce1925",
+                          "key3": "d586cba70440f44f",
+                          "msg": "00"
                         }
                       ]
                     },
@@ -579,7 +671,7 @@
 
             ]]></artwork>
     </figure>
-      <t>The following is a example JSON object for message authentication test results sent from the crypto module to the ACVP server.</t>
+      <t>The following is a example JSON object for HMAC test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
                 {
@@ -593,6 +685,25 @@
                        {
                             "tc_id": 2173,
                             "mac": "feb3ff7b06eb7f62e9d19c331abbe2d183d2bc7a"
+                       }
+                    ]
+                }
+            ]]></artwork>
+       </figure>
+      <t>The following is a example JSON object for CMAC test results sent from the crypto module to the ACVP server.</t>
+      <figure>
+        <artwork><![CDATA[
+                {
+                    "acv_version": "0.2",
+                    "vs_id": 1566,
+                    "test_results": [
+                        {
+                            "tc_id": 2175,
+                            "mac": "fea01c84a7"
+                        },
+                       {
+                            "tc_id": 2176,
+                            "mac": "164bdb8582"
                        }
                     ]
                 }
