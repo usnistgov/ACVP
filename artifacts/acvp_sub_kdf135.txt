@@ -63,19 +63,20 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   3
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
-     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   5
-   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   6
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   6
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
-   Appendix A.  Example SP800-135 KDF Capabilities JSON Object . . .   7
-   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   7
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   8
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   9
+     2.1.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   4
+     2.2.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   5
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   9
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  10
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  10
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  11
+   Appendix A.  Example SP800-135 KDF Capabilities JSON Object . . .  11
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  11
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  12
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Introduction
 
@@ -104,8 +105,7 @@ Table of Contents
    allows the crypto module to advertise support for specific
    algorithms, notifying the ACVP server which algorithms need test
    vectors generated for the validation process.  This section describes
-   the constructs for advertising support of SP800-135 KDF algorithms to
-   the ACVP server.
+
 
 
 
@@ -113,6 +113,9 @@ Fussell                 Expires December 3, 2016                [Page 2]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   the constructs for advertising support of SP800-135 KDF algorithms to
+   the ACVP server.
 
    The algorithm capabilities are advertised as JSON objects within the
    'algorithms' value of the ACVP registration message.  The
@@ -124,27 +127,83 @@ Internet-Draft                Sym Alg JSON                     June 2016
    self-contained JSON object.  The following JSON values are used for
    SP800-135 KDFalgorithm capabilities:
 
-   +-----------+----------------------+-------+-------------+----------+
-   | JSON      | Description          | JSON  | Valid       | Optional |
-   | Value     |                      | type  | Values      |          |
-   +-----------+----------------------+-------+-------------+----------+
-   | algorithm | The hash algorithm   | value | See Section | No       |
-   |           | and mode to be       |       | 2.1         |          |
-   |           | validated.           |       |             |          |
-   | inbyte    | Implementation only  | value | yes, no     | No       |
-   |           | hashes byte-oriented |       |             |          |
-   |           | messages             |       |             |          |
-   | inempty   | Implementation does  | value | yes, no     | No       |
-   |           | not accept Null      |       |             |          |
-   |           | (zero-length)        |       |             |          |
-   |           | messages             |       |             |          |
-   | outbyte   | Implementation only  | value | yes, no     | Yes      |
-   |           | outputs  byte-       |       |             |          |
-   |           | oriented messages    |       |             |          |
-   | inlen     | Minimum input length | value | 0-65536     | Yes      |
-   | outlen    | Maximum output       | value | 0-65536     | Yes      |
-   |           | length               |       |             |          |
-   +-----------+----------------------+-------+-------------+----------+
+   +-----------+---------------------+-------+--------------+----------+
+   | JSON      | Description         | JSON  | Valid Values | Optional |
+   | Value     |                     | type  |              |          |
+   +-----------+---------------------+-------+--------------+----------+
+   | algorithm | The KDF to be       | value | See Section  | No       |
+   |           | validated.          |       | 2.1          |          |
+   | aesval    | The TDES validation | value | same or      | Yes      |
+   |           | number or           |       | value        |          |
+   |           | implemented in same |       |              |          |
+   |           | implementation(SRTP |       |              |          |
+   |           | ).                  |       |              |          |
+   | hmacval   | The HMAC validation | value | same or      | Yes      |
+   |           | number or           |       | value        |          |
+   |           | implemented in same |       |              |          |
+   |           | implementation(IKEv |       |              |          |
+   |           | 1, IKEv2, TLS,      |       |              |          |
+   |           | TPM).               |       |              |          |
+   | shaval    | The SHA validation  | value | same or      | Yes      |
+   |           | number or           |       | value        |          |
+   |           | implemented in same |       |              |          |
+   |           | implementation(IKEv |       |              |          |
+   |           | 1, IKEv2, ANS       |       |              |          |
+   |           | X9.63-2001, SSH,    |       |              |          |
+   |           | SNMP, TLS, TPM).    |       |              |          |
+   | methods   | Type of method or   | array | See Section  | Yes      |
+   |           | algorithm supported |       | 2.2          |          |
+   | sha       | SHA functions       | array | SHA-1,       | Yes      |
+   |           | supported           |       | SHA-224,     |          |
+   |           |                     |       | SHA-256,     |          |
+   |           |                     |       | SHA-384,     |          |
+   |           |                     |       | SHA-512      |          |
+   | keylen    | Key length minimum  | array | 0-65536      | Yes      |
+   |           | and maximum         |       |              |          |
+   | EngineID  | SNMP: Two engine    | array | 0-0xF        | Yes      |
+   |           | IDs in hexidecimal, |       |              |          |
+
+
+
+Fussell                 Expires December 3, 2016                [Page 3]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   |           | can be the same     |       |              |          |
+   | plen      | SNMP: Password      | array | alphanumeric | Yes      |
+   |           | minimum and maximum |       |              |          |
+   |           | lengths             |       |              |          |
+   | kdr0      | SRTP: Key           | array | all, 1-24    | Yes      |
+   |           | Derivation Rate 0   |       |              |          |
+   | kdr1      | SRTP: Key           | array | all, 1-24    | Yes      |
+   |           | Derivation Rate 1   |       |              |          |
+   | field     | ANSI X9.63: Minimum | array | 0-65536      | Yes      |
+   |           | and Maximum field   |       |              |          |
+   |           | size in             |       |              |          |
+   | sharedinf | ANSI X9.63: Minimum | array | 0-1024       | Yes      |
+   | o         | and Maximum         |       |              |          |
+   |           | sharedinfo size in  |       |              |          |
+   |           | bits                |       |              |          |
+   | initiator | IKE: Minimum and    | array | 0-65536      | Yes      |
+   |           | maximum lengths in  |       |              |          |
+   |           | bytes               |       |              |          |
+   | responder | IKE: Minimum and    | array | 0-65536      | Yes      |
+   |           | maximum lengths in  |       |              |          |
+   |           | bytes               |       |              |          |
+   | psk       | IKE: Pre-shared key | array | 0-65536      | Yes      |
+   |           | minimum and maximum |       |              |          |
+   |           | lengths in bytes    |       |              |          |
+   | dhkey     | IKE: Three Diffie-  | array | 0-65536      | Yes      |
+   |           | Hellman shared      |       |              |          |
+   |           | secret key lengths  |       |              |          |
+   |           | in bytes            |       |              |          |
+   | dkmlen    | IKE: Minimum and    | array | 0-65536      | Yes      |
+   |           | maximum lengths of  |       |              |          |
+   |           | the 7 keys derived  |       |              |          |
+   |           | by SKEYSEED in      |       |              |          |
+   |           | bytes               |       |              |          |
+   +-----------+---------------------+-------+--------------+----------+
 
          Table 1: SP800-135 KDF Algorithm Capabilities JSON Values
 
@@ -158,66 +217,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    The following SP800-135 KDF algorithms may be advertised by the ACVP
    compliant crypto module:
 
-   o  SHA-1
-
-   o  SHA-224
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 3]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
-   o  SHA-256
-
-   o  SHA-384
-
-   o  SHA-512
-
-   o  SHA-512-224
-
-   o  SHA-512-256
-
-   o  SHA3-224
-
-   o  SHA3-256
-
-   o  SHA3-384
-
-   o  SHA3-512
-
-   o  SHAKE-128
-
-   o  SHAKE-256
-
-3.  Test Vectors
-
-   The ACVP server provides test vectors to the ACVP client, which are
-   then processed and returned to the ACVP server for validation.  A
-   typical ACVP validation session would require multiple test vector
-   sets to be downloaded and processed by the ACVP client.  Each test
-   vector set represents an individual crypto algorithm, such as SHA-1,
-   SHA-224, SHA-256, etc.  This section describes the JSON schema for a
-   test vector set used with SP800-135 KDF algorithms.
-
-   The test vector set JSON schema is a multi-level hierarchy that
-   contains meta data for the entire vector set as well as individual
-   test vectors to be processed by the ACVP client.  The following table
-   describes the JSON elements at the top level of the hierarchy.
-
-
-
-
-
-
-
-
-
-
-
-
+   o  IKEv1
 
 
 
@@ -225,6 +225,72 @@ Fussell                 Expires December 3, 2016                [Page 4]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   o  IKEv2
+
+   o  TLS
+
+   o  ANSI X9.63
+
+   o  SSH
+
+   o  SRTP
+
+   o  SNMP
+
+   o  TPM
+
+2.2.  Supported SP800-135 KDF Algorithms
+
+   The following SP800-135 KDF algorithms may be advertised by the ACVP
+   compliant crypto module:
+
+   o  Digital Signature(IKEv1)
+
+   o  Public Key Encryption(IKEv1)
+
+   o  Pre-shared Key(IKEv1)
+
+   o  TLS 1.0/1.1(TLS)
+
+   o  TLS 1.2(TLS)
+
+   o  TDES CBC(SSH)
+
+   o  AES-128-CBC(SSH)
+
+   o  AES-192-CBC(SSH)
+
+   o  AES-256-CBC(SSH)
+
+   o  AES-128-CBC(SRTP)
+
+   o  AES-192-CBC(SRTP)
+
+   o  AES-256-CBC(SRTP)
+
+3.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual Key Derivation Function (KDF),
+   such as SNMP, SSH, etc.  This section describes the JSON schema for a
+   test vector set used with SP800-135 KDF algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -250,21 +316,169 @@ Internet-Draft                Sym Alg JSON                     June 2016
    vector set.  For instance, all test vectors that use the same key
    size would be grouped together.  The Test Group JSON object contains
    meta data that applies to all test vectors within the group.  The
-   following table describes the SP800-135 KDF JSON elements of the Test
-   Group JSON object.
+   following table describes the SP800-135 KDF IKEv1 JSON elements of
+   the Test Group JSON object.
 
    +-------+----------------------------------------+-------+----------+
    | JSON  | Description                            | JSON  | Optional |
    | Value |                                        | type  |          |
    +-------+----------------------------------------+-------+----------+
-   | type  | Type of test: short, long or           | value | No       |
-   |       | MonteCarlo                             |       |          |
    | tests | Array of individual test vector JSON   | array | No       |
    |       | objects, which are defined in Section  |       |          |
    |       | 3.2                                    |       |          |
    +-------+----------------------------------------+-------+----------+
 
                       Table 3: Test Group JSON Object
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   The following table describes the SP800-135 KDF IKEv2 JSON elements
+   of the Test Group JSON object.
+
+   +-------+----------------------------------------+-------+----------+
+   | JSON  | Description                            | JSON  | Optional |
+   | Value |                                        | type  |          |
+   +-------+----------------------------------------+-------+----------+
+   | tests | Array of individual test vector JSON   | array | No       |
+   |       | objects, which are defined in Section  |       |          |
+   |       | 3.2                                    |       |          |
+   +-------+----------------------------------------+-------+----------+
+
+                      Table 4: Test Group JSON Object
+
+   The following table describes the SP800-135 KDF ANS X9.63 JSON
+   elements of the Test Group JSON object.
+
+   +------------+-----------------------------------+-------+----------+
+   | JSON Value | Description                       | JSON  | Optional |
+   |            |                                   | type  |          |
+   +------------+-----------------------------------+-------+----------+
+   | field      | Minimum and maximum field size    | array | No       |
+   | sharedinfo | Minimum and maximum sharedinfo    | array | No       |
+   |            | length                            |       |          |
+   | keylen     | Minimum and maximum key lengths,  | array | No       |
+   |            | maximum less than or equal to     |       |          |
+   |            | 4096                              |       |          |
+   | sha        | SHA functions supported           | array | No       |
+   | tests      | Array of individual test vector   | array | No       |
+   |            | JSON objects, which are defined   |       |          |
+   |            | in Section 3.2                    |       |          |
+   +------------+-----------------------------------+-------+----------+
+
+                      Table 5: Test Group JSON Object
+
+   The following table describes the SP800-135 KDF SSH JSON elements of
+   the Test Group JSON object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +---------+--------------------------------------+-------+----------+
+   | JSON    | Description                          | JSON  | Optional |
+   | Value   |                                      | type  |          |
+   +---------+--------------------------------------+-------+----------+
+   | methods | See Section 2.2                      | array | No       |
+   | sha     | SHA functions supported              | array | No       |
+   | tests   | Array of individual test vector JSON | array | No       |
+   |         | objects, which are defined in        |       |          |
+   |         | Section 3.2                          |       |          |
+   +---------+--------------------------------------+-------+----------+
+
+                      Table 6: Test Group JSON Object
+
+   The following table describes the SP800-135 KDF SRTP JSON elements of
+   the Test Group JSON object.
+
+   +---------+-------------------------------------+--------+----------+
+   | JSON    | Description                         | JSON   | Optional |
+   | Value   |                                     | type   |          |
+   +---------+-------------------------------------+--------+----------+
+   | methods | See Section 2.2                     | array  | No       |
+   | kdr0    | Key Derivation Rate 0               | array  | No       |
+   |         |                                     | or all |          |
+   | kdr1    | Key Derivation Rate 0               | array  | No       |
+   |         |                                     | or all |          |
+   | tests   | Array of individual test vector     | array  | No       |
+   |         | JSON objects, which are defined in  |        |          |
+   |         | Section 3.2                         |        |          |
+   +---------+-------------------------------------+--------+----------+
+
+                      Table 7: Test Group JSON Object
+
+   The following table describes the SP800-135 KDF SNMP JSON elements of
+   the Test Group JSON object.
+
+   +----------+-------------------------------------+-------+----------+
+   | JSON     | Description                         | JSON  | Optional |
+   | Value    |                                     | type  |          |
+   +----------+-------------------------------------+-------+----------+
+   | EngineID | Engine ID                           | value | No       |
+   | plen     | Password length                     | array | No       |
+   | tests    | Array of individual test vector     | array | No       |
+   |          | JSON objects, which are defined in  |       |          |
+   |          | Section 3.2                         |       |          |
+   +----------+-------------------------------------+-------+----------+
+
+                      Table 8: Test Group JSON Object
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   The following table describes the SP800-135 KDF TLS JSON elements of
+   the Test Group JSON object.
+
+   +---------+--------------------------------------+-------+----------+
+   | JSON    | Description                          | JSON  | Optional |
+   | Value   |                                      | type  |          |
+   +---------+--------------------------------------+-------+----------+
+   | methods | See Section 2.2                      | array | No       |
+   | sha     | SHA functions supported              | array | No       |
+   | tests   | Array of individual test vector JSON | array | No       |
+   |         | objects, which are defined in        |       |          |
+   |         | Section 3.2                          |       |          |
+   +---------+--------------------------------------+-------+----------+
+
+                      Table 9: Test Group JSON Object
+
+   The following table describes the SP800-135 KDF TMP JSON elements of
+   the Test Group JSON object.
+
+   +-------+----------------------------------------+-------+----------+
+   | JSON  | Description                            | JSON  | Optional |
+   | Value |                                        | type  |          |
+   +-------+----------------------------------------+-------+----------+
+   | tests | Array of individual test vector JSON   | array | No       |
+   |       | objects, which are defined in Section  |       |          |
+   |       | 3.2                                    |       |          |
+   +-------+----------------------------------------+-------+----------+
+
+                     Table 10: Test Group JSON Object
 
 3.2.  Test Vectors JSON Schema
 
@@ -277,7 +491,17 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Fussell                 Expires December 3, 2016                [Page 5]
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 9]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -293,7 +517,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | md       | Hash value generated              | value   | Yes      |
    +----------+-----------------------------------+---------+----------+
 
-                      Table 4: Test Case JSON Object
+                      Table 11: Test Case JSON Object
 
 4.  Test Vector Responses
 
@@ -314,7 +538,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |              | JSON schema as defined in Section 3.2      |       |
    +--------------+--------------------------------------------+-------+
 
-                 Table 5: Vector Set Response JSON Object
+                 Table 12: Vector Set Response JSON Object
 
 5.  Acknowledgements
 
@@ -333,7 +557,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Fussell                 Expires December 3, 2016                [Page 6]
+Fussell                 Expires December 3, 2016               [Page 10]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -389,7 +613,7 @@ Appendix B.  Example Test Vectors JSON Object
 
 
 
-Fussell                 Expires December 3, 2016                [Page 7]
+Fussell                 Expires December 3, 2016               [Page 11]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -445,7 +669,7 @@ Appendix C.  Example Test Results JSON Object
 
 
 
-Fussell                 Expires December 3, 2016                [Page 8]
+Fussell                 Expires December 3, 2016               [Page 12]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -501,4 +725,4 @@ Author's Address
 
 
 
-Fussell                 Expires December 3, 2016                [Page 9]
+Fussell                 Expires December 3, 2016               [Page 13]
