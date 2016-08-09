@@ -1,0 +1,504 @@
+
+
+
+
+TBD                                                      B. Fussell, Ed.
+Internet-Draft                                       Cisco Systems, Inc.
+Intended status: Informational                                 June 2016
+Expires: December 3, 2016
+
+
+    ACVP IKEv2 Key Derivation Function Algorithm JSON Specification
+                   draft-ietf-acvp-subkdf135-ikev2-00
+
+Abstract
+
+   This document defines the JSON schema for using SP800-135 KDF
+   algorithms with the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on December 3, 2016.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 1]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
+     2.1.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   4
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   6
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   6
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Example SP800-135 KDF Capabilities JSON Object . . .   7
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   8
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   8
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   9
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing SP800-135
+   KDF algorithms using ACVP.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
+
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of SP800-135 KDF algorithms to
+   the ACVP server.
+
+
+
+Fussell                 Expires December 3, 2016                [Page 2]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   The algorithm capabilities are advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each algorithm capability advertised is a
+   self-contained JSON object.  The following JSON values are used for
+   SP800-135 KDF algorithm capabilities:
+
+   +-----------+---------------------+-------+--------------+----------+
+   | JSON      | Description         | JSON  | Valid Values | Optional |
+   | Value     |                     | type  |              |          |
+   +-----------+---------------------+-------+--------------+----------+
+   | algorithm | The KDF to be       | value | See Section  | No       |
+   |           | validated           |       | 2.1          |          |
+   | hmacval   | The HMAC validation | value | same or      | No       |
+   |           | number or           |       | value        |          |
+   |           | implemented in same |       |              |          |
+   |           | implementation      |       |              |          |
+   | shaval    | The SHA validation  | value | same or      | No       |
+   |           | number or           |       | value        |          |
+   |           | implemented in same |       |              |          |
+   |           | implementation      |       |              |          |
+   | sha       | SHA functions       | array | SHA-1,       | No       |
+   |           | supported           |       | SHA-224,     |          |
+   |           |                     |       | SHA-256,     |          |
+   |           |                     |       | SHA-384,     |          |
+   |           |                     |       | SHA-512      |          |
+   | initiator | Minimum and maximum | array | 0-65536      | No       |
+   |           | lengths in bytes    |       |              |          |
+   | responder | Minimum and maximum | array | 0-65536      | No       |
+   |           | lengths in bytes    |       |              |          |
+   | dkmlen    | Minimum and maximum | array | 0-65536      | Yes      |
+   |           | lengths of the 7    |       |              |          |
+   |           | keys derived by     |       |              |          |
+   |           | SKEYSEED in bytes   |       |              |          |
+   +-----------+---------------------+-------+--------------+----------+
+
+         Table 1: SP800-135 KDF Algorithm Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   For example, SHA-1 requires inbyte, inempty, inlen, and outlen.
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 3]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+2.1.  Supported SP800-135 KDF Algorithms
+
+   The following SP800-135 KDF algorithms may be advertised by the ACVP
+   compliant crypto module:
+
+   o  IKEv2
+
+   o  IKEv2
+
+   o  TLS
+
+   o  ANSI X9.63
+
+   o  SSH
+
+   o  SRTP
+
+   o  SNMP
+
+   o  TPM
+
+3.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual Key Derivation Function (KDF),
+   such as SNMP, SSH, etc.  This section describes the JSON schema for a
+   test vector set used with SP800-135 KDF algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +-------------+--------------------------------------------+--------+
+   | JSON Value  | Description                                | JSON   |
+   |             |                                            | type   |
+   +-------------+--------------------------------------------+--------+
+   | acv_version | Protocol version identifier                | value  |
+   | vs_id       | Unique numeric identifier for the vector   | value  |
+   |             | set                                        |        |
+   | algorithm   | IKEv2                                      | value  |
+   | test_groups | Array of test group JSON objects, which    | array  |
+   |             | are defined in Section 3.1                 |        |
+   +-------------+--------------------------------------------+--------+
+
+                      Table 2: Vector Set JSON Object
+
+3.1.  Test Groups JSON Schema
+
+   The test_groups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the IKEv2 JSON elements of the Test Group
+   JSON object.
+
+   +----------+-------------------------------------+-------+----------+
+   | JSON     | Description                         | JSON  | Optional |
+   | Value    |                                     | type  |          |
+   +----------+-------------------------------------+-------+----------+
+   | girlen   | Diffie-Hellman shared secret length | value | No       |
+   | sha      | The SHA type used for the test      | value | No       |
+   |          | vectors                             |       |          |
+   | initlen  | Length of initiator nonce           | value | No       |
+   | resplen  | Length of responder nonce           | value | No       |
+   | dkm      | Derived Key Matrerial for the       | value | No       |
+   |          | parent security authority in bytes  |       |          |
+   | dkmchild | Derived Key Matrerial for the child | value | No       |
+   |          | security authority in bytes         |       |          |
+   | tests    | Array of individual test vector     | array | No       |
+   |          | JSON objects, which are defined in  |       |          |
+   |          | Section 3.2                         |       |          |
+   +----------+-------------------------------------+-------+----------+
+
+                   Table 3: IKEv2 Test Group JSON Object
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+3.2.  Test Vectors JSON Schema
+
+   Each test group contains an array of one or more test vectors.  Each
+   test vector is a JSON object that represents a single test case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each SP800-135 KDF IKEv2 test vector.
+
+   +----------+-----------------------------------+---------+----------+
+   | JSON     | Description                       | JSON    | Optional |
+   | Value    |                                   | type    |          |
+   +----------+-----------------------------------+---------+----------+
+   | tc_id    | Unique numeric identifier for the | value   | No       |
+   |          | test case                         |         |          |
+   | ni       | Value of the initiator nonce      | value   | No       |
+   | nr       | Value of the responder nonce      | value   | No       |
+   | gir      | Diffie-Hellman shared secret      | value   | No       |
+   | girnew   | New Diffie-Hellman shared secret  | value   | No       |
+   | spii     | security parameter indice of the  | value   | No       |
+   |          | initiator                         |         |          |
+   | spir     | security parameter indice of the  | value   | No       |
+   |          | responder                         |         |          |
+   +----------+-----------------------------------+---------+----------+
+
+                      Table 4: Test Case JSON Object
+
+4.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the resonse vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +--------------+--------------------------------------------+-------+
+   | JSON Value   | Description                                | JSON  |
+   |              |                                            | type  |
+   +--------------+--------------------------------------------+-------+
+   | acv_version  | Protocol version identifier                | value |
+   | vs_id        | Unique numeric identifier for the vector   | value |
+   |              | set                                        |       |
+   | test_results | Array of JSON objects that represent each  | array |
+   |              | test vector result, as defined by the      |       |
+   |              | tables below                               |       |
+   +--------------+--------------------------------------------+-------+
+
+                 Table 5: Vector Set Response JSON Object
+
+   The following table describes the JSON object that represents a
+   vector set response for IKEv2.
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +----------------+--------------------------------------+-----------+
+   | JSON Value     | Description                          | JSON type |
+   +----------------+--------------------------------------+-----------+
+   | skeyseed       | Results of the extraction step       | value     |
+   | skeyseed_rekey | Results of the newly created skeyid  | value     |
+   | dkm            | Derived key Material from expansion  | value     |
+   |                | step                                 |           |
+   | dkm_child      | Expansion step results for child SA  | value     |
+   | dkm_child_dh   | Expansion step results for child SA  | value     |
+   |                | DH                                   |           |
+   +----------------+--------------------------------------+-----------+
+
+                 Table 6: Vector Set Response JSON Object
+
+5.  Acknowledgements
+
+   TBD...
+
+6.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+7.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+8.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+Appendix A.  Example SP800-135 KDF Capabilities JSON Object
+
+   The following is a example JSON object advertising support for SHA-
+   256.
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+               {
+                   "algorithm": "IKEv2",
+                   "hmacval": "123456",
+                   "shaval": "654321",
+                   "initiator" : [128, 2048],
+                   "responder" : [128, 2048],
+                   "sha" : ["SHA-1", "SHA-256", SHA-384", SHA-512"],
+                   "dkmlen" : [1056, 3072],
+               }
+
+Appendix B.  Example Test Vectors JSON Object
+
+   The following is a example JSON object for SP800-135 KDF test vectors
+   sent from the ACVP server to the crypto module.
+
+                {
+                  "acv_version": "0.2",
+                  "vs_id": 1564,
+                  "algorithm": "IKEv2",
+                  "test_groups": [
+                    {
+                      "girlen" : 224,
+                      "sha" : "SHA-1",
+                      "initlen" : 128,
+                      "resplen" : 128,
+                      "dkmlen" : 1056,
+                      "dkmchildlen" : 1056,
+                      "tests": [
+                        {
+                          "tc_id": 2170,
+                          "ni" : "d6e106297cdbdfa858340842f7e8177a",
+                          "nr" : "23a498f2862ca8d80049340797815f8d",
+                          "gir" : "b1d49a782337e866e41a6626a561b423b7dd368c46292f610d554aff",
+                          "girnew" : "897c7be2a35af41e844f9d80df7a70d88ed1f0d6ff916f95a069efe4",
+                          "spii" : "d49e0a11c35e989f",
+                          "spir" : "ab4192dfd0e37333",
+                        },
+                      ]
+                    },
+                  ]
+                }
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for SP800-135 KDF test results
+   sent from the crypto module to the ACVP server.
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+                {
+                    "acv_version": "0.2",
+                    "vs_id": 1564,
+                    "test_results": [
+                        {
+                            "tc_id": 2170,
+                            "skeyseed" : "59dbb66af31264f955fa72b6a3b0ff68b414e8f5"
+                            "dkm" : "76a35ca17b3de68999c2e73fcf94ca793d88e5cfb9f509e1ae5c9c245338d3652446c967122ee98ac6ac75dec39edeea8fbd2ca18e596d32e19f17b65caaa2af9697bfdcdc83e90bfdb89d7fdfbbb73e7f194de5eea717d8451b972a5e63e54067a39e25db739660bcc768469e003c707399ae5c294f13630acf32a0853c3a8469d89f0c",
+                            "dkm_child" : "c9d2e20781d56f0442258c69b2575667106af5ca805e8d507b68c50d2b724e8df833a47599ba97575251408ffb0cff81ef7abe3fc7eb34ff37bfdb7ddc2d7d348ffada65957894be90d0cc982d2244f10c19f2027735f658a8089c0a1fb2557af6da312d5f1dd93b4ca5b35cc4377a092d00e816e97ce63cbd00f4df91ea2a4fd39fca53",
+                            "dkm_child_dh" : "6acfad2a4e95ec7f9c2cd084976d0a95ebaf99818396bb23304a84296c179b3dd31a83e396fb8a77c71264839315436beae2281593a62ba31c02475651b2fded0a1afdd2634909ca7762b149a25a9948a23ef9460a354b0928aadacf72f3276667f730579f1a4d325ebf61f0c0badbecd08c9e0177472c5b4dccdc48393ce18d02ebfa92"
+                            "skeyseed_rekey" : "31bf324a192f519be4d9c157adc7d194b4167215",
+                        }
+                    ]
+                }
+
+
+Author's Address
+
+   Barry Fussell (editor)
+   Cisco Systems, Inc.
+   170 West Tasman Dr.
+   San Jose, CA  95134
+   USA
+
+   Email: bfussell@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 9]
