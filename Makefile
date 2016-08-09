@@ -14,3 +14,13 @@ all:
 	xml2rfc src/acvp_sub_kdf135_ikev2.xml -o artifacts/acvp_sub_kdf135_ikev2.txt
 	xml2rfc --html src/acvp_sub_kdf135_x963.xml -o artifacts/acvp_sub_kdf135_x963.html
 	xml2rfc src/acvp_sub_kdf135_x963.xml -o artifacts/acvp_sub_kdf135_x963.txt
+	xml2rfc --html src/acvp_sub_kdf135_tpm.xml -o artifacts/acvp_sub_kdf135_tpm.html
+	xml2rfc src/acvp_sub_kdf135_tpm.xml -o artifacts/acvp_sub_kdf135_tpm.txt
+	xml2rfc --html src/acvp_sub_kdf135_tls.xml -o artifacts/acvp_sub_kdf135_tls.html
+	xml2rfc src/acvp_sub_kdf135_tls.xml -o artifacts/acvp_sub_kdf135_tls.txt
+	xml2rfc --html src/acvp_sub_kdf135_ssh.xml -o artifacts/acvp_sub_kdf135_ssh.html
+	xml2rfc src/acvp_sub_kdf135_ssh.xml -o artifacts/acvp_sub_kdf135_ssh.txt
+	xml2rfc --html src/acvp_sub_kdf135_srtp.xml -o artifacts/acvp_sub_kdf135_srtp.html
+	xml2rfc src/acvp_sub_kdf135_srtp.xml -o artifacts/acvp_sub_kdf135_srtp.txt
+	xml2rfc --html src/acvp_sub_kdf135_snmp.xml -o artifacts/acvp_sub_kdf135_snmp.html
+	xml2rfc src/acvp_sub_kdf135_snmp.xml -o artifacts/acvp_sub_kdf135_snmp.txt
