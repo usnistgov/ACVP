@@ -112,7 +112,7 @@
 	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications
 	      define the constructs for testing individual crypto algorithms.  Each sub-specification
 	      addresses a specific class of crypto algorithms.  This sub-specification defines the JSON
-	      constructs for testing DRBG crypto algorithms using ACVP.</t>
+	      constructs for testing NIST-approved DRBG algorithms from SP 800-90A <xref target="SP800-90A"/> using ACVP. See also <xref target="DRBGVS"/> </t>
 
       <section title="Requirements Language">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -120,14 +120,68 @@
 	document are to be interpreted in
 	<xref target="RFC2119">RFC 2119</xref>.</t>
       </section>
+      <section anchor="defaults_def" title="Default values">
+          <t>ACVP has default values for many of the input parameters for testing the DRBG algorithms.For example, the Entropy Input, Nonce, Personalization String, and Addtional Input parameters have default values. 
+               The specific details and restrictions on each of these input lengths is specified in  <xref target="caps_reg"/>,  <xref target="caps_table"/> and the notes following it. To indicate a preference for using a 
+               default value for any of these parameters, the value zero (0) should be set. If the implementation does not support one of these
+              defaults, the corresponding supported bit length values shall be set explicitly. </t>
+      </section>
     </section>
 
 <section anchor="caps_reg" title="Capabilities Registration">
     <t>ACVP requires crypto modules to register their capabilities.  This allows the crypto
 	module to advertise support for specific algorithms, notifying the ACVP server which
 	algorithms need test vectors generated for the validation process.  This section
-    describes the constructs for advertising support of hash algorithms to the ACVP server.</t>
-
+    describes the constructs for advertising support of DRBG algorithms to the ACVP server.</t>
+       
+	<section anchor="supported_algs" title="Supported DRBG Algorithms">
+	    <t>The following DRBG algorithms and modes may be advertised by the ACVP compliant crypto module:</t>
+	    <texttable anchor="algs_table" title="Supported DRBG Algorithm and Modes JSON Values">
+          <ttcol align="left">JSON algorithm value</ttcol>
+          <ttcol align="left">JSON mode value</ttcol>
+          <c>Hash_DRBG</c>
+          <c>SHA-1</c>
+          <c/>
+          <c>SHA-224</c>
+          <c/>
+          <c>SHA-256</c>
+          <c/>
+          <c>SHA-384</c>
+          <c/>
+          <c>SHA-512</c>
+          <c/>
+          <c>SHA-512/224</c>
+          <c/>
+          <c>SHA-512/256</c>
+          <c/>
+          <c/>
+          <c>HMAC_DRBG</c>
+          <c>SHA-1</c>
+          <c/>
+          <c>SHA-224</c>
+          <c/>
+          <c>SHA-256</c>
+          <c/>
+          <c>SHA-384</c>
+          <c/>
+          <c>SHA-512</c>
+          <c/>
+          <c>SHA-512/224</c>
+          <c/>
+          <c>SHA-512/256</c>
+          <c/>
+          <c/>
+        <c>CTR_DRBG</c>
+          <c>3KeyTDEA</c>
+          <c/>
+          <c>AES-128</c>
+          <c/>
+          <c>AES-192</c>
+          <c/>
+          <c>AES-256</c>
+</texttable>
+	</section>
+	<section anchor="supported_caps" title="Supported DRBG Algorithm Capabilities">
     <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms'
 	value of the ACVP registration message.  The 'algorithms' value is an array, where each
 	array element is an individual JSON object defined in this section.  The 'algorithms'
@@ -147,16 +201,36 @@
           <ttcol align="left">Optional</ttcol>
 
           <c>algorithm</c>
-	  <c>The DRBG algorithm and mode to be validated.</c>
+	  <c>The DRBG algorithm to be validated.</c>
           <c>value</c>
-          <c>See <xref target="supported_algs"/></c>
+          <c>See <xref target="algs_table"/></c>
           <c>No</c>
          <c/>
          <c/>
           <c/>
           <c/>
           <c/>
-                  <c>aesval</c>
+<c>mode</c>
+          <c>The algorithm mode to be validated</c>
+          <c>value</c>
+          <c>See <xref target="algs_table"/></c>
+          <c>No</c> 
+         <c/>
+         <c/>
+          <c/>
+          <c/>
+          <c/>
+<c>df</c>
+          <c>derivation function option</c>
+          <c>value</c>
+          <c>yes, no</c>
+          <c>Yes, applicable to CTR_DRBG only</c> 
+         <c/>
+         <c/>
+          <c/>
+          <c/>
+          <c/>
+<c>aesval</c>
 	  <c>The prerequisite AES validation number or implemented in same implementation.</c>
           <c>value</c>
           <c>same or value</c>
@@ -289,48 +363,19 @@
 	         <t>Note 2: Implementations that either have prediction resistance always ON or always OFF shall have only one of the prediction resistance flags set. </t>
 	         <t>Note 3: Implementations that can be used either way will have both flags set.</t>
 	         <t>Note 4: For CTR_DRBG implementations, at least one of the derivation function options shall be set depending on the one actually used or both</t>	
-           <t>Note 5: All DRBGs are tested at their maximum supported security strength so this is the minimum bit length of the entropy input that ACVP will accept. Longer entropy inputs are permitted, 
+           <t>Note 5: All DRBGs are tested at their maximum supported security strength so this is the minimum bit length of the entropy input that ACVP will accept. 
+           The maximum supported security strength is also the default value for this input. Longer entropy inputs are permitted, 
           with the following exception: for CTR_DRBG with no df, the bit length must equal the seed length.</t>
-          <t>Note 6: CTR_DRBG with no derivation function (no df) does not use a nonce; the nonce values, if supplied, will be ignored for this case.</t>
-          <t>Note 7: CTR_DRBG with no derivation function (no df), where the second personalization string length must be less than or equal to the seed length. 
+          <t>Note 6: CTR_DRBG with no derivation function (no df) does not use a nonce; the nonce values, if supplied, will be ignored for this case. The default nonce bit length is one-half
+           the maximum security strength supported by the mechanism/option.</t>
+          <t>Note 7: ACVP has two default bit length values for personalization string: zero (0) and maximum supported
+           supported security strength except in the case of CTR_DRBG with no derivation function (no df), where the second personalization string length must be less than or equal to the seed length. 
           If the implementation only supports one personalization string length, then set both numbers equal to each other. 
-          If the implementation does not use a personalization string, set both numbers to 0 (zero).</t>
-          <t>Note 8: The addtional input configuration and restrictions are the same as those for the personalization string.</t>
+          If the implementation does not use a personalization string, set both numbers to 0 (zero). </t>
+          <t>Note 8: The addtional input configuration and restrictions are the same as those for the personalization string.Similarly, for the default addtional input bit legths - same as those for
+          personalization string lengths.</t>
           
-        
-	<section anchor="supported_algs" title="Supported DRBG Algorithms">
-	    <t>The following DRBG algorithms and modes may be advertised by the ACVP compliant crypto module:</t>
-	    <t><list style="symbols">
-		<t>Hash_DRBG
-		   <list style="symbols">
-		   <t>SHA-1</t>
-		   <t>SHA-224</t>
-		   <t>SHA-256</t>
-		   <t>SHA-384</t>
-		   <t>SHA-512</t>
-		   <t>SHA-512/224</t>
-		   <t>SHA-512/256</t>
-		   </list></t>
-		<t>HMAC_DRBG	  
-		   <list style="symbols">
-		   <t>SHA-1</t>
-		   <t>SHA-224</t>
-		   <t>SHA-256</t>
-		   <t>SHA-384</t>
-		   <t>SHA-512</t>
-		   <t>SHA-512/224</t>
-		   <t>SHA-512/256</t>
-		   </list></t>
-		<t>CTR_DRBG	   
-		<list style="symbols">
-		   <t>3KeyTDEA</t>
-		   <t>AES-128</t>
-		   <t>AES-192</t>
-		   <t>AES-256</t>
-		   </list></t>
-	    </list></t>
-	</section>
-
+   </section>
     </section>
 
     <section anchor="test_vectors" title="Test Vectors">
@@ -376,7 +421,7 @@
 	        in the vector set.  For instance, all test vectors that use the same key size would be grouped
 	        together.  The Test Group JSON object contains meta data that applies to all test vectors within
 	        the group.  The following table describes the DRBG JSON elements of the Test Group JSON object.</t>
-	        <t>ACVP allows default bit lengths for the inputs to specific algorithms, typically communicated as numerical value zero (0).. If an implementation does not support one of the defaults,
+	        <t>ACVP allows default bit lengths for the inputs to specific algorithms, typically communicated as numerical value zero (0). If an implementation does not support one of the defaults,
 the bit lengths the supported values shall be specified explicitly. </t>
 	    <texttable anchor="vs_tg_table" title="Test Group JSON Object">
 		<ttcol align="left">JSON Value</ttcol>
@@ -527,26 +572,6 @@ the bit lengths the supported values shall be specified explicitly. </t>
 		<c>Unique numeric identifier for the test case</c>
 		<c>value</c>
 		<c>No</c>
-
-		<c>EntropyInput</c>
-		<c>entropy value</c>
-		<c>value</c>
-		<c>No</c>
-
-		<c>Nonce</c>
-		<c>Value of the nonce</c>
-		<c>value</c>
-		<c>No</c>
-
-		<c>PersonalizationString</c>
-		<c>value of the personlization string</c>
-		<c>value</c>
-		<c>No</c>
-		
-		<c>PredictionResistanceInput</c>
-		<c>array of additonal input/entropy input value pairs for prediction resistance testing. See <xref target="vs_prtc_table"/></c>
-		<c>array</c>
-		<c>No</c>
 		
 		<c>ReturnedBits</c>
 		<c>value of the computed DRBG output</c>
@@ -593,9 +618,43 @@ the bit lengths the supported values shall be specified explicitly. </t>
           <date year="2016"/>
         </front>
       </reference>
+ <reference anchor="SP800-90A" target="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90Ar1.pdf">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>Recommendation for Random Number Generation Using Deterministic Random Bit Generators</title>
+
+          <author initials="E." surname="Barker">
+            <organization>NIST</organization>
+          </author>
+
+          <author initials="J." surname="Kelsey">
+            <organization>NIST</organization>
+          </author>
+
+          <date day="29" month="June" year="2015"/>
+        </front>
+      </reference>      
+ <reference anchor="DRBGVS" target="http://csrc.nist.gov/groups/STM/cavp/documents/drbg/DRBGVS.pdf">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>The NIST SP 800-90A Deterministic Random Bit Generator Validation SYSTEM (DRBGVS)</title>
+
+          <author initials="S." surname="Keller">
+            <organization>NIST</organization>
+          </author>
+
+          <author initials="T." surname="Hall">
+            <organization>NIST</organization>
+          </author>
+
+          <date day="29" month="October" year="2015"/>
+        </front>
+      </reference>      
     </references>
 
-    <section anchor="app-reg-ex" title="Example Secure Hash Capabilities JSON Object">
+    <section anchor="app-reg-ex" title="Example DRBG Capabilities JSON Object">
       <t>The following is a example JSON object advertising support for CTR_DRBG with 3KeyTDEA.</t>
       <figure>
         <artwork><![CDATA[
