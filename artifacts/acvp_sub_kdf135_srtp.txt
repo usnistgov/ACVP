@@ -1,0 +1,504 @@
+
+
+
+
+TBD                                                      B. Fussell, Ed.
+Internet-Draft                                       Cisco Systems, Inc.
+Intended status: Informational                                 June 2016
+Expires: December 3, 2016
+
+
+     ACVP SRTP Key Derivation Function Algorithm JSON Specification
+                      draft-ietf-acvp-subkdf135-00
+
+Abstract
+
+   This document defines the JSON schema for using SP800-135 SRTP KDF
+   algorithms with the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on December 3, 2016.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 1]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
+     2.1.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   3
+     2.2.  Supported SP800-135 KDF Methodss  . . . . . . . . . . . .   4
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   5
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   6
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Example SP800-135 KDF Capabilities JSON Object . . .   7
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   8
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   8
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   9
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing SP800-135
+   KDF algorithms using ACVP.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
+
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 2]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   the constructs for advertising support of SP800-135 KDF algorithms to
+   the ACVP server.
+
+   The algorithm capabilities are advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each algorithm capability advertised is a
+   self-contained JSON object.  The following JSON values are used for
+   SP800-135 KDF algorithm capabilities:
+
+   +-----------+----------------------+-------+-------------+----------+
+   | JSON      | Description          | JSON  | Valid       | Optional |
+   | Value     |                      | type  | Values      |          |
+   +-----------+----------------------+-------+-------------+----------+
+   | algorithm | The KDF to be        | value | See Section | No       |
+   |           | validated            |       | 2.1         |          |
+   | aesval    | The AES validation   | value | same or     | Yes      |
+   |           | number or            |       | value       |          |
+   |           | implemented in same  |       |             |          |
+   |           | implementation(SRTP) |       |             |          |
+   | methods   | Type of method or    | array | See Section | Yes      |
+   |           | algorithm supported  |       | 2.2         |          |
+   | kdr0      | SRTP: Key Derivation | array | all, 1-24   | Yes      |
+   |           | Rate 0               |       |             |          |
+   | kdr1      | SRTP: Key Derivation | array | all, 1-24   | Yes      |
+   |           | Rate 1               |       |             |          |
+   +-----------+----------------------+-------+-------------+----------+
+
+         Table 1: SP800-135 KDF Algorithm Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   For example, SHA-1 requires inbyte, inempty, inlen, and outlen.
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
+
+2.1.  Supported SP800-135 KDF Algorithms
+
+   The following SP800-135 KDF algorithms may be advertised by the ACVP
+   compliant crypto module:
+
+   o  IKEv1
+
+   o  IKEv2
+
+   o  TLS
+
+
+
+Fussell                 Expires December 3, 2016                [Page 3]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   o  ANSI X9.63
+
+   o  SSH
+
+   o  SRTP
+
+   o  SNMP
+
+   o  TPM
+
+2.2.  Supported SP800-135 KDF Methodss
+
+   The following SP800-135 KDF methods may be advertised by the ACVP
+   compliant crypto module:
+
+   o  AES-128-CBC
+
+   o  AES-192-CBC
+
+   o  AES-256-CBC
+
+3.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual Key Derivation Function (KDF),
+   such as SNMP, SSH, etc.  This section describes the JSON schema for a
+   test vector set used with SP800-135 KDF algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +-------------+--------------------------------------------+--------+
+   | JSON Value  | Description                                | JSON   |
+   |             |                                            | type   |
+   +-------------+--------------------------------------------+--------+
+   | acv_version | Protocol version identifier                | value  |
+   | vs_id       | Unique numeric identifier for the vector   | value  |
+   |             | set                                        |        |
+   | algorithm   | See Section 2.1                            | value  |
+   | test_groups | Array of test group JSON objects, which    | array  |
+   |             | are defined in Section 3.1                 |        |
+   +-------------+--------------------------------------------+--------+
+
+                      Table 2: Vector Set JSON Object
+
+3.1.  Test Groups JSON Schema
+
+   The test_groups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The KDF test group for SRTP is as follows:
+
+   +--------+---------------------------------------+-------+----------+
+   | JSON   | Description                           | JSON  | Optional |
+   | Value  |                                       | type  |          |
+   +--------+---------------------------------------+-------+----------+
+   | method | The method used for the test vectors. | value | No       |
+   |        | See Section 2.2 for possible values   |       |          |
+   | kdr    | The Key Derivation Rate used          | value | No       |
+   | tests  | Array of individual test vector JSON  | array | No       |
+   |        | objects, which are defined in Section |       |          |
+   |        | 3.2                                   |       |          |
+   +--------+---------------------------------------+-------+----------+
+
+                     Table 3: Vector Group JSON Object
+
+3.2.  Test Vectors JSON Schema
+
+   Each test group contains an array of one or more test vectors.  Each
+   test vector is a JSON object that represents a single test case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each SP800-135 KDF SRTP test vector.
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +------------+---------------------------------+---------+----------+
+   | JSON Value | Description                     | JSON    | Optional |
+   |            |                                 | type    |          |
+   +------------+---------------------------------+---------+----------+
+   | tc_id      | Unique numeric identifier for   | value   | No       |
+   |            | the test case                   |         |          |
+   | kmaster    | Master key value                | value   | No       |
+   | msalt      | Master salt value               | value   | No       |
+   | kdr        | Key derivation rate value       | value   | No       |
+   | index      | Index value for SCTP            | value   | No       |
+   | indexsrtcp | Index value for SRTCP           | value   | No       |
+   +------------+---------------------------------+---------+----------+
+
+                      Table 4: Test Case JSON Object
+
+4.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the resonse vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +--------------+--------------------------------------------+-------+
+   | JSON Value   | Description                                | JSON  |
+   |              |                                            | type  |
+   +--------------+--------------------------------------------+-------+
+   | acv_version  | Protocol version identifier                | value |
+   | vs_id        | Unique numeric identifier for the vector   | value |
+   |              | set                                        |       |
+   | test_results | Array of JSON objects that represent each  | array |
+   |              | test vector result, as defined by the      |       |
+   |              | tables below                               |       |
+   +--------------+--------------------------------------------+-------+
+
+                 Table 5: Vector Set Response JSON Object
+
+   The following table describes the JSON object that represents a
+   vector set response for SRTP.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+           +------------+--------------------------+-----------+
+           | JSON Value | Description              | JSON type |
+           +------------+--------------------------+-----------+
+           | srtp_ke    | SRTP encryption key      | value     |
+           | srtp_ka    | SRTP authentication key  | value     |
+           | srtp_ks    | SRTP salting key         | value     |
+           | srtcp_ke   | SRTCP encryption key     | value     |
+           | srtcp_ka   | SRTCP authentication key | value     |
+           | srtcp_ks   | SRTCP salting key        | value     |
+           +------------+--------------------------+-----------+
+
+                 Table 6: Vector Set Response JSON Object
+
+5.  Acknowledgements
+
+   TBD...
+
+6.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+7.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+8.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+Appendix A.  Example SP800-135 KDF Capabilities JSON Object
+
+   The following is a example JSON object advertising support for SHA-
+   256.
+
+
+
+            {
+                "algorithm": "SRTP",
+                "aesval": "123456",
+                "methods" : ["AES-128-CBC", "AES-192-CBC", "AES-256-CBC" ],
+                "kdr" : [ "all"]
+            }
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+Appendix B.  Example Test Vectors JSON Object
+
+   The following is a example JSON object for SP800-135 KDF test vectors
+   sent from the ACVP server to the crypto module.
+
+                {
+                  "acv_version": "0.2",
+                  "vs_id": 1564,
+                  "algorithm": "SRTP",
+                  "test_groups": [
+                    {
+                      "method": "AES-128-CBC",
+                      "kdr" : "all",
+                      "tests": [
+                        {
+                          "tc_id": 2170,
+                          "kmaster" : "3a18bc2b15738e054f87014c9096da98",
+                          "msalt" : "85b9fa33b28a76b844fd453c3af7",
+                          "kdr" : "000000000000",
+                          "index" : "92373bee6572",
+                          "indexsrtcp" : "1dfb5e64",
+
+                        },
+                      ]
+                    },
+                  ]
+                }
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for SP800-135 KDF test results
+   sent from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+                {
+                    "acv_version": "0.2",
+                    "vs_id": 1564,
+                    "test_results": [
+                        {
+                            "tc_id": 2170,
+                            "srtp_ke" : "82e463c444f177ff459829c59e4c31e7",
+                            "srtp_ka" : "986bfe23803a98ad28abcc09466f758770244f34",
+                            "srtp_ks" : "1338f50d9ba6511c9a5c6360ad6e",
+                            "srtcp_ke" : "4e0c1fdf228b3564b6d2061bcf49d3ff",
+                            "srtcp_ka" : "0fd8416b54975965fd12ac4a84428dceea41281c",
+                            "srtcp_ks" : "88357f3f7c2c556b1f9a8ccbdbbf",
+                        }
+                    ]
+                }
+
+
+Author's Address
+
+   Barry Fussell (editor)
+   Cisco Systems, Inc.
+   170 West Tasman Dr.
+   San Jose, CA  95134
+   USA
+
+   Email: bfussell@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 9]
