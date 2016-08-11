@@ -633,7 +633,7 @@
 </table>
 <h1 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a> <a href="#tgjs" id="tgjs">Test Groups JSON Schema</a></h1>
 <p id="rfc.section.3.1.p.1">The test_groups element at the top level in the test vector JSON object is an array of test groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set.  For instance, all test vectors that use the same key size would be grouped together.  The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.</p>
-<p id="rfc.section.3.1.p.2">The KDF test group for SRTP is as follows:</p>
+<p id="rfc.section.3.1.p.2">The KDF test group for KDF108 is as follows:</p>
 <div id="rfc.table.3"/>
 <div id="vs_tg_table5"/>
 <table cellpadding="3" cellspacing="0" class="tt full center">
@@ -680,7 +680,7 @@
   </tbody>
 </table>
 <h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#tvjs" id="tvjs">Test Vectors JSON Schema</a></h1>
-<p id="rfc.section.3.2.p.1">Each test group contains an array of one or more test vectors.  Each test vector is a JSON object that represents a single test case to be processed by the ACVP client.  The following table describes the JSON elements for each SP800-108 KDF SRTP test vector.</p>
+<p id="rfc.section.3.2.p.1">Each test group contains an array of one or more test vectors.  Each test vector is a JSON object that represents a single test case to be processed by the ACVP client.  The following table describes the JSON elements for each SP800-108 KDF test vector.</p>
 <div id="rfc.table.4"/>
 <div id="vs_tc_table5"/>
 <table cellpadding="3" cellspacing="0" class="tt full center">
@@ -702,8 +702,8 @@
     </tr>
     <tr>
       <td class="left">L</td>
-      <td class="left">Length of Ko keying material</td>
-      <td class="left">0-65536</td>
+      <td class="left">Minimum and maximum lengths of Ko keying material</td>
+      <td class="left">array</td>
       <td class="left">No</td>
     </tr>
     <tr>
@@ -745,7 +745,7 @@
     </tr>
   </tbody>
 </table>
-<p id="rfc.section.4.p.2">The following table describes the JSON object that represents a vector set response for SRTP.</p>
+<p id="rfc.section.4.p.2">The following table describes the JSON object that represents a vector set response for KDF108.</p>
 <div id="rfc.table.6"/>
 <div id="vr_top_table5"/>
 <table cellpadding="3" cellspacing="0" class="tt full center">
@@ -765,7 +765,7 @@
     </tr>
     <tr>
       <td class="left">fixedInputData</td>
-      <td class="left">SRTP authentication key</td>
+      <td class="left">Fixed input data string</td>
       <td class="left">value</td>
     </tr>
     <tr>
@@ -804,10 +804,17 @@
 
 
             {
-                "algorithm": "SRTP",
-                "aesval": "123456",
-		"methods" : ["AES-128-CBC", "AES-192-CBC", "AES-256-CBC" ],
-		"kdr" : [ "all"]
+                "algorithm": "counterMode",
+                "kasval": "123456",
+                "drbgval": "123456",
+                "hmacval": "123456",
+                "cmacval": "123456",
+		"methods" : ["CMAC-AES-128", "CMAC-AES-192", "CMAC-AES-256" ],
+		"r" : "8",
+		"L" : ["0", "256"],
+		"SP" : "SP800-90A",
+		"order" : "before",
+
             }
             </pre>
 <h1 id="rfc.appendix.B"><a href="#rfc.appendix.B">Appendix B.</a> <a href="#app-vs-ex" id="app-vs-ex">Example Test Vectors JSON Object</a></h1>
@@ -816,20 +823,17 @@
                 {
                   "acv_version": "0.2",
                   "vs_id": 1564,
-                  "algorithm": "SRTP",
+                  "algorithm": "counterMode",
                   "test_groups": [
                     {
-                      "method": "AES-128-CBC",
-		      "kdr" : "all",
+                      "method": "CMAC-AES-128",
+		      "ctrLocation" : "before",
+		      "rLen" : 8,
                       "tests": [
                         {
                           "tc_id": 2170,
-			  "kmaster" : "3a18bc2b15738e054f87014c9096da98",
-			  "msalt" : "85b9fa33b28a76b844fd453c3af7",
-			  "kdr" : "000000000000",
-			  "index" : "92373bee6572",
-			  "indexsrtcp" : "1dfb5e64",
-
+			  "L" : "128",
+			  "KI" : "dff1e50ac0b69dc40f1051d46c2b069c",
                         },
                       ]
                     },
@@ -845,12 +849,9 @@
                     "test_results": [
                         {
                             "tc_id": 2170,
-			    "srtp_ke" : "82e463c444f177ff459829c59e4c31e7",
-			    "srtp_ka" : "986bfe23803a98ad28abcc09466f758770244f34",
-			    "srtp_ks" : "1338f50d9ba6511c9a5c6360ad6e",
-			    "srtcp_ke" : "4e0c1fdf228b3564b6d2061bcf49d3ff",
-			    "srtcp_ka" : "0fd8416b54975965fd12ac4a84428dceea41281c",
-			    "srtcp_ks" : "88357f3f7c2c556b1f9a8ccbdbbf",
+			    "fixedInputDataByteLen" : "60",
+			    "fixedInputData" : "c16e6e02c5a3dcc8d78b9ac1306877761310455b4e41469951d9e6c2245a064b33fd8c3b01203a7824485bf0a64060c4648b707d2607935699316ea5",
+			    "KO" : "8be8f0869b3c0ba97b71863d1b9f7813",
                         }
                     ]
                 }
