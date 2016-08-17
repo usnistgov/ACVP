@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-ietf-acvp-subdsa-00" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the
+         full title is longer than 39 characters -->
+
+    <title abbrev="Sym Alg JSON">ACVP DSA Algorithm JSON Specification</title>
+
+    <!-- add 'role="editor"' below for the editors if appropriate -->
+
+    <!-- Another author who claims to be an editor -->
+
+    <author fullname="Barry Fussell" initials="B.F." role="editor"
+            surname="Fussell">
+      <organization>Cisco Systems, Inc.</organization>
+
+      <address>
+        <postal>
+          <street>170 West Tasman Dr.</street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95134</code>
+
+          <country>USA</country>
+        </postal>
+
+        <email>bfussell@cisco.com</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+
+    <date month="June" year="2016" />
+
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+         in the current day for you. If only the current year is specified, xml2rfc will fill
+	 in the current day and month for you. If the year is not the current one, it is
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+	 specify just the year. -->
+
+    <!-- Meta-data Declarations -->
+
+    <area>General</area>
+
+    <workgroup>TBD</workgroup>
+
+    <!-- WG name at the upperleft corner of the doc,
+         IETF is fine for individual submissions.
+	 If this element is not present, the default is "Network Working Group",
+         which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+    <keyword>acvp</keyword>
+    <keyword>crypto</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+      <t>This document defines the JSON schema for using DSA algorithms with the ACVP specification.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically
+              verify the cryptographic implementation of a software or hardware crypto module.
+              The ACVP specification defines how a crypto module communicates with an ACVP
+              server, including crypto capabilities negotiation, session management, authentication,
+	      vector processing and more.  The ACVP specification does not define algorithm specific
+	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications
+	      define the constructs for testing individual crypto algorithms.  Each sub-specification
+	      addresses a specific class of crypto algorithms.  This sub-specification defines the JSON
+	      constructs for testing DSA2 algorithms using ACVP.</t>
+
+      <section title="Requirements Language">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+	document are to be interpreted in
+	<xref target="RFC2119">RFC 2119</xref>.</t>
+      </section>
+    </section>
+
+<section anchor="caps_reg" title="Capabilities Registration">
+    <t>ACVP requires crypto modules to register their capabilities.  This allows the crypto
+	module to advertise support for specific algorithms, notifying the ACVP server which
+	algorithms need test vectors generated for the validation process.  This section
+    describes the constructs for advertising support of DSA2 algorithms to the ACVP server.</t>
+
+    <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms'
+	value of the ACVP registration message.  The 'algorithms' value is an array, where each
+	array element is an individual JSON object defined in this section.  The 'algorithms'
+	value is part of the 'capability_exchange' element of the ACVP JSON registration message.
+	See the ACVP specification for details on the registration message.
+
+	Each algorithm capability advertised is a self-contained JSON object.  The following
+	JSON values are used for DSA2 algorithm capabilities:</t>
+
+        <texttable anchor="caps_table" title="DSA2 Algorithm Capabilities JSON Values">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+          <ttcol align="left">Valid Values</ttcol>
+          <ttcol align="left">Optional</ttcol>
+
+          <c>algorithm</c>
+	  <c>The algorithm under test</c>
+          <c>value</c>
+          <c>DSA2</c>
+          <c>No</c>
+
+          <c>shaval</c>
+	  <c>The SHA validation number or implemented in "same" implementation</c>
+          <c>value</c>
+          <c>same or value</c>
+          <c>No</c>
+
+          <c>sha2val</c>
+	  <c>A second (optional) SHA validation number or implemented in "same" implementation</c>
+          <c>value</c>
+          <c>same or value</c>
+          <c>Yes</c>
+
+          <c>drbgval</c>
+	  <c>The DRBG validation number or implemented in "same" implementation</c>
+          <c>value</c>
+          <c>same or value</c>
+          <c>No</c>
+
+	  <c>methods</c>
+	  <c>Method and associated parameters represented as an array of the following JSON values</c>
+	  <c>array</c>
+	  <c>See the following values</c>
+	  <c>No</c>
+
+	  <c>type</c>
+	  <c>Type of method or algorithm supported, represented as an array of the following JSON values</c>
+	  <c>value</c>
+	  <c>See <xref target="supported_types" /></c>
+	  <c>No</c>
+
+	  <c>GenPQ</c>
+	  <c>Genrate P and Q method, one or both</c>
+	  <c>array</c>
+	  <c>Probable, Provable</c>
+	  <c>Yes</c>
+
+	  <c>GenG</c>
+	  <c>Genrate G method, one or both</c>
+	  <c>array</c>
+	  <c>Unverifiable, Canonical</c>
+	  <c>Yes</c>
+
+	  <c>LNinfo</c>
+	  <c>Array of the following values for this type of method</c>
+	  <c>array</c>
+	  <c>See the following two fields as values of the array</c>
+	  <c>No</c>
+
+	  <c>LN</c>
+	  <c>Length in bits of prime modulus p and the prime divisor</c>
+	  <c>value</c>
+	  <c>1024-224, 2048-224, 2048-256, 3072-256</c>
+	  <c>No</c>
+
+          <c>sha</c>
+	  <c>Array of SHA values used for an LN</c>
+	  <c>array</c>
+	  <c>See <xref target="supported_sha"/></c>	
+          <c>Yes</c>
+        </texttable>
+
+
+
+
+	<t>Note: Some optional values are required depending on the algorithm.  Failure to provide these values will
+	result in the ACVP server returning an error to the ACVP client during registration.</t>
+
+	<section anchor="supported_types" title="Supported DSA2 Functions">
+	    <t>The following DSA2 method types may be advertised by the ACVP compliant crypto module:</t>
+	    <t><list style="symbols">
+		<t>PQGGen</t>
+		<t>PQGVer</t>
+		<t>KeyPair</t>
+		<t>SigGen</t>
+		<t>SigVer</t>
+	    </list></t>
+	</section>
+
+	<section anchor="supported_sha" title="Supported SHA Methods">
+	    <t>The following SHA methods may be advertised by the ACVP compliant crypto module:</t>
+	    <t><list style="symbols">
+		<t>SHA-1</t>
+		<t>SHA-224</t>
+		<t>SHA-256</t>
+		<t>SHA-384</t>
+		<t>SHA-512</t>
+		<t>SHA-512-244</t>
+		<t>SHA-512-256</t>
+	    </list></t>
+	</section>
+    </section>
+
+    <section anchor="test_vectors" title="Test Vectors">
+	<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
+	    the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
+	    sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
+	    DSA functionc.  This section describes the JSON schema for a test vector set used with DSA2 algorithms.</t>
+
+	<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
+	vector set as well as individual test vectors to be processed by the ACVP client.The following table describes the JSON elements at the top level of the hierarchy.
+	</t>
+	<texttable anchor="vs_top_table" title="Vector Set JSON Object">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+
+	  <c>acv_version</c>
+	  <c>Protocol version identifier</c>
+          <c>value</c>
+
+	  <c>vs_id</c>
+	  <c>Unique numeric identifier for the vector set</c>
+          <c>value</c>
+
+          <c>algorithm</c>
+	  <c>DSA2</c>
+          <c>value</c>
+
+	  <c>test_groups</c>
+	  <c>Array of test group JSON objects, which are defined in <xref target="tgjs" /></c>
+          <c>array</c>
+	</texttable>
+
+	<section title="Test Groups JSON Schema" anchor="tgjs">
+	    <t>The test_groups element at the top level in the test vector JSON object is an array of test
+		groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
+	        in the vector set.  For instance, all test vectors that use the same key size would be grouped
+	        together.  The Test Group JSON object contains meta data that applies to all test vectors within
+	        the group. The following table describes the secure hash JSON elements of the Test Group JSON object.</t>
+
+	<t> The test group for DSA2 is as follows:</t>
+	<texttable anchor="vs_tg_table5" title="Vector Group JSON Object">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+	  <ttcol align="left">Optional</ttcol>
+
+
+	  <c>type</c>
+	  <c>The method type used for the test vectors.  See <xref target="supported_types" /> for possible values</c>
+          <c>value</c>
+          <c>No</c>
+
+	  <c>LN</c>
+	  <c>Length in bits of prime modulus p and the prime divisor as second item of array</c>
+	  <c>array</c>
+          <c>No</c>
+
+          <c>sha</c>
+	  <c>SHA version used</c>
+	  <c>array</c>
+          <c>Yes</c>
+
+	  <c>GenPQ</c>
+	  <c>Probable, Provable</c>
+          <c>value</c>
+          <c>Yes</c>
+
+	  <c>GenG</c>
+	  <c>Unverifiable, Canonical</c>
+	  <c>array</c>
+	  <c>Yes</c>
+
+	  <c>tests</c>
+	  <c>Array of individual test vector JSON objects, which are defined in <xref target="tvjs" /></c>
+	  <c>array</c>
+          <c>No</c>
+	</texttable>
+
+          </section>
+
+	<section title="Test Vectors JSON Schema" anchor="tvjs">
+	    <t>Each test group contains an array of one or more test vectors.  Each test vector is a JSON object
+		that represents a single test case to be processed by the ACVP client.  The following table describes the JSON elements for each DSA2 test vector.</t>
+	    <texttable anchor="vs_tc_table5" title="Test Case JSON Object">
+		<ttcol align="left">JSON Value</ttcol>
+		<ttcol align="left">Description</ttcol>
+		<ttcol align="left">JSON type</ttcol>
+		<ttcol align="left">Optional</ttcol>
+
+		<c>tc_id</c>
+		<c>Unique numeric identifier for the test case</c>
+		<c>value</c>
+		<c>No</c>
+
+		<c>P</c>
+		<c>The prime modulus</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>Q</c>
+		<c>The prime divisor of P-1</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>G</c>
+		<c>The generator</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>R</c>
+		<c>The signature component R</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>S</c>
+		<c>The signature component S</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>Y</c>
+		<c>The public key component Y</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>number</c>
+		<c>Number of domain parameter sets to be generated</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>seed</c>
+		<c>Seed used to generate P and Q</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>counter</c>
+		<c>The counter output from the generation of p</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>N</c>
+		<c>The number of sets of X and Y values to generate</c>
+		<c>value</c>
+		<c>Yes</c>
+
+		<c>message</c>
+		<c>The message used to generate signature or verify signature</c>
+		<c>value</c>
+		<c>Yes</c>
+
+	    </texttable>
+	</section>
+    </section>
+
+    <section anchor="vector_responses" title="Test Vector Responses">
+	<t>After the ACVP client downloads and processes a vector set, it must send the resonse vectors
+	back to the ACVP server.  The following table describes the JSON object that represents a vector set response.</t>
+
+	<texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+
+	  <c>acv_version</c>
+	  <c>Protocol version identifier</c>
+          <c>value</c>
+
+	  <c>vs_id</c>
+	  <c>Unique numeric identifier for the vector set</c>
+          <c>value</c>
+
+	  <c>test_results</c>
+	  <c>Array of JSON objects that represent each test vector result, as defined by the tables below</c>
+          <c>array</c>
+	</texttable>
+
+	<t>The following table describes the JSON object that represents a vector set response for DSA2.</t>	<texttable anchor="vr_top_table5" title="Vector Set Response JSON Object">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+	  <ttcol align="left">Optional</ttcol>
+
+	  <c>P</c>
+	  <c>The prime modulus</c>
+	  <c>value</c>
+	  <c>Yes</c>
+
+	  <c>Q</c>
+	  <c>The prime divisor of P-1</c>
+	  <c>value</c>
+	  <c>Yes</c>
+
+	  <c>G</c>
+	  <c>The generator</c>
+	  <c>value</c>
+	  <c>Yes</c>
+
+	  <c>X</c>
+	  <c>The private key component X</c>
+	  <c>value</c>
+	  <c>Yes</c>
+
+	  <c>Y</c>
+	  <c>The public key component Y</c>
+	  <c>value</c>
+	  <c>Yes</c>
+
+	  <c>seed</c>
+	  <c>Seed used to generate P and Q</c>
+	  <c>value</c>
+	  <c>Yes</c>
+
+	  <c>counter</c>
+	  <c>The counter output from the generation of p</c>
+	  <c>value</c>
+	  <c>Yes</c>
+
+	  <c>results</c>
+	  <c>The Pass or Fail result of the verify</c>
+	  <c>value</c>
+	  <c>Yes</c>
+	</texttable>
+    </section>
+
+    <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>TBD...</t>
+    </section>
+
+    <!-- Possibly a 'Contributors' section ... -->
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This memo includes no request to IANA.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Security considerations are addressed by the ACVP specification.</t>
+    </section>
+  </middle>
+
+  <!--  *****BACK MATTER ***** -->
+
+  <back>
+    <references title="Normative References">
+      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+      &RFC2119;
+
+      <reference anchor="ACVP">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>ACVP Specification</title>
+
+          <author initials="authInitials" surname="authSurName">
+            <organization>NIST</organization>
+          </author>
+
+          <date year="2016" />
+        </front>
+      </reference>
+    </references>
+
+    <section anchor="app-reg-ex" title="Example DSA2 Capabilities JSON Object">
+      <t>The following is a example JSON object advertising support for SHA-256.</t>
+      <figure>
+        <artwork><![CDATA[
+
+
+            {
+                "algorithm": "DSA2",
+                "shaval": "123456",
+                "drbgval": "123456",
+                "methods": [
+			      { "type" : "PQGGen",
+			        "GenPQ" : ["provable", "probable"],
+			        "GenG" : ["unverifiable", "canonical"],
+			        "LNinfo" : [
+			                { "LN : 2048-224, 
+				          "sha" : [SHA-1, SHA-224, SHA-256]},
+				        { "LN" : 2048-256, 
+				          "sha" : [SHA-1, SHA-224, SHA-256]},
+				       ]
+                              },
+			      { "type" : "PQGVer",
+			        "GenPQ" : ["provable", "probable"],
+			        "GenG" : ["unverifiable", "canonical"],
+			        "LNinfo" : [
+			                { "LN : 2048-224, 
+				          "sha" : [SHA-1, SHA-224, SHA-256]},
+				        { "LN" : 2048-256, 
+				          "sha" : [SHA-1, SHA-224, SHA-256]},
+				       ]
+                              }
+			   ] 
+            }
+            ]]></artwork>
+    </figure>
+    </section>
+    <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
+      <t>The following is a example JSON object for DSA2 test vectors sent from the ACVP server to the crypto module.</t>
+      <figure>
+        <artwork><![CDATA[
+                {
+                  "acv_version": "0.2",
+                  "vs_id": 1564,
+                  "algorithm": "DSA2",
+                  "test_groups": [
+                    {
+                      "type": "PQGVer",
+		      "GenPQ" : "probable",
+		      "LN : 2048-224, 
+		      "sha" : "SHA-224",
+                      "tests": [
+                        {
+                          "tc_id": 2170,
+			  "P" : "c92bd1ea2bbc438a85cf5d40e2a526b5db6d77082c7f086f264c9c70f6561ee438d2c381817be12e0cde6556a97e4624b43f6f6a3688c2791ccb84bb75f19eeb85656534b02738a952ea6aaeeb0625831f6640b869146a0bb5c0664503126f1e80f3033da0e7573ca0c91bbcda2618e2978c3ba3d9e73c125b4548a10a8b3d6ef1ad5ecba64298fd5f19f7062d882c044ffbf64c81f91542f7aff72dea711d0bf6b37402266050670e2f605c74aefb220ac6dbdb05842cf71d0967a292dd36656a2e58a52f1f84f54bab94f83b8d462f3d1bb79582e00389ee088767ab2a95f987daa86966d342d58cf71f8b419e85403a19025d595f1e60245b87264a93047d",
+			  "Q" : "ba15474ce0d94df493534038946932162cb58f8a56832e7b2bc92c07",
+			  "seed" : "09f16b3b6fbd738c9155fe15c2ad77933cc83e6d861b290a036cdf6a",
+			  "counter" : 839,
+                        },
+                      ]
+                    },
+                  ]
+                }
+            ]]></artwork>
+      </figure>
+    </section>
+    <section anchor="app-results-ex" title="Example Test Results JSON Object">
+      <t>The following is a example JSON object for DSA2 test results sent from the crypto module to the ACVP server.</t>
+      <figure>
+        <artwork><![CDATA[
+                {
+                    "acv_version": "0.2",
+                    "vs_id": 1564,
+                    "test_results": [
+                        {
+                            "tc_id": 2170,
+			    "result" : "False",
+                        }
+                    ]
+                }
+
+            ]]></artwork>
+        </figure>
+    </section>
+  </back>
+</rfc>
