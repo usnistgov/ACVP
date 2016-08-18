@@ -1,0 +1,784 @@
+
+
+
+
+TBD                                                     A. Vassilev, Ed.
+Internet-Draft            National Institute of Standards and Technology
+Intended status: Informational                           August 18, 2016
+Expires: February 19, 2017
+
+
+            ACVP RSA Algorithm Validation JSON Specification
+                       draft-ietf-acvp-subrsa-00
+
+Abstract
+
+   This document defines the JSON schema for testing RSA algorithm
+   implementations for conformance to [FIPS186-4] with the ACVP
+   specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on February 19, 2017.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+Vassilev                Expires February 19, 2017               [Page 1]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+     1.2.  Testing scope . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+     2.1.  Supported RSA Algorithm modes . . . . . . . . . . . . . .   3
+     2.2.  Supported RSA Capabilities  . . . . . . . . . . . . . . .   3
+     2.3.  Supported RSA Modes Capabilities  . . . . . . . . . . . .   6
+       2.3.1.  The keyGen Mode Capabilities  . . . . . . . . . . . .   6
+         2.3.1.1.  keyGen With Provable Primes Capabilities  . . . .   6
+         2.3.1.2.  keyGen With Probable Primes Capabilities  . . . .   7
+         2.3.1.3.  keyGen Full Set Of Capabilities . . . . . . . . .   8
+       2.3.2.  The sigGen Mode Capabilities  . . . . . . . . . . . .  10
+       2.3.3.  The sigVer Mode Capabilities  . . . . . . . . . . . .  10
+       2.3.4.  The legacySigVer Mode Capabilities  . . . . . . . . .  10
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  10
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  11
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .  12
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  12
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  13
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  13
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  13
+   Appendix A.  Example RSA Capabilities JSON Object . . . . . . . .  14
+   Appendix B.  Example Test Results JSON Object . . . . . . . . . .  14
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing RSA
+   akgorithm implementations for conformance to [FIPS186-4] using ACVP.
+   See also [RSA2VS].
+
+
+
+
+
+
+
+
+Vassilev                Expires February 19, 2017               [Page 2]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
+
+1.2.  Testing scope
+
+   The ACVP testing for RSA allows conformance testing for the three
+   modes of using the algorithm as specified in [FIPS186-4]: key
+   generation, signature generation and signature verification.
+   Correspondingly, ACVP allows testing of the five different methods
+   for key generation in [FIPS186-4], Appendix B.3.
+
+   ACVP also allows testing of legacy RSA implementations in the
+   signature verification mode according to [FIPS186-2].
+
+2.  Capabilities Registration
+
+   ACVP requires cryptographic modules to register their capabilities.
+   This allows the cryptographic module to advertise support for
+   specific algorithms, notifying the ACVP server which algorithms need
+   test vectors generated for the validation process.  This section
+   describes the constructs for advertising support of the RSA algorithm
+   in all allowed modes to the ACVP server - see [FIPS186-4] for
+   details.
+
+2.1.  Supported RSA Algorithm modes
+
+   The following RSA algorithm modes may be advertised by the ACVP
+   compliant crypto module:
+
+                +----------------------+-----------------+
+                | JSON algorithm value | JSON mode value |
+                +----------------------+-----------------+
+                | RSA                  | keyGen          |
+                |                      | sigGen          |
+                |                      | sigVer          |
+                |                      | legacySigVer    |
+                +----------------------+-----------------+
+
+            Table 1: Supported RSA Algorithm Modes JSON Values
+
+2.2.  Supported RSA Capabilities
+
+   The algorithm capabilities are advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+
+
+
+Vassilev                Expires February 19, 2017               [Page 3]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each RSA algorithm capability advertised is a
+   self-contained JSON object.  The following JSON values are used for
+   RSA algorithm capabilities:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vassilev                Expires February 19, 2017               [Page 4]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   +-----------+----------------------+-------+-------------+----------+
+   | JSON      | Description          | JSON  | Valid       | Optional |
+   | Value     |                      | type  | Values      |          |
+   +-----------+----------------------+-------+-------------+----------+
+   | algorithm | The RSA algorithm to | value | RSA         | No       |
+   |           | be validated.        |       |             |          |
+   |           |                      |       |             |          |
+   | mode      | The mode to be       | value | see Table 1 | No       |
+   |           | validated            |       |             |          |
+   |           |                      |       |             |          |
+   | drbgVal   | The prerequisite     | value | same or     | No       |
+   |           | DRBG validation      |       | value       |          |
+   |           | number or            |       |             |          |
+   |           | implemented in same  |       |             |          |
+   |           | implementation.      |       |             |          |
+   |           |                      |       |             |          |
+   | shaVal    | The prerequisite SHA | value | same or     | No       |
+   |           | validation number or |       | value       |          |
+   |           | implemented in same  |       |             |          |
+   |           | implementation.      |       |             |          |
+   |           |                      |       |             |          |
+   | drbg2Val  | The prerequisite     | value | same or     | Yes      |
+   |           | second DRBG          |       | value       |          |
+   |           | validation number or |       |             |          |
+   |           | implemented in same  |       |             |          |
+   |           | implementation.      |       |             |          |
+   |           |                      |       |             |          |
+   | sha2Val   | The prerequisite     | value | same or     | Yes      |
+   |           | second SHA           |       | value       |          |
+   |           | validation number or |       |             |          |
+   |           | implemented in same  |       |             |          |
+   |           | implementation.      |       |             |          |
+   |           |                      |       |             |          |
+   | sha3Val   | The prerequisite     | value | same or     | Yes      |
+   |           | third SHA validation |       | value       |          |
+   |           | number or            |       |             |          |
+   |           | implemented in same  |       |             |          |
+   |           | implementation.      |       |             |          |
+   |           |                      |       |             |          |
+   | modeSpecs | Array of mode        | array | See Table 1 | No       |
+   |           | capabilities         |       | and Section |          |
+   |           | specificaitons.      |       | 2.3         |          |
+   +-----------+----------------------+-------+-------------+----------+
+
+              Table 2: RSA Algorithm Capabilities JSON Values
+
+
+
+
+
+
+Vassilev                Expires February 19, 2017               [Page 5]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+2.3.  Supported RSA Modes Capabilities
+
+   The RSA mode capabilities are advertised as arrays of JSON objects
+   within the 'modeSpecs' value of the ACVP registration message - see
+   Table 2.  The 'modeSpecs' value is an array, where each array element
+   is an array of individual JSON objects corresponding to a particular
+   RSA mode defined in this section.  The 'modeSpecs' value is part of
+   the 'capability_exchange' element of the ACVP JSON registration
+   message.  See the ACVP specification for details on the registration
+   message.
+
+   Each RSA mode capabilities are advertised as an array of self-
+   contained JSON objects.
+
+2.3.1.  The keyGen Mode Capabilities
+
+   The RSA keyGen mode capabilities are advertised as an array of JSON
+   objects within the array of 'modeSpecs' value of the ACVP
+   registration message. as part of the 'capability_exchange' element of
+   the ACVP JSON registration message.  See the ACVP specification for
+   details on the registration message.
+
+   Each RSA keyGen mode capability is advertised as a self-contained
+   JSON object.
+
+   The following subsections define the capabilities that may be
+   advertised by the ACVP compliant crypto modules.
+
+2.3.1.1.  keyGen With Provable Primes Capabilities
+
+   The following key generation with provable primes capabilities may be
+   advertised by the ACVP compliant crypto module:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vassilev                Expires February 19, 2017               [Page 6]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   +-----------------+------------------+-------+------------+---------+
+   | JSON value      | Description      | JSON  | Valid      | Optiona |
+   |                 |                  | type  | values     | l       |
+   +-----------------+------------------+-------+------------+---------+
+   | modListProvPrim | supported RSA    | array | any non-   | Yes     |
+   | e               | moduli for       |       | empty      |         |
+   |                 | provable prime   |       | subset of  |         |
+   |                 | generation - see |       | {2048,     |         |
+   |                 | [FIPS186-4],     |       | 3072,      |         |
+   |                 | Appendix B.3.2   |       | 4096}      |         |
+   |                 |                  |       |            |         |
+   | hashListProvPri | supported hash   | array | any non-   | Yes     |
+   | me              | algorithms for   |       | empty      |         |
+   |                 | provable prime   |       | subset of  |         |
+   |                 | generation - see |       | {SHA1,     |         |
+   |                 | [FIPS186-4],     |       | SHA224,    |         |
+   |                 | Appendix B.3.2   |       | SHA256,    |         |
+   |                 |                  |       | SHA384,    |         |
+   |                 |                  |       | SHA512, SH |         |
+   |                 |                  |       | A512/224,  |         |
+   |                 |                  |       | SHA512/256 |         |
+   |                 |                  |       | }          |         |
+   |                 |                  |       |            |         |
+   | capMatrixProvPr | supported        | matri | yes/no     | Yes     |
+   | ime             | capabilities     | x     |            |         |
+   |                 | matrix {[modList |       |            |         |
+   |                 | ProvPrime], [has |       |            |         |
+   |                 | hListProvPrime]} |       |            |         |
+   |                 | for provable     |       |            |         |
+   |                 | prime generation |       |            |         |
+   +-----------------+------------------+-------+------------+---------+
+
+    Table 3: Supported RSA keyGen moduli and hash options for provable
+                            primes JSON Values
+
+2.3.1.2.  keyGen With Probable Primes Capabilities
+
+   The following key generation with probable primes capabilities may be
+   advertised by the ACVP compliant crypto modules:
+
+
+
+
+
+
+
+
+
+
+
+
+Vassilev                Expires February 19, 2017               [Page 7]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   +--------------+-------------------+-------+-------------+----------+
+   | JSON value   | Description       | JSON  | Valid       | Optional |
+   |              |                   | type  | values      |          |
+   +--------------+-------------------+-------+-------------+----------+
+   | modProbPrime | supported RSA     | array | any non-    | Yes      |
+   |              | moduli for        |       | empty       |          |
+   |              | probable prime    |       | subset of   |          |
+   |              | generation - see  |       | {2048,      |          |
+   |              | [FIPS186-4],      |       | 3072, 4096} |          |
+   |              | Appendix B.3.3    |       |             |          |
+   |              |                   |       |             |          |
+   | TableC2      | Number of Miller- | value | decimal     | Yes      |
+   |              | Rabin rounds from |       |             |          |
+   |              | Table C.2 in      |       |             |          |
+   |              | [FIPS186-4],      |       |             |          |
+   |              | Appendix C.3      |       |             |          |
+   |              |                   |       |             |          |
+   | TableC3      | Number of Miller- | value | decimal     | Yes      |
+   |              | Rabin rounds from |       |             |          |
+   |              | Table C.3 in      |       |             |          |
+   |              | [FIPS186-4],      |       |             |          |
+   |              | Appendix C.3      |       |             |          |
+   +--------------+-------------------+-------+-------------+----------+
+
+    Table 4: Supported RSA keyGen moduli and primality test options for
+                        probable primes JSON Values
+
+2.3.1.3.  keyGen Full Set Of Capabilities
+
+   The complete list of RSA key generation capabilities may be
+   advertised by the ACVP compliant crypto module:
+
+   +-------------------+-----------------+--------+---------+----------+
+   | JSON Value        | Description     | JSON   | Valid   | Optional |
+   |                   |                 | type   | Values  |          |
+   +-------------------+-----------------+--------+---------+----------+
+   | fixedPubExp       | supports fixed  | value  | yes,no  | Yes      |
+   |                   | public key      |        |         |          |
+   |                   | exponent e      |        |         |          |
+   |                   |                 |        |         |          |
+   | fixedPubExpVal    | the value of    | value  | hex     | Yes      |
+   |                   | the public key  |        |         |          |
+   |                   | exponent e in   |        |         |          |
+   |                   | hex             |        |         |          |
+   |                   |                 |        |         |          |
+   | randPubExp        | supports random | value  | yes,no  | Yes      |
+   |                   | public key      |        |         |          |
+   |                   | exponent e      |        |         |          |
+
+
+
+Vassilev                Expires February 19, 2017               [Page 8]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   |                   |                 |        |         |          |
+   | randPQ            | random P and Q  | value  | 1,2     | Yes      |
+   |                   | primes          |        |         |          |
+   |                   | generated as    |        |         |          |
+   |                   | (see            |        |         |          |
+   |                   | [FIPS186-4] ):  |        |         |          |
+   |                   | 1 - provable    |        |         |          |
+   |                   | primes          |        |         |          |
+   |                   | (Appendix       |        |         |          |
+   |                   | B.3.2); 2 -     |        |         |          |
+   |                   | probable primes |        |         |          |
+   |                   | (Appendix       |        |         |          |
+   |                   | B.3.3)          |        |         |          |
+   |                   |                 |        |         |          |
+   | randPQCond        | random P and Q  | value  | 1,2,3   | Yes      |
+   |                   | primes          |        |         |          |
+   |                   | generated with  |        |         |          |
+   |                   | additional      |        |         |          |
+   |                   | conditions as   |        |         |          |
+   |                   | (see            |        |         |          |
+   |                   | [FIPS186-4] ):  |        |         |          |
+   |                   | 1 - provable    |        |         |          |
+   |                   | primes          |        |         |          |
+   |                   | (Appendix       |        |         |          |
+   |                   | B.3.4); 2 - pro |        |         |          |
+   |                   | vable/probable  |        |         |          |
+   |                   | primes          |        |         |          |
+   |                   | (Appendix       |        |         |          |
+   |                   | B.3.5); 3 -     |        |         |          |
+   |                   | probable primes |        |         |          |
+   |                   | (Appendix       |        |         |          |
+   |                   | B.3.6).         |        |         |          |
+   |                   |                 |        |         |          |
+   | capMatrixProvPrim | capabilities    | matrix | yes/no  | Yes      |
+   | es                | matrix for all  |        |         |          |
+   |                   | supported       |        |         |          |
+   |                   | moduli and hash |        |         |          |
+   |                   | algorithms (see |        |         |          |
+   |                   | Table 3)        |        |         |          |
+   |                   |                 |        |         |          |
+   | modProbPrime      | see Table 4     | array  | see     | Yes      |
+   |                   |                 |        | Table 4 |          |
+   |                   |                 |        |         |          |
+   | TableC2           | see Table 4     | value  | see     | Yes      |
+   |                   |                 |        | Table 4 |          |
+   |                   |                 |        |         |          |
+   | TableC3           | see Table 4     | value  | see     | Yes      |
+   |                   |                 |        | Table 4 |          |
+
+
+
+Vassilev                Expires February 19, 2017               [Page 9]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   +-------------------+-----------------+--------+---------+----------+
+
+               Table 5: RSA keyGen Capabilities JSON Values
+
+2.3.2.  The sigGen Mode Capabilities
+
+   The RSA sigGen mode capabilities are advertised as an array of JSON
+   objects within the array of 'modeSpecs' value of the ACVP
+   registration message. as part of the 'capability_exchange' element of
+   the ACVP JSON registration message.  See the ACVP specification for
+   details on the registration message.
+
+   Each RSA sigGen mode capability is advertised as a self-contained
+   JSON object.
+
+2.3.3.  The sigVer Mode Capabilities
+
+   The RSA sigVer mode capabilities are advertised as an array of JSON
+   objects within the array of 'modeSpecs' value of the ACVP
+   registration message. as part of the 'capability_exchange' element of
+   the ACVP JSON registration message.  See the ACVP specification for
+   details on the registration message.
+
+   Each RSA sigVer mode capability is advertised as a self-contained
+   JSON object.
+
+2.3.4.  The legacySigVer Mode Capabilities
+
+   The RSA legacySigVer mode capabilities are advertised as an array of
+   JSON objects within the array of 'modeSpecs' value of the ACVP
+   registration message. as part of the 'capability_exchange' element of
+   the ACVP JSON registration message.  See the ACVP specification for
+   details on the registration message.
+
+   Each RSA legacySigVer mode capability is advertised as a self-
+   contained JSON object.
+
+3.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual algorithm, such as Hash_DRBG,
+   etc.  This section describes the JSON schema for a test vector set
+   used with DRBG algorithms.
+
+
+
+
+
+Vassilev                Expires February 19, 2017              [Page 10]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+   +-------------+---------------------------------------------+-------+
+   | JSON Value  | Description                                 | JSON  |
+   |             |                                             | type  |
+   +-------------+---------------------------------------------+-------+
+   | version     | Protocol version identifier                 | value |
+   |             |                                             |       |
+   | vectorSetId | Unique numeric identifier for the vector    | value |
+   |             | set                                         |       |
+   |             |                                             |       |
+   | algorithm   | The DRBG algorithm used for the test        | value |
+   |             | vectors.  See Section 2.1 for possible      |       |
+   |             | values.                                     |       |
+   |             |                                             |       |
+   | mode        | The DRBG algorithm mode used for the test   | value |
+   |             | vectors.  See Section 2.1 for possible      |       |
+   |             | values.                                     |       |
+   |             |                                             |       |
+   | testGroups  | Array of test group JSON objects, which are | array |
+   |             | defined in Section 3.1                      |       |
+   +-------------+---------------------------------------------+-------+
+
+                      Table 6: Vector Set JSON Object
+
+3.1.  Test Groups JSON Schema
+
+   The test_groups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the DRBG JSON elements of the Test Group
+   JSON object.
+
+   ACVP allows default bit lengths for the inputs to specific
+   algorithms, typically communicated as numerical value zero (0).  If
+   an implementation does not support one of the defaults, the bit
+   lengths the supported values shall be specified explicitly.
+
+
+
+
+
+
+
+
+Vassilev                Expires February 19, 2017              [Page 11]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+            +------------+-------------+-----------+----------+
+            | JSON Value | Description | JSON type | Optional |
+            +------------+-------------+-----------+----------+
+            |            |             |           |          |
+            +------------+-------------+-----------+----------+
+
+                      Table 7: Test Group JSON Object
+
+3.2.  Test Vectors JSON Schema
+
+   Each test group contains an array of one or more test vectors.  Each
+   test vector is a JSON object that represents a single test case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each DRBG test vector.
+
+   +------------+---------------------------------+---------+----------+
+   | JSON Value | Description                     | JSON    | Optional |
+   |            |                                 | type    |          |
+   +------------+---------------------------------+---------+----------+
+   | testCaseId | Unique numeric identifier for   | value   | No       |
+   |            | the test case                   |         |          |
+   +------------+---------------------------------+---------+----------+
+
+                 Table 8: RSA KeyGen Test Case JSON Object
+
+4.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the resonse vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +-------------+---------------------------------------------+-------+
+   | JSON Value  | Description                                 | JSON  |
+   |             |                                             | type  |
+   +-------------+---------------------------------------------+-------+
+   | version     | Protocol version identifier                 | value |
+   |             |                                             |       |
+   | vectorSetId | Unique numeric identifier for the vector    | value |
+   |             | set                                         |       |
+   |             |                                             |       |
+   | testResults | Array of JSON objects that represent each   | array |
+   |             | test vector result, which uses the same     |       |
+   |             | JSON schema as defined in Section 3.2       |       |
+   +-------------+---------------------------------------------+-------+
+
+                 Table 9: Vector Set Response JSON Object
+
+
+
+
+Vassilev                Expires February 19, 2017              [Page 12]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   Each test group contains an array of one or more test vectors.  Each
+   test vector is a JSON object that represents a single test case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each DRBG test vector.
+
+   +------------+---------------------------------+---------+----------+
+   | JSON Value | Description                     | JSON    | Optional |
+   |            |                                 | type    |          |
+   +------------+---------------------------------+---------+----------+
+   | testCaseId | Unique numeric identifier for   | value   | No       |
+   |            | the test case                   |         |          |
+   |            |                                 |         |          |
+   | TBD        | TBD                             | value   | No       |
+   +------------+---------------------------------+---------+----------+
+
+            Table 10: RSA KeyGen Test Case Results JSON Object
+
+5.  Acknowledgements
+
+   TBD...
+
+6.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+7.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+8.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [FIPS186-2]
+              NIST, "FIPS PUB 186-2 Digital Signature Standard", October
+              2001, <http://csrc.nist.gov/publications/fips/archive/
+              fips186-2/fips186-2-change1.pdf>.
+
+   [FIPS186-4]
+              NIST, "FIPS PUB 186-4 Digital Signature Standard", July
+              2013, <http://nvlpubs.nist.gov/nistpubs/FIPS/
+              NIST.FIPS.186-4.pdf>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+Vassilev                Expires February 19, 2017              [Page 13]
+
+Internet-Draft                RSA Alg JSON                   August 2016
+
+
+   [RSA2VS]   Keller, S., "The NIST SP 800-90A Deterministic Random Bit
+              Generator Validation SYSTEM (DRBGVS)", July 2014,
+              <http://csrc.nist.gov/groups/STM/cavp/documents/dss2/
+              rsa2vs.pdf>.
+
+Appendix A.  Example RSA Capabilities JSON Object
+
+   The following is a example JSON object advertising support for TBD.
+
+Appendix B.  Example Test Results JSON Object
+
+   The following is a example JSON object for TBD test results sent from
+   the crypto module to the ACVP server.
+
+Author's Address
+
+   Apostol Vassilev (editor)
+   National Institute of Standards and Technology
+   100 Bureau Dr.
+   Gaithersburg, MD  20899
+   USA
+
+   Email: apostol.vassilev@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vassilev                Expires February 19, 2017              [Page 14]
