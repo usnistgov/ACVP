@@ -1,0 +1,616 @@
+
+
+
+
+TBD                                                      B. Fussell, Ed.
+Internet-Draft                                       Cisco Systems, Inc.
+Intended status: Informational                                 June 2016
+Expires: December 3, 2016
+
+
+                ACVP ECDSA2 Algorithm JSON Specification
+                      draft-ietf-acvp-subecdsa-00
+
+Abstract
+
+   This document defines the JSON schema for using ECDSA2 algorithms
+   with the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on December 3, 2016.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 1]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
+     2.1.  Supported DSA2 Functions  . . . . . . . . . . . . . . . .   4
+     2.2.  Supported ECDSA2 Functions  . . . . . . . . . . . . . . .   4
+     2.3.  Supported SHA Methods . . . . . . . . . . . . . . . . . .   5
+     2.4.  Supported Method Options  . . . . . . . . . . . . . . . .   5
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   7
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   8
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
+   Appendix A.  Example ECDSA2 Capabilities JSON Object  . . . . . .   9
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   9
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing ECDSA2
+   algorithms using ACVP.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
+
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+
+
+
+Fussell                 Expires December 3, 2016                [Page 2]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of ECDSA2 algorithms to the
+   ACVP server.
+
+   The algorithm capabilities are advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each algorithm capability advertised is a
+   self-contained JSON object.  The following JSON values are used for
+   ECDSA2 algorithm capabilities:
+
+   +-----------+----------------------+-------+-------------+----------+
+   | JSON      | Description          | JSON  | Valid       | Optional |
+   | Value     |                      | type  | Values      |          |
+   +-----------+----------------------+-------+-------------+----------+
+   | algorithm | The algorithm under  | value | ECDSA2      | No       |
+   |           | test                 |       |             |          |
+   | shaVal    | The SHA validation   | value | same or     | No       |
+   |           | number or            |       | value       |          |
+   |           | implemented in       |       |             |          |
+   |           | "same"               |       |             |          |
+   |           | implementation       |       |             |          |
+   | sha2Val   | A second (optional)  | value | same or     | Yes      |
+   |           | SHA validation       |       | value       |          |
+   |           | number or            |       |             |          |
+   |           | implemented in       |       |             |          |
+   |           | "same"               |       |             |          |
+   |           | implementation       |       |             |          |
+   | sha3Val   | A third (optional)   | value | same or     | Yes      |
+   |           | SHA validation       |       | value       |          |
+   |           | number or            |       |             |          |
+   |           | implemented in       |       |             |          |
+   |           | "same"               |       |             |          |
+   |           | implementation       |       |             |          |
+   | drbgVal   | The DRBG validation  | value | same or     | No       |
+   |           | number or            |       | value       |          |
+   |           | implemented in       |       |             |          |
+   |           | "same"               |       |             |          |
+   |           | implementation       |       |             |          |
+   | drbg2Val  | A second (optional)  | value | same or     | Yes      |
+   |           | DRBG validation      |       | value       |          |
+   |           | number or            |       |             |          |
+   |           | implemented in       |       |             |          |
+   |           | "same"               |       |             |          |
+   |           | implementation       |       |             |          |
+
+
+
+Fussell                 Expires December 3, 2016                [Page 3]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   | methods   | Method and           | array | See the     | No       |
+   |           | associated           |       | following   |          |
+   |           | parameters           |       | values      |          |
+   |           | represented as an    |       |             |          |
+   |           | array of the         |       |             |          |
+   |           | following JSON       |       |             |          |
+   |           | values               |       |             |          |
+   | type      | Type of operation    | array | See Section | No       |
+   |           | supported            |       | 2.1         |          |
+   | curves    | EC curves supported  | array | See Section | No       |
+   |           | and the support sha  |       | 2.2         |          |
+   |           | per curve            |       |             |          |
+   | sha       | Array of SHA values  | array | See Section | Yes      |
+   |           | used for a specific  |       | 2.3         |          |
+   |           | curve                |       |             |          |
+   | options   | Options used for key | array | See Section | Yes      |
+   |           | pair generation      |       | 2.4         |          |
+   +-----------+----------------------+-------+-------------+----------+
+
+            Table 1: ECDSA2 Algorithm Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
+
+2.1.  Supported DSA2 Functions
+
+   The following DSA2 method types may be advertised by the ACVP
+   compliant crypto module:
+
+   o  keyPair
+
+   o  PKV
+
+   o  sigGen
+
+   o  sigVer
+
+2.2.  Supported ECDSA2 Functions
+
+   The following ECDSA2 method types may be advertised by the ACVP
+   compliant crypto module:
+
+   o  P-244
+
+   o  P-256
+
+   o  P-384
+
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   o  P-521
+
+   o  K-233
+
+   o  K-283
+
+   o  K-409
+
+   o  K-571
+
+   o  B-233
+
+   o  B-283
+
+   o  B-409
+
+   o  B-571
+
+2.3.  Supported SHA Methods
+
+   The following SHA methods may be advertised by the ACVP compliant
+   crypto module:
+
+   o  SHA-1
+
+   o  SHA-224
+
+   o  SHA-256
+
+   o  SHA-384
+
+   o  SHA-512
+
+   o  SHA-512-244
+
+   o  SHA-512-256
+
+2.4.  Supported Method Options
+
+   The following options may be advertised by the ACVP compliant crypto
+   module:
+
+   o  randomBits
+
+   o  testingCandidates
+
+   o  186-2
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   o  sigGen186-4
+
+   o  sigGenComponent
+
+3.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual ECDSA2 function.  This section
+   describes the JSON schema for a test vector set used with ECDSA2
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+   +------------+---------------------------------------------+--------+
+   | JSON Value | Description                                 | JSON   |
+   |            |                                             | type   |
+   +------------+---------------------------------------------+--------+
+   | acvVersion | Protocol version identifier                 | value  |
+   | vsId       | Unique numeric identifier for the vector    | value  |
+   |            | set                                         |        |
+   | algorithm  | ECDSA2                                      | value  |
+   | testGroups | Array of test group JSON objects, which are | array  |
+   |            | defined in Section 3.1                      |        |
+   +------------+---------------------------------------------+--------+
+
+                      Table 2: Vector Set JSON Object
+
+3.1.  Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The test group for ECDSA2 is as follows:
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +---------+--------------------------------------+-------+----------+
+   | JSON    | Description                          | JSON  | Optional |
+   | Value   |                                      | type  |          |
+   +---------+--------------------------------------+-------+----------+
+   | type    | The type of operation for the test   | value | No       |
+   |         | vectors. See Section 2.1 for         |       |          |
+   |         | possible values                      |       |          |
+   | curve   | The curve type used for the test     | value | No       |
+   |         | vectors. See Section 2.2 for         |       |          |
+   |         | possible values                      |       |          |
+   | options | The options for the operation. See   | array | No       |
+   |         | Section 2.4                          |       |          |
+   | sha     | SHA version used                     | array | Yes      |
+   | tests   | Array of individual test vector JSON | array | No       |
+   |         | objects, which are defined in        |       |          |
+   |         | Section 3.2                          |       |          |
+   +---------+--------------------------------------+-------+----------+
+
+                     Table 3: Vector Group JSON Object
+
+3.2.  Test Vectors JSON Schema
+
+   Each test group contains an array of one or more test vectors.  Each
+   test vector is a JSON object that represents a single test case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ECDSA2 test vector.
+
+   +---------+-------------------------------------+--------+----------+
+   | JSON    | Description                         | JSON   | Optional |
+   | Value   |                                     | type   |          |
+   +---------+-------------------------------------+--------+----------+
+   | tcId    | Unique numeric identifier for the   | value  | No       |
+   |         | test case                           |        |          |
+   | qx      | The public key curve point x        | value  | Yes      |
+   | qy      | The public key curve point y        | value  | Yes      |
+   | r       | The signature component R           | value  | Yes      |
+   | s       | The signature component S           | value  | Yes      |
+   | number  | Number of keypair sets to be        | value  | Yes      |
+   |         | generated                           |        |          |
+   | message | The message used to generate        | value  | Yes      |
+   |         | signature or verify signature       |        |          |
+   +---------+-------------------------------------+--------+----------+
+
+                      Table 4: Test Case JSON Object
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+4.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the resonse vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +-------------+---------------------------------------------+-------+
+   | JSON Value  | Description                                 | JSON  |
+   |             |                                             | type  |
+   +-------------+---------------------------------------------+-------+
+   | acvVersion  | Protocol version identifier                 | value |
+   | vsId        | Unique numeric identifier for the vector    | value |
+   |             | set                                         |       |
+   | testResults | Array of JSON objects that represent each   | array |
+   |             | test vector result, as defined by the       |       |
+   |             | tables below                                |       |
+   +-------------+---------------------------------------------+-------+
+
+                 Table 5: Vector Set Response JSON Object
+
+   The following table describes the JSON object that represents a
+   vector set response for ECDSA2.
+
+   +---------+------------------------------------+---------+----------+
+   | JSON    | Description                        | JSON    | Optional |
+   | Value   |                                    | type    |          |
+   +---------+------------------------------------+---------+----------+
+   | d       | The private key                    | value   | Yes      |
+   | qx      | The public key curve point x       | value   | Yes      |
+   | qy      | The public key curve point y       | value   | Yes      |
+   | r       | The signature component R          | value   | Yes      |
+   | s       | The signature component S          | value   | Yes      |
+   | results | The Pass or Fail result of the     | value   | Yes      |
+   |         | verify or validation               |         |          |
+   +---------+------------------------------------+---------+----------+
+
+                 Table 6: Vector Set Response JSON Object
+
+5.  Acknowledgements
+
+   TBD...
+
+6.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+7.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+8.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+Appendix A.  Example ECDSA2 Capabilities JSON Object
+
+   The following is a example JSON object advertising support for
+   ECDSA2.
+
+
+
+            {
+                "algorithm": "ECDSA2",
+                "shaval": "123456",
+                "drbgval": "123456",
+                "methods": [
+                              { "type" : "SigVer",
+                                "curveInfo" : [
+                                        { "curve" : P-224,
+                                          "sha" : [SHA-1, SHA-224, SHA-256]},
+                                        { "curve" : P-256,
+                                          "sha" : [SHA-1, SHA-224, SHA-256]},
+                                       ]
+                              },
+                              { "type" : "KeyPair",
+                                "options" : ["Random Bits", "Testing Candidates"],
+                                "curveInfo" : [
+                                        { "curve" : P-224},
+                                        { "curve" : P-256},
+                                       ]
+                              }
+                           ]
+            }
+
+Appendix B.  Example Test Vectors JSON Object
+
+   The following is a example JSON object for ECDSA2 test vectors sent
+   from the ACVP server to the crypto module.
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 9]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+                {
+                  "acvVersion": "0.2",
+                  "vsId": 1564,
+                  "algorithm": "ECDSA2",
+                  "testGroups": [
+                    {
+                      "type": "SigVer",
+                      "curve" : P-256,
+                      "sha" : "SHA-256",
+                      "tests": [
+                        {
+                          "tcId": 2170,
+                          "Msg" : "b6a3a0a5c8aecf753242d0bb1465e71b450532d29574f81b4d2a63c165ed63dce2add4aa85a849bf7e5e78cec9a2a56908d67ecfbbbac367b8305dc190298d011a42da17999841dfaf8d083f9153eb9bc91433fcf9548340040f90cd3175faa890ae81002351f7bf9c093d1585a671ed4b95315796fbe929a620553b69c79e95"
+                          "qx" : "d97f2a944063befe63a07b708629638fd658d049207982dc4b810582d21beb77",
+                          "qy" : "6528f1e1342d38f6f862aa446202bff1c55546187c2c42a1b4ebdaee506aeb7e",
+                          "r" : "f057a51efd6a889793a5e57b71aedf5545ef8ca91ffa1145cc11fe305f732de1",
+                          "s" : "c35557c560c5e035edd8ce72980f054f0467450c25a8d2f8ceea0ab2676bd92e",
+                        },
+                      ]
+                    },
+                  ]
+                }
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for ECDSA2 test results sent
+   from the crypto module to the ACVP server.
+
+                   {
+                       "acvVersion": "0.2",
+                       "vsId": 1564,
+                       "testResults": [
+                           {
+                               "tcId": 2170,
+                               "result" : "Pass",
+                           }
+                       ]
+                   }
+
+
+Author's Address
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 10]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   Barry Fussell (editor)
+   Cisco Systems, Inc.
+   170 West Tasman Dr.
+   San Jose, CA  95134
+   USA
+
+   Email: bfussell@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 11]

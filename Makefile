@@ -28,3 +28,5 @@ all:
 	xml2rfc src/acvp_sub_kdf108.xml -o artifacts/acvp_sub_kdf108.txt
 	xml2rfc --html src/acvp_sub_dsa.xml -o artifacts/acvp_sub_dsa.html
 	xml2rfc src/acvp_sub_dsa.xml -o artifacts/acvp_sub_dsa.txt
+	xml2rfc --html src/acvp_sub_ecdsa.xml -o artifacts/acvp_sub_ecdsa.html
+	xml2rfc src/acvp_sub_ecdsa.xml -o artifacts/acvp_sub_ecdsa.txt
