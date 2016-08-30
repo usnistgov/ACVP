@@ -1,4 +1,4 @@
-SOURCES=acvp_protocol.xml acvp_sub_symmetric.xml
+﻿SOURCES=acvp_protocol.xml acvp_sub_symmetric.xml
 HTMLS=$(SOURES:.xml=.html)
 
 all:
@@ -30,3 +30,7 @@ all:
 	xml2rfc src/acvp_sub_dsa.xml -o artifacts/acvp_sub_dsa.txt
 	xml2rfc --html src/acvp_sub_ecdsa.xml -o artifacts/acvp_sub_ecdsa.html
 	xml2rfc src/acvp_sub_ecdsa.xml -o artifacts/acvp_sub_ecdsa.txt
+	xml2rfc --html src/acvp_sub_drbg.xml -o artifacts/acvp_sub_drbg.html
+	xml2rfc src/acvp_sub_drbg.xml -o artifacts/acvp_sub_drbg.txt
+	xml2rfc --html src/acvp_sub_rsa.xml -o artifacts/acvp_sub_rsa.html
+	xml2rfc src/acvp_sub_rsa.xml -o artifacts/acvp_sub_rsa.txt
