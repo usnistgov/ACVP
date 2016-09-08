@@ -4,8 +4,8 @@
 
 TBD                                                     A. Vassilev, Ed.
 Internet-Draft            National Institute of Standards and Technology
-Intended status: Informational                           August 19, 2016
-Expires: February 20, 2017
+Intended status: Informational                               August 2016
+Expires: February 2, 2017
 
 
      ACVP Deterministic Random Bit Generator (DRBG) Algorithm JSON
@@ -32,7 +32,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 20, 2017.
+   This Internet-Draft will expire on February 2, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Vassilev                Expires February 20, 2017               [Page 1]
+Vassilev                Expires February 2, 2017                [Page 1]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -65,8 +65,9 @@ Table of Contents
      1.2.  Default values  . . . . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
      2.1.  Supported DRBG Algorithms . . . . . . . . . . . . . . . .   3
-     2.2.  Supported DRBG Algorithm Capabilities . . . . . . . . . .   4
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   7
+     2.2.  Required Prerequisite Algorithms for DRBG Validations . .   4
+     2.3.  Supported DRBG Algorithm Capabilities . . . . . . . . . .   4
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   8
      3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   8
      3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   9
    4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  11
@@ -76,8 +77,8 @@ Table of Contents
    8.  Normative References  . . . . . . . . . . . . . . . . . . . .  12
    Appendix A.  Example DRBG Capabilities JSON Object  . . . . . . .  12
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  14
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  17
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  19
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  16
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  18
 
 1.  Introduction
 
@@ -105,16 +106,16 @@ Table of Contents
    ACVP has default values for many of the input parameters for testing
    the DRBG algorithms.For example, the Entropy Input, Nonce,
    Personalization String, and Addtional Input parameters have default
-   values.  The specific details and restrictions on each of these input
 
 
 
-Vassilev                Expires February 20, 2017               [Page 2]
+Vassilev                Expires February 2, 2017                [Page 2]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
 
-   lengths is specified in Section 2, Table 2 and the notes following
+   values.  The specific details and restrictions on each of these input
+   lengths is specified in Section 2, Table 3 and the notes following
    it.  To indicate a preference for using a default value for any of
    these parameters, the value zero (0) should be set.  If the
    implementation does not support one of these defaults, the
@@ -164,13 +165,47 @@ Internet-Draft                DRBG Alg JSON                  August 2016
 
 
 
-
-Vassilev                Expires February 20, 2017               [Page 3]
+Vassilev                Expires February 2, 2017                [Page 3]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
 
-2.2.  Supported DRBG Algorithm Capabilities
+2.2.  Required Prerequisite Algorithms for DRBG Validations
+
+   Each DRBG implementation relies on other cryptographic primitives
+   (algorithms) - see [SP800-90A].  For example, a hashDRBG uses an
+   underlying hash algorithm.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   +--------------+--------------+---------------+----------+----------+
+   | JSON Value   | Description  | JSON type     | Valid    | Optional |
+   |              |              |               | Values   |          |
+   +--------------+--------------+---------------+----------+----------+
+   | algorithm    | a            | value         | SHA,     | No       |
+   |              | prerequisite |               | HMAC,    |          |
+   |              | algorithm    |               | AES,     |          |
+   |              |              |               | TDES     |          |
+   |              |              |               |          |          |
+   | valValue     | algorithm    | value         | actual   | No       |
+   |              | validation   |               | number   |          |
+   |              | number       |               | or       |          |
+   |              |              |               | "same"   |          |
+   |              |              |               |          |          |
+   | prereqAlgVal | prerequistie | object with   | see      | No       |
+   |              | algorithm    | algorithm and | above    |          |
+   |              | validation   | valValue      |          |          |
+   |              |              | properties    |          |          |
+   |              |              |               |          |          |
+   | prereqVals   | prerequistie | array of      | see      | No       |
+   |              | algorithm    | prereqAlgVal  | above    |          |
+   |              | validations  | objects       |          |          |
+   +--------------+--------------+---------------+----------+----------+
+
+        Table 2: Required DRBG Prerequisite Algorithms JSON Values
+
+2.3.  Supported DRBG Algorithm Capabilities
 
    The algorithm capabilities are advertised as JSON objects within the
    'algorithms' value of the ACVP registration message.  The
@@ -182,146 +217,132 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    self-contained JSON object.  The following JSON values are used for
    DRBG algorithm capabilities:
 
-   +------------------+-------------+------+----------------+----------+
-   | JSON Value       | Description | JSON | Valid Values   | Optional |
-   |                  |             | type |                |          |
-   +------------------+-------------+------+----------------+----------+
-   | algorithm        | The DRBG    | valu | See Table 1    | No       |
-   |                  | algorithm   | e    |                |          |
-   |                  | to be       |      |                |          |
-   |                  | validated.  |      |                |          |
-   |                  |             |      |                |          |
-   | mode             | The         | valu | See Table 1    | No       |
-   |                  | algorithm   | e    |                |          |
-   |                  | mode to be  |      |                |          |
-   |                  | validated   |      |                |          |
-   |                  |             |      |                |          |
-   | derFuncEnabled   | derivation  | valu | yes, no        | Yes, app |
-   |                  | function    | e    |                | licable  |
-   |                  | option      |      |                | to       |
-   |                  |             |      |                | ctrDRBG  |
-   |                  |             |      |                | only     |
-   |                  |             |      |                |          |
-   | aesVal           | The prerequ | valu | same or value  | Yes      |
-   |                  | isite AES   | e    |                |          |
-   |                  | validation  |      |                |          |
-   |                  | number or   |      |                |          |
-   |                  | implemented |      |                |          |
-   |                  | in same imp |      |                |          |
-   |                  | lementation |      |                |          |
-   |                  | .           |      |                |          |
-   |                  |             |      |                |          |
-   | shaVal           | The prerequ | valu | same or value  | Yes      |
-   |                  | isite SHA   | e    |                |          |
-   |                  | validation  |      |                |          |
-   |                  | number or   |      |                |          |
-   |                  | implemented |      |                |          |
-   |                  | in same imp |      |                |          |
-   |                  | lementation |      |                |          |
+   +----------------+------------+----------+---------------+----------+
 
 
 
-Vassilev                Expires February 20, 2017               [Page 4]
+Vassilev                Expires February 2, 2017                [Page 4]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
 
-   |                  | .           |      |                |          |
-   |                  |             |      |                |          |
-   | tdesVal          | The prerequ | valu | same or value  | Yes      |
-   |                  | isite TDES  | e    |                |          |
-   |                  | validation  |      |                |          |
-   |                  | number or   |      |                |          |
-   |                  | implemented |      |                |          |
-   |                  | in same imp |      |                |          |
-   |                  | lementation |      |                |          |
-   |                  | .           |      |                |          |
-   |                  |             |      |                |          |
-   | hmacVal          | The prerequ | valu | same or value  | Yes      |
-   |                  | isite HMAC  | e    |                |          |
-   |                  | validation  |      |                |          |
-   |                  | number or   |      |                |          |
-   |                  | implemented |      |                |          |
-   |                  | in same imp |      |                |          |
-   |                  | lementation |      |                |          |
-   |                  | .           |      |                |          |
-   |                  |             |      |                |          |
-   | predResistanceEn | an implemen | valu | yes, no        | No       |
-   | abled            | tation that | e    |                |          |
-   |                  | can be used |      |                |          |
-   |                  | with        |      |                |          |
-   |                  | prediction  |      |                |          |
-   |                  | resistance. |      |                |          |
-   |                  | See Table 2 |      |                |          |
-   |                  | notes       |      |                |          |
-   |                  | below.      |      |                |          |
-   |                  |             |      |                |          |
-   | reseedImplemente | Reseeding   | valu | yes, no        | No       |
-   | d                | of the DRBG | e    |                |          |
-   |                  | shall be    |      |                |          |
-   |                  | performed   |      |                |          |
-   |                  | in          |      |                |          |
-   |                  | accordance  |      |                |          |
-   |                  | with the sp |      |                |          |
-   |                  | ecification |      |                |          |
-   |                  | for the     |      |                |          |
-   |                  | given DRBG  |      |                |          |
-   |                  | mechanism.  |      |                |          |
-   |                  | See Table 2 |      |                |          |
-   |                  | notes       |      |                |          |
-   |                  | below.      |      |                |          |
-   |                  |             |      |                |          |
-   | entropyInputLen  | the bit     | valu | at least the   | No       |
-   |                  | length of   | e    | maximum        |          |
-   |                  | the entropy |      | security       |          |
+   | JSON Value     | Descriptio | JSON     | Valid Values  | Optional |
+   |                | n          | type     |               |          |
+   +----------------+------------+----------+---------------+----------+
+   | algorithm      | The DRBG   | value    | See Table 1   | No       |
+   |                | algorithm  |          |               |          |
+   |                | to be      |          |               |          |
+   |                | validated. |          |               |          |
+   |                |            |          |               |          |
+   | mode           | The        | value    | See Table 1   | No       |
+   |                | algorithm  |          |               |          |
+   |                | mode to be |          |               |          |
+   |                | validated  |          |               |          |
+   |                |            |          |               |          |
+   | derFuncEnabled | derivation | value    | yes, no       | Yes, app |
+   |                | function   |          |               | licable  |
+   |                | option     |          |               | to       |
+   |                |            |          |               | ctrDRBG  |
+   |                |            |          |               | only     |
+   |                |            |          |               |          |
+   | prereqVals     | The prereq | array of | array         | No       |
+   |                | uisite     | prereqAl |               |          |
+   |                | algorithm  | gVal     |               |          |
+   |                | validation | objects  |               |          |
+   |                | s          | - see    |               |          |
+   |                |            | Section  |               |          |
+   |                |            | 2.2      |               |          |
+   |                |            |          |               |          |
+   | predResistance | an impleme | value    | yes, no       | No       |
+   | Enabled        | ntation    |          |               |          |
+   |                | that can   |          |               |          |
+   |                | be used    |          |               |          |
+   |                | with       |          |               |          |
+   |                | prediction |          |               |          |
+   |                | resistance |          |               |          |
+   |                | . See      |          |               |          |
+   |                | Table 3    |          |               |          |
+   |                | notes      |          |               |          |
+   |                | below.     |          |               |          |
+   |                |            |          |               |          |
+   | reseedImplemen | Reseeding  | value    | yes, no       | No       |
+   | ted            | of the     |          |               |          |
+   |                | DRBG shall |          |               |          |
+   |                | be         |          |               |          |
+   |                | performed  |          |               |          |
+   |                | in         |          |               |          |
+   |                | accordance |          |               |          |
+   |                | with the s |          |               |          |
+   |                | pecificati |          |               |          |
 
 
 
-Vassilev                Expires February 20, 2017               [Page 5]
+Vassilev                Expires February 2, 2017                [Page 5]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
 
-   |                  | input. See  |      | strength       |          |
-   |                  | Table 2     |      | supported by   |          |
-   |                  | notes       |      | the mechanism/ |          |
-   |                  | below.      |      | option, larger |          |
-   |                  |             |      | values are     |          |
-   |                  |             |      | optional       |          |
-   |                  |             |      |                |          |
-   | nonceLen         | .See Table  | valu | at least one   | Yes      |
-   |                  | 2 notes     | e    | half of the    |          |
-   |                  | below.      |      | maximum        |          |
-   |                  |             |      | security       |          |
-   |                  |             |      | strength       |          |
-   |                  |             |      | supported by   |          |
-   |                  |             |      | the mechanism/ |          |
-   |                  |             |      | option. Longer |          |
-   |                  |             |      | nonces are     |          |
-   |                  |             |      | permitted.     |          |
-   |                  |             |      |                |          |
-   | persoStringLen   | .See Table  | Arra | set to zero or | No       |
-   |                  | 2 notes     | y    | the maximum    |          |
-   |                  | below.      |      | security       |          |
-   |                  |             |      | strength       |          |
-   |                  |             |      | supported by   |          |
-   |                  |             |      | the mechanism/ |          |
-   |                  |             |      | option.        |          |
-   |                  |             |      |                |          |
-   | additionalInputL | .See Table  | Arra | set to zero or | No       |
-   | en               | 2 notes     | y    | the maximum    |          |
-   |                  | below.      |      | security       |          |
-   |                  |             |      | strength       |          |
-   |                  |             |      | supported by   |          |
-   |                  |             |      | the mechanism/ |          |
-   |                  |             |      | option.        |          |
-   |                  |             |      |                |          |
-   | returnedBitsLen  | .See Table  | valu |                | No       |
-   |                  | 2 notes     | e    |                |          |
-   |                  | below.      |      |                |          |
-   +------------------+-------------+------+----------------+----------+
+   |                | on for the |          |               |          |
+   |                | given DRBG |          |               |          |
+   |                | mechanism. |          |               |          |
+   |                | See Table  |          |               |          |
+   |                | 3 notes    |          |               |          |
+   |                | below.     |          |               |          |
+   |                |            |          |               |          |
+   | entropyInputLe | the bit    | value    | at least the  | No       |
+   | n              | length of  |          | maximum       |          |
+   |                | the        |          | security      |          |
+   |                | entropy    |          | strength      |          |
+   |                | input. See |          | supported by  |          |
+   |                | Table 3    |          | the mechanism |          |
+   |                | notes      |          | /option,      |          |
+   |                | below.     |          | larger values |          |
+   |                |            |          | are optional  |          |
+   |                |            |          |               |          |
+   | nonceLen       | .See Table | value    | at least one  | Yes      |
+   |                | 3 notes    |          | half of the   |          |
+   |                | below.     |          | maximum       |          |
+   |                |            |          | security      |          |
+   |                |            |          | strength      |          |
+   |                |            |          | supported by  |          |
+   |                |            |          | the mechanism |          |
+   |                |            |          | /option.      |          |
+   |                |            |          | Longer nonces |          |
+   |                |            |          | are           |          |
+   |                |            |          | permitted.    |          |
+   |                |            |          |               |          |
+   | persoStringLen | .See Table | Array    | set to zero   | No       |
+   |                | 3 notes    |          | or the        |          |
+   |                | below.     |          | maximum       |          |
+   |                |            |          | security      |          |
+   |                |            |          | strength      |          |
+   |                |            |          | supported by  |          |
+   |                |            |          | the mechanism |          |
+   |                |            |          | /option.      |          |
+   |                |            |          |               |          |
+   | additionalInpu | .See Table | Array    | set to zero   | No       |
+   | tLen           | 3 notes    |          | or the        |          |
+   |                | below.     |          | maximum       |          |
+   |                |            |          | security      |          |
+   |                |            |          | strength      |          |
+   |                |            |          | supported by  |          |
+   |                |            |          | the mechanism |          |
+   |                |            |          | /option.      |          |
+   |                |            |          |               |          |
+   | returnedBitsLe | .See Table | value    |               | No       |
 
-             Table 2: DRBG Algorithm Capabilities JSON Values
+
+
+Vassilev                Expires February 2, 2017                [Page 6]
+
+Internet-Draft                DRBG Alg JSON                  August 2016
+
+
+   | n              | 3 notes    |          |               |          |
+   |                | below.     |          |               |          |
+   +----------------+------------+----------+---------------+----------+
+
+             Table 3: DRBG Algorithm Capabilities JSON Values
 
    Note 1: If an implementation can be used without prediction
    resistance, the flag predResistanceNotEnabled shall be set.
@@ -329,14 +350,6 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    Note 2: Implementations that either have prediction resistance always
    ON or always OFF shall have only one of the prediction resistance
    flags set.
-
-
-
-
-Vassilev                Expires February 20, 2017               [Page 6]
-
-Internet-Draft                DRBG Alg JSON                  August 2016
-
 
    Note 3: Implementations that can be used either way will have both
    flags set.
@@ -369,6 +382,18 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    same as those for the persoString.Similarly, for the default
    addtionalInput bit legths - same as those for persoString lengths.
 
+
+
+
+
+
+
+
+Vassilev                Expires February 2, 2017                [Page 7]
+
+Internet-Draft                DRBG Alg JSON                  August 2016
+
+
 3.  Test Vectors
 
    The ACVP server provides test vectors to the ACVP client, which are
@@ -383,16 +408,6 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    contains meta data for the entire vector set as well as individual
    test vectors to be processed by the ACVP client.  The following table
    describes the JSON elements at the top level of the hierarchy.
-
-
-
-
-
-
-Vassilev                Expires February 20, 2017               [Page 7]
-
-Internet-Draft                DRBG Alg JSON                  August 2016
-
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -415,7 +430,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    |             | defined in Section 3.1                      |       |
    +-------------+---------------------------------------------+-------+
 
-                      Table 3: Vector Set JSON Object
+                      Table 4: Vector Set JSON Object
 
 3.1.  Test Groups JSON Schema
 
@@ -428,27 +443,17 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    following table describes the DRBG JSON elements of the Test Group
    JSON object.
 
+
+
+Vassilev                Expires February 2, 2017                [Page 8]
+
+Internet-Draft                DRBG Alg JSON                  August 2016
+
+
    ACVP allows default bit lengths for the inputs to specific
    algorithms, typically communicated as numerical value zero (0).  If
    an implementation does not support one of the defaults, the bit
    lengths the supported values shall be specified explicitly.
-
-
-
-
-
-
-
-
-
-
-
-
-
-Vassilev                Expires February 20, 2017               [Page 8]
-
-Internet-Draft                DRBG Alg JSON                  August 2016
-
 
    +-------------------+---------------------------+--------+----------+
    | JSON Value        | Description               | JSON   | Optional |
@@ -480,7 +485,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    |                   | Section 3.2               |        |          |
    +-------------------+---------------------------+--------+----------+
 
-                      Table 4: Test Group JSON Object
+                      Table 5: Test Group JSON Object
 
 3.2.  Test Vectors JSON Schema
 
@@ -496,12 +501,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
 
 
 
-
-
-
-
-
-Vassilev                Expires February 20, 2017               [Page 9]
+Vassilev                Expires February 2, 2017                [Page 9]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -525,10 +525,10 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    |                     | input/entropy input      |       |          |
    |                     | value pairs for          |       |          |
    |                     | prediction resistance    |       |          |
-   |                     | testing. See Table 6     |       |          |
+   |                     | testing. See Table 7     |       |          |
    +---------------------+--------------------------+-------+----------+
 
-                    Table 5: DRBG Test Case JSON Object
+                    Table 6: DRBG Test Case JSON Object
 
    Each prediction resistance test group contains an array of one or
    more test vectors, typically two.  Each test vector is a JSON object
@@ -549,7 +549,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    |                 | resistance tests             |       |          |
    +-----------------+------------------------------+-------+----------+
 
-           Table 6: Prediction Resistance Test Case JSON Object
+           Table 7: Prediction Resistance Test Case JSON Object
 
 
 
@@ -557,7 +557,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
 
 
 
-Vassilev                Expires February 20, 2017              [Page 10]
+Vassilev                Expires February 2, 2017               [Page 10]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -583,7 +583,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    |             | JSON schema as defined in Section 3.2       |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 7: Vector Set Response JSON Object
+                 Table 8: Vector Set Response JSON Object
 
    Each test group contains an array of one or more test vectors.  Each
    test vector is a JSON object that represents a single test case to be
@@ -601,7 +601,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    |              | output                        |         |          |
    +--------------+-------------------------------+---------+----------+
 
-                Table 8: DRBG Test Case Results JSON Object
+                Table 9: DRBG Test Case Results JSON Object
 
 5.  Acknowledgements
 
@@ -613,7 +613,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
 
 
 
-Vassilev                Expires February 20, 2017              [Page 11]
+Vassilev                Expires February 2, 2017               [Page 11]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -647,21 +647,19 @@ Appendix A.  Example DRBG Capabilities JSON Object
    The following is a example JSON object advertising support for
    ctrDRBG with 3KeyTDEA.
 
-
-
-               {
-                   "algorithm": "ctrDRBG",
-                   "mode": "3KeyTDEA",
-                   "derFuncEnabled":"yes",
-                   "tdesVal": "same",
-                   "predResistanceEnabled": "yes",
-                   "reseedImplemented" : "yes",
-                   "entropyInputLen":"112",
-                   "nonceLen":"56",
-                   "persoStringLen":"0",
-                   "additionalInputLen":"0",
-                   "returnedBitsLen":"256"
-               }
+              {
+                  "algorithm": "ctrDRBG",
+                  "mode": "3KeyTDEA",
+                  "derFuncEnabled":"yes",
+                  "prereqVals": [{algorithm: "TDES", valValue: "same"}],
+                  "predResistanceEnabled": "yes",
+                  "reseedImplemented" : "yes",
+                  "entropyInputLen":"112",
+                  "nonceLen":"56",
+                  "persoStringLen":"0",
+                  "additionalInputLen":"0",
+                  "returnedBitsLen":"256"
+              }
 
    The following is a example JSON object advertising support for
    ctrDRBG with AES-128.
@@ -669,7 +667,9 @@ Appendix A.  Example DRBG Capabilities JSON Object
 
 
 
-Vassilev                Expires February 20, 2017              [Page 12]
+
+
+Vassilev                Expires February 2, 2017               [Page 12]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -678,7 +678,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
                    "algorithm": "ctrDRBG",
                    "mode": "AES-128",
                    "derFuncEnabled":"yes",
-                   "aesVal": "same",
+                  "prereqVals": [{algorithm: "AES", valValue: "1234"}],
                    "predResistanceEnabled": "yes",
                    "reseedImplemented" : "yes",
                    "entropyInputLen":"128",
@@ -691,100 +691,49 @@ Internet-Draft                DRBG Alg JSON                  August 2016
    The following is a example JSON object advertising support for
    hashDRBG with AES-256.
 
-
-
-               {
-                   "algorithm": "hashDRBG",
-                   "mode": "AES-256",
-                   "aesVal": "same",
-                   "shaVal": "same",
-                   "predResistanceEnabled": "yes",
-                   "reseedImplemented" : "yes",
-                   "entropyInputLen":"256",
-                   "nonceLen":"128",
-                   "persoStringLen":"0",
-                   "additionalInputLen":"0",
-                   "returnedBitsLen":"1024"
-               }
+            {
+                "algorithm": "hashDRBG",
+                "mode": "AES-256",
+                "prereqVals": [{algorithm: "AES", valValue: "1234"}, {algorithm: "SHA", valValue: "5678"}],
+                "predResistanceEnabled": "yes",
+                "reseedImplemented" : "yes",
+                "entropyInputLen":"256",
+                "nonceLen":"128",
+                "persoStringLen":"0",
+                "additionalInputLen":"0",
+                "returnedBitsLen":"1024"
+            }
 
    The following is a example JSON object advertising support for
    hmacDRBG with AES-256.
 
+            {
+                "algorithm": "hmacDRBG",
+                "mode": "AES-256",
+                "prereqVals": [{algorithm: "AES", valValue: "1234"}, {algorithm: "HMAC", valValue: "9012"}],
+                "predResistanceEnabled": "yes",
+                "reseedImplemented" : "yes",
+                "entropyInputLen":"256",
+                "nonceLen":"128",
+                "persoStringLen":"0",
+                "additionalInputLen":"0",
+                "returnedBitsLen":"1024"
+            }
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-Vassilev                Expires February 20, 2017              [Page 13]
+Vassilev                Expires February 2, 2017               [Page 13]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
-
-               {
-                   "algorithm": "hmacDRBG",
-                   "mode": "AES-256",
-                  "aesVal": "same",
-                   "hmacVal": "same",
-                   "predResistanceEnabled": "yes",
-                   "reseedImplemented" : "yes",
-                   "entropyInputLen":"256",
-                   "nonceLen":"128",
-                   "persoStringLen":"0",
-                   "additionalInputLen":"0",
-                   "returnedBitsLen":"1024"
-               }
 
 Appendix B.  Example Test Vectors JSON Object
 
    The following is a example JSON object for ctrDRBG test vectors sent
    from the ACVP server to the crypto module.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Vassilev                Expires February 20, 2017              [Page 14]
-
-Internet-Draft                DRBG Alg JSON                  August 2016
-
 
                 {
                   "version": "0.2",
@@ -832,12 +781,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
 
 
 
-
-
-
-
-
-Vassilev                Expires February 20, 2017              [Page 15]
+Vassilev                Expires February 2, 2017               [Page 14]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -893,7 +837,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
 
 
 
-Vassilev                Expires February 20, 2017              [Page 16]
+Vassilev                Expires February 2, 2017               [Page 15]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -949,7 +893,7 @@ Appendix C.  Example Test Results JSON Object
 
 
 
-Vassilev                Expires February 20, 2017              [Page 17]
+Vassilev                Expires February 2, 2017               [Page 16]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -1005,7 +949,7 @@ Internet-Draft                DRBG Alg JSON                  August 2016
 
 
 
-Vassilev                Expires February 20, 2017              [Page 18]
+Vassilev                Expires February 2, 2017               [Page 17]
 
 Internet-Draft                DRBG Alg JSON                  August 2016
 
@@ -1061,4 +1005,4 @@ Author's Address
 
 
 
-Vassilev                Expires February 20, 2017              [Page 19]
+Vassilev                Expires February 2, 2017               [Page 18]
