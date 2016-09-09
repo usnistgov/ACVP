@@ -138,6 +138,8 @@
 	Each algorithm capability advertised is a self-contained JSON object.  The following
 	JSON values are used for hash algorithm capabilities:</t>
 
+
+    <section anchor="hash_caps_reg" title="HASH Algorithm Capabilities Registration">
         <texttable anchor="caps_table" title="Hash Algorithm Capabilities JSON Values">
           <ttcol align="left">JSON Value</ttcol>
           <ttcol align="left">Description</ttcol>
@@ -187,11 +189,44 @@
           <c>Yes</c>
 
         </texttable>
+        </section>
 
 
-	<t>Each MAC algorithm capability advertised is a self-contained JSON object.  The following
-	JSON values are used for MAC algorithm capabilities:</t>
+	<section anchor="prereq_algs" title="Required Prerequisite Algorithms for MAC Validations">
+	    <t>Each MAC implementation relies on other cryptographic primitives.
+	    For example, CMAC uses an underlying SHA algorithm. Each of these underlying algorithm primitives 
+	    must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
+	    <texttable anchor="rereqs_table" title="Required MAC Prerequisite Algorithms JSON Values">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+          <ttcol align="left">Valid Values</ttcol>
+          <ttcol align="left">Optional</ttcol>
+          <c>algorithm</c>
+          <c>a prerequisite algorithm</c>
+          <c>value</c>
+          <c>AES, SHA, TDES</c>
+          <c>No</c>
+          <c/><c/><c/><c/><c/>
 
+          <c>valValue</c>
+          <c>algorithm validation number</c>
+          <c>value</c>
+          <c>actual number or "same"</c>
+          <c>No</c>
+          <c/><c/><c/><c/><c/>
+
+          <c>prereqAlgVal</c>
+          <c>prerequistie algorithm validation</c>
+          <c>object with algorithm and valValue properties</c>
+          <c>see above</c>
+          <c>No</c>
+
+	  </texttable>
+	  </section>
+
+        <section anchor="mac_caps_reg" title="MAC Algorithm Capabilities Registration">
+        <t>Each algorithm capability advertised is a self-contained JSON object using the following values.</t>
         <texttable anchor="caps_table2" title="MAC Algorithm Capabilities JSON Values">
           <ttcol align="left">JSON Value</ttcol>
           <ttcol align="left">Description</ttcol>
@@ -206,25 +241,11 @@
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
-          <c>aesVal</c>
-	  <c>The AES validation number or implemented in same implementation(CMAC).</c>
-          <c>value</c>
-          <c>same or value</c>
-          <c>Yes</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>shaVal</c>
-	  <c>The SHA validation number or implemented in same implementation(HMAC).</c>
-          <c>value</c>
-          <c>same or value</c>
-          <c>Yes</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>tdesVal</c>
-	  <c>The TDES validation number or implemented in same implementation(CMAC).</c>
-          <c>value</c>
-          <c>same or value</c>
-          <c>Yes</c>
+          <c>prereqVals</c>
+          <c>prerequistie algorithm validations</c>
+          <c>array of prereqAlgVal objects</c>
+          <c>See <xref target="prereq_algs" /></c>
+          <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
           <c>keyRange1</c>
@@ -271,8 +292,6 @@
         </texttable>
 
 
-
-
 	<t>Note: Some optional values are required depending on the algorithm. Failure to provide these values will result in the ACVP server returning an error to the ACVP client during registration.</t>
 
 
@@ -289,6 +308,8 @@
 		<t>Two message lengths NOT divisible by block size</t>
 		<t>The largest message length supported</t>
 	    </list></t>
+
+	</section>
 
 	<section anchor="supported_algs" title="Supported Hash Algorithms">
 	    <t>The following hash algorithms may be advertised by the ACVP compliant crypto module:</t>
@@ -323,7 +344,6 @@
 		<t>CMAC-TDES</t>
 	    </list></t>
 	</section>
-
     </section>
 
     <section anchor="test_vectors" title="Test Vectors">
@@ -584,7 +604,7 @@
 
             {
                 "algorithm": "HMAC-SHA-256",
-		"shaVal" : "123445",
+                "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"}],
                 "keySize1": [ 32, 56],
                 "keySize2": [192, 256],
                 "keyBlock": "yes",
@@ -599,8 +619,8 @@
 
             {
                 "algorithm": "CMAC-TDES",
-		"aesVal" : "1293871297",
-		"tdesVal" : "1293871297",
+                "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
+		                {"algorithm" : "TDES", "valValue" : "123456"}],
                 "inEmpty": "yes",
 		"macLen" : [0, 8],
 		"msgLen" : [0, 32, 15, 31, 40]

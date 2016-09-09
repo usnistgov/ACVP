@@ -63,19 +63,22 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported Symmetric Algorithms  . . . . . . . . . . . . .   5
+     2.1.  Required Prerequisite Algorithms for Symmetric
+           Validations . . . . . . . . . . . . . . . . . . . . . . .   3
+     2.2.  Symmetric Algorithm Capabilities JSON Values  . . . . . .   3
+     2.3.  Supported Symmetric Algorithms  . . . . . . . . . . . . .   5
    3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
-     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   7
-   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   8
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   9
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
-   Appendix A.  Example Capabilities JSON Object . . . . . . . . . .   9
-   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  10
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  13
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   7
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   8
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   9
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  10
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  10
+   Appendix A.  Example Capabilities JSON Object . . . . . . . . . .  10
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  11
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  14
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
 
 1.  Introduction
 
@@ -103,9 +106,6 @@ Table of Contents
    ACVP requires crypto modules to register their capabilities.  This
    allows the crypto module to advertise support for specific
    algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
-   the constructs for advertising support of symmetric algorithms to the
-   ACVP server.
 
 
 
@@ -114,6 +114,10 @@ Foley                   Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of symmetric algorithms to the
+   ACVP server.
+
    The symmetric algorithm capabilities are advertised as JSON objects
    within the 'algorithms' value of the ACVP registration message.  The
    'algorithms' value is an array, where each array element is an
@@ -121,47 +125,43 @@ Internet-Draft                Sym Alg JSON                     June 2016
    value is part of the 'capability_exchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
    registration message.  Each symmetric algorithm capability advertised
-   is a self-contained JSON object.  The following JSON values are used
-   for symmetric algorithm capabilities:
+   is a self-contained JSON object.
 
+2.1.  Required Prerequisite Algorithms for Symmetric Validations
 
+   Some symmetric algorithm implementations rely on other cryptographic
+   primitives.  For example, CCM uses an underlying AES algorithm.  Each
+   of these underlying algorithm primitives must be validated, either
+   separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
 
+   +--------------+--------------+---------------+----------+----------+
+   | JSON Value   | Description  | JSON type     | Valid    | Optional |
+   |              |              |               | Values   |          |
+   +--------------+--------------+---------------+----------+----------+
+   | algorithm    | a            | value         | AES,     | Yes      |
+   |              | prerequisite |               | DRBG,    |          |
+   |              | algorithm    |               | TDES     |          |
+   |              |              |               |          |          |
+   | valValue     | algorithm    | value         | actual   | Yes      |
+   |              | validation   |               | number   |          |
+   |              | number       |               | or       |          |
+   |              |              |               | "same"   |          |
+   |              |              |               |          |          |
+   | prereqAlgVal | prerequistie | object with   | see      | Yes      |
+   |              | algorithm    | algorithm and | above    |          |
+   |              | validation   | valValue      |          |          |
+   |              |              | properties    |          |          |
+   +--------------+--------------+---------------+----------+----------+
 
+           Table 1: Required Prerequisite Algorithms JSON Values
 
+2.2.  Symmetric Algorithm Capabilities JSON Values
 
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   +------------+--------------+--------------+-------------+----------+
 
 
 
@@ -170,54 +170,54 @@ Foley                   Expires December 3, 2016                [Page 3]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +-----------+-----------------+-------+------------------+----------+
-   | JSON      | Description     | JSON  | Valid Values     | Optional |
-   | Value     |                 | type  |                  |          |
-   +-----------+-----------------+-------+------------------+----------+
-   | algorithm | The symmetric   | value | See Section 2.1  | No       |
-   |           | algorithm and   |       |                  |          |
-   |           | mode to be      |       |                  |          |
-   |           | validated.      |       |                  |          |
-   |           |                 |       |                  |          |
-   | direction | The crypto      | array | encrypt, decrypt | No       |
-   |           | operation       |       |                  |          |
-   |           | direction       |       |                  |          |
-   |           |                 |       |                  |          |
-   | keyLen    | The supported   | array | 128, 168, 192,   | No       |
-   |           | key lengths in  |       | 256              |          |
-   |           | bits            |       |                  |          |
-   |           |                 |       |                  |          |
-   | ptLen     | The supported   | array | 0-65536          | No       |
-   |           | plaintext       |       |                  |          |
-   |           | lengths in bits |       |                  |          |
-   |           |                 |       |                  |          |
-   | ivLen     | The supported   | array | 8-1024           | Yes      |
-   |           | IV lengths in   |       |                  |          |
-   |           | bits            |       |                  |          |
-   |           |                 |       |                  |          |
-   | ivGen     | IV generation   | value | internal,        | Yes      |
-   |           | method for AEAD |       | external         |          |
-   |           | algorithms      |       |                  |          |
-   |           |                 |       |                  |          |
-   | ivGenMode | IV generation   | value | 8.2.1, 8.2.2     | Yes      |
-   |           | mode for AEAD   |       |                  |          |
-   |           | algorithms      |       |                  |          |
-   |           |                 |       |                  |          |
-   | aadLen    | The supported   | array | 0-65536          | Yes      |
-   |           | AAD lengths in  |       |                  |          |
-   |           | bits for AEAD   |       |                  |          |
-   |           | algorithms      |       |                  |          |
-   |           |                 |       |                  |          |
-   | tagLen    | The supported   | array | 4, 6, 8, 10, 12, | Yes      |
-   |           | Tag lengths in  |       | 14, 16, 32, 64,  |          |
-   |           | bits for AEAD   |       | 96, 104, 112,    |          |
-   |           | algorithms      |       | 120, 128         |          |
-   +-----------+-----------------+-------+------------------+----------+
-
-           Table 1: Symmetric Algorithm Capabilities JSON Values
-
-   Note: Some optional values are required depending on the algorithm.
-   For example, AES-GCM requires ivLen, ivGen, ivGenMode, aadLen and
+   | JSON Value | Description  | JSON type    | Valid       | Optional |
+   |            |              |              | Values      |          |
+   +------------+--------------+--------------+-------------+----------+
+   | algorithm  | The          | value        | See Section | No       |
+   |            | symmetric    |              | 2.3         |          |
+   |            | algorithm    |              |             |          |
+   |            | and mode to  |              |             |          |
+   |            | be           |              |             |          |
+   |            | validated.   |              |             |          |
+   |            |              |              |             |          |
+   | prereqVals | Prerequistie | array of     | See Section | Yes      |
+   |            | algorithm    | prereqAlgVal | 2.1         |          |
+   |            | validations  | objects      |             |          |
+   |            |              |              |             |          |
+   | direction  | The crypto   | array        | encrypt,    | No       |
+   |            | operation    |              | decrypt     |          |
+   |            | direction    |              |             |          |
+   |            |              |              |             |          |
+   | keyLen     | The          | array        | 128, 168,   | No       |
+   |            | supported    |              | 192, 256    |          |
+   |            | key lengths  |              |             |          |
+   |            | in bits      |              |             |          |
+   |            |              |              |             |          |
+   | ptLen      | The          | array        | 0-65536     | No       |
+   |            | supported    |              |             |          |
+   |            | plaintext    |              |             |          |
+   |            | lengths in   |              |             |          |
+   |            | bits         |              |             |          |
+   |            |              |              |             |          |
+   | ivLen      | The          | array        | 8-1024      | Yes      |
+   |            | supported IV |              |             |          |
+   |            | lengths in   |              |             |          |
+   |            | bits         |              |             |          |
+   |            |              |              |             |          |
+   | ivGen      | IV           | value        | internal,   | Yes      |
+   |            | generation   |              | external    |          |
+   |            | method for   |              |             |          |
+   |            | AEAD         |              |             |          |
+   |            | algorithms   |              |             |          |
+   |            |              |              |             |          |
+   | ivGenMode  | IV           | value        | 8.2.1,      | Yes      |
+   |            | generation   |              | 8.2.2       |          |
+   |            | mode for     |              |             |          |
+   |            | AEAD         |              |             |          |
+   |            | algorithms   |              |             |          |
+   |            |              |              |             |          |
+   | aadLen     | The          | array        | 0-65536     | Yes      |
+   |            | supported    |              |             |          |
 
 
 
@@ -226,10 +226,27 @@ Foley                   Expires December 3, 2016                [Page 4]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   |            | AAD lengths  |              |             |          |
+   |            | in bits for  |              |             |          |
+   |            | AEAD         |              |             |          |
+   |            | algorithms   |              |             |          |
+   |            |              |              |             |          |
+   | tagLen     | The          | array        | 4, 6, 8,    | Yes      |
+   |            | supported    |              | 10, 12, 14, |          |
+   |            | Tag lengths  |              | 16, 32, 64, |          |
+   |            | in bits for  |              | 96, 104,    |          |
+   |            | AEAD         |              | 112, 120,   |          |
+   |            | algorithms   |              | 128         |          |
+   +------------+--------------+--------------+-------------+----------+
+
+           Table 2: Symmetric Algorithm Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   For example, AES-GCM requires ivLen, ivGen, ivGenMode, aadLen and
    tagLen.  Failure to provide these values will result in the ACVP
    server returning an error to the ACVP client during registration.
 
-2.1.  Supported Symmetric Algorithms
+2.3.  Supported Symmetric Algorithms
 
    The following symmetric algorithms may be advertised by the ACVP
    compliant crypto module:
@@ -258,6 +275,13 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  AES-KWP
 
+
+
+Foley                   Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    o  TDES-EBC
 
    o  TDES-CBC
@@ -273,14 +297,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    o  TDES-CTR
 
    o  TDES-KW
-
-
-
-
-Foley                   Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
 3.  Test Vectors
 
@@ -298,6 +314,30 @@ Internet-Draft                Sym Alg JSON                     June 2016
    test vectors to be processed by the ACVP client.  The following table
    describes the JSON elements at the top level of the hierarchy.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Foley                   Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    +------------+----------------------------------------------+-------+
    | JSON Value | Description                                  | JSON  |
    |            |                                              | type  |
@@ -307,7 +347,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | vsId       | Unique numeric identifier for the vector set | value |
    |            |                                              |       |
    | algorithm  | The symmetric algorithm and mode used for    | value |
-   |            | the test vectors.  See Section 2.1 for       |       |
+   |            | the test vectors.  See Section 2.3 for       |       |
    |            | possible values.                             |       |
    |            |                                              |       |
    | direction  | The encryption direction: encrypt or decrypt | value |
@@ -316,7 +356,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | defined in Section 3.1                       |       |
    +------------+----------------------------------------------+-------+
 
-                      Table 2: Vector Set JSON Object
+                      Table 3: Vector Set JSON Object
 
 3.1.  Test Groups JSON Schema
 
@@ -333,7 +373,23 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Foley                   Expires December 3, 2016                [Page 6]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Foley                   Expires December 3, 2016                [Page 7]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -357,7 +413,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |        | 3.2                                   |       |          |
    +--------+---------------------------------------+-------+----------+
 
-                      Table 3: Test Group JSON Object
+                      Table 4: Test Group JSON Object
 
 3.2.  Test Vectors JSON Schema
 
@@ -389,7 +445,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Foley                   Expires December 3, 2016                [Page 7]
+Foley                   Expires December 3, 2016                [Page 8]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -414,7 +470,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | tag      | Tag to use for AEAD algorithms    | value   | Yes      |
    +----------+-----------------------------------+---------+----------+
 
-                      Table 4: Test Case JSON Object
+                      Table 5: Test Case JSON Object
 
 4.  Test Vector Responses
 
@@ -437,7 +493,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | JSON schema as defined in Section 3.2       |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 5: Vector Set Response JSON Object
+                 Table 6: Vector Set Response JSON Object
 
 
 
@@ -445,7 +501,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Foley                   Expires December 3, 2016                [Page 8]
+Foley                   Expires December 3, 2016                [Page 9]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -501,45 +557,47 @@ Appendix A.  Example Capabilities JSON Object
 
 
 
-Foley                   Expires December 3, 2016                [Page 9]
+Foley                   Expires December 3, 2016               [Page 10]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-               {
-                   "algorithm": "AES-GCM",
-                   "direction": [
-                       "encrypt",
-                       "decrypt"
-                   ],
-                   "ivGen": "internal",
-                   "ivGenMode": "8.2.1",
-                   "keyLen": [
-                       128,
-                       192,
-                       256
-                   ],
-                   "tagLen": [
-                       96,
-                       128
-                   ],
-                   "ivLen": [
-                       96
-                   ],
-                   "ptLen": [
-                       0,
-                       128,
-                       136,
-                       256,
-                       264
-                   ],
-                   "aadLen": [
-                       128,
-                       136,
-                       256,
-                       264
-                   ]
-               }
+            {
+                "algorithm": "AES-GCM",
+                "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
+                                {"algorithm" : "DRBG", "valValue" : "123456"}],
+                "direction": [
+                    "encrypt",
+                    "decrypt"
+                ],
+                "ivGen": "internal",
+                "ivGenMode": "8.2.1",
+                "keyLen": [
+                    128,
+                    192,
+                    256
+                ],
+                "tagLen": [
+                    96,
+                    128
+                ],
+                "ivLen": [
+                    96
+                ],
+                "ptLen": [
+                    0,
+                    128,
+                    136,
+                    256,
+                    264
+                ],
+                "aadLen": [
+                    128,
+                    136,
+                    256,
+                    264
+                ]
+            }
 
 Appendix B.  Example Test Vectors JSON Object
 
@@ -552,16 +610,16 @@ Appendix B.  Example Test Vectors JSON Object
                      "algorithm": "AES-GCM",
                      "direction": "encrypt",
                      "testGroups": [
-                       {
-                         "keyLen": 128,
 
 
 
-Foley                   Expires December 3, 2016               [Page 10]
+Foley                   Expires December 3, 2016               [Page 11]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+                       {
+                         "keyLen": 128,
                          "ivLen": 96,
                          "ptLen": 0,
                          "aadLen": 128,
@@ -608,16 +666,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
                            },
                            {
                              "tcId": 2187,
-                             "key": "DAE8E9A248931962FDB03F4C3B227801",
-                             "pt": "",
 
 
 
-Foley                   Expires December 3, 2016               [Page 11]
+Foley                   Expires December 3, 2016               [Page 12]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+                             "key": "DAE8E9A248931962FDB03F4C3B227801",
+                             "pt": "",
                              "aad": "FFDBB1801C99C87C6782CAA36E4F0BDDD0"
                            }
                          ]
@@ -664,16 +722,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
                              "key": "962574476C8D12E6487C6CDDA952E8C8",
                              "pt": "DFF4D0CFF9D8628FA51EB8E533A68C32",
                              "aad": "AEF2547382355E157E15DBECB64A8C77"
-                           }
-                         ]
 
 
 
-Foley                   Expires December 3, 2016               [Page 12]
+Foley                   Expires December 3, 2016               [Page 13]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+                           }
+                         ]
                        }
                      ]
                    }
@@ -720,16 +778,16 @@ Appendix C.  Example Test Results JSON Object
                            {
                                "tcId": 2187,
                                "iv": "010203043E56946A9C9E18D7",
-                               "ct": "",
-                               "tag": "7DA8BA92D64071909972395C981C4567"
 
 
 
-Foley                   Expires December 3, 2016               [Page 13]
+Foley                   Expires December 3, 2016               [Page 14]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+                               "ct": "",
+                               "tag": "7DA8BA92D64071909972395C981C4567"
                            },
                            {
                                "tcId": 2201,
@@ -779,9 +837,7 @@ Author's Address
 
 
 
-
-
-Foley                   Expires December 3, 2016               [Page 14]
+Foley                   Expires December 3, 2016               [Page 15]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -837,4 +893,4 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Foley                   Expires December 3, 2016               [Page 15]
+Foley                   Expires December 3, 2016               [Page 16]

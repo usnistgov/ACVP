@@ -63,9 +63,11 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported DSA2 Functions  . . . . . . . . . . . . . . . .   4
-     2.2.  Supported SHA Methods . . . . . . . . . . . . . . . . . .   5
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
+     2.1.  Required Prerequisite Algorithms for DSA Validations  . .   3
+     2.2.  DSA2 Algorithm Capabilities Registration  . . . . . . . .   3
+     2.3.  Supported DSA2 Functions  . . . . . . . . . . . . . . . .   5
+     2.4.  Supported SHA Methods . . . . . . . . . . . . . . . . . .   5
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   6
      3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
      3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   7
    4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   8
@@ -104,8 +106,6 @@ Table of Contents
    ACVP requires crypto modules to register their capabilities.  This
    allows the crypto module to advertise support for specific
    algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
-
 
 
 
@@ -114,6 +114,7 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   vectors generated for the validation process.  This section describes
    the constructs for advertising support of DSA2 algorithms to the ACVP
    server.
 
@@ -123,45 +124,44 @@ Internet-Draft                Sym Alg JSON                     June 2016
    individual JSON object defined in this section.  The 'algorithms'
    value is part of the 'capability_exchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
-   registration message.  Each algorithm capability advertised is a
-   self-contained JSON object.  The following JSON values are used for
-   DSA2 algorithm capabilities:
+   registration message.
 
-   +-----------+--------------------+-------+---------------+----------+
-   | JSON      | Description        | JSON  | Valid Values  | Optional |
-   | Value     |                    | type  |               |          |
-   +-----------+--------------------+-------+---------------+----------+
-   | algorithm | The algorithm      | value | DSA2          | No       |
-   |           | under test         |       |               |          |
-   |           |                    |       |               |          |
-   | shaVal    | The SHA validation | value | same or value | No       |
-   |           | number or          |       |               |          |
-   |           | implemented in     |       |               |          |
-   |           | "same"             |       |               |          |
-   |           | implementation     |       |               |          |
-   |           |                    |       |               |          |
-   | sha2Val   | A second           | value | same or value | Yes      |
-   |           | (optional) SHA     |       |               |          |
-   |           | validation number  |       |               |          |
-   |           | or implemented in  |       |               |          |
-   |           | "same"             |       |               |          |
-   |           | implementation     |       |               |          |
-   |           |                    |       |               |          |
-   | drbgVal   | The DRBG           | value | same or value | No       |
-   |           | validation number  |       |               |          |
-   |           | or implemented in  |       |               |          |
-   |           | "same"             |       |               |          |
-   |           | implementation     |       |               |          |
-   |           |                    |       |               |          |
-   | methods   | Method and         | array | See the       | No       |
-   |           | associated         |       | following     |          |
-   |           | parameters         |       | values        |          |
-   |           | represented as an  |       |               |          |
-   |           | array of the       |       |               |          |
-   |           | following JSON     |       |               |          |
-   |           | values             |       |               |          |
-   |           |                    |       |               |          |
-   | type      | Type of method or  | value | See Section   | No       |
+2.1.  Required Prerequisite Algorithms for DSA Validations
+
+   Each DSA implementation relies on other cryptographic primitives.
+   For example, DSA uses an underlying SHA algorithm.  Each of these
+   underlying algorithm primitives must be validated, either separately
+   or as part of the same submission.  ACVP provides a mechanism for
+   specifying the required prerequisites:
+
+   +--------------+--------------+---------------+----------+----------+
+   | JSON Value   | Description  | JSON type     | Valid    | Optional |
+   |              |              |               | Values   |          |
+   +--------------+--------------+---------------+----------+----------+
+   | algorithm    | a            | value         | DRBG,    | No       |
+   |              | prerequisite |               | SHA,     |          |
+   |              | algorithm    |               | SHA_OPT2 |          |
+   |              |              |               |          |          |
+   | valValue     | algorithm    | value         | actual   | No       |
+   |              | validation   |               | number   |          |
+   |              | number       |               | or       |          |
+   |              |              |               | "same"   |          |
+   |              |              |               |          |          |
+   | prereqAlgVal | prerequistie | object with   | see      | No       |
+   |              | algorithm    | algorithm and | above    |          |
+   |              | validation   | valValue      |          |          |
+   |              |              | properties    |          |          |
+   +--------------+--------------+---------------+----------+----------+
+
+        Table 1: Required DSA2 Prerequisite Algorithms JSON Values
+
+2.2.  DSA2 Algorithm Capabilities Registration
+
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+   +-----------+-------------+--------------+---------------+----------+
+   | JSON      | Description | JSON type    | Valid Values  | Optional |
 
 
 
@@ -170,43 +170,80 @@ Fussell                 Expires December 3, 2016                [Page 3]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   |           | algorithm          |       | 2.1           |          |
-   |           | supported,         |       |               |          |
-   |           | represented as an  |       |               |          |
-   |           | array of the       |       |               |          |
-   |           | following JSON     |       |               |          |
-   |           | values             |       |               |          |
-   |           |                    |       |               |          |
-   | genPQ     | Genrate P and Q    | array | Probable,     | Yes      |
-   |           | method, one or     |       | Provable      |          |
-   |           | both               |       |               |          |
-   |           |                    |       |               |          |
-   | genG      | Genrate G method,  | array | Unverifiable, | Yes      |
-   |           | one or both        |       | Canonical     |          |
-   |           |                    |       |               |          |
-   | lnInfo    | Array of the       | array | See the       | No       |
-   |           | following values   |       | following two |          |
-   |           | for this type of   |       | fields as     |          |
-   |           | method             |       | values of the |          |
-   |           |                    |       | array         |          |
-   |           |                    |       |               |          |
-   | ln        | Length in bits of  | value | 1024-224,     | No       |
-   |           | prime modulus p    |       | 2048-224,     |          |
-   |           | and the prime      |       | 2048-256,     |          |
-   |           | divisor            |       | 3072-256      |          |
-   |           |                    |       |               |          |
-   | sha       | Array of SHA       | array | See Section   | Yes      |
-   |           | values used for an |       | 2.2           |          |
-   |           | LN                 |       |               |          |
-   +-----------+--------------------+-------+---------------+----------+
+   | Value     |             |              |               |          |
+   +-----------+-------------+--------------+---------------+----------+
+   | algorithm | The         | value        | DSA2          | No       |
+   |           | algorithm   |              |               |          |
+   |           | under test  |              |               |          |
+   |           |             |              |               |          |
+   | prereqVal | prerequisti | array of     | See Section   | No       |
+   | s         | e algorithm | prereqAlgVal | 2.1           |          |
+   |           | validations | objects      |               |          |
+   |           |             |              |               |          |
+   | methods   | Method and  | array        | See the       | No       |
+   |           | associated  |              | following     |          |
+   |           | parameters  |              | values        |          |
+   |           | represented |              |               |          |
+   |           | as an array |              |               |          |
+   |           | of the      |              |               |          |
+   |           | following   |              |               |          |
+   |           | JSON values |              |               |          |
+   |           |             |              |               |          |
+   | type      | Type of     | value        | See Section   | No       |
+   |           | method or   |              | 2.3           |          |
+   |           | algorithm   |              |               |          |
+   |           | supported,  |              |               |          |
+   |           | represented |              |               |          |
+   |           | as an array |              |               |          |
+   |           | of the      |              |               |          |
+   |           | following   |              |               |          |
+   |           | JSON values |              |               |          |
+   |           |             |              |               |          |
+   | genPQ     | Genrate P   | array        | Probable,     | Yes      |
+   |           | and Q       |              | Provable      |          |
+   |           | method, one |              |               |          |
+   |           | or both     |              |               |          |
+   |           |             |              |               |          |
+   | genG      | Genrate G   | array        | Unverifiable, | Yes      |
+   |           | method, one |              | Canonical     |          |
+   |           | or both     |              |               |          |
+   |           |             |              |               |          |
+   | lnInfo    | Array of    | array        | See the       | No       |
+   |           | the         |              | following two |          |
+   |           | following   |              | fields as     |          |
+   |           | values for  |              | values of the |          |
+   |           | this type   |              | array         |          |
+   |           | of method   |              |               |          |
+   |           |             |              |               |          |
+   | ln        | Length in   | value        | 1024-224,     | No       |
+   |           | bits of     |              | 2048-224,     |          |
+   |           | prime       |              | 2048-256,     |          |
 
-             Table 1: DSA2 Algorithm Capabilities JSON Values
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   |           | modulus p   |              | 3072-256      |          |
+   |           | and the     |              |               |          |
+   |           | prime       |              |               |          |
+   |           | divisor     |              |               |          |
+   |           |             |              |               |          |
+   | sha       | Array of    | array        | See Section   | Yes      |
+   |           | SHA values  |              | 2.4           |          |
+   |           | used for an |              |               |          |
+   |           | LN          |              |               |          |
+   +-----------+-------------+--------------+---------------+----------+
+
+             Table 2: DSA2 Algorithm Capabilities JSON Values
 
    Note: Some optional values are required depending on the algorithm.
    Failure to provide these values will result in the ACVP server
    returning an error to the ACVP client during registration.
 
-2.1.  Supported DSA2 Functions
+2.3.  Supported DSA2 Functions
 
    The following DSA2 method types may be advertised by the ACVP
    compliant crypto module:
@@ -219,16 +256,9 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  SigGen
 
-
-
-Fussell                 Expires December 3, 2016                [Page 4]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    o  SigVer
 
-2.2.  Supported SHA Methods
+2.4.  Supported SHA Methods
 
    The following SHA methods may be advertised by the ACVP compliant
    crypto module:
@@ -244,6 +274,13 @@ Internet-Draft                Sym Alg JSON                     June 2016
    o  SHA-512
 
    o  SHA-512-244
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    o  SHA-512-256
 
@@ -262,26 +299,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    test vectors to be processed by the ACVP client.The following table
    describes the JSON elements at the top level of the hierarchy.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    +------------+---------------------------------------------+--------+
    | JSON Value | Description                                 | JSON   |
    |            |                                             | type   |
@@ -297,7 +314,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | defined in Section 3.1                      |        |
    +------------+---------------------------------------------+--------+
 
-                      Table 2: Vector Set JSON Object
+                      Table 3: Vector Set JSON Object
 
 3.1.  Test Groups JSON Schema
 
@@ -316,23 +333,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Fussell                 Expires December 3, 2016                [Page 6]
 
 Internet-Draft                Sym Alg JSON                     June 2016
@@ -343,7 +343,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | Value |                                        | type  |          |
    +-------+----------------------------------------+-------+----------+
    | type  | The method type used for the test      | value | No       |
-   |       | vectors.  See Section 2.1 for possible |       |          |
+   |       | vectors.  See Section 2.3 for possible |       |          |
    |       | values                                 |       |          |
    |       |                                        |       |          |
    | ln    | Length in bits of prime modulus p and  | array | No       |
@@ -361,7 +361,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |       | 3.2                                    |       |          |
    +-------+----------------------------------------+-------+----------+
 
-                     Table 3: Vector Group JSON Object
+                     Table 4: Vector Group JSON Object
 
 3.2.  Test Vectors JSON Schema
 
@@ -428,7 +428,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |         | signature or verify signature       |        |          |
    +---------+-------------------------------------+--------+----------+
 
-                      Table 4: Test Case JSON Object
+                      Table 5: Test Case JSON Object
 
 4.  Test Vector Responses
 
@@ -464,7 +464,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | tables below                                |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 5: Vector Set Response JSON Object
+                 Table 6: Vector Set Response JSON Object
 
    The following table describes the JSON object that represents a
    vector set response for DSA2.
@@ -492,7 +492,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |          | verify                            |         |          |
    +----------+-----------------------------------+---------+----------+
 
-                 Table 6: Vector Set Response JSON Object
+                 Table 7: Vector Set Response JSON Object
 
 
 
@@ -564,14 +564,14 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
             {
                 "algorithm": "DSA2",
-                "shaVal": "123456",
-                "drbgVal": "123456",
+                "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"},
+                                {"algorithm" : "DRBG", "valValue" : "123456"}],
                 "methods": [
                               { "type" : "PQGGen",
                                 "genPQ" : ["provable", "probable"],
                                 "genG" : ["unverifiable", "canonical"],
                                 "lnInfo" : [
-                                        { "ln : 2048-224,
+                                        { "ln" : 2048-224,
                                           "sha" : [SHA-1, SHA-224, SHA-256]},
                                         { "ln" : 2048-256,
                                           "sha" : [SHA-1, SHA-224, SHA-256]},
@@ -581,7 +581,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
                                 "genPQ" : ["provable", "probable"],
                                 "genG" : ["unverifiable", "canonical"],
                                 "lnInfo" : [
-                                        { "ln : 2048-224,
+                                        { "ln" : 2048-224,
                                           "sha" : [SHA-1, SHA-224, SHA-256]},
                                         { "ln" : 2048-256,
                                           "sha" : [SHA-1, SHA-224, SHA-256]},
@@ -626,7 +626,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
                     {
                       "type": "PQGVer",
                       "genPQ" : "probable",
-                      "ln : 2048-224,
+                      "ln" : 2048-224,
                       "sha" : "SHA-224",
                       "tests": [
                         {

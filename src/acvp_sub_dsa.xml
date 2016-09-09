@@ -133,11 +133,43 @@
 	value of the ACVP registration message.  The 'algorithms' value is an array, where each
 	array element is an individual JSON object defined in this section.  The 'algorithms'
 	value is part of the 'capability_exchange' element of the ACVP JSON registration message.
-	See the ACVP specification for details on the registration message.
+	See the ACVP specification for details on the registration message.</t>
 
-	Each algorithm capability advertised is a self-contained JSON object.  The following
-	JSON values are used for DSA2 algorithm capabilities:</t>
+	<section anchor="prereq_algs" title="Required Prerequisite Algorithms for DSA Validations">
+	    <t>Each DSA implementation relies on other cryptographic primitives.
+	    For example, DSA uses an underlying SHA algorithm. Each of these underlying algorithm primitives 
+	    must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
+	    <texttable anchor="rereqs_table" title="Required DSA2 Prerequisite Algorithms JSON Values">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+          <ttcol align="left">Valid Values</ttcol>
+          <ttcol align="left">Optional</ttcol>
+          <c>algorithm</c>
+          <c>a prerequisite algorithm</c>
+          <c>value</c>
+          <c>DRBG, SHA, SHA_OPT2</c>
+          <c>No</c>
+          <c/><c/><c/><c/><c/>
 
+          <c>valValue</c>
+          <c>algorithm validation number</c>
+          <c>value</c>
+          <c>actual number or "same"</c>
+          <c>No</c>
+          <c/><c/><c/><c/><c/>
+
+          <c>prereqAlgVal</c>
+          <c>prerequistie algorithm validation</c>
+          <c>object with algorithm and valValue properties</c>
+          <c>see above</c>
+          <c>No</c>
+
+	  </texttable>
+	  </section>
+
+    <section anchor="dsa_caps_reg" title="DSA2 Algorithm Capabilities Registration">
+    <t>Each algorithm capability advertised is a self-contained JSON object using the following values.</t>
         <texttable anchor="caps_table" title="DSA2 Algorithm Capabilities JSON Values">
           <ttcol align="left">JSON Value</ttcol>
           <ttcol align="left">Description</ttcol>
@@ -152,24 +184,10 @@
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
-          <c>shaVal</c>
-	  <c>The SHA validation number or implemented in "same" implementation</c>
-          <c>value</c>
-          <c>same or value</c>
-          <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>sha2Val</c>
-	  <c>A second (optional) SHA validation number or implemented in "same" implementation</c>
-          <c>value</c>
-          <c>same or value</c>
-          <c>Yes</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>drbgVal</c>
-	  <c>The DRBG validation number or implemented in "same" implementation</c>
-          <c>value</c>
-          <c>same or value</c>
+          <c>prereqVals</c>
+          <c>prerequistie algorithm validations</c>
+          <c>array of prereqAlgVal objects</c>
+          <c>See <xref target="prereq_algs" /></c>
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
@@ -222,11 +240,9 @@
           <c>Yes</c>
         </texttable>
 
-
-
-
 	<t>Note: Some optional values are required depending on the algorithm.  Failure to provide these values will
 	result in the ACVP server returning an error to the ACVP client during registration.</t>
+  </section>
 
 	<section anchor="supported_types" title="Supported DSA2 Functions">
 	    <t>The following DSA2 method types may be advertised by the ACVP compliant crypto module:</t>
@@ -550,14 +566,14 @@
 
             {
                 "algorithm": "DSA2",
-                "shaVal": "123456",
-                "drbgVal": "123456",
+                "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"},
+			        {"algorithm" : "DRBG", "valValue" : "123456"}],
                 "methods": [
 			      { "type" : "PQGGen",
 			        "genPQ" : ["provable", "probable"],
 			        "genG" : ["unverifiable", "canonical"],
 			        "lnInfo" : [
-			                { "ln : 2048-224, 
+			                { "ln" : 2048-224, 
 				          "sha" : [SHA-1, SHA-224, SHA-256]},
 				        { "ln" : 2048-256, 
 				          "sha" : [SHA-1, SHA-224, SHA-256]},
@@ -567,7 +583,7 @@
 			        "genPQ" : ["provable", "probable"],
 			        "genG" : ["unverifiable", "canonical"],
 			        "lnInfo" : [
-			                { "ln : 2048-224, 
+			                { "ln" : 2048-224, 
 				          "sha" : [SHA-1, SHA-224, SHA-256]},
 				        { "ln" : 2048-256, 
 				          "sha" : [SHA-1, SHA-224, SHA-256]},
@@ -590,7 +606,7 @@
                     {
                       "type": "PQGVer",
 		      "genPQ" : "probable",
-		      "ln : 2048-224, 
+		      "ln" : 2048-224, 
 		      "sha" : "SHA-224",
                       "tests": [
                         {
