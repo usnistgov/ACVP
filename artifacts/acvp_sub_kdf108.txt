@@ -62,9 +62,12 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
-   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported SP800-108 KDF Algorithms  . . . . . . . . . . .   5
-     2.2.  Supported SP800-108 KDF Methods . . . . . . . . . . . . .   5
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+     2.1.  Required Prerequisite Algorithms for SP800-108 KDF
+           Validations . . . . . . . . . . . . . . . . . . . . . . .   3
+     2.2.  SP800-108 KDF Algorithm Capabilities Registration . . . .   4
+     2.3.  Supported SP800-108 KDF Algorithms  . . . . . . . . . . .   5
+     2.4.  Supported SP800-108 KDF Methods . . . . . . . . . . . . .   5
    3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
      3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
      3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   7
@@ -73,9 +76,9 @@ Table of Contents
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
    8.  Normative References  . . . . . . . . . . . . . . . . . . . .   8
-   Appendix A.  Example SP800-108 KDF Capabilities JSON Object . . .   9
+   Appendix A.  Example SP800-108 KDF Capabilities JSON Object . . .   8
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   9
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  10
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   9
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
 
 1.  Introduction
@@ -99,12 +102,9 @@ Table of Contents
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted in RFC 2119 [RFC2119].
 
-2.  Capabilities Registration
 
-   ACVP requires crypto modules to register their capabilities.  This
-   allows the crypto module to advertise support for specific
-   algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
+
+
 
 
 
@@ -114,6 +114,12 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
    the constructs for advertising support of SP800-108 KDF algorithms to
    the ACVP server.
 
@@ -123,43 +129,37 @@ Internet-Draft                Sym Alg JSON                     June 2016
    individual JSON object defined in this section.  The 'algorithms'
    value is part of the 'capability_exchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
-   registration message.  Each algorithm capability advertised is a
-   self-contained JSON object.  The following JSON values are used for
-   SP800-108 KDF algorithm capabilities:
+   registration message.
 
+2.1.  Required Prerequisite Algorithms for SP800-108 KDF Validations
 
+   Each SP800-108 KDF implementation relies on other cryptographic
+   primitives.  For example, the KDF must utilize an underlying MAC
+   algorithm.  Each of these underlying algorithm primitives must be
+   validated, either separately or as part of the same submission.  ACVP
+   provides a mechanism for specifying the required prerequisites:
 
+   +--------------+--------------+---------------+----------+----------+
+   | JSON Value   | Description  | JSON type     | Valid    | Optional |
+   |              |              |               | Values   |          |
+   +--------------+--------------+---------------+----------+----------+
+   | algorithm    | a            | value         | KAS,     | No       |
+   |              | prerequisite |               | DRBG,    |          |
+   |              | algorithm    |               | CMAC,    |          |
+   |              |              |               | HMAC     |          |
+   |              |              |               |          |          |
+   | valValue     | algorithm    | value         | actual   | No       |
+   |              | validation   |               | number   |          |
+   |              | number       |               | or       |          |
+   |              |              |               | "same"   |          |
+   |              |              |               |          |          |
+   | prereqAlgVal | prerequistie | object with   | see      | No       |
+   |              | algorithm    | algorithm and | above    |          |
+   |              | validation   | valValue      |          |          |
+   |              |              | properties    |          |          |
+   +--------------+--------------+---------------+----------+----------+
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    Table 1: Required SP800-108 KDF Prerequisite Algorithms JSON Values
 
 
 
@@ -170,53 +170,53 @@ Fussell                 Expires December 3, 2016                [Page 3]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +-----------+----------------------+-------+-------------+----------+
-   | JSON      | Description          | JSON  | Valid       | Optional |
-   | Value     |                      | type  | Values      |          |
-   +-----------+----------------------+-------+-------------+----------+
-   | algorithm | The KDF to be        | value | See Section | No       |
-   |           | validated            |       | 2.1         |          |
-   | kasVal    | The SP800-56 KAS     | value | same or     | Yes      |
-   |           | validation number or |       | value       |          |
-   |           | implemented in       |       |             |          |
-   |           | "same"               |       |             |          |
-   |           | implementation       |       |             |          |
-   | drbgVal   | The SP800-56 DRBG    | value | same or     | Yes      |
-   |           | validation number or |       | value       |          |
-   |           | implemented in       |       |             |          |
-   |           | "same"               |       |             |          |
-   |           | implementation       |       |             |          |
-   | cmacVal   | The CMAC validation  | value | same or     | Yes      |
-   |           | number or            |       | value       |          |
-   |           | implemented in       |       |             |          |
-   |           | "same"               |       |             |          |
-   |           | implementation       |       |             |          |
-   | hmacVal   | The HMAC validation  | value | same or     | Yes      |
-   |           | number or            |       | value       |          |
-   |           | implemented in       |       |             |          |
-   |           | "same"               |       |             |          |
-   |           | implementation       |       |             |          |
-   | methods   | Type of method or    | array | See Section | No       |
-   |           | algorithm supported  |       | 2.2         |          |
-   | r         | Select all lengths   | array | 8, 16, 24,  | Yes      |
-   |           | of r in bits if      |       | 32          |          |
-   |           | counter used         |       |             |          |
-   | l         | Length in bits of Ko | array | 0-65536     | No       |
-   |           | keying material, 2   |       |             |          |
-   |           | lengths evenly       |       |             |          |
-   |           | divisible by h, and  |       |             |          |
-   |           | if supported 2 that  |       |             |          |
-   |           | are not              |       |             |          |
-   | sp        | List the SPs used to | array | SP800-56A,  | No       |
-   |           | generate K           |       | SP800-56B,  |          |
-   |           |                      |       | SP800-90A,  |          |
-   |           |                      |       | N/A         |          |
-   | order     | Order of fixed input | array | before,     | No       |
-   |           | data                 |       | middle,     |          |
-   |           |                      |       | after       |          |
-   +-----------+----------------------+-------+-------------+----------+
+2.2.  SP800-108 KDF Algorithm Capabilities Registration
 
-         Table 1: SP800-108 KDF Algorithm Capabilities JSON Values
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+   +------------+--------------+--------------+-------------+----------+
+   | JSON Value | Description  | JSON type    | Valid       | Optional |
+   |            |              |              | Values      |          |
+   +------------+--------------+--------------+-------------+----------+
+   | algorithm  | The KDF to   | value        | See Section | No       |
+   |            | be validated |              | 2.3         |          |
+   | prereqVals | prerequistie | array of     | See Section | No       |
+   |            | algorithm    | prereqAlgVal | 2.1         |          |
+   |            | validations  | objects      |             |          |
+   |            |              |              |             |          |
+   | methods    | Type of      | array        | See Section | No       |
+   |            | method or    |              | 2.4         |          |
+   |            | algorithm    |              |             |          |
+   |            | supported    |              |             |          |
+   | r          | Select all   | array        | 8, 16, 24,  | Yes      |
+   |            | lengths of r |              | 32          |          |
+   |            | in bits if   |              |             |          |
+   |            | counter used |              |             |          |
+   | l          | Length in    | array        | 0-65536     | No       |
+   |            | bits of Ko   |              |             |          |
+   |            | keying       |              |             |          |
+   |            | material, 2  |              |             |          |
+   |            | lengths      |              |             |          |
+   |            | evenly       |              |             |          |
+   |            | divisible by |              |             |          |
+   |            | h, and if    |              |             |          |
+   |            | supported 2  |              |             |          |
+   |            | that are not |              |             |          |
+   | sp         | List the SPs | array        | SP800-56A,  | No       |
+   |            | used to      |              | SP800-56B,  |          |
+   |            | generate K   |              | SP800-90A,  |          |
+   |            |              |              | N/A         |          |
+   | order      | Order of     | array        | before,     | No       |
+   |            | fixed input  |              | middle,     |          |
+   |            | data         |              | after       |          |
+   +------------+--------------+--------------+-------------+----------+
+
+         Table 2: SP800-108 KDF Algorithm Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
 
 
 
@@ -226,11 +226,7 @@ Fussell                 Expires December 3, 2016                [Page 4]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   Note: Some optional values are required depending on the algorithm.
-   Failure to provide these values will result in the ACVP server
-   returning an error to the ACVP client during registration.
-
-2.1.  Supported SP800-108 KDF Algorithms
+2.3.  Supported SP800-108 KDF Algorithms
 
    The following SP800-108 KDF algorithms may be advertised by the ACVP
    compliant crypto module:
@@ -241,7 +237,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  doublePipelineIterationMode
 
-2.2.  Supported SP800-108 KDF Methods
+2.4.  Supported SP800-108 KDF Methods
 
    The following SP800-108 KDF methods may be advertised by the ACVP
    compliant crypto module:
@@ -274,6 +270,10 @@ Internet-Draft                Sym Alg JSON                     June 2016
    such as SNMP, SSH, etc.  This section describes the JSON schema for a
    test vector set used with SP800-108 KDF algorithms.
 
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.The following table
+   describes the JSON elements at the top level of the hierarchy.
 
 
 
@@ -282,11 +282,6 @@ Fussell                 Expires December 3, 2016                [Page 5]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   The test vector set JSON schema is a multi-level hierarchy that
-   contains meta data for the entire vector set as well as individual
-   test vectors to be processed by the ACVP client.The following table
-   describes the JSON elements at the top level of the hierarchy.
-
    +------------+---------------------------------------------+--------+
    | JSON Value | Description                                 | JSON   |
    |            |                                             | type   |
@@ -294,12 +289,12 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | acvVersion | Protocol version identifier                 | value  |
    | vsId       | Unique numeric identifier for the vector    | value  |
    |            | set                                         |        |
-   | algorithm  | See Section 2.1                             | value  |
+   | algorithm  | See Section 2.3                             | value  |
    | testGroups | Array of test group JSON objects, which are | array  |
    |            | defined in Section 3.1                      |        |
    +------------+---------------------------------------------+--------+
 
-                      Table 2: Vector Set JSON Object
+                      Table 3: Vector Set JSON Object
 
 3.1.  Test Groups JSON Schema
 
@@ -314,18 +309,23 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    The KDF test group for KDF108 is as follows:
 
+   +-------------+----------------------------------+-------+----------+
+   | JSON Value  | Description                      | JSON  | Optional |
+   |             |                                  | type  |          |
+   +-------------+----------------------------------+-------+----------+
+   | method      | The method used for the test     | value | No       |
+   |             | vectors.  See Section 2.4 for    |       |          |
+   |             | possible values                  |       |          |
+   | prf         | Psuedorandom function HMAC or    | value | No       |
+   |             | CMAC used                        |       |          |
+   | ctrLocation | Before, middle or after.         | value | No       |
+   | rLen        | Length of r in bits.             | 8-32  | No       |
+   | tests       | Array of individual test vector  | array | No       |
+   |             | JSON objects, which are defined  |       |          |
+   |             | in Section 3.2                   |       |          |
+   +-------------+----------------------------------+-------+----------+
 
-
-
-
-
-
-
-
-
-
-
-
+                     Table 4: Vector Group JSON Object
 
 
 
@@ -337,24 +337,6 @@ Fussell                 Expires December 3, 2016                [Page 6]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
-
-   +-------------+----------------------------------+-------+----------+
-   | JSON Value  | Description                      | JSON  | Optional |
-   |             |                                  | type  |          |
-   +-------------+----------------------------------+-------+----------+
-   | method      | The method used for the test     | value | No       |
-   |             | vectors.  See Section 2.2 for    |       |          |
-   |             | possible values                  |       |          |
-   | prf         | Psuedorandom function HMAC or    | value | No       |
-   |             | CMAC used                        |       |          |
-   | ctrLocation | Before, middle or after.         | value | No       |
-   | rLen        | Length of r in bits.             | 8-32  | No       |
-   | tests       | Array of individual test vector  | array | No       |
-   |             | JSON objects, which are defined  |       |          |
-   |             | in Section 3.2                   |       |          |
-   +-------------+----------------------------------+-------+----------+
-
-                     Table 3: Vector Group JSON Object
 
 3.2.  Test Vectors JSON Schema
 
@@ -373,7 +355,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | ki       | Key derivation key                | value   | No       |
    +----------+-----------------------------------+---------+----------+
 
-                      Table 4: Test Case JSON Object
+                      Table 5: Test Case JSON Object
 
 4.  Test Vector Responses
 
@@ -381,18 +363,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    send the resonse vectors back to the ACVP server.  The following
    table describes the JSON object that represents a vector set
    response.
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 7]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -406,10 +376,23 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | tables below                                |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 5: Vector Set Response JSON Object
+                 Table 6: Vector Set Response JSON Object
 
    The following table describes the JSON object that represents a
    vector set response for KDF108.
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    +-----------------------+--------------------------------+----------+
    | JSON Value            | Description                    | JSON     |
@@ -422,7 +405,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |                       | output                         |          |
    +-----------------------+--------------------------------+----------+
 
-                 Table 6: Vector Set Response JSON Object
+                 Table 7: Vector Set Response JSON Object
 
 5.  Acknowledgements
 
@@ -440,16 +423,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
 
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 8]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -462,12 +435,25 @@ Appendix A.  Example SP800-108 KDF Capabilities JSON Object
 
 
 
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
             {
                 "algorithm": "counterMode",
-                "kasVal": "123456",
-                "drbgVal": "123456",
-                "hmacVal": "123456",
-                "cmacVal": "123456",
+                "prereqVals" : [{"algorithm" : "DRBG", "valValue" : "123456"},
+                                {"algorithm" : "CMAC", "valValue" : "123456"}],
                 "methods" : ["CMAC-AES-128", "CMAC-AES-192", "CMAC-AES-256" ],
                 "r" : "8",
                 "L" : ["0", "256"],
@@ -480,31 +466,6 @@ Appendix B.  Example Test Vectors JSON Object
 
    The following is a example JSON object for SP800-108 KDF test vectors
    sent from the ACVP server to the crypto module.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 9]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
                    {
                      "acvVersion": "0.2",
@@ -531,6 +492,20 @@ Appendix C.  Example Test Results JSON Object
    The following is a example JSON object for SP800-108 KDF test results
    sent from the crypto module to the ACVP server.
 
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 9]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
                 {
                     "acvVersion": "0.2",
                     "vsId": 1564,
@@ -554,6 +529,31 @@ Author's Address
    USA
 
    Email: bfussell@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
