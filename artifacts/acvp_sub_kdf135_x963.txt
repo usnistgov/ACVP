@@ -62,8 +62,11 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
-   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   5
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+     2.1.  Required Prerequisite Algorithms for KDF135 ANS X9.63
+           Validations . . . . . . . . . . . . . . . . . . . . . . .   3
+     2.2.  KDF135 ANS X9.63 Algorithm Capabilities JSON Values . . .   4
+     2.3.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   5
    3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
    4.  Test Groups JSON Schema . . . . . . . . . . . . . . . . . . .   6
    5.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . . . .   7
@@ -99,12 +102,9 @@ Table of Contents
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted in RFC 2119 [RFC2119].
 
-2.  Capabilities Registration
 
-   ACVP requires crypto modules to register their capabilities.  This
-   allows the crypto module to advertise support for specific
-   algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
+
+
 
 
 
@@ -114,6 +114,12 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
    the constructs for advertising support of SP800-135 ANS X9.63 KDF
    algorithms to the ACVP server.
 
@@ -123,43 +129,37 @@ Internet-Draft                Sym Alg JSON                     June 2016
    individual JSON object defined in this section.  The 'algorithms'
    value is part of the 'capability_exchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
-   registration message.  Each algorithm capability advertised is a
-   self-contained JSON object.  The following JSON values are used for
-   SP800-135 ANS X9.63 KDF algorithm capabilities:
+   registration message.  Each KDF algorithm capability advertised is a
+   self-contained JSON object.
 
+2.1.  Required Prerequisite Algorithms for KDF135 ANS X9.63 Validations
 
+   Some KDF135 algorithm implementations rely on other cryptographic
+   primitives.  For example, ANS X9.63 uses an underlying SHA algorithm.
+   Each of these underlying algorithm primitives must be validated,
+   either separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
 
+   +--------------+--------------+---------------+----------+----------+
+   | JSON Value   | Description  | JSON type     | Valid    | Optional |
+   |              |              |               | Values   |          |
+   +--------------+--------------+---------------+----------+----------+
+   | algorithm    | a            | value         | SHA      | No       |
+   |              | prerequisite |               |          |          |
+   |              | algorithm    |               |          |          |
+   |              |              |               |          |          |
+   | valValue     | algorithm    | value         | actual   | No       |
+   |              | validation   |               | number   |          |
+   |              | number       |               | or       |          |
+   |              |              |               | "same"   |          |
+   |              |              |               |          |          |
+   | prereqAlgVal | prerequistie | object with   | see      | Yes      |
+   |              | algorithm    | algorithm and | above    |          |
+   |              | validation   | valValue      |          |          |
+   |              |              | properties    |          |          |
+   +--------------+--------------+---------------+----------+----------+
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+           Table 1: Required Prerequisite Algorithms JSON Values
 
 
 
@@ -170,45 +170,45 @@ Fussell                 Expires December 3, 2016                [Page 3]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +------------+--------------------+-------+--------------+----------+
-   | JSON Value | Description        | JSON  | Valid Values | Optional |
-   |            |                    | type  |              |          |
-   +------------+--------------------+-------+--------------+----------+
-   | algorithm  | The KDF to be      | value | See Section  | No       |
-   |            | validated          |       | 2.1          |          |
-   |            |                    |       |              |          |
-   | hmacVal    | The HMAC           | value | same or      | No       |
-   |            | validation number  |       | value        |          |
-   |            | or implemented in  |       |              |          |
-   |            | same               |       |              |          |
-   |            | implementation     |       |              |          |
-   |            |                    |       |              |          |
-   | shaVal     | The SHA validation | value | same or      | No       |
-   |            | number or          |       | value        |          |
-   |            | implemented in     |       |              |          |
-   |            | same               |       |              |          |
-   |            | implementation     |       |              |          |
-   |            |                    |       |              |          |
-   | sha        | SHA functions      | array | SHA-224,     | No       |
-   |            | supported          |       | SHA-256,     |          |
-   |            |                    |       | SHA-384,     |          |
-   |            |                    |       | SHA-512      |          |
-   |            |                    |       |              |          |
-   | keyLen     | Key length minimum | array | 128-4096     | No       |
-   |            | and maximum        |       |              |          |
-   |            |                    |       |              |          |
-   | field      | ANSI X9.63:        | array | 224-571      | No       |
-   |            | Minimum and        |       |              |          |
-   |            | Maximum field size |       |              |          |
-   |            | in                 |       |              |          |
-   |            |                    |       |              |          |
-   | sharedInfo | ANSI X9.63:        | array | 0-1024       | No       |
-   |            | Minimum and        |       |              |          |
-   |            | Maximum sharedinfo |       |              |          |
-   |            | size in bits       |       |              |          |
-   +------------+--------------------+-------+--------------+----------+
+2.2.  KDF135 ANS X9.63 Algorithm Capabilities JSON Values
 
-    Table 1: SP800-135 ANS X9.63 KDF Algorithm Capabilities JSON Values
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+   +------------+--------------+--------------+-------------+----------+
+   | JSON Value | Description  | JSON type    | Valid       | Optional |
+   |            |              |              | Values      |          |
+   +------------+--------------+--------------+-------------+----------+
+   | algorithm  | The KDF to   | value        | See Section | No       |
+   |            | be validated |              | 2.3         |          |
+   |            |              |              |             |          |
+   | prereqVals | Prerequistie | array of     | See Section | No       |
+   |            | algorithm    | prereqAlgVal | 2.1         |          |
+   |            | validations  | objects      |             |          |
+   |            |              |              |             |          |
+   | sha        | SHA          | array        | SHA-224,    | No       |
+   |            | functions    |              | SHA-256,    |          |
+   |            | supported    |              | SHA-384,    |          |
+   |            |              |              | SHA-512     |          |
+   |            |              |              |             |          |
+   | keyLen     | Key length   | array        | 128-4096    | No       |
+   |            | minimum and  |              |             |          |
+   |            | maximum      |              |             |          |
+   |            |              |              |             |          |
+   | field      | ANSI X9.63:  | array        | 224-571     | No       |
+   |            | Minimum and  |              |             |          |
+   |            | Maximum      |              |             |          |
+   |            | field size   |              |             |          |
+   |            | in           |              |             |          |
+   |            |              |              |             |          |
+   | sharedInfo | ANSI X9.63:  | array        | 0-1024      | No       |
+   |            | Minimum and  |              |             |          |
+   |            | Maximum      |              |             |          |
+   |            | sharedinfo   |              |             |          |
+   |            | size in bits |              |             |          |
+   +------------+--------------+--------------+-------------+----------+
+
+    Table 2: SP800-135 ANS X9.63 KDF Algorithm Capabilities JSON Values
 
    Note: Some optional values are required depending on the algorithm.
    Failure to provide these values will result in the ACVP server
@@ -226,7 +226,7 @@ Fussell                 Expires December 3, 2016                [Page 4]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-2.1.  Supported SP800-135 KDF Algorithms
+2.3.  Supported SP800-135 KDF Algorithms
 
    The following SP800-135 KDF algorithms may be advertised by the ACVP
    compliant crypto module:
@@ -297,7 +297,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | are defined in Section 4                   |         |
    +------------+--------------------------------------------+---------+
 
-                      Table 2: Vector Set JSON Object
+                      Table 3: Vector Set JSON Object
 
 4.  Test Groups JSON Schema
 
@@ -358,7 +358,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |           | Section 5                          |       |          |
    +-----------+------------------------------------+-------+----------+
 
-                     Table 3: Vector Group JSON Object
+                     Table 4: Vector Group JSON Object
 
 5.  Test Vectors JSON Schema
 
@@ -379,7 +379,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | sharedInfo | Shared information              | value   | No       |
    +------------+---------------------------------+---------+----------+
 
-                      Table 4: Test Case JSON Object
+                      Table 5: Test Case JSON Object
 
 6.  Test Vector Responses
 
@@ -411,7 +411,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | tables below                                |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 5: Vector Set Response JSON Object
+                 Table 6: Vector Set Response JSON Object
 
    The following table describes the JSON object that represents a
    vector set response for ANS X9.63.
@@ -422,7 +422,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
                 | keyData    | Key data value | value     |
                 +------------+----------------+-----------+
 
-                 Table 6: Vector Set Response JSON Object
+                 Table 7: Vector Set Response JSON Object
 
 7.  Acknowledgements
 
@@ -462,15 +462,14 @@ Appendix A.  Example SP800-135 ANS X9.63 KDF Capabilities JSON Object
 
 
 
-               {
-                   "algorithm": "ANSI X9.63",
-                   "hmacVal": "123456",
-                   "shaVal": "654321",
-                   "sha" : [ "SHA-256", SHA-384", SHA-512"]
-                   "field" : [224, 571],
-                   "sharedInfo" : [0, 512],
-                   "keyLen" : [128, 2048],
-               }
+            {
+                "algorithm": "ANSI X9.63",
+                "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"}],
+                "sha" : [ "SHA-256", SHA-384", SHA-512"]
+                "field" : [224, 571],
+                "sharedInfo" : [0, 512],
+                "keyLen" : [128, 2048],
+            }
 
 Appendix B.  Example Test Vectors JSON Object
 
@@ -497,6 +496,7 @@ Appendix B.  Example Test Vectors JSON Object
                     },
                   ]
                 }
+
 
 
 
