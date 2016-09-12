@@ -135,8 +135,45 @@
 	value is part of the 'capabilityExchange' element of the ACVP JSON registration message.
 	See the ACVP specification for details on the registration message.
 
-	Each algorithm capability advertised is a self-contained JSON object.  The following
-	JSON values are used for SP800-135 IKEv1 KDF algorithm capabilities:</t>
+	Each KDF algorithm capability advertised is a self-contained JSON object.</t>
+
+	<section anchor="prereq_algs" title="Required Prerequisite Algorithms for KDF135 IKEv1 Validations">
+	    <t>Some KDF135 algorithm implementations rely on other cryptographic primitives.
+	    For example, IKEv1 uses an underlying SHA algorithm. Each of these underlying algorithm primitives 
+	    must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
+
+	    <texttable anchor="rereqs_table" title="Required Prerequisite Algorithms JSON Values">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+          <ttcol align="left">Valid Values</ttcol>
+          <ttcol align="left">Optional</ttcol>
+          <c>algorithm</c>
+          <c>a prerequisite algorithm</c>
+          <c>value</c>
+          <c>HMAC, SHA</c>
+          <c>No</c>
+          <c/><c/><c/><c/><c/>
+
+          <c>valValue</c>
+          <c>algorithm validation number</c>
+          <c>value</c>
+          <c>actual number or "same"</c>
+          <c>No</c>
+          <c/><c/><c/><c/><c/>
+
+          <c>prereqAlgVal</c>
+          <c>prerequistie algorithm validation</c>
+          <c>object with algorithm and valValue properties</c>
+          <c>see above</c>
+          <c>Yes</c>
+
+	  </texttable>
+	  </section>
+
+
+	<section anchor="cap_ex" title="KDF135 IKEv1 Algorithm Capabilities JSON Values">
+	<t>Each algorithm capability advertised is a self-contained JSON object using the following values.</t>
 
         <texttable anchor="caps_table" title="SP800-135 IKEv1 KDF Algorithm Capabilities JSON Values">
           <ttcol align="left">JSON Value</ttcol>
@@ -152,17 +189,10 @@
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
-          <c>hmacVal</c>
-	  <c>The HMAC validation number or implemented in same implementation</c>
-          <c>value</c>
-          <c>same or value</c>
-          <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>shaVal</c>
-	  <c>The SHA validation number or implemented in same implementation</c>
-          <c>value</c>
-          <c>same or value</c>
+          <c>prereqVals</c>
+          <c>Prerequistie algorithm validations</c>
+          <c>array of prereqAlgVal objects</c>
+          <c>See <xref target="prereq_algs" /></c>
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
@@ -208,11 +238,9 @@
           <c>Yes</c>
         </texttable>
 
-
-
-
 	<t>Note: Some optional values are required depending on the algorithm.  Failure to provide these values will
 	result in the ACVP server returning an error to the ACVP client during registration.</t>
+	</section>
 
 	<section anchor="supported_algs" title="Supported SP800-135 KDF Algorithms">
 	    <t>The following SP800-135 KDF algorithms may be advertised by the ACVP compliant crypto module:</t>
@@ -491,8 +519,8 @@
 
             {
                 "algorithm": "IKEv1",
-                "hmacVal": "123456",
-                "shaVal": "654321",
+                "prereqVals" : [{"algorithm" : "HMAC", "valValue" : "123456"},
+                                {"algorithm" : "SHA", "valValue" : "123456"}],
 		"methods" : ["pke", "psKey"],
 		"initiator" : [64, 2048],
 		"responder" : [64, 2048],

@@ -62,10 +62,13 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
-   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   5
-     2.2.  Supported SP800-135 IKEv1 KDF IKEv1 Methods . . . . . . .   5
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+     2.1.  Required Prerequisite Algorithms for KDF135 IKEv1
+           Validations . . . . . . . . . . . . . . . . . . . . . . .   3
+     2.2.  KDF135 IKEv1 Algorithm Capabilities JSON Values . . . . .   4
+     2.3.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   5
+     2.4.  Supported SP800-135 IKEv1 KDF IKEv1 Methods . . . . . . .   5
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   6
      3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
      3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   7
    4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   8
@@ -99,12 +102,9 @@ Table of Contents
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted in RFC 2119 [RFC2119].
 
-2.  Capabilities Registration
 
-   ACVP requires crypto modules to register their capabilities.  This
-   allows the crypto module to advertise support for specific
-   algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
+
+
 
 
 
@@ -114,6 +114,12 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
    the constructs for advertising support of SP800-135 IKEv1 KDF
    algorithms to the ACVP server.
 
@@ -123,43 +129,37 @@ Internet-Draft                Sym Alg JSON                     June 2016
    individual JSON object defined in this section.  The 'algorithms'
    value is part of the 'capabilityExchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
-   registration message.  Each algorithm capability advertised is a
-   self-contained JSON object.  The following JSON values are used for
-   SP800-135 IKEv1 KDF algorithm capabilities:
+   registration message.  Each KDF algorithm capability advertised is a
+   self-contained JSON object.
 
+2.1.  Required Prerequisite Algorithms for KDF135 IKEv1 Validations
 
+   Some KDF135 algorithm implementations rely on other cryptographic
+   primitives.  For example, IKEv1 uses an underlying SHA algorithm.
+   Each of these underlying algorithm primitives must be validated,
+   either separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
 
+   +--------------+--------------+---------------+----------+----------+
+   | JSON Value   | Description  | JSON type     | Valid    | Optional |
+   |              |              |               | Values   |          |
+   +--------------+--------------+---------------+----------+----------+
+   | algorithm    | a            | value         | HMAC,    | No       |
+   |              | prerequisite |               | SHA      |          |
+   |              | algorithm    |               |          |          |
+   |              |              |               |          |          |
+   | valValue     | algorithm    | value         | actual   | No       |
+   |              | validation   |               | number   |          |
+   |              | number       |               | or       |          |
+   |              |              |               | "same"   |          |
+   |              |              |               |          |          |
+   | prereqAlgVal | prerequistie | object with   | see      | Yes      |
+   |              | algorithm    | algorithm and | above    |          |
+   |              | validation   | valValue      |          |          |
+   |              |              | properties    |          |          |
+   +--------------+--------------+---------------+----------+----------+
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+           Table 1: Required Prerequisite Algorithms JSON Values
 
 
 
@@ -170,54 +170,54 @@ Fussell                 Expires December 3, 2016                [Page 3]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +-----------+----------------------+-------+-------------+----------+
-   | JSON      | Description          | JSON  | Valid       | Optional |
-   | Value     |                      | type  | Values      |          |
-   +-----------+----------------------+-------+-------------+----------+
-   | algorithm | The KDF to be        | value | See Section | No       |
-   |           | validated            |       | 2.1         |          |
-   |           |                      |       |             |          |
-   | hmacVal   | The HMAC validation  | value | same or     | No       |
-   |           | number or            |       | value       |          |
-   |           | implemented in same  |       |             |          |
-   |           | implementation       |       |             |          |
-   |           |                      |       |             |          |
-   | shaVal    | The SHA validation   | value | same or     | No       |
-   |           | number or            |       | value       |          |
-   |           | implemented in same  |       |             |          |
-   |           | implementation       |       |             |          |
-   |           |                      |       |             |          |
-   | methods   | Type of method       | array | See Section | No       |
-   |           | supported            |       | 2.2         |          |
-   |           |                      |       |             |          |
-   | initiator | Minimum and maximum  | array | 64-2048     | No       |
-   |           | lengths in bytes     |       |             |          |
-   |           |                      |       |             |          |
-   | responder | Minimum and maximum  | array | 64-2048     | No       |
-   |           | lengths in bytes     |       |             |          |
-   |           |                      |       |             |          |
-   | dhKey     | Array of up to three | array | 0-8192      | No       |
-   |           | Diffie-Hellman       |       |             |          |
-   |           | shared secret key    |       |             |          |
-   |           | lengths in bits and  |       |             |          |
-   |           | array of SHA sizes   |       |             |          |
-   |           | supported for the    |       |             |          |
-   |           | each length          |       |             |          |
-   |           |                      |       |             |          |
-   | sha       | Array of SHA         | array | SHA-1,      | No       |
-   |           | functions supported  |       | SHA-224,    |          |
-   |           | for each DH key      |       | SHA-256,    |          |
-   |           |                      |       | SHA-384,    |          |
-   |           |                      |       | SHA-512     |          |
-   |           |                      |       |             |          |
-   | psk       | Pre-shared key       | array | 0-65536     | Yes      |
-   |           | minimum and maximum  |       |             |          |
-   |           | lengths in bytes     |       |             |          |
-   +-----------+----------------------+-------+-------------+----------+
+2.2.  KDF135 IKEv1 Algorithm Capabilities JSON Values
 
-      Table 1: SP800-135 IKEv1 KDF Algorithm Capabilities JSON Values
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
 
-
+   +-----------+---------------+--------------+-------------+----------+
+   | JSON      | Description   | JSON type    | Valid       | Optional |
+   | Value     |               |              | Values      |          |
+   +-----------+---------------+--------------+-------------+----------+
+   | algorithm | The KDF to be | value        | See Section | No       |
+   |           | validated     |              | 2.3         |          |
+   |           |               |              |             |          |
+   | prereqVal | Prerequistie  | array of     | See Section | No       |
+   | s         | algorithm     | prereqAlgVal | 2.1         |          |
+   |           | validations   | objects      |             |          |
+   |           |               |              |             |          |
+   | methods   | Type of       | array        | See Section | No       |
+   |           | method        |              | 2.4         |          |
+   |           | supported     |              |             |          |
+   |           |               |              |             |          |
+   | initiator | Minimum and   | array        | 64-2048     | No       |
+   |           | maximum       |              |             |          |
+   |           | lengths in    |              |             |          |
+   |           | bytes         |              |             |          |
+   |           |               |              |             |          |
+   | responder | Minimum and   | array        | 64-2048     | No       |
+   |           | maximum       |              |             |          |
+   |           | lengths in    |              |             |          |
+   |           | bytes         |              |             |          |
+   |           |               |              |             |          |
+   | dhKey     | Array of up   | array        | 0-8192      | No       |
+   |           | to three      |              |             |          |
+   |           | Diffie-       |              |             |          |
+   |           | Hellman       |              |             |          |
+   |           | shared secret |              |             |          |
+   |           | key lengths   |              |             |          |
+   |           | in bits and   |              |             |          |
+   |           | array of SHA  |              |             |          |
+   |           | sizes         |              |             |          |
+   |           | supported for |              |             |          |
+   |           | the each      |              |             |          |
+   |           | length        |              |             |          |
+   |           |               |              |             |          |
+   | sha       | Array of SHA  | array        | SHA-1,      | No       |
+   |           | functions     |              | SHA-224,    |          |
+   |           | supported for |              | SHA-256,    |          |
+   |           | each DH key   |              | SHA-384,    |          |
+   |           |               |              | SHA-512     |          |
 
 
 
@@ -226,11 +226,21 @@ Fussell                 Expires December 3, 2016                [Page 4]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   |           |               |              |             |          |
+   | psk       | Pre-shared    | array        | 0-65536     | Yes      |
+   |           | key minimum   |              |             |          |
+   |           | and maximum   |              |             |          |
+   |           | lengths in    |              |             |          |
+   |           | bytes         |              |             |          |
+   +-----------+---------------+--------------+-------------+----------+
+
+      Table 2: SP800-135 IKEv1 KDF Algorithm Capabilities JSON Values
+
    Note: Some optional values are required depending on the algorithm.
    Failure to provide these values will result in the ACVP server
    returning an error to the ACVP client during registration.
 
-2.1.  Supported SP800-135 KDF Algorithms
+2.3.  Supported SP800-135 KDF Algorithms
 
    The following SP800-135 KDF algorithms may be advertised by the ACVP
    compliant crypto module:
@@ -251,7 +261,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  TPM
 
-2.2.  Supported SP800-135 IKEv1 KDF IKEv1 Methods
+2.4.  Supported SP800-135 IKEv1 KDF IKEv1 Methods
 
    The following SP800-135 IKEv1 KDF methods may be advertised by the
    ACVP compliant crypto module:
@@ -261,6 +271,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
    o  pke (Public Key Encryption)
 
    o  psKey (Pre-shared Key)
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
 3.  Test Vectors
 
@@ -274,14 +294,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    The test vector set JSON schema is a multi-level hierarchy that
    contains meta data for the entire vector set as well as individual
-
-
-
-Fussell                 Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    test vectors to be processed by the ACVP client.The following table
    describes the JSON elements at the top level of the hierarchy.
 
@@ -300,7 +312,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | defined in Section 3.1                      |        |
    +------------+---------------------------------------------+--------+
 
-                      Table 2: Vector Set JSON Object
+                      Table 3: Vector Set JSON Object
 
 3.1.  Test Groups JSON Schema
 
@@ -321,18 +333,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 Fussell                 Expires December 3, 2016                [Page 6]
 
 Internet-Draft                Sym Alg JSON                     June 2016
@@ -343,7 +343,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | Value   |                                      | type  |          |
    +---------+--------------------------------------+-------+----------+
    | method  | The method used for the test         | value | No       |
-   |         | vectors.  See Section 2.2 for        |       |          |
+   |         | vectors.  See Section 2.4 for        |       |          |
    |         | possible values                      |       |          |
    |         |                                      |       |          |
    | gxyLen  | Diffie-Hellman shared secret length  | value | No       |
@@ -362,7 +362,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |         | Section 3.2                          |       |          |
    +---------+--------------------------------------+-------+----------+
 
-                   Table 3: IKEv1 Test Group JSON Object
+                   Table 4: IKEv1 Test Group JSON Object
 
 3.2.  Test Vectors JSON Schema
 
@@ -414,7 +414,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | psKey    | Value of the pre-shared key       | value   | Yes      |
    +----------+-----------------------------------+---------+----------+
 
-                      Table 4: Test Case JSON Object
+                      Table 5: Test Case JSON Object
 
 4.  Test Vector Responses
 
@@ -437,7 +437,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | tables below                                |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 5: Vector Set Response JSON Object
+                 Table 6: Vector Set Response JSON Object
 
    The following table describes the JSON object that represents a
    vector set response for IKEv1.
@@ -462,7 +462,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
         | sKeyIdE    | Results of the expansion step  | value     |
         +------------+--------------------------------+-----------+
 
-                 Table 6: Vector Set Response JSON Object
+                 Table 7: Vector Set Response JSON Object
 
 5.  Acknowledgements
 
@@ -508,8 +508,8 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
             {
                 "algorithm": "IKEv1",
-                "hmacVal": "123456",
-                "shaVal": "654321",
+                "prereqVals" : [{"algorithm" : "HMAC", "valValue" : "123456"},
+                                {"algorithm" : "SHA", "valValue" : "123456"}],
                 "methods" : ["pke", "psKey"],
                 "initiator" : [64, 2048],
                 "responder" : [64, 2048],
