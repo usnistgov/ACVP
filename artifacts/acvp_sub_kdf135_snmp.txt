@@ -63,19 +63,22 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
-     2.1.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   3
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   4
-     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   5
-   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   5
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   6
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
-   Appendix A.  Example SP800-135 SNMP KDF Capabilities JSON Object    7
-   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   7
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   7
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
+     2.1.  Required Prerequisite Algorithms for KDF135 SNMP
+           Validations . . . . . . . . . . . . . . . . . . . . . . .   3
+     2.2.  KDF135 SNMP Algorithm Capabilities JSON Values  . . . . .   3
+     2.3.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   4
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .   6
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   6
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Example SP800-135 SNMP KDF Capabilities JSON Object    8
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   8
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   8
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   9
 
 1.  Introduction
 
@@ -103,9 +106,6 @@ Table of Contents
    ACVP requires crypto modules to register their capabilities.  This
    allows the crypto module to advertise support for specific
    algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
-   the constructs for advertising support of SP800-135 SNMP KDF
-   algorithms to the ACVP server.
 
 
 
@@ -114,44 +114,94 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of SP800-135 SNMP KDF
+   algorithms to the ACVP server.
+
    The algorithm capabilities are advertised as JSON objects within the
    'algorithms' value of the ACVP registration message.  The
    'algorithms' value is an array, where each array element is an
    individual JSON object defined in this section.  The 'algorithms'
    value is part of the 'capability_exchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
-   registration message.  Each algorithm capability advertised is a
-   self-contained JSON object.  The following JSON values are used for
-   SP800-135 SNMP KDF algorithm capabilities:
+   registration message.  Each KDF algorithm capability advertised is a
+   self-contained JSON object.
 
-   +-----------+----------------------+-------+-------------+----------+
-   | JSON      | Description          | JSON  | Valid       | Optional |
-   | Value     |                      | type  | Values      |          |
-   +-----------+----------------------+-------+-------------+----------+
-   | algorithm | The KDF to be        | value | See Section | No       |
-   |           | validated            |       | 2.1         |          |
-   |           |                      |       |             |          |
-   | shaVal    | The SHA validation   | value | same or     | No       |
-   |           | number or            |       | value       |          |
-   |           | implemented in same  |       |             |          |
-   |           | implementation       |       |             |          |
-   |           |                      |       |             |          |
-   | engineID  | SNMP: Two engine IDs | array | 0-0xF       | No       |
-   |           | in hexidecimal, can  |       |             |          |
-   |           | be the same          |       |             |          |
-   |           |                      |       |             |          |
-   | pLen      | SNMP: Password       | array | value       | No       |
-   |           | minimum and maximum  |       |             |          |
-   |           | lengths              |       |             |          |
-   +-----------+----------------------+-------+-------------+----------+
+2.1.  Required Prerequisite Algorithms for KDF135 SNMP Validations
 
-      Table 1: SP800-135 SNMP KDF Algorithm Capabilities JSON Values
+   Some KDF135 algorithm implementations rely on other cryptographic
+   primitives.  For example, SNMP uses an underlying SHA algorithm.
+   Each of these underlying algorithm primitives must be validated,
+   either separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
+
+   +--------------+--------------+---------------+----------+----------+
+   | JSON Value   | Description  | JSON type     | Valid    | Optional |
+   |              |              |               | Values   |          |
+   +--------------+--------------+---------------+----------+----------+
+   | algorithm    | a            | value         | SHA      | No       |
+   |              | prerequisite |               |          |          |
+   |              | algorithm    |               |          |          |
+   |              |              |               |          |          |
+   | valValue     | algorithm    | value         | actual   | No       |
+   |              | validation   |               | number   |          |
+   |              | number       |               | or       |          |
+   |              |              |               | "same"   |          |
+   |              |              |               |          |          |
+   | prereqAlgVal | prerequistie | object with   | see      | Yes      |
+   |              | algorithm    | algorithm and | above    |          |
+   |              | validation   | valValue      |          |          |
+   |              |              | properties    |          |          |
+   +--------------+--------------+---------------+----------+----------+
+
+           Table 1: Required Prerequisite Algorithms JSON Values
+
+2.2.  KDF135 SNMP Algorithm Capabilities JSON Values
+
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 3]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +------------+--------------+--------------+-------------+----------+
+   | JSON Value | Description  | JSON type    | Valid       | Optional |
+   |            |              |              | Values      |          |
+   +------------+--------------+--------------+-------------+----------+
+   | algorithm  | The KDF to   | value        | See Section | No       |
+   |            | be validated |              | 2.3         |          |
+   |            |              |              |             |          |
+   | prereqVals | Prerequistie | array of     | See Section | No       |
+   |            | algorithm    | prereqAlgVal | 2.1         |          |
+   |            | validations  | objects      |             |          |
+   |            |              |              |             |          |
+   | engineID   | SNMP: Two    | array        | 0-0xF       | No       |
+   |            | engine IDs   |              |             |          |
+   |            | in           |              |             |          |
+   |            | hexidecimal, |              |             |          |
+   |            | can be the   |              |             |          |
+   |            | same         |              |             |          |
+   |            |              |              |             |          |
+   | pLen       | SNMP:        | array        | value       | No       |
+   |            | Password     |              |             |          |
+   |            | minimum and  |              |             |          |
+   |            | maximum      |              |             |          |
+   |            | lengths      |              |             |          |
+   +------------+--------------+--------------+-------------+----------+
+
+      Table 2: SP800-135 SNMP KDF Algorithm Capabilities JSON Values
 
    Note: Some optional values are required depending on the algorithm.
    Failure to provide these values will result in the ACVP server
    returning an error to the ACVP client during registration.
 
-2.1.  Supported SP800-135 KDF Algorithms
+2.3.  Supported SP800-135 KDF Algorithms
 
    The following SP800-135 KDF algorithms may be advertised by the ACVP
    compliant crypto module:
@@ -162,19 +212,19 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  TLS
 
-
-
-
-Fussell                 Expires December 3, 2016                [Page 3]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    o  ANSI X9.63
 
    o  SSH
 
    o  SRTP
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    o  SNMP
 
@@ -210,7 +260,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | defined in Section 3.1                      |        |
    +------------+---------------------------------------------+--------+
 
-                      Table 2: Vector Set JSON Object
+                      Table 3: Vector Set JSON Object
 
 3.1.  Test Groups JSON Schema
 
@@ -218,20 +268,19 @@ Internet-Draft                Sym Alg JSON                     June 2016
    object is an array of test groups.  Test vectors are grouped into
    similar test cases to reduce the amount of data transmitted in the
    vector set.  For instance, all test vectors that use the same key
-
-
-
-Fussell                 Expires December 3, 2016                [Page 4]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    size would be grouped together.  The Test Group JSON object contains
    meta data that applies to all test vectors within the group.  The
    following table describes the secure hash JSON elements of the Test
    Group JSON object.
 
    The KDF test group for SNMP is as follows:
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    +----------+-------------------------------------+-------+----------+
    | JSON     | Description                         | JSON  | Optional |
@@ -246,7 +295,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |          | Section 3.2                         |       |          |
    +----------+-------------------------------------+-------+----------+
 
-                     Table 3: Vector Group JSON Object
+                     Table 4: Vector Group JSON Object
 
 3.2.  Test Vectors JSON Schema
 
@@ -265,7 +314,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | password | Password value                    | value   | No       |
    +----------+-----------------------------------+---------+----------+
 
-                      Table 4: Test Case JSON Object
+                      Table 5: Test Case JSON Object
 
 4.  Test Vector Responses
 
@@ -277,7 +326,14 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Fussell                 Expires December 3, 2016                [Page 5]
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -296,7 +352,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | tables below                                |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 5: Vector Set Response JSON Object
+                 Table 6: Vector Set Response JSON Object
 
    The following table describes the JSON object that represents a
    vector set response for SNMP.
@@ -307,7 +363,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
                | sKey       | Shared key value | value     |
                +------------+------------------+-----------+
 
-                 Table 6: Vector Set Response JSON Object
+                 Table 7: Vector Set Response JSON Object
 
 5.  Acknowledgements
 
@@ -333,7 +389,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-Fussell                 Expires December 3, 2016                [Page 6]
+Fussell                 Expires December 3, 2016                [Page 7]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -345,10 +401,10 @@ Appendix A.  Example SP800-135 SNMP KDF Capabilities JSON Object
 
 
 
-               {
-                   "algorithm": "SNMP",
-                   "shaVal": "654321",
-               }
+            {
+                "algorithm": "SNMP",
+                "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"}],
+            }
 
 Appendix B.  Example Test Vectors JSON Object
 
@@ -389,7 +445,7 @@ Appendix C.  Example Test Results JSON Object
 
 
 
-Fussell                 Expires December 3, 2016                [Page 7]
+Fussell                 Expires December 3, 2016                [Page 8]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -445,4 +501,4 @@ Author's Address
 
 
 
-Fussell                 Expires December 3, 2016                [Page 8]
+Fussell                 Expires December 3, 2016                [Page 9]
