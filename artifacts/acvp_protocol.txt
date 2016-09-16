@@ -4,8 +4,8 @@
 
 Internet Engineering Task Force                          B. Fussell, Ed.
 Internet-Draft                                             Cisco Systems
-Intended status: Informational                           August 29, 2016
-Expires: March 2, 2017
+Intended status: Informational                        September 16, 2016
+Expires: March 20, 2017
 
 
               Automated Cryptographic Validation Protocol
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on March 2, 2017.
+   This Internet-Draft will expire on March 20, 2017.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 1]
+Fussell                  Expires March 20, 2017                 [Page 1]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
 Table of Contents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 2]
+Fussell                  Expires March 20, 2017                 [Page 2]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
 1.1.  Requirements Language
@@ -165,9 +165,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 3]
+Fussell                  Expires March 20, 2017                 [Page 3]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
    conflicting) conformance criteria.  ACVP does not define an interface
@@ -221,9 +221,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 4]
+Fussell                  Expires March 20, 2017                 [Page 4]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
                         Server/Client Architecture
@@ -277,9 +277,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 5]
+Fussell                  Expires March 20, 2017                 [Page 5]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
       specific and will vary depending on the API available on the
@@ -333,9 +333,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 6]
+Fussell                  Expires March 20, 2017                 [Page 6]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
 5.  Security
@@ -389,9 +389,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 7]
+Fussell                  Expires March 20, 2017                 [Page 7]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
 10.1.  Product Registration/Capabilities Exchange
@@ -445,9 +445,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                 [Page 8]
+Fussell                  Expires March 20, 2017                 [Page 8]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
    o  /validation/acvp/vectors
@@ -465,24 +465,30 @@ Internet-Draft              Abbreviated Title                August 2016
 
    JWT example:
 
+{
+"alg" : "none"
+}
    {
-   "alg" : "none"
+      "iss" : "nist.org",
+      "exp" : 1426420800,
+      "company" : "MyCompany",
+      "jti" : 0987654321,
+      "pkey" : "cc74f56acdba635079383a03941d68db55c7b3c2fcd0f9716c9b62d56d3f8f546e9ec0244203b6ab4a82c08a46b1dbc243c6434861e31ab51065f41dbce00482498d4474d1ed3b09dc727af6b9c788fdb5da283c5a98cf8ac9e473f34644c6bbfc146e28f8158f725ce25bcb73e0a2c05378739d101df15a0c1297a1a2e3abc7912e24caba5465e78f694ad0d3cf48f2f01c4580d774d592684756efbdf0cc7648470dd78a3b38973b18946e71c8feaf2f28b93a2ff36b1cc31236e5845145899e8a0438aeb1073bc0d23d5c7898845d5227867a38234739595d55a44e41a39feff8eb447757fc6b246d92f02fe43b46e46c7403a5966f40ba4e01ca64e955c5"
    }
-      {
-         "iss" : "nist.org",
-         "exp" : 1426420800,
-         "company" : "MyCompany",
-         "jti" : 0987654321
-      }
-      {
-      Empty octet string (since alg is none).
-      }
+   {
+   Empty octet string (since alg is none).
+   }
 
                                  Figure 5
 
    The JWT can be secured if desired using the header encryption "alg"
    value defined to HS256(HMAC-SHA256) or one of the other secure
    values.  Key agreement would follow RFC7518.
+
+   The first four claims are required, however "pkey" is an optional
+   private claim used to pass the key used for encrypting the database
+   at the server.  Enabling this option is discussed further in
+   Section 11.2
 
 11.1.  Establish Connection HTTPS GET/200 OK
 
@@ -495,15 +501,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-
-
-
-
-
-
-Fussell                   Expires March 2, 2017                 [Page 9]
+Fussell                  Expires March 20, 2017                 [Page 9]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
 POST /validation/acvp/register HTTP1.1
@@ -542,6 +542,11 @@ Authorization: Bearer JWT
    for this registration populate the field "certificateRequest" with
    "no".
 
+   The client may request the server to encrypt all data at rest by
+   registering "encryptAtRest" with "yes".  Omitting the "encryptAtRest"
+   field or registering with "no" will indicate to the server that no
+   encryption is require for the data at rest.
+
 
    POST /validation/acvp/register HTTP1.1
    User Agent:
@@ -549,19 +554,20 @@ Authorization: Bearer JWT
    Accept:
    {
    "operation" : "register",
+
+
+
+Fussell                  Expires March 20, 2017                [Page 10]
+
+Internet-Draft              Abbreviated Title             September 2016
+
+
    "acvVersion" : "0.2",
    "certificateRequest" : "yes",
+   "encryptAtRest" : "yes",
    "oeInformation" : {
    "vendorName" : "Cisco",
    "vendorURL" : "www.cisco.com",
-
-
-
-Fussell                   Expires March 2, 2017                [Page 10]
-
-Internet-Draft              Abbreviated Title                August 2016
-
-
    "contact" : "John Doe",
    "contactEmail" : "johndoe@cisco.com",
    "moduleName" : "Cisco ACV Test Module 1.0",
@@ -605,19 +611,18 @@ Internet-Draft              Abbreviated Title                August 2016
       }
    }
 
+
+
+Fussell                  Expires March 20, 2017                [Page 11]
+
+Internet-Draft              Abbreviated Title             September 2016
+
+
                                  Figure 7
 
    Successful response from server is 200 OK and a set of vector set
    identifiers.  The extensions section is optional and can be
    implementation specific for value add.  Follow on versions could
-
-
-
-Fussell                   Expires March 2, 2017                [Page 11]
-
-Internet-Draft              Abbreviated Title                August 2016
-
-
    include protocol information.  A full JSON representation of the
    algorithm sheet information will be added as an appendix.
 
@@ -664,14 +669,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-
-
-
-
-
-Fussell                   Expires March 2, 2017                [Page 12]
+Fussell                  Expires March 20, 2017                [Page 12]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
    HTTP 1.1 200 OK
@@ -725,9 +725,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                [Page 13]
+Fussell                  Expires March 20, 2017                [Page 13]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
    HTTP 1.1 200 OK
@@ -781,9 +781,9 @@ Internet-Draft              Abbreviated Title                August 2016
 
 
 
-Fussell                   Expires March 2, 2017                [Page 14]
+Fussell                  Expires March 20, 2017                [Page 14]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
 13.  Other Considerations
@@ -837,9 +837,9 @@ Appendix A.  JSON Formatting Guidelines
 
 
 
-Fussell                   Expires March 2, 2017                [Page 15]
+Fussell                  Expires March 20, 2017                [Page 15]
 
-Internet-Draft              Abbreviated Title                August 2016
+Internet-Draft              Abbreviated Title             September 2016
 
 
    use quotations if those values are generally used as a string, for
@@ -893,4 +893,4 @@ Author's Address
 
 
 
-Fussell                   Expires March 2, 2017                [Page 16]
+Fussell                  Expires March 20, 2017                [Page 16]

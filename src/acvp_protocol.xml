@@ -326,7 +326,8 @@ A server may accept a down-level version from the client if it can process at a 
       "iss" : "nist.org",
       "exp" : 1426420800,
       "company" : "MyCompany",
-      "jti" : 0987654321
+      "jti" : 0987654321,
+      "pkey" : "cc74f56acdba635079383a03941d68db55c7b3c2fcd0f9716c9b62d56d3f8f546e9ec0244203b6ab4a82c08a46b1dbc243c6434861e31ab51065f41dbce00482498d4474d1ed3b09dc727af6b9c788fdb5da283c5a98cf8ac9e473f34644c6bbfc146e28f8158f725ce25bcb73e0a2c05378739d101df15a0c1297a1a2e3abc7912e24caba5465e78f694ad0d3cf48f2f01c4580d774d592684756efbdf0cc7648470dd78a3b38973b18946e71c8feaf2f28b93a2ff36b1cc31236e5845145899e8a0438aeb1073bc0d23d5c7898845d5227867a38234739595d55a44e41a39feff8eb447757fc6b246d92f02fe43b46e46c7403a5966f40ba4e01ca64e955c5"
    }
    {
    Empty octet string (since alg is none).
@@ -337,6 +338,7 @@ A server may accept a down-level version from the client if it can process at a 
 <t>The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values.  Key agreement would follow RFC7518.
 </t>
 
+<t> The first four claims are required, however "pkey" is an optional private claim used to pass the key used for encrypting the database at the server.  Enabling this option is discussed further in <xref target="reg_capex"/></t>
 
      <section title="Establish Connection HTTPS GET/200 OK">
 <t>Establish the connection, send POST and receive 200 OK response with JWT from server.</t>
@@ -376,8 +378,10 @@ Authorization: Bearer JWT
      </section>
 
 
-     <section title="Product Registration with Capabilities">
+     <section anchor="reg_capex" title="Product Registration with Capabilities">
      <t>POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions. In addition, if an algorithm certificate is not desired for this registration populate the field "certificateRequest"  with "no".</t> 
+
+     <t>The client may request the server to encrypt all data at rest by registering "encryptAtRest" with "yes". Omitting the "encryptAtRest" field or registering with "no" will indicate to the server that no encryption is require for the data at rest.</t>
 
      <figure align="center" anchor="xml_json3">
        <artwork align="left"><![CDATA[
@@ -390,6 +394,7 @@ Accept:
 "operation" : "register",
 "acvVersion" : "0.2",
 "certificateRequest" : "yes",
+"encryptAtRest" : "yes",
 "oeInformation" : {
 "vendorName" : "Cisco",
 "vendorURL" : "www.cisco.com",
