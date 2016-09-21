@@ -1,0 +1,952 @@
+
+
+
+
+TBD                                                      B. Fussell, Ed.
+Internet-Draft                                       Cisco Systems, Inc.
+Intended status: Informational                                 June 2016
+Expires: December 3, 2016
+
+
+                    ACVP KAS ECC JSON Specification
+                      draft-ietf-acvp-subkasecc-00
+
+Abstract
+
+   This document defines the JSON schema for using KAS ECC algorithms
+   with the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on December 3, 2016.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 1]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+     2.1.  Required Prerequisite Algorithms for KAS ECC Validations    3
+     2.2.  KAS ECC Algorithm Capabilities JSON Values  . . . . . . .   4
+     2.3.  KAS ECC Component Test Capabilities JSON Values . . . . .   4
+     2.4.  KAS ECC Scheme Capabilities JSON Values . . . . . . . . .   5
+     2.5.  KAS ECC Parameter Set JSON Values . . . . . . . . . . . .   6
+     2.6.  Supported KAS ECC Functions . . . . . . . . . . . . . . .   7
+     2.7.  Supported KAS ECC Schemes . . . . . . . . . . . . . . . .   8
+     2.8.  Supported ECDSA2 Curves . . . . . . . . . . . . . . . . .   8
+     2.9.  Supported SHA Methods . . . . . . . . . . . . . . . . . .   9
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   9
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  10
+     3.2.  Test Vectors JSON Schema  . . . . . . . . . . . . . . . .  11
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  13
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  14
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  14
+   Appendix A.  Example KAS ECC Capabilities JSON Object . . . . . .  14
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  15
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  16
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  16
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing KAS ECC
+   algorithms using ACVP.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 2]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of KAS ECC algorithms to the
+   ACVP server.
+
+   The algorithm capabilities are advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each KDF algorithm capability advertised is a
+   self-contained JSON object.
+
+2.1.  Required Prerequisite Algorithms for KAS ECC Validations
+
+   Some algorithm implementations rely on other cryptographic
+   primitives.  For example, IKEv2 uses an underlying SHA algorithm.
+   Each of these underlying algorithm primitives must be validated,
+   either separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
+
+   +--------------+--------------+--------------+-----------+----------+
+   | JSON Value   | Description  | JSON type    | Valid     | Optional |
+   |              |              |              | Values    |          |
+   +--------------+--------------+--------------+-----------+----------+
+   | algorithm    | a            | value        | CCM,      | No       |
+   |              | prerequisite |              | CMAC,     |          |
+   |              | algorithm    |              | DRBG,     |          |
+   |              |              |              | ECDSA,    |          |
+   |              |              |              | HMAC, SHA |          |
+   |              |              |              |           |          |
+   | valValue     | algorithm    | value        | actual    | No       |
+   |              | validation   |              | number or |          |
+   |              | number       |              | "same"    |          |
+   |              |              |              |           |          |
+   | prereqAlgVal | prerequistie | object with  | see above | Yes      |
+   |              | algorithm    | algorithm    |           |          |
+   |              | validation   | and valValue |           |          |
+   |              |              | properties   |           |          |
+   |              |              |              |           |          |
+   +--------------+--------------+--------------+-----------+----------+
+
+           Table 1: Required Prerequisite Algorithms JSON Values
+
+
+
+Fussell                 Expires December 3, 2016                [Page 3]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+2.2.  KAS ECC Algorithm Capabilities JSON Values
+
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+   +------------+--------------+--------------+-------------+----------+
+   | JSON Value | Description  | JSON type    | Valid       | Optional |
+   |            |              |              | Values      |          |
+   +------------+--------------+--------------+-------------+----------+
+   | algorithm  | The          | value        | KAS ECC     | No       |
+   |            | algorithm    |              |             |          |
+   |            | under test   |              |             |          |
+   |            |              |              |             |          |
+   | prereqVals | Prerequistie | array of     | See Section | No       |
+   |            | algorithm    | prereqAlgVal | 2.1         |          |
+   |            | validations  | objects      |             |          |
+   |            |              |              |             |          |
+   | function   | Type of      | array        | See Section | No       |
+   |            | function     |              | 2.6         |          |
+   |            | supported    |              |             |          |
+   |            |              |              |             |          |
+   | scheme     | Array of     | value        | See Section | No       |
+   |            | supported    |              | 2.7         |          |
+   |            | key          |              |             |          |
+   |            | agreement    |              |             |          |
+   |            | schemes each |              |             |          |
+   |            | having their |              |             |          |
+   |            | own          |              |             |          |
+   |            | capabilities |              |             |          |
+   |            |              |              |             |          |
+   +------------+--------------+--------------+-------------+----------+
+
+                 Table 2: KAS ECC Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
+
+2.3.  KAS ECC Component Test Capabilities JSON Values
+
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +-----------+---------------------+--------+-------------+----------+
+   | JSON      | Description         | JSON   | Valid       | Optional |
+   | Value     |                     | type   | Values      |          |
+   +-----------+---------------------+--------+-------------+----------+
+   | primitive | Sec 5.7.1.2 ECCDH   | value  | Yes or No   | No       |
+   |           | Component Primitive |        |             |          |
+   |           |                     |        |             |          |
+   | ecdsa     | Array of ECDSA      | array  | See Section | Yes      |
+   |           | curves values       |        | 2.8         |          |
+   |           | supported           |        |             |          |
+   +-----------+---------------------+--------+-------------+----------+
+
+                 Table 3: KAS ECC Capabilities JSON Values
+
+2.4.  KAS ECC Scheme Capabilities JSON Values
+
+   All other schemem capability advertised is a self-contained JSON
+   object using the following values.
+
+   +-------------+----------------+-------+-----------------+----------+
+   | JSON Value  | Description    | JSON  | Valid Values    | Optional |
+   |             |                | type  |                 |          |
+   +-------------+----------------+-------+-----------------+----------+
+   | withKDF     | Key            | value | Yes or No       | No       |
+   |             | confirmation   |       |                 |          |
+   |             | is not         |       |                 |          |
+   |             | supported      |       |                 |          |
+   |             |                |       |                 |          |
+   | role        | Roles          | array | initiator       | Yes      |
+   |             | supported for  |       | and/or reponder |          |
+   |             | key agreement  |       |                 |          |
+   |             |                |       |                 |          |
+   | kdf         | Select the KDF | array | concatenation   | Yes      |
+   |             | being tested   |       | and/or ASN1     |          |
+   |             |                |       |                 |          |
+   | keyConf     | Select the if  | value | Yes or No       | Yes      |
+   |             | Key            |       |                 |          |
+   |             | Confirmation   |       |                 |          |
+   |             | is supported   |       |                 |          |
+   |             |                |       |                 |          |
+   | nonce       | Select the     | array | random,         | Yes      |
+   |             | nonce types    |       | timestamp,      |          |
+   |             | supported      |       | increasing,     |          |
+   |             |                |       | combination     |          |
+   |             |                |       |                 |          |
+   | keyConfRole | Select the key | array | provider and/or | Yes      |
+   |             | confirmation   |       | recipient       |          |
+   |             | roles          |       |                 |          |
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   |             | supported      |       |                 |          |
+   |             |                |       |                 |          |
+   | keyConfType | Select the key | array | unilateral      | Yes      |
+   |             | confirmation   |       | and/or          |          |
+   |             | type supported |       | bilateral       |          |
+   |             |                |       |                 |          |
+   | parmSetEB   | Define the EB  | value | See Section 2.5 | Yes      |
+   |             | parameter set  |       |                 |          |
+   |             |                |       |                 |          |
+   | parmSetEC   | Define the EC  | value | See Section 2.5 | Yes      |
+   |             | parameter set  |       |                 |          |
+   |             |                |       |                 |          |
+   | parmSetED   | Define the ED  | value | See Section 2.5 | Yes      |
+   |             | parameter set  |       |                 |          |
+   |             |                |       |                 |          |
+   | parmSetEE   | Define the EE  | value | See Section 2.5 | Yes      |
+   |             | parameter set  |       |                 |          |
+   +-------------+----------------+-------+-----------------+----------+
+
+                 Table 4: KAS ECC Capabilities JSON Values
+
+2.5.  KAS ECC Parameter Set JSON Values
+
+   Each parameter set advertised is a self-contained JSON object using
+   the following values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +---------------+------------------+-------+-------------+----------+
+   | JSON Value    | Description      | JSON  | Valid       | Optional |
+   |               |                  | type  | Values      |          |
+   +---------------+------------------+-------+-------------+----------+
+   | psCurve       | ECDSA curve for  | value | P-224,      | No       |
+   |               | this set         |       | K-233,      |          |
+   |               |                  |       | B-233       |          |
+   |               |                  |       |             |          |
+   | sha           | SHA values       | array | See Section | Yes      |
+   |               | supported        |       | 2.9         |          |
+   |               |                  |       |             |          |
+   | ccmKeySize    | CCM key sizes    | array | 128, 192,   | Yes      |
+   |               | supported        |       | 256         |          |
+   |               |                  |       |             |          |
+   | ccmNonceLen   | Largest nonce    | value | 7-11        | Yes      |
+   |               | length supported |       |             |          |
+   |               |                  |       |             |          |
+   | ccmMacLen     | CCM MAC length   | value | 8-16, even  | Yes      |
+   |               | in bytes         |       | values only |          |
+   |               |                  |       |             |          |
+   | cmacAESKeyLen | AES key lengths  | array | 128, 192,   | Yes      |
+   |               | in bits          |       | 256         |          |
+   |               | supported        |       |             |          |
+   |               |                  |       |             |          |
+   | cmacMacLen    | CMAC MAC length  | array | 8-16        | Yes      |
+   |               | in bytes, note:  |       |             |          |
+   |               | 8 lte MacLen lte |       |             |          |
+   |               | Blocksize(16)    |       |             |          |
+   |               |                  |       |             |          |
+   | hmacSHA       | SHA sizes        | array | 224, 256,   | Yes      |
+   |               | supported        |       | 384, 512    |          |
+   +---------------+------------------+-------+-------------+----------+
+
+                 Table 5: KAS ECC Capabilities JSON Values
+
+2.6.  Supported KAS ECC Functions
+
+   The following function types may be advertised by the ACVP compliant
+   crypto module:
+
+   o  dpGen
+
+   o  dpVal
+
+   o  keyPairGen
+
+   o  keyPairGenPrim
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   o  fullVal
+
+   o  partVal
+
+   o  keyRegen
+
+2.7.  Supported KAS ECC Schemes
+
+   The following schemes may be advertised by the ACVP compliant crypto
+   module:
+
+   o  Full Unified
+
+   o  Full MQV
+
+   o  Ephemiral Unified
+
+   o  One Pass Unified
+
+   o  One Pass MQV
+
+   o  One Pass DH
+
+   o  Static Unified
+
+   o  Sec 5.7.1.2 ECCDH Component Test
+
+2.8.  Supported ECDSA2 Curves
+
+   The following ECDSA2 curves may be advertised by the ACVP compliant
+   crypto module:
+
+   o  P-244
+
+   o  P-256
+
+   o  P-384
+
+   o  P-521
+
+   o  K-233
+
+   o  K-283
+
+   o  K-409
+
+   o  K-571
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   o  B-233
+
+   o  B-283
+
+   o  B-409
+
+   o  B-571
+
+2.9.  Supported SHA Methods
+
+   The following SHA methods may be advertised by the ACVP compliant
+   crypto module:
+
+   o  SHA-1
+
+   o  SHA-224
+
+   o  SHA-256
+
+   o  SHA-384
+
+   o  SHA-512
+
+3.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual KAS ECC function.  This section
+   describes the JSON schema for a test vector set used with KAS ECC
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 9]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +------------+---------------------------------------------+--------+
+   | JSON Value | Description                                 | JSON   |
+   |            |                                             | type   |
+   +------------+---------------------------------------------+--------+
+   | acvVersion | Protocol version identifier                 | value  |
+   |            |                                             |        |
+   | vsId       | Unique numeric identifier for the vector    | value  |
+   |            | set                                         |        |
+   |            |                                             |        |
+   | algorithm  | KAS ECC                                     | value  |
+   |            |                                             |        |
+   | type       | Type of operation supported                 | value  |
+   |            |                                             |        |
+   | testGroups | Array of test group JSON objects, which are | array  |
+   |            | defined in Section 3.1                      |        |
+   +------------+---------------------------------------------+--------+
+
+                      Table 6: Vector Set JSON Object
+
+3.1.  Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The test group for KAS ECC is as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 10]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +-----------+------------------------------+-------------+----------+
+   | JSON      | Description                  | JSON type   | Optional |
+   | Value     |                              |             |          |
+   +-----------+------------------------------+-------------+----------+
+   | scheme    | The scheme for the test      | value       | No       |
+   |           | vectors. See Section 2.7 for |             |          |
+   |           | possible values              |             |          |
+   |           |                              |             |          |
+   | curve     | EC curve used                | See Section | No       |
+   |           |                              | 2.8         |          |
+   |           |                              |             |          |
+   | parmSetEB | EB parameter set values      | See Section | Yes      |
+   |           |                              | 2.5         |          |
+   |           |                              |             |          |
+   | parmSetEC | EC parameter set values      | See Section | Yes      |
+   |           |                              | 2.5         |          |
+   |           |                              |             |          |
+   | parmSetED | EB parameter set values      | See Section | Yes      |
+   |           |                              | 2.5         |          |
+   |           |                              |             |          |
+   | parmSetEE | EB parameter set values      | See Section | Yes      |
+   |           |                              | 2.5         |          |
+   | tests     | Array of individual test     | array       | No       |
+   |           | vector JSON objects, which   |             |          |
+   |           | are defined in Section 3.2   |             |          |
+   +-----------+------------------------------+-------------+----------+
+
+                     Table 7: Vector Group JSON Object
+
+3.2.  Test Vectors JSON Schema
+
+   Each test group contains an array of one or more test vectors.  Each
+   test vector is a JSON object that represents a single test case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each KAS ECC test vector.
+
+   +---------------+--------------------------------+-------+----------+
+   | JSON Value    | Description                    | JSON  | Optional |
+   |               |                                | type  |          |
+   +---------------+--------------------------------+-------+----------+
+   | tcId          | Unique numeric identifier for  | value | No       |
+   |               | the test case                  |       |          |
+   |               |                                |       |          |
+   | qsX           | The ECDSA static public key x  | value | Yes      |
+   |               | coordinate                     |       |          |
+   |               |                                |       |          |
+   | qsY           | The ECDSA static public key y  | value | Yes      |
+   |               | coordinate                     |       |          |
+
+
+
+Fussell                 Expires December 3, 2016               [Page 11]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   |               |                                |       |          |
+   | qeX           | The ECDSA ephemeral public key | value | Yes      |
+   |               | x coordinate                   |       |          |
+   |               |                                |       |          |
+   | qeY           | The ECDSA ephemeral public key | value | Yes      |
+   |               | y coordinate                   |       |          |
+   |               |                                |       |          |
+   | nonceEphem    | nonceEphemCAVS ONLY USED BY    | value | Yes      |
+   |               | C(1,2) and C(0,2) schemes with |       |          |
+   |               | KC. nonce to be used in the    |       |          |
+   |               | MacData field                  |       |          |
+   |               |                                |       |          |
+   | nonce         | The 16 byte nonce concatenated | value | Yes      |
+   |               | to the "Standard Test Message" |       |          |
+   |               |                                |       |          |
+   | nonceDKM      | The nonce supplied by the      | value | Yes      |
+   |               | initiator to be used in the OI |       |          |
+   |               | field in the PartyUInfo field. |       |          |
+   |               |                                |       |          |
+   | dsIUT         | The IUT ECDSA static private   | value | Yes      |
+   |               | key                            |       |          |
+   |               |                                |       |          |
+   | qsIUTX        | The IUT ECDSA static public    | value | Yes      |
+   |               | key x coordinate               |       |          |
+   |               |                                |       |          |
+   | qsIUTY        | The IUT ECDSA static public    | value | Yes      |
+   |               | key y coordinate               |       |          |
+   |               |                                |       |          |
+   | nonceEphemIUT | nonceEphemIUT ONLY USED BY     | value | Yes      |
+   |               | C(1,2) and C(0,2) schemes with |       |          |
+   |               | KC. nonce to be used in the    |       |          |
+   |               | MacData field                  |       |          |
+   |               |                                |       |          |
+   | deIUT         | The IUT ECDSA ephemeral        | value | Yes      |
+   |               | private key                    |       |          |
+   |               |                                |       |          |
+   | qeIUTX        | The IUT ECDSA ephemeral public | value | Yes      |
+   |               | key x coordinate               |       |          |
+   |               |                                |       |          |
+   | qeIUTY        | The IUT ECDSA ephemeral public | value | Yes      |
+   |               | key y coordinate               |       |          |
+   |               |                                |       |          |
+   | nonceDKMIUT   | The nonce supplied by the      | value | Yes      |
+   |               | initiator to be used in the OI |       |          |
+   |               | field in the PartyUInfo field. |       |          |
+   |               |                                |       |          |
+   | ccmNonce      | Nonce used by the CCM          | value | Yes      |
+   |               | function, if CCM is used to    |       |          |
+
+
+
+Fussell                 Expires December 3, 2016               [Page 12]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   |               | generate the Tag.              |       |          |
+   |               |                                |       |          |
+   | oiLen         | Length of the OtherInfo field  | value | Yes      |
+   |               |                                |       |          |
+   | otherInfo     | OtherInfo field                | value | Yes      |
+   |               |                                |       |          |
+   | Tag           | The tag (or MAC) GENERATED BY  | value | Yes      |
+   |               | THE CAVS by using the DKM to   |       |          |
+   |               | MAC the Message with the       |       |          |
+   |               | specified method               |       |          |
+   |               |                                |       |          |
+   | iutTag        | The tag (or MAC) GENERATED BY  | value | Yes      |
+   |               | THE IUT by using the DKM to    |       |          |
+   |               | MAC the Message with the       |       |          |
+   |               | specified method               |       |          |
+   |               |                                |       |          |
+   | result        | P (Pass) or F (Fail)           | value | Yes      |
+   |               | indicating if the IUT agrees   |       |          |
+   |               | with the Tag generated by the  |       |          |
+   |               | CAVS.                          |       |          |
+   +---------------+--------------------------------+-------+----------+
+
+                      Table 8: Test Case JSON Object
+
+4.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the resonse vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +-------------+--------------------------------------------+--------+
+   | JSON Value  | Description                                | JSON   |
+   |             |                                            | type   |
+   +-------------+--------------------------------------------+--------+
+   | acvVersion  | Protocol version identifier                | value  |
+   |             |                                            |        |
+   | vsId        | Unique numeric identifier for the vector   | value  |
+   |             | set                                        |        |
+   |             |                                            |        |
+   | testResults | Array of JSON objects that represent each  | array  |
+   |             | test vector result, Section 3.2            |        |
+   +-------------+--------------------------------------------+--------+
+
+                 Table 9: Vector Set Response JSON Object
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 13]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+5.  Acknowledgements
+
+   TBD...
+
+6.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+7.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+8.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+Appendix A.  Example KAS ECC Capabilities JSON Object
+
+   The following is a example JSON object advertising support for KAS
+   ECC.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 14]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+            {
+                "algorithm": "KAS ECC",
+                "prereqVals" : [{"algorithm" : "ECDSA", "valValue" : "123456"},
+                                {"algorithm" : "DRBG", "valValue" : "123456"},
+                                {"algorithm" : "SHA", "valValue" : "123456"}],
+                "methods": [
+                              { "type" : "keyGenPairPrim",
+                                "curveInfo" : [
+                                        { "curve" : P-224,
+                                          "sha" : [SHA-1, SHA-224, SHA-256]},
+                                        { "curve" : P-256,
+                                          "sha" : [SHA-1, SHA-224, SHA-256]},
+                                       ]
+                              },
+                              { "type" : "KeyPair",
+                                "options" : ["Random Bits", "Testing Candidates"],
+                                "curveInfo" : [
+                                        { "curve" : P-224},
+                                        { "curve" : P-256},
+                                       ]
+                              }
+                           ]
+            }
+
+Appendix B.  Example Test Vectors JSON Object
+
+   The following is a example JSON object for KAS ECC test vectors sent
+   from the ACVP server to the crypto module.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 15]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+                {
+                  "acvVersion": "0.2",
+                  "vsId": 1564,
+                  "algorithm": "KAS ECC",
+                  "testGroups": [
+                    {
+                      "type": "SigVer",
+                      "curve" : P-256,
+                      "sha" : "SHA-256",
+                      "tests": [
+                        {
+                          "tcId": 2170,
+                          "Msg" : "b6a3a0a5c8aecf753242d0bb1465e71b450532d29574f81b4d2a63c165ed63dce2add4aa85a849bf7e5e78cec9a2a56908d67ecfbbbac367b8305dc190298d011a42da17999841dfaf8d083f9153eb9bc91433fcf9548340040f90cd3175faa890ae81002351f7bf9c093d1585a671ed4b95315796fbe929a620553b69c79e95"
+                          "qx" : "d97f2a944063befe63a07b708629638fd658d049207982dc4b810582d21beb77",
+                          "qy" : "6528f1e1342d38f6f862aa446202bff1c55546187c2c42a1b4ebdaee506aeb7e",
+                          "r" : "f057a51efd6a889793a5e57b71aedf5545ef8ca91ffa1145cc11fe305f732de1",
+                          "s" : "c35557c560c5e035edd8ce72980f054f0467450c25a8d2f8ceea0ab2676bd92e",
+                        },
+                      ]
+                    },
+                  ]
+                }
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for KAS ECC test results sent
+   from the crypto module to the ACVP server.
+
+                   {
+                       "acvVersion": "0.2",
+                       "vsId": 1564,
+                       "testResults": [
+                           {
+                               "tcId": 2170,
+                               "result" : "Pass",
+                           }
+                       ]
+                   }
+
+
+Author's Address
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 16]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   Barry Fussell (editor)
+   Cisco Systems, Inc.
+   170 West Tasman Dr.
+   San Jose, CA  95134
+   USA
+
+   Email: bfussell@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 17]
