@@ -34,3 +34,5 @@ all:
 	xml2rfc src/acvp_sub_drbg.xml -o artifacts/acvp_sub_drbg.txt
 	xml2rfc --html src/acvp_sub_rsa.xml -o artifacts/acvp_sub_rsa.html
 	xml2rfc src/acvp_sub_rsa.xml -o artifacts/acvp_sub_rsa.txt
+	xml2rfc --html src/acvp_sub_kas_ecc.xml -o artifacts/acvp_sub_kas_ecc.html
+	xml2rfc src/acvp_sub_kas_ecc.xml -o artifacts/acvp_sub_kas_ecc.txt
