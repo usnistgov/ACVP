@@ -83,7 +83,7 @@ Table of Contents
    Appendix A.  Example KAS ECC Capabilities JSON Object . . . . . .  14
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  15
    Appendix C.  Example Test Results JSON Object . . . . . . . . . .  16
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  16
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -187,10 +187,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | algorithm    | prereqAlgVal | 2.1         |          |
    |            | validations  | objects      |             |          |
    |            |              |              |             |          |
-   | function   | Type of      | array        | See Section | No       |
-   |            | function     |              | 2.6         |          |
-   |            | supported    |              |             |          |
-   |            |              |              |             |          |
    | scheme     | Array of     | value        | See Section | No       |
    |            | supported    |              | 2.7         |          |
    |            | key          |              |             |          |
@@ -199,6 +195,10 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | having their |              |             |          |
    |            | own          |              |             |          |
    |            | capabilities |              |             |          |
+   |            |              |              |             |          |
+   | functions  | Type of      | array        | See Section | No       |
+   |            | function     |              | 2.6         |          |
+   |            | supported    |              |             |          |
    |            |              |              |             |          |
    +------------+--------------+--------------+-------------+----------+
 
@@ -255,8 +255,8 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | supported      |       |                 |          |
    |             |                |       |                 |          |
    | role        | Roles          | array | initiator       | Yes      |
-   |             | supported for  |       | and/or reponder |          |
-   |             | key agreement  |       |                 |          |
+   |             | supported for  |       | and/or          |          |
+   |             | key agreement  |       | responder       |          |
    |             |                |       |                 |          |
    | kdf         | Select the KDF | array | concatenation   | Yes      |
    |             | being tested   |       | and/or ASN1     |          |
@@ -367,8 +367,15 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |               | 8 lte MacLen lte |       |             |          |
    |               | Blocksize(16)    |       |             |          |
    |               |                  |       |             |          |
-   | hmacSHA       | SHA sizes        | array | 224, 256,   | Yes      |
-   |               | supported        |       | 384, 512    |          |
+   | hmacSHA       | SHA size         | value | 224, 256,   | Yes      |
+   |               | supported for    |       | 384, 512    |          |
+   |               | HMAC             |       |             |          |
+   |               |                  |       |             |          |
+   | hmacKeySize   | HMAC key size in | value | 14 or       | Yes      |
+   |               | bytes, gte 14    |       | greater     |          |
+   |               |                  |       |             |          |
+   | hmacMacLen    | HMAC Mac langth  | value | 8 or        | Yes      |
+   |               | in bytes, gte 8  |       | greater     |          |
    +---------------+------------------+-------+-------------+----------+
 
                  Table 5: KAS ECC Capabilities JSON Values
@@ -380,19 +387,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  dpGen
 
-   o  dpVal
-
-   o  keyPairGen
-
-   o  keyPairGenPrim
-
-
 
 
 Fussell                 Expires December 3, 2016                [Page 7]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   o  dpVal
+
+   o  keyPairGen
 
    o  fullVal
 
@@ -438,10 +442,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  K-283
 
-   o  K-409
-
-   o  K-571
-
 
 
 
@@ -449,6 +449,10 @@ Fussell                 Expires December 3, 2016                [Page 8]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   o  K-409
+
+   o  K-571
 
    o  B-233
 
@@ -487,10 +491,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    contains meta data for the entire vector set as well as individual
    test vectors to be processed by the ACVP client.The following table
    describes the JSON elements at the top level of the hierarchy.
-
-
-
-
 
 
 
@@ -562,32 +562,37 @@ Fussell                 Expires December 3, 2016               [Page 10]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +-----------+------------------------------+-------------+----------+
-   | JSON      | Description                  | JSON type   | Optional |
-   | Value     |                              |             |          |
-   +-----------+------------------------------+-------------+----------+
-   | scheme    | The scheme for the test      | value       | No       |
-   |           | vectors. See Section 2.7 for |             |          |
-   |           | possible values              |             |          |
-   |           |                              |             |          |
-   | curve     | EC curve used                | See Section | No       |
-   |           |                              | 2.8         |          |
-   |           |                              |             |          |
-   | parmSetEB | EB parameter set values      | See Section | Yes      |
-   |           |                              | 2.5         |          |
-   |           |                              |             |          |
-   | parmSetEC | EC parameter set values      | See Section | Yes      |
-   |           |                              | 2.5         |          |
-   |           |                              |             |          |
-   | parmSetED | EB parameter set values      | See Section | Yes      |
-   |           |                              | 2.5         |          |
-   |           |                              |             |          |
-   | parmSetEE | EB parameter set values      | See Section | Yes      |
-   |           |                              | 2.5         |          |
-   | tests     | Array of individual test     | array       | No       |
-   |           | vector JSON objects, which   |             |          |
-   |           | are defined in Section 3.2   |             |          |
-   +-----------+------------------------------+-------------+----------+
+   +---------+--------------------------+-------------------+----------+
+   | JSON    | Description              | JSON type         | Optional |
+   | Value   |                          |                   |          |
+   +---------+--------------------------+-------------------+----------+
+   | scheme  | The scheme for the test  | value             | No       |
+   |         | vectors. See Section 2.7 |                   |          |
+   |         | for possible values      |                   |          |
+   |         |                          |                   |          |
+   | curve   | EC curve used            | See Section 2.8   | No       |
+   |         |                          |                   |          |
+   | parmSet | Parameter set value to   | EB, EC, ED, EE    | Yes      |
+   |         | use                      |                   |          |
+   |         |                          |                   |          |
+   | sha     | SHA values being used    | See Section 2.9   | Yes      |
+   |         |                          |                   |          |
+   | ccm     | CCM key size being used  | 128, 192, 256     | Yes      |
+   |         |                          |                   |          |
+   | hmac    | HMAC being used          | HMAC-SHA224,      | Yes      |
+   |         |                          | HMAC-SHA256,      |          |
+   |         |                          | HMAC-SHA384,      |          |
+   |         |                          | HMAC-SHA512       |          |
+   |         |                          |                   |          |
+   | cmac    | CMAC being used          | CMAC-AES128,      | Yes      |
+   |         |                          | CMAC-AES192,      |          |
+   |         |                          | CMAC-AES256       |          |
+   |         |                          |                   |          |
+   | tests   | Array of individual test | array             | No       |
+   |         | vector JSON objects,     |                   |          |
+   |         | which are defined in     |                   |          |
+   |         | Section 3.2              |                   |          |
+   +---------+--------------------------+-------------------+----------+
 
                      Table 7: Vector Group JSON Object
 
@@ -605,11 +610,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | tcId          | Unique numeric identifier for  | value | No       |
    |               | the test case                  |       |          |
    |               |                                |       |          |
-   | qsX           | The ECDSA static public key x  | value | Yes      |
-   |               | coordinate                     |       |          |
-   |               |                                |       |          |
-   | qsY           | The ECDSA static public key y  | value | Yes      |
-   |               | coordinate                     |       |          |
 
 
 
@@ -618,6 +618,11 @@ Fussell                 Expires December 3, 2016               [Page 11]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   | qsX           | The ECDSA static public key x  | value | Yes      |
+   |               | coordinate                     |       |          |
+   |               |                                |       |          |
+   | qsY           | The ECDSA static public key y  | value | Yes      |
+   |               | coordinate                     |       |          |
    |               |                                |       |          |
    | qeX           | The ECDSA ephemeral public key | value | Yes      |
    |               | x coordinate                   |       |          |
@@ -636,6 +641,11 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | nonceDKM      | The nonce supplied by the      | value | Yes      |
    |               | initiator to be used in the OI |       |          |
    |               | field in the PartyUInfo field. |       |          |
+   |               |                                |       |          |
+   | ds            | The ECDSA static private key   | value | Yes      |
+   |               |                                |       |          |
+   | de            | The ECDSA ephemeral private    | value | Yes      |
+   |               | key                            |       |          |
    |               |                                |       |          |
    | dsIUT         | The IUT ECDSA static private   | value | Yes      |
    |               | key                            |       |          |
@@ -656,6 +666,14 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |               |                                |       |          |
    | qeIUTX        | The IUT ECDSA ephemeral public | value | Yes      |
    |               | key x coordinate               |       |          |
+
+
+
+Fussell                 Expires December 3, 2016               [Page 12]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    |               |                                |       |          |
    | qeIUTY        | The IUT ECDSA ephemeral public | value | Yes      |
    |               | key y coordinate               |       |          |
@@ -666,21 +684,13 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |               |                                |       |          |
    | ccmNonce      | Nonce used by the CCM          | value | Yes      |
    |               | function, if CCM is used to    |       |          |
-
-
-
-Fussell                 Expires December 3, 2016               [Page 12]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    |               | generate the Tag.              |       |          |
    |               |                                |       |          |
    | oiLen         | Length of the OtherInfo field  | value | Yes      |
    |               |                                |       |          |
    | otherInfo     | OtherInfo field                | value | Yes      |
    |               |                                |       |          |
-   | Tag           | The tag (or MAC) GENERATED BY  | value | Yes      |
+   | tag           | The tag (or MAC) GENERATED BY  | value | Yes      |
    |               | THE CAVS by using the DKM to   |       |          |
    |               | MAC the Message with the       |       |          |
    |               | specified method               |       |          |
@@ -690,10 +700,18 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |               | MAC the Message with the       |       |          |
    |               | specified method               |       |          |
    |               |                                |       |          |
-   | result        | P (Pass) or F (Fail)           | value | Yes      |
-   |               | indicating if the IUT agrees   |       |          |
-   |               | with the Tag generated by the  |       |          |
-   |               | CAVS.                          |       |          |
+   | dkm           | Derived Keying Material.       | value | Yes      |
+   |               |                                |       |          |
+   | z             | A shared secret that is used   | value | Yes      |
+   |               | to derive secret keying        |       |          |
+   |               | material using a key           |       |          |
+   |               | derivation function.           |       |          |
+   |               |                                |       |          |
+   | macData       | The message to be MAced.       | value | Yes      |
+   |               |                                |       |          |
+   | result        | Pass Fail indicating if the    | value | Yes      |
+   |               | IUT agrees with the Tag        |       |          |
+   |               | generated by the CAVS.         |       |          |
    +---------------+--------------------------------+-------+----------+
 
                       Table 8: Test Case JSON Object
@@ -704,6 +722,13 @@ Internet-Draft                Sym Alg JSON                     June 2016
    send the resonse vectors back to the ACVP server.  The following
    table describes the JSON object that represents a vector set
    response.
+
+
+
+Fussell                 Expires December 3, 2016               [Page 13]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    +-------------+--------------------------------------------+--------+
    | JSON Value  | Description                                | JSON   |
@@ -719,16 +744,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    +-------------+--------------------------------------------+--------+
 
                  Table 9: Vector Set Response JSON Object
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016               [Page 13]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
 5.  Acknowledgements
 
@@ -766,21 +781,6 @@ Appendix A.  Example KAS ECC Capabilities JSON Object
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Fussell                 Expires December 3, 2016               [Page 14]
 
 Internet-Draft                Sym Alg JSON                     June 2016
@@ -791,22 +791,28 @@ Internet-Draft                Sym Alg JSON                     June 2016
                 "prereqVals" : [{"algorithm" : "ECDSA", "valValue" : "123456"},
                                 {"algorithm" : "DRBG", "valValue" : "123456"},
                                 {"algorithm" : "SHA", "valValue" : "123456"}],
-                "methods": [
-                              { "type" : "keyGenPairPrim",
-                                "curveInfo" : [
-                                        { "curve" : P-224,
-                                          "sha" : [SHA-1, SHA-224, SHA-256]},
-                                        { "curve" : P-256,
-                                          "sha" : [SHA-1, SHA-224, SHA-256]},
-                                       ]
-                              },
-                              { "type" : "KeyPair",
-                                "options" : ["Random Bits", "Testing Candidates"],
-                                "curveInfo" : [
-                                        { "curve" : P-224},
-                                        { "curve" : P-256},
-                                       ]
-                              }
+                "functions": ["keyPairGen", "dpGen"],
+                "scheme" : [{"Sec 5.7.1.2 ECCDH Component Test" :
+                                 { "primitive" : "yes",
+                                   "ecdsa" : [P-256]},
+                                 },
+                             },
+                             { "Full Unified" :
+                                { "withKDF" : "yes",
+                                  "role" : ["initiator"],
+                                  "kdf" : [concatenation],
+                                  "keyConf" : "no",
+                                  "parmSetEB" :
+                                      { "spCurve" : "P-224",
+                                        "sha" : [224],
+                                        "ccmKeySize" : [128],
+                                        "ccmNonceLen" : 13,
+                                        "ccmMacLen" : 16,
+                                        "cmacAESKeyLen" : [128],
+                                        "cmacMacLen" : 128,
+                                     },
+                                },
+                             },
                            ]
             }
 
@@ -814,12 +820,6 @@ Appendix B.  Example Test Vectors JSON Object
 
    The following is a example JSON object for KAS ECC test vectors sent
    from the ACVP server to the crypto module.
-
-
-
-
-
-
 
 
 
@@ -848,20 +848,39 @@ Internet-Draft                Sym Alg JSON                     June 2016
                   "algorithm": "KAS ECC",
                   "testGroups": [
                     {
-                      "type": "SigVer",
+                      "scheme": "Sec 5.7.1.2 ECCDH Component Test",
                       "curve" : P-256,
                       "sha" : "SHA-256",
                       "tests": [
                         {
                           "tcId": 2170,
-                          "Msg" : "b6a3a0a5c8aecf753242d0bb1465e71b450532d29574f81b4d2a63c165ed63dce2add4aa85a849bf7e5e78cec9a2a56908d67ecfbbbac367b8305dc190298d011a42da17999841dfaf8d083f9153eb9bc91433fcf9548340040f90cd3175faa890ae81002351f7bf9c093d1585a671ed4b95315796fbe929a620553b69c79e95"
-                          "qx" : "d97f2a944063befe63a07b708629638fd658d049207982dc4b810582d21beb77",
-                          "qy" : "6528f1e1342d38f6f862aa446202bff1c55546187c2c42a1b4ebdaee506aeb7e",
-                          "r" : "f057a51efd6a889793a5e57b71aedf5545ef8ca91ffa1145cc11fe305f732de1",
-                          "s" : "c35557c560c5e035edd8ce72980f054f0467450c25a8d2f8ceea0ab2676bd92e",
+                          "qsX" : "3b0c9d86b66a410a3f924979f62a29a160bbd2e8b87b44422057a8a5e5dd49f6",
+                          "qsY" : "7e38ac86c83b787206728525d0c194838f8ca8c6a8e1b21d38acdc17456d0a4f",
                         },
                       ]
                     },
+                      "scheme": "Full Unified",
+                      "parmSet" : "EB",
+                      "sha" : "SHA-224",
+                      "tests": [
+                        {
+                          "tcId": 2171,
+                          "ds" : "ebfe2cb9f6c202ba1bfe1262b9b18afd568f1897e54759a67d7356b1",
+                          "qsX" : "4a7bee27e32c37327ec96f70a9e18796ab87ceed16861112aeea1311",
+                          "qsY" : "0fb6c082051ea0fef3b06e9989dd8c5fd236ccc8c9366a375f426ec8",
+                          "de" : "64f72afd10a2f3adca0728d3acf437aeac8b294a08808ea60626f487",
+                          "qeX" : "9cf9f8d751b9032e79cb89236cf16eb707fc415411d40645a4796b84",
+                          "qeY" : "c7e0ba911b6dec5dce3a748db2f380c1e55bfc0d9b2a193017387361",
+                          "dsIUT" : "6f7c73e7b22fbb992156a970ce5edd8cca6c7a9375cb6490558bec70",
+                          "qsIUTX" : "79a215a5c1d5e68dbc259527e5f856b748c3498375f7c2dbb1315f2f",
+                          "qsIUTY" : "0009b15a8a40a9d9d5d8508b8772e91447d642aabdc745aeab20faf1",
+                          "deIUT" : "0caf1bbd8d554769c0f74f33bd19f23609d18ed3badc7530910bfb79",
+                          "qeIUTX" : "1dbb80e2820f13a6e036a9dbfc846dd2f127c79618e3eb4a06c31a6d",
+                          "qeIUTY" : "f61db3ec77cb54c00bdf7690aa0ff1b82234c2a7ed5622bc3177b9c3",
+                          "ccmNonce" : "1517f0379da60bcb70c6216936",
+                          "otherInfo" : "a1b2c3d4e5434156536964554d912b575975a4bfeb9dd47e039956d4afce4d65d0274c90200873fc7484db733fcf35",
+                          "iutTag" : "332d1f595f67e11a9a8fb52000363ca6",
+                        },
                   ]
                 }
 
@@ -869,25 +888,6 @@ Appendix C.  Example Test Results JSON Object
 
    The following is a example JSON object for KAS ECC test results sent
    from the crypto module to the ACVP server.
-
-                   {
-                       "acvVersion": "0.2",
-                       "vsId": 1564,
-                       "testResults": [
-                           {
-                               "tcId": 2170,
-                               "result" : "Pass",
-                           }
-                       ]
-                   }
-
-
-Author's Address
-
-
-
-
-
 
 
 
@@ -898,6 +898,27 @@ Fussell                 Expires December 3, 2016               [Page 16]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+                {
+                    "acvVersion": "0.2",
+                    "vsId": 1564,
+                    "testResults": [
+                        {
+                            "tcId": 2170,
+                            "qsIUTX" : "60006447cf8f19977515784553cc5531f3fe9db1e7f334b752a141fb1b52d0fb",
+                            "qsIUTY" : "40ec0979e6d8c08796115d9550e819f0bb47613af6d1dc2a5d8938ff370ed973",
+                            "z" : "41bb3d087e78de21a617a64e7d67cbb0ead8c29547cc38b379ea19592e018e3f"
+                        },
+                       {
+                            "tcId": 2171,
+                            "z" : "90f66c669c2d6f0c8e150c8d25c581ecf720cf6e30fb39560e04d676045d35218c781e2f503f2a21b72c05781567654a4ba7cb7f9a54eeda",
+                            "macData" : "4b435f325f55a1b2c3d4e54341565369641dbb80e2820f13a6e036a9dbfc846dd2f127c79618e3eb4a06c31a6df61db3ec77cb54c00bdf7690aa0ff1b82234c2a7ed5622bc3177b9c39cf9f8d751b9032e79cb89236cf16eb707fc415411d40645a4796b84c7e0ba911b6dec5dce3a748db2f380c1e55bfc0d9b2a193017387361"
+                            "dkm" : "8c1908ce4139f2447e8cc8a99f108c11",
+                            "result" : "false",
+                    ]
+                }
+
+Author's Address
+
    Barry Fussell (editor)
    Cisco Systems, Inc.
    170 West Tasman Dr.
@@ -905,27 +926,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    USA
 
    Email: bfussell@cisco.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
