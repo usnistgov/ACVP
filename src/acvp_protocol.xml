@@ -364,10 +364,6 @@ Content-Length: (length of JWT)
 Once the session is established the client must include the JWT with 
 each message.
 
-GET /validation/acvp/ vectors?vsId=1  HTTP1.1
-User Agent: acvp-client/0.2
-Host: www.my-acvpserver.com
-Authorization: Bearer JWT
            ]]></artwork>
      </figure>
 
@@ -379,9 +375,19 @@ Authorization: Bearer JWT
 
 
      <section anchor="reg_capex" title="Product Registration with Capabilities">
-     <t>POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions. In addition, if an algorithm certificate is not desired for this registration populate the field "certificateRequest"  with "no".</t> 
+     <t>POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions. In addition there are a few parameters that specify session specific information:</t>
 
-     <t>The client may request the server to encrypt all data at rest by registering "encryptAtRest" with "yes". Omitting the "encryptAtRest" field or registering with "no" will indicate to the server that no encryption is require for the data at rest.</t>
+     <t><list style="symbols">
+
+     <t>certificateRequest - If an algorithm certificate is not desired for this registration populate the field "certificateRequest"  with "no", otherwise "yes".</t> 
+     <t>responseRequest - If this vector session is for the purposes of testing the client or DUT prior to a certificate request and desires the responses to the vectors as well, indicate with "yes", otherwise omit the keyword or indicate with "no"</t>
+     <t>production - If this is a production environment indicate so with "yes", otherwise omit this keyword or indicate with "no".  A production environment may not be able to support intermediate value tests and therefore those tests will be excluded.</t>
+     <t>encryptAtRest - The client may request the server to encrypt all data at rest by registering "encryptAtRest" with "yes". Omitting the "encryptAtRest" field or registering with "no" will indicate to the server that no encryption is require for the data at rest.</t>
+	   </list></t> 
+
+<t>Note that when a certificate request is made production and responseRequest shall be omitted or set to "no". Conversely if no certificate is requested, the operationalEnvironment section may be omitted.</t>
+
+
 
      <figure align="center" anchor="xml_json3">
        <artwork align="left"><![CDATA[
@@ -394,6 +400,8 @@ Accept:
 "operation" : "register",
 "acvVersion" : "0.2",
 "certificateRequest" : "yes",
+"responseRequest" : "no",
+"production" : "no",
 "encryptAtRest" : "yes",
 "oeInformation" : {
 "vendorName" : "Cisco",
@@ -406,10 +414,12 @@ Accept:
 "moduleVersion" : "1.0",
 "processor" : "Intel Woodcrest",
 "operatingSystem" : "Linux 3.1"
-     },
+     {
      "implementationDescription" : 
           "Sample crypto module for demonstrating ACV protocol."
      },
+                            },
+                   },
 "capabilityExchange" : {
 "algorithms" : [
          {
@@ -443,7 +453,7 @@ Accept:
            ]]></artwork>
      </figure>
 
-<t>Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.  A full JSON representation of the algorithm sheet information will be added as an appendix.</t>
+<t>Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.</t>
 
      <figure align="center" anchor="xml_json4">
        <artwork align="left"><![CDATA[
@@ -462,52 +472,77 @@ Accept:
 
 	</section>
 
-     <section title="Registration/Capabilities Exchange response">
-     <t>POST response is 200 OK with json data.</t>
-
-     <figure align="center" anchor="xml_json5">
-       <artwork align="left"><![CDATA[
-{
-"version" : "0.2",
-"capabilityResponse" : {          
-       "vectorSets" :[{"vsId" :930}],
-       "testSession" :{"testId" :183}, 
-"accessToken" : "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxMjMwMTIwLCJjb21wYW55IjogIkNpc2NvIiwianRpIjoxODN9.h1tQALiupn_Jx4UWPPTjFNeY9Wu7DI8bWkbh8Xt0GCr3DYf2J_FzoGwlPnUBuPR63kIN0HmKPrlv6r8Ykb1JeA"
-    }
-}
-
-           ]]></artwork>
-     </figure>
-     <t>Specific JSON formatted vectors and their responses are documented in
-        the protocol sub-documents.  These include coverage for symmetric,
-        asymmetric, digests, KDFs, etc.</t>
-     </section>
-
      <section title="Vector Set Download Request">
 	 <t>
 	     After registration, the server provides a list of vector sets to the client, each identified
 	     by a VS-ID.  The client will download, process, and upload test results for each vector set.
 	     This message is used to download a vector set from the server for a particular VS-ID.
 	 </t>
-	 <figure align="center" anchor="xml_json8">
+	 <figure align="center" anchor="xml_json5">
 	    <artwork align="left"><![CDATA[
-GET /validation/acvp/ vectors?vsId=1  HTTP1.1
+GET /validation/acvp/ vectors?vsId=1437  HTTP1.1
 User Agent: acvp-client/0.2
 Host: www.my-acvpserver.com
 Authorization: Bearer JWT
             ]]></artwork>
 	 </figure>
+
+	 <t>The server will respond with the vector set associated with the vsId for the client to process</t>
+
+
+
+
+	 <figure align="center" anchor="xml_json6">
+	    <artwork align="left"><![CDATA[
+
+200 OK Response:
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+  "acv_version": "0.2",
+  "vs_id": 1437,
+  "algorithm": "AES-GCM",
+  "mode": "encrypt",
+  "test_groups": [
+    {
+      "keylen": 128,
+      "ivlen": 96,
+      "ptlen": 0,
+      "aadlen": 128,
+      "taglen": 128,
+      "tests": [
+        {
+          "tcId": 12340,
+          "key": "30BA1DBCB530347A148FB286D9A59757",
+          "pt": "",
+          "aad": "6CA553A59DFBD8F7E0DA619470F8986C"
+        },
+        {
+          "tcId": 12341,
+          "key": "AB7BB9349285B3E7403E99FED8B5060E",
+          "pt": "",
+          "aad": "79504FF995F70FFD328D7070CCBD62F1"
+        }.....
+
+	<With requestResponse set iv, ct and tag would be included>
+
+            ]]></artwork>
+	 </figure>
+
+
 	 <t>
-	     Since the server may not have had enough time to generate the vector set for a given test session, 
+	     If the server did not have had enough time to generate the vector set for a given test session, 
 	     the server may reply:
 	 </t>
-	<figure align="center" anchor="xml_json10">
+	<figure align="center" anchor="xml_json7">
 	    <artwork align="left"><![CDATA[
 HTTP 1.1 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
 {
+"vs_id": 1437,
 "version" : 0.2,
 "retry" : 10
 }
@@ -523,12 +558,16 @@ Content-Length: <length of results>
      <section title="Test Results Request">
 	 <t>The client will send this request to learn the results for an individual vector set.</t>
 
-     <figure align="center" anchor="xml_json7">
+     <figure align="center" anchor="xml_json8">
        <artwork align="left"><![CDATA[
-GET /validation/acvp/results?vsId=1 HTTP1.1
+GET /validation/acvp/results?vsId=1437 HTTP1.1
 User Agent:
 Host: www.my-acvpserver.com
 Accept: /
+
+
+Response to GET is:
+
 HTTP 1.1 200 OK
 Status: 200 OK
 Content-Type: application/json
@@ -536,13 +575,11 @@ Content-Length: <length of results>
 {
 "version" : "0.2",
 "results" : {
-    "vsId" : 930,
+    "vsId" : 1437,
     "disposition" : "incomplete",
     "tests" : [
 	    { "tcId" : 12340, "result" : "passed" },
-            { "tcId" : 12341, "result" : "passed" },
-            { "tcId" : 12342, "result" : "incomplete" },
-            { "tcId" : 12343, "result" : "passed" }
+            { "tcId" : 12341, "result" : "incomplete" },
               ]
    }
 } 
@@ -599,7 +636,7 @@ Authorization: Bearer JWT
 	   on database costs, need for artifacts, etc. If the vector set has expired, the server will reply with an
 	   expired response when the client attempts to download the vector set:
        </t>
-	<figure align="center" anchor="xml_json6">
+	<figure align="center" anchor="xml_json10">
 	<artwork align="left"><![CDATA[
 HTTP 1.1 200 OK
 Status: 200 OK
@@ -633,7 +670,7 @@ Content-Length: <length of results>
             <artwork><![CDATA[
                 {
                   "acvVersion": "0.2",
-		  "vsId": 1564,
+		  "vsId": 1437,
 		  "expiry": "2018-12-31 23:59:59",
                   "algorithm": "AES-GCM",
                   "direction": "encrypt",
@@ -646,7 +683,7 @@ Content-Length: <length of results>
                       "tagLen": 128,
                       "tests": [
                         {
-                          "tcId": 2171,
+                          "tcId": 12340,
                           "key": "1529BAC6229586F057FAA59353851686",
                           "pt": "",
                           "aad": "4B11160620475D8EE440C3795CF62D26"
@@ -658,6 +695,7 @@ Content-Length: <length of results>
 			.
 			.
 			.
+
 	    ]]></artwork>
 	</figure>
 	<section title="Resending test responses">

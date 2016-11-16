@@ -395,10 +395,9 @@
 <link href="#rfc.section.11" rel="Chapter" title="11 Message Formats"/>
 <link href="#rfc.section.11.1" rel="Chapter" title="11.1 Establish Connection HTTPS GET/200 OK"/>
 <link href="#rfc.section.11.2" rel="Chapter" title="11.2 Product Registration with Capabilities"/>
-<link href="#rfc.section.11.3" rel="Chapter" title="11.3 Registration/Capabilities Exchange response"/>
-<link href="#rfc.section.11.4" rel="Chapter" title="11.4 Vector Set Download Request"/>
-<link href="#rfc.section.11.5" rel="Chapter" title="11.5 Test Results Request"/>
-<link href="#rfc.section.11.6" rel="Chapter" title="11.6 Optional Flows"/>
+<link href="#rfc.section.11.3" rel="Chapter" title="11.3 Vector Set Download Request"/>
+<link href="#rfc.section.11.4" rel="Chapter" title="11.4 Test Results Request"/>
+<link href="#rfc.section.11.5" rel="Chapter" title="11.5 Optional Flows"/>
 <link href="#rfc.section.12" rel="Chapter" title="12 Vector Set Expiration"/>
 <link href="#rfc.section.12.1" rel="Chapter" title="12.1 Resending test responses"/>
 <link href="#rfc.section.13" rel="Chapter" title="13 Error Codes"/>
@@ -415,7 +414,7 @@
 
   <meta name="dct.creator" content="Fussell, B., Ed." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-acvp-protocol-0.2" />
-  <meta name="dct.issued" scheme="ISO8601" content="2016-10-6" />
+  <meta name="dct.issued" scheme="ISO8601" content="2016-11-16" />
   <meta name="dct.abstract" content="This document defines the Automated Cryptographic Validation Protocol(ACVP)." />
   <meta name="description" content="This document defines the Automated Cryptographic Validation Protocol(ACVP)." />
 
@@ -436,10 +435,10 @@
 </tr>
 <tr>
   <td class="left">Intended status: Informational</td>
-  <td class="right">October 6, 2016</td>
+  <td class="right">November 16, 2016</td>
 </tr>
 <tr>
-  <td class="left">Expires: April 9, 2017</td>
+  <td class="left">Expires: May 20, 2017</td>
   <td class="right"></td>
 </tr>
 
@@ -460,7 +459,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on April 9, 2017.</p>
+<p>This Internet-Draft will expire on May 20, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -493,10 +492,9 @@
 </ul><li>11.   <a href="#rfc.section.11">Message Formats</a></li>
 <ul><li>11.1.   <a href="#rfc.section.11.1">Establish Connection HTTPS GET/200 OK</a></li>
 <li>11.2.   <a href="#rfc.section.11.2">Product Registration with Capabilities</a></li>
-<li>11.3.   <a href="#rfc.section.11.3">Registration/Capabilities Exchange response</a></li>
-<li>11.4.   <a href="#rfc.section.11.4">Vector Set Download Request</a></li>
-<li>11.5.   <a href="#rfc.section.11.5">Test Results Request</a></li>
-<li>11.6.   <a href="#rfc.section.11.6">Optional Flows</a></li>
+<li>11.3.   <a href="#rfc.section.11.3">Vector Set Download Request</a></li>
+<li>11.4.   <a href="#rfc.section.11.4">Test Results Request</a></li>
+<li>11.5.   <a href="#rfc.section.11.5">Optional Flows</a></li>
 </ul><li>12.   <a href="#rfc.section.12">Vector Set Expiration</a></li>
 <ul><li>12.1.   <a href="#rfc.section.12.1">Resending test responses</a></li>
 </ul><li>13.   <a href="#rfc.section.13">Error Codes</a></li>
@@ -718,16 +716,20 @@ Content-Length: (length of JWT)
 Once the session is established the client must include the JWT with 
 each message.
 
-GET /validation/acvp/ vectors?vsId=1  HTTP1.1
-User Agent: acvp-client/0.2
-Host: www.my-acvpserver.com
-Authorization: Bearer JWT
            </pre>
 <p class="figure">Figure 6</p>
 <p id="rfc.section.11.1.p.2">The authentication mechanism will be defined by the server.</p>
 <h1 id="rfc.section.11.2"><a href="#rfc.section.11.2">11.2.</a> <a href="#reg_capex" id="reg_capex">Product Registration with Capabilities</a></h1>
-<p id="rfc.section.11.2.p.1">POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions. In addition, if an algorithm certificate is not desired for this registration populate the field "certificateRequest"  with "no".</p>
-<p id="rfc.section.11.2.p.2">The client may request the server to encrypt all data at rest by registering "encryptAtRest" with "yes". Omitting the "encryptAtRest" field or registering with "no" will indicate to the server that no encryption is require for the data at rest.</p>
+<p id="rfc.section.11.2.p.1">POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions. In addition there are a few parameters that specify session specific information:</p>
+<p/>
+
+<ul>
+  <li>certificateRequest - If an algorithm certificate is not desired for this registration populate the field "certificateRequest"  with "no", otherwise "yes".</li>
+  <li>responseRequest - If this vector session is for the purposes of testing the client or DUT prior to a certificate request and desires the responses to the vectors as well, indicate with "yes", otherwise omit the keyword or indicate with "no"</li>
+  <li>production - If this is a production environment indicate so with "yes", otherwise omit this keyword or indicate with "no".  A production environment may not be able to support intermediate value tests and therefore those tests will be excluded.</li>
+  <li>encryptAtRest - The client may request the server to encrypt all data at rest by registering "encryptAtRest" with "yes". Omitting the "encryptAtRest" field or registering with "no" will indicate to the server that no encryption is require for the data at rest.</li>
+</ul>
+<p id="rfc.section.11.2.p.3">Note that when a certificate request is made production and responseRequest shall be omitted or set to "no". Conversely if no certificate is requested, the operationalEnvironment section may be omitted.</p>
 <div id="rfc.figure.7"/>
 <div id="xml_json3"/>
 <pre>
@@ -740,6 +742,8 @@ Accept:
 "operation" : "register",
 "acvVersion" : "0.2",
 "certificateRequest" : "yes",
+"responseRequest" : "no",
+"production" : "no",
 "encryptAtRest" : "yes",
 "oeInformation" : {
 "vendorName" : "Cisco",
@@ -752,10 +756,12 @@ Accept:
 "moduleVersion" : "1.0",
 "processor" : "Intel Woodcrest",
 "operatingSystem" : "Linux 3.1"
-     },
+     {
      "implementationDescription" : 
           "Sample crypto module for demonstrating ACV protocol."
      },
+                            },
+                   },
 "capabilityExchange" : {
 "algorithms" : [
          {
@@ -788,7 +794,7 @@ Accept:
 }
            </pre>
 <p class="figure">Figure 7</p>
-<p id="rfc.section.11.2.p.3">Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.  A full JSON representation of the algorithm sheet information will be added as an appendix.</p>
+<p id="rfc.section.11.2.p.4">Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.</p>
 <div id="rfc.figure.8"/>
 <div id="xml_json4"/>
 <pre>
@@ -803,58 +809,85 @@ Accept:
 }
            </pre>
 <p class="figure">Figure 8</p>
-<h1 id="rfc.section.11.3"><a href="#rfc.section.11.3">11.3.</a> Registration/Capabilities Exchange response</h1>
-<p id="rfc.section.11.3.p.1">POST response is 200 OK with json data.</p>
+<h1 id="rfc.section.11.3"><a href="#rfc.section.11.3">11.3.</a> Vector Set Download Request</h1>
+<p id="rfc.section.11.3.p.1">After registration, the server provides a list of vector sets to the client, each identified by a VS-ID.  The client will download, process, and upload test results for each vector set.  This message is used to download a vector set from the server for a particular VS-ID.  </p>
 <div id="rfc.figure.9"/>
 <div id="xml_json5"/>
 <pre>
-{
-"version" : "0.2",
-"capabilityResponse" : {          
-       "vectorSets" :[{"vsId" :930}],
-       "testSession" :{"testId" :183}, 
-"accessToken" : "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxMjMwMTIwLCJjb21wYW55IjogIkNpc2NvIiwianRpIjoxODN9.h1tQALiupn_Jx4UWPPTjFNeY9Wu7DI8bWkbh8Xt0GCr3DYf2J_FzoGwlPnUBuPR63kIN0HmKPrlv6r8Ykb1JeA"
-    }
-}
-
-           </pre>
-<p class="figure">Figure 9</p>
-<p id="rfc.section.11.3.p.2">Specific JSON formatted vectors and their responses are documented in the protocol sub-documents.  These include coverage for symmetric, asymmetric, digests, KDFs, etc.</p>
-<h1 id="rfc.section.11.4"><a href="#rfc.section.11.4">11.4.</a> Vector Set Download Request</h1>
-<p id="rfc.section.11.4.p.1">After registration, the server provides a list of vector sets to the client, each identified by a VS-ID.  The client will download, process, and upload test results for each vector set.  This message is used to download a vector set from the server for a particular VS-ID.  </p>
-<div id="rfc.figure.10"/>
-<div id="xml_json8"/>
-<pre>
-GET /validation/acvp/ vectors?vsId=1  HTTP1.1
+GET /validation/acvp/ vectors?vsId=1437  HTTP1.1
 User Agent: acvp-client/0.2
 Host: www.my-acvpserver.com
 Authorization: Bearer JWT
             </pre>
+<p class="figure">Figure 9</p>
+<p id="rfc.section.11.3.p.2">The server will respond with the vector set associated with the vsId for the client to process</p>
+<div id="rfc.figure.10"/>
+<div id="xml_json6"/>
+<pre>
+
+200 OK Response:
+Status: 200 OK
+Content-Type: application/json
+Content-Length: &lt;length of results&gt;
+{
+  "acv_version": "0.2",
+  "vs_id": 1437,
+  "algorithm": "AES-GCM",
+  "mode": "encrypt",
+  "test_groups": [
+    {
+      "keylen": 128,
+      "ivlen": 96,
+      "ptlen": 0,
+      "aadlen": 128,
+      "taglen": 128,
+      "tests": [
+        {
+          "tcId": 12340,
+          "key": "30BA1DBCB530347A148FB286D9A59757",
+          "pt": "",
+          "aad": "6CA553A59DFBD8F7E0DA619470F8986C"
+        },
+        {
+          "tcId": 12341,
+          "key": "AB7BB9349285B3E7403E99FED8B5060E",
+          "pt": "",
+          "aad": "79504FF995F70FFD328D7070CCBD62F1"
+        }.....
+
+	&lt;With requestResponse set iv, ct and tag would be included&gt;
+
+            </pre>
 <p class="figure">Figure 10</p>
-<p id="rfc.section.11.4.p.2">Since the server may not have had enough time to generate the vector set for a given test session, the server may reply: </p>
+<p id="rfc.section.11.3.p.3">If the server did not have had enough time to generate the vector set for a given test session, the server may reply: </p>
 <div id="rfc.figure.11"/>
-<div id="xml_json10"/>
+<div id="xml_json7"/>
 <pre>
 HTTP 1.1 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: &lt;length of results&gt;
 {
+"vs_id": 1437,
 "version" : 0.2,
 "retry" : 10
 }
            </pre>
 <p class="figure">Figure 11</p>
-<p id="rfc.section.11.4.p.3">Where the retry value represents the number of seconds for the client to wait before retrying the request.  The server may set the retry value based on the current server load and expected processing time to generate the vector set.  </p>
-<h1 id="rfc.section.11.5"><a href="#rfc.section.11.5">11.5.</a> Test Results Request</h1>
-<p id="rfc.section.11.5.p.1">The client will send this request to learn the results for an individual vector set.</p>
+<p id="rfc.section.11.3.p.4">Where the retry value represents the number of seconds for the client to wait before retrying the request.  The server may set the retry value based on the current server load and expected processing time to generate the vector set.  </p>
+<h1 id="rfc.section.11.4"><a href="#rfc.section.11.4">11.4.</a> Test Results Request</h1>
+<p id="rfc.section.11.4.p.1">The client will send this request to learn the results for an individual vector set.</p>
 <div id="rfc.figure.12"/>
-<div id="xml_json7"/>
+<div id="xml_json8"/>
 <pre>
-GET /validation/acvp/results?vsId=1 HTTP1.1
+GET /validation/acvp/results?vsId=1437 HTTP1.1
 User Agent:
 Host: www.my-acvpserver.com
 Accept: /
+
+
+Response to GET is:
+
 HTTP 1.1 200 OK
 Status: 200 OK
 Content-Type: application/json
@@ -862,20 +895,18 @@ Content-Length: &lt;length of results&gt;
 {
 "version" : "0.2",
 "results" : {
-    "vsId" : 930,
+    "vsId" : 1437,
     "disposition" : "incomplete",
     "tests" : [
 	    { "tcId" : 12340, "result" : "passed" },
-            { "tcId" : 12341, "result" : "passed" },
-            { "tcId" : 12342, "result" : "incomplete" },
-            { "tcId" : 12343, "result" : "passed" }
+            { "tcId" : 12341, "result" : "incomplete" },
               ]
    }
 } 
            </pre>
 <p class="figure">Figure 12</p>
-<p id="rfc.section.11.5.p.2">The results request is an optional flow since some clients may not require success/fail information. Another possibility is to provide an out of band management session on the server may provide access to algorithm test results.</p>
-<p id="rfc.section.11.5.p.3">Disposition is defined overall for the entire vector set as:</p>
+<p id="rfc.section.11.4.p.2">The results request is an optional flow since some clients may not require success/fail information. Another possibility is to provide an out of band management session on the server may provide access to algorithm test results.</p>
+<p id="rfc.section.11.4.p.3">Disposition is defined overall for the entire vector set as:</p>
 <p/>
 
 <ul>
@@ -885,7 +916,7 @@ Content-Length: &lt;length of results&gt;
   <li>EXPIRED indicates not all the test case responses were received from the client prior to expiry.</li>
   <li>PASSED indicates all test cases have been processed by the server and have passed.</li>
 </ul>
-<p id="rfc.section.11.5.p.5">Result is defined for individual test cases:</p>
+<p id="rfc.section.11.4.p.5">Result is defined for individual test cases:</p>
 <p/>
 
 <ul>
@@ -895,8 +926,8 @@ Content-Length: &lt;length of results&gt;
   <li>EXPIRED indicates the client did not send the test case response to the server prior to expiry.</li>
   <li>PASSED indicates the test case passed.</li>
 </ul>
-<h1 id="rfc.section.11.6"><a href="#rfc.section.11.6">11.6.</a> Optional Flows</h1>
-<p id="rfc.section.11.6.p.1">The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</p>
+<h1 id="rfc.section.11.5"><a href="#rfc.section.11.5">11.5.</a> Optional Flows</h1>
+<p id="rfc.section.11.5.p.1">The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</p>
 <div id="rfc.figure.13"/>
 <div id="xml_json9"/>
 <pre>
@@ -906,11 +937,11 @@ Host: www.my-acvpserver.com
 Authorization: Bearer JWT
            </pre>
 <p class="figure">Figure 13</p>
-<p id="rfc.section.11.6.p.2">The server response will always be 200 OK.</p>
+<p id="rfc.section.11.5.p.2">The server response will always be 200 OK.</p>
 <h1 id="rfc.section.12"><a href="#rfc.section.12">12.</a> Vector Set Expiration</h1>
 <p id="rfc.section.12.p.1">Vector sets can expire.  For example, in terms of a validation authority use, the vector sets are one-time use only.  Old vector sets can never be reused to obtain a new validation certificate for an algorithm implementation or to update an existing certificate. Expiration is a server specific definition which depends on database costs, need for artifacts, etc. If the vector set has expired, the server will reply with an expired response when the client attempts to download the vector set: </p>
 <div id="rfc.figure.14"/>
-<div id="xml_json6"/>
+<div id="xml_json10"/>
 <pre>
 HTTP 1.1 200 OK
 Status: 200 OK
@@ -928,7 +959,7 @@ Content-Length: &lt;length of results&gt;
 <pre>
                 {
                   "acvVersion": "0.2",
-		  "vsId": 1564,
+		  "vsId": 1437,
 		  "expiry": "2018-12-31 23:59:59",
                   "algorithm": "AES-GCM",
                   "direction": "encrypt",
@@ -941,7 +972,7 @@ Content-Length: &lt;length of results&gt;
                       "tagLen": 128,
                       "tests": [
                         {
-                          "tcId": 2171,
+                          "tcId": 12340,
                           "key": "1529BAC6229586F057FAA59353851686",
                           "pt": "",
                           "aad": "4B11160620475D8EE440C3795CF62D26"
@@ -953,6 +984,7 @@ Content-Length: &lt;length of results&gt;
 			.
 			.
 			.
+
 	    </pre>
 <h1 id="rfc.section.12.1"><a href="#rfc.section.12.1">12.1.</a> Resending test responses</h1>
 <p id="rfc.section.12.1.p.1">When one or more test cases fails, the client will need to correct the issue in the crypto module and send the responses again.  The resending of responses for failed test cases will occur for an entire vector set.  Therefore, even if only a single test case in the vector set failed, the client will need to download, process, and upload responses to the server for the entire vector set (presumably after the problem has been corrected in the DUT).  The resending of vector set responses must occur prior to expiry.  </p>
