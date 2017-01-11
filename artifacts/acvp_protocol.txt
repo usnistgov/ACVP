@@ -4,8 +4,8 @@
 
 Internet Engineering Task Force                          B. Fussell, Ed.
 Internet-Draft                                             Cisco Systems
-Intended status: Informational                           January 5, 2017
-Expires: July 9, 2017
+Intended status: Informational                                      2016
+Expires: July 13, 2017
 
 
               Automated Cryptographic Validation Protocol
@@ -31,11 +31,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on July 9, 2017.
+   This Internet-Draft will expire on July 13, 2017.
 
 Copyright Notice
 
-   Copyright (c) 2017 IETF Trust and the persons identified as the
+   Copyright (c) 2016 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Fussell                   Expires July 9, 2017                  [Page 1]
+Fussell                   Expires July 13, 2017                 [Page 1]
 
-Internet-Draft              Abbreviated Title               January 2017
+Internet-Draft              Abbreviated Title                       2016
 
 
 Table of Contents
@@ -65,28 +65,30 @@ Table of Contents
    2.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   3
      2.1.  Audience  . . . . . . . . . . . . . . . . . . . . . . . .   4
      2.2.  Goals . . . . . . . . . . . . . . . . . . . . . . . . . .   4
-     2.3.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
+     2.3.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   5
    3.  Architecture  . . . . . . . . . . . . . . . . . . . . . . . .   5
      3.1.  Server/Client Architecture  . . . . . . . . . . . . . . .   5
      3.2.  Server/Proxy Architecture . . . . . . . . . . . . . . . .   6
    4.  ACV Protocol  . . . . . . . . . . . . . . . . . . . . . . . .   6
-   5.  Security  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
-   6.  Authentication  . . . . . . . . . . . . . . . . . . . . . . .   7
-   7.  Traceability  . . . . . . . . . . . . . . . . . . . . . . . .   7
-   8.  Encoding  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
-   9.  Versioning  . . . . . . . . . . . . . . . . . . . . . . . . .   7
-   10. Messaging . . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     10.1.  Product Registration/Capabilities Exchange . . . . . . .   8
-     10.2.  KAT Exchange . . . . . . . . . . . . . . . . . . . . . .   8
-   11. Message Formats . . . . . . . . . . . . . . . . . . . . . . .   8
-     11.1.  Establish Connection HTTPS GET/200 OK  . . . . . . . . .   9
-     11.2.  Product Registration with Capabilities . . . . . . . . .  10
-     11.3.  Vector Set Download Request  . . . . . . . . . . . . . .  12
-     11.4.  Test Results Request . . . . . . . . . . . . . . . . . .  14
+     4.1.  HTTP URI Hierarchy  . . . . . . . . . . . . . . . . . . .   7
+     4.2.  HTTP URI Operations . . . . . . . . . . . . . . . . . . .   7
+   5.  Security  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+   6.  Authentication  . . . . . . . . . . . . . . . . . . . . . . .   8
+   7.  Traceability  . . . . . . . . . . . . . . . . . . . . . . . .   8
+   8.  Encoding  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+   9.  Versioning  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+   10. Messaging . . . . . . . . . . . . . . . . . . . . . . . . . .   9
+     10.1.  Product Registration/Capabilities Exchange . . . . . . .   9
+     10.2.  KAT Exchange . . . . . . . . . . . . . . . . . . . . . .   9
+   11. Message Formats . . . . . . . . . . . . . . . . . . . . . . .   9
+     11.1.  Establish Connection HTTPS GET/200 OK  . . . . . . . . .  10
+     11.2.  Product Registration with Capabilities . . . . . . . . .  11
+     11.3.  Vector Set Download Request  . . . . . . . . . . . . . .  13
+     11.4.  Test Results Request . . . . . . . . . . . . . . . . . .  15
      11.5.  Optional Flows . . . . . . . . . . . . . . . . . . . . .  16
-   12. Vector Set Expiration . . . . . . . . . . . . . . . . . . . .  16
+   12. Vector Set Expiration . . . . . . . . . . . . . . . . . . . .  17
      12.1.  Resending test responses . . . . . . . . . . . . . . . .  18
-   13. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  18
+   13. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  19
    14. Other Considerations  . . . . . . . . . . . . . . . . . . . .  19
    15. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  19
    16. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
@@ -103,16 +105,17 @@ Table of Contents
    communication protocol can also be used to validate the correctness
    of the implementations of the algorithms in the cryptographic module
    with a validation authority.  This document describes how ACVP is
+
+
+
+
+Fussell                   Expires July 13, 2017                 [Page 2]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
    structured with respect to the client-server model, the messaging
    protocol, optional features and flows.
-
-
-
-
-Fussell                   Expires July 9, 2017                  [Page 2]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
 1.1.  Requirements Language
 
@@ -159,17 +162,16 @@ Internet-Draft              Abbreviated Title               January 2017
    those algorithms, and defines a mapping between the data on the wire
    and the algorithm testing specification.  ACVP does not define
    detailed conformance criteria, such as those in FIPS-140.  Instead,
+
+
+
+Fussell                   Expires July 13, 2017                 [Page 3]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
    it aims to be independent of particular conformance criteria, so that
    it can be used in multiple domains with different (even potentially
-
-
-
-
-Fussell                   Expires July 9, 2017                  [Page 3]
-
-Internet-Draft              Abbreviated Title               January 2017
-
-
    conflicting) conformance criteria.  ACVP does not define an interface
    that can be used to manage or control a cryptographic module.
 
@@ -212,19 +214,21 @@ Internet-Draft              Abbreviated Title               January 2017
    purposes of internal organizational testing only may chose not to
    include some of those features.
 
+
+
+
+
+
+
+
+Fussell                   Expires July 13, 2017                 [Page 4]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
 2.3.  Terminology
 
    TBD
-
-
-
-
-
-
-Fussell                   Expires July 9, 2017                  [Page 4]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
 3.  Architecture
 
@@ -270,17 +274,16 @@ Internet-Draft              Abbreviated Title               January 2017
 
    o  Device Under Test - contains the ACV client and the crypto module
       under test which can include various algorithms and functions that
+
+
+
+Fussell                   Expires July 13, 2017                 [Page 5]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
       encrypt/decrypt, generate keys, signatures, perform varifications
       and DRBG functions.
-
-
-
-
-
-Fussell                   Expires July 9, 2017                  [Page 5]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
    o  Crpyographic Module API - This is the interface to the crypto
       module from the ACV Client.  This interface is environment
@@ -315,6 +318,26 @@ Internet-Draft              Abbreviated Title               January 2017
    The ACV protocol will utilize existing mechanisms for transport
    coordinated with JSON formatted messaging.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                   Expires July 13, 2017                 [Page 6]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
                              Protocol Layering
 
    +-----------------------------------------------+
@@ -330,13 +353,57 @@ Internet-Draft              Abbreviated Title               January 2017
 
                                  Figure 3
 
+4.1.  HTTP URI Hierarchy
+
+
+             +---------------------------------------------+
+                server              path prefix
+             +----------------+---+---------------+-----------+
+     https://my-acvpserver.com:123/validation/acvp/register
+             +----------------+---+---------------+-----------+
+                               port                operation
+
+
+                                 Figure 4
+
+4.2.  HTTP URI Operations
+
+   Operations and their corresponding operation names
+
+   +-----------------------------------+----------------+--------------+
+   | Operation                         | Operation Path | Details      |
+   +-----------------------------------+----------------+--------------+
+   | Registration and DUT Capabilities | /register      | Section 11.2 |
+   |                                   |                |              |
+   | Vector set download request       | /vectors       | Section 11.3 |
+   |                                   |                |              |
+   | Request results from Server       | /results       | Section 11.4 |
+   |                                   |                |              |
+   | Request server to cancel session  | /cancel        | Section 11.5 |
+   +-----------------------------------+----------------+--------------+
+
+                                  Table 1
+
+   The operation path is appended to the path prefix to form the URI
+   used with HTTP GET or POST to perform the desired ACVP operation.  An
 
 
 
-Fussell                   Expires July 9, 2017                  [Page 6]
+Fussell                   Expires July 13, 2017                 [Page 7]
 
-Internet-Draft              Abbreviated Title               January 2017
+Internet-Draft              Abbreviated Title                       2016
 
+
+   example valid URI absolute path for the "/register" operation is
+   "/validation/acvp/register".  To register a DUT the ACVP client would
+   use the following HTTP request-line:
+
+   POST /validation/acvp/register HTTP/1.1
+
+   Likewise, to request a specific vector set from the server the ACVP
+   client would use the following request-line:
+
+   GET /validation/acvp/vectors?vsId=1 HTTP/1.1
 
 5.  Security
 
@@ -375,24 +442,20 @@ Internet-Draft              Abbreviated Title               January 2017
    and will contain a simple major.minor format.  Major version changes
    will not be backward compatible, however additions and enhancements
    that do not disrupt compatibility will be indicated with a minor
+
+
+
+Fussell                   Expires July 13, 2017                 [Page 8]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
    version change.  A server may accept a down-level version from the
    client if it can process at a lower level.  If not, it will reject
    the session.  All subsequent messages will carry the negotiated
    version value.
 
 10.  Messaging
-
-
-
-
-
-
-
-
-Fussell                   Expires July 9, 2017                  [Page 7]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
 10.1.  Product Registration/Capabilities Exchange
 
@@ -419,38 +482,8 @@ Internet-Draft              Abbreviated Title               January 2017
 
 11.  Message Formats
 
-                               URI Hierarchy
-
-
-           +-------------------------------------------+
-                server        service path
-           +---------------+------------------------------+
-     www://my-acpserver.com:123/validation/acvp/vectors?vsId=1
-     +-+   +---------------++-++----------++--------------+
-    scheme      server      port  service     vector file 1
-
-
-                                 Figure 4
-
    Servers may require a contextual path in the URI prior to the service
    section and clients/proxies must be able to support it.
-
-   Additional URI paths include:
-
-   o  /validation/acvp/register
-
-   o  /validation/acvp/results
-
-   o  /validation/acvp/cancel
-
-
-
-Fussell                   Expires July 9, 2017                  [Page 8]
-
-Internet-Draft              Abbreviated Title               January 2017
-
-
-   o  /validation/acvp/vectors
 
    Unique variable definitions to identify the vector set, device and
    session include:
@@ -464,6 +497,14 @@ Internet-Draft              Abbreviated Title               January 2017
       the client as part of the capabilities exchange.
 
    JWT example:
+
+
+
+
+Fussell                   Expires July 13, 2017                 [Page 9]
+
+Internet-Draft              Abbreviated Title                       2016
+
 
 {
 "alg" : "none"
@@ -501,9 +542,24 @@ Internet-Draft              Abbreviated Title               January 2017
 
 
 
-Fussell                   Expires July 9, 2017                  [Page 9]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                   Expires July 13, 2017                [Page 10]
 
-Internet-Draft              Abbreviated Title               January 2017
+Internet-Draft              Abbreviated Title                       2016
 
 
 POST /validation/acvp/register HTTP1.1
@@ -557,9 +613,9 @@ each message.
 
 
 
-Fussell                   Expires July 9, 2017                 [Page 10]
+Fussell                   Expires July 13, 2017                [Page 11]
 
-Internet-Draft              Abbreviated Title               January 2017
+Internet-Draft              Abbreviated Title                       2016
 
 
       the "encryptAtRest" field or registering with "no" will indicate
@@ -613,9 +669,9 @@ Internet-Draft              Abbreviated Title               January 2017
 
 
 
-Fussell                   Expires July 9, 2017                 [Page 11]
+Fussell                   Expires July 13, 2017                [Page 12]
 
-Internet-Draft              Abbreviated Title               January 2017
+Internet-Draft              Abbreviated Title                       2016
 
 
    "tagLen" : [
@@ -669,15 +725,12 @@ Internet-Draft              Abbreviated Title               January 2017
 
 
 
-Fussell                   Expires July 9, 2017                 [Page 12]
+Fussell                   Expires July 13, 2017                [Page 13]
 
-Internet-Draft              Abbreviated Title               January 2017
+Internet-Draft              Abbreviated Title                       2016
 
 
-   This message is used to download a vector set from the server for a
-   particular VS-ID.
-
-   GET /validation/acvp/ vectors?vsId=1437  HTTP1.1
+   GET /validation/acvp/vectors?vsId=1437  HTTP1.1
    User Agent: acvp-client/0.2
    Host: www.my-acvpserver.com
    Authorization: Bearer JWT
@@ -723,15 +776,15 @@ Internet-Draft              Abbreviated Title               January 2017
 
                                  Figure 10
 
+   If the server did not have enough time to generate the vector set for
+   a given test session, the server may reply:
 
 
-Fussell                   Expires July 9, 2017                 [Page 13]
+
+Fussell                   Expires July 13, 2017                [Page 14]
 
-Internet-Draft              Abbreviated Title               January 2017
+Internet-Draft              Abbreviated Title                       2016
 
-
-   If the server did not have had enough time to generate the vector set
-   for a given test session, the server may reply:
 
    HTTP 1.1 200 OK
    Status: 200 OK
@@ -754,37 +807,6 @@ Internet-Draft              Abbreviated Title               January 2017
 
    The client will send this request to learn the results for an
    individual vector set.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                   Expires July 9, 2017                 [Page 14]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
 GET /validation/acvp/results?vsId=1437 HTTP1.1
 User Agent:
@@ -813,6 +835,13 @@ Content-Length: <length of results>
 
                                  Figure 12
 
+
+
+Fussell                   Expires July 13, 2017                [Page 15]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
    The results request is an optional flow since some clients may not
    require success/fail information.  Another possibility is to provide
    an out of band management session on the server may provide access to
@@ -833,14 +862,6 @@ Content-Length: <length of results>
 
    o  PASSED indicates all test cases have been processed by the server
       and have passed.
-
-
-
-
-Fussell                   Expires July 9, 2017                 [Page 15]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
    Result is defined for individual test cases:
 
@@ -865,6 +886,18 @@ Internet-Draft              Abbreviated Title               January 2017
    traceability or debugging purposes it desires.  This may be important
    for those cases where there are test failures.
 
+
+
+
+
+
+
+
+Fussell                   Expires July 13, 2017                [Page 16]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
    POST /validation/acvp/cancel HTTP1.1
    User Agent: acvp-client/0.2
    Host: www.my-acvpserver.com
@@ -884,19 +917,6 @@ Internet-Draft              Abbreviated Title               January 2017
    costs, need for artifacts, etc.  If the vector set has expired, the
    server will reply with an expired response when the client attempts
    to download the vector set:
-
-
-
-
-
-
-
-
-
-Fussell                   Expires July 9, 2017                 [Page 16]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
    HTTP 1.1 200 OK
    Status: 200 OK
@@ -926,33 +946,18 @@ Internet-Draft              Abbreviated Title               January 2017
    may change the expiration timestamp of a previously issued vector set
    to either extend or shorten its lifetime subject to server policy.
    The expiration timestamp must be in the 'expiry' JSON value, which is
+
+
+
+Fussell                   Expires July 13, 2017                [Page 17]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
    included in the JSON encoded vector set.  The expiry JSON value will
    be a string value of the UTC timestamp using form "YYYY-MM-DD
    HH:MM:SS".  The following figure shows a partial JSON encoded vector
    set that contains the expiry value.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                   Expires July 9, 2017                 [Page 17]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
                    {
                      "acvVersion": "0.2",
@@ -994,6 +999,17 @@ Internet-Draft              Abbreviated Title               January 2017
    the problem has been corrected in the DUT).  The resending of vector
    set responses must occur prior to expiry.
 
+
+
+
+
+
+
+Fussell                   Expires July 13, 2017                [Page 18]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
 13.  Error Codes
 
    Errors will follow HTTP[S] numbering scheme.  In addition errors as
@@ -1001,14 +1017,6 @@ Internet-Draft              Abbreviated Title               January 2017
    describes in detail the error and any associated troubleshooting
    information.  A non-exhaustive list of JSON encoded error messages
    are in Appendix 2.
-
-
-
-
-Fussell                   Expires July 9, 2017                 [Page 18]
-
-Internet-Draft              Abbreviated Title               January 2017
-
 
 14.  Other Considerations
 
@@ -1050,6 +1058,14 @@ Appendix A.  JSON Formatting Guidelines
 
    Metadata assigned to the keyword may use any format which best
    reflects the information being represented including hyphens,
+
+
+
+Fussell                   Expires July 13, 2017                [Page 19]
+
+Internet-Draft              Abbreviated Title                       2016
+
+
    underscores alternating case, numbers, etc.  However, brevity should
    be a major consideration, for example:
 
@@ -1058,14 +1074,6 @@ Appendix A.  JSON Formatting Guidelines
    strings or big numbers shall use double quotes at both ends.  Big
    numbers require conversion from strings to whatever format is used by
    the DUT.  Numerical values of integer size or with decimal points may
-
-
-
-Fussell                   Expires July 9, 2017                 [Page 19]
-
-Internet-Draft              Abbreviated Title               January 2017
-
-
    use quotations if those values are generally used as a string, for
    example the acvVersion would generally be used in displaying
    information not in any mathematical operations.  Something like
@@ -1109,12 +1117,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-Fussell                   Expires July 9, 2017                 [Page 20]
+Fussell                   Expires July 13, 2017                [Page 20]

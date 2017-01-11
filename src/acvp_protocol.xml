@@ -71,7 +71,7 @@
      </address>
    </author>
 
-   <date year="2017"/>
+   <date year="2016"/>
 
    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
         in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -242,6 +242,67 @@ The following functions are outside the scope of this document:</t>
            ]]></artwork>
 
      </figure>
+	<section title="HTTP URI Hierarchy">
+	<figure align="center" anchor="xml_figure4">
+
+       <artwork align="left"><![CDATA[
+
+          +---------------------------------------------+
+             server              path prefix
+          +----------------+---+---------------+-----------+
+  https://my-acvpserver.com:123/validation/acvp/register
+          +----------------+---+---------------+-----------+ 
+                            port                operation
+
+           ]]></artwork>
+         
+           </figure>
+         </section>
+
+	<section title="HTTP URI Operations">
+	<t>Operations and their corresponding operation names</t>
+
+        <texttable anchor="uri_table" title="">
+          <ttcol align="left">Operation</ttcol>
+          <ttcol align="left">Operation Path</ttcol>
+          <ttcol align="left">Details</ttcol>
+
+	  <c>Registration and DUT Capabilities</c>
+	  <c>/register</c>
+	  <c><xref target="reg_capex" /></c>
+	  <c/><c/><c/>
+
+	  <c>Vector set download request</c>
+	  <c>/vectors</c>
+	  <c><xref target="vector_dl" /></c>
+	  <c/><c/><c/>
+
+	  <c>Request results from Server</c>
+	  <c>/results</c>
+	  <c><xref target="results_req" /></c>
+	  <c/><c/><c/>
+
+	  <c>Request server to cancel session</c>
+	  <c>/cancel</c>
+	  <c><xref target="optional_flows" /></c>
+
+        </texttable>
+	<t>The operation path is appended to the path prefix to form
+	   the URI used with HTTP GET or POST to perform the desired ACVP
+	   operation.  An example valid URI absolute path for the "/register"
+	   operation is "/validation/acvp/register".  To register a DUT
+           the ACVP client would use the following HTTP request-line:</t>
+
+	   <t>POST /validation/acvp/register HTTP/1.1</t>
+
+	   <t>Likewise, to request a specific vector set from the server the ACVP client  
+	   would use the following request-line:</t>
+
+	   <t>GET /validation/acvp/vectors?vsId=1 HTTP/1.1</t>
+
+
+       </section>
+
      </section>
 
        <section title="Security">
@@ -283,32 +344,8 @@ A server may accept a down-level version from the client if it can process at a 
 
      <section title="Message Formats">
 
-    <figure align="center" anchor="xml_figure4">
-       <preamble>URI Hierarchy</preamble>
-
-       <artwork align="left"><![CDATA[
-
-        +-------------------------------------------+
-             server        service path       
-        +---------------+------------------------------+
-  www://my-acpserver.com:123/validation/acvp/vectors?vsId=1
-  +-+   +---------------++-++----------++--------------+ 
- scheme      server      port  service     vector file 1
-
-           ]]></artwork>
-
-     </figure>
-
 
        <t>Servers may require a contextual path in the URI prior to the service section and clients/proxies must be able to support it.</t>
-<t>Additional URI paths include:</t>
-             <t><list style="symbols">
-
-<t> /validation/acvp/register</t>
-<t> /validation/acvp/results</t>
-<t> /validation/acvp/cancel</t>
-<t> /validation/acvp/vectors</t>
-	   </list></t> 
 
 <t>Unique variable definitions to identify the vector set, device and session include:</t>
 	    <t><list style="symbols">
@@ -471,16 +508,15 @@ Accept:
 
 	</section>
 
-     <section title="Vector Set Download Request">
+     <section anchor="vector_dl" title="Vector Set Download Request">
 	 <t>
 	     After registration, the server provides a list of vector sets to the client, each identified
 	     by a VS-ID.  The client shall download, process, and upload test results for each vector set, one at a time. Note that the client shall upload 
 	     complete test results for each processed vector set, i.e. containing a result for every test case in the vector set.
 	 </t>
-	 <t> This message is used to download a vector set from the server for a particular VS-ID.</t>
 	 <figure align="center" anchor="xml_json5">
 	    <artwork align="left"><![CDATA[
-GET /validation/acvp/ vectors?vsId=1437  HTTP1.1
+GET /validation/acvp/vectors?vsId=1437  HTTP1.1
 User Agent: acvp-client/0.2
 Host: www.my-acvpserver.com
 Authorization: Bearer JWT
@@ -532,7 +568,7 @@ Content-Length: <length of results>
 
 
 	 <t>
-	     If the server did not have had enough time to generate the vector set for a given test session, 
+	     If the server did not have enough time to generate the vector set for a given test session, 
 	     the server may reply:
 	 </t>
 	<figure align="center" anchor="xml_json7">
@@ -555,7 +591,7 @@ Content-Length: <length of results>
 	</t>
      </section>
 
-     <section title="Test Results Request">
+     <section anchor="results_req" title="Test Results Request">
 	 <t>The client will send this request to learn the results for an individual vector set.</t>
 
      <figure align="center" anchor="xml_json8">
@@ -609,7 +645,7 @@ Content-Length: <length of results>
 	   </list></t> 
       </section>
 
-     <section title="Optional Flows">
+     <section anchor="optional_flows" title="Optional Flows">
 <t>The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</t>
      <figure align="center" anchor="xml_json9">
        <artwork align="left"><![CDATA[
