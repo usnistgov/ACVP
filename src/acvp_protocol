@@ -1,0 +1,905 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs), 
+    please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+    (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space 
+    (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-ietf-acvp-protocol-0.2" ipr="trust200902">
+ <!-- category values: std, bcp, info, exp, and historic
+    ipr values: trust200902, noModificationTrust200902, noDerivativesTrust200902,
+       or pre5378Trust200902
+    you can add the attributes updates="NNNN" and obsoletes="NNNN" 
+    they will automatically be output with "(if approved)" -->
+
+ <!-- ***** FRONT MATTER ***** -->
+
+ <front>
+   <!-- The abbreviated title is used in the page header - it is only necessary if the 
+        full title is longer than 39 characters -->
+
+   <title abbrev="Abbreviated Title">Automated Cryptographic Validation Protocol
+   </title>
+
+   <!-- add 'role="editor"' below for the editors if appropriate -->
+
+   <!-- Another author who claims to be an editor -->
+
+   <author fullname="Barry Fussell" initials="B.F." role="editor" surname="Fussell">
+     <organization>Cisco Systems</organization>
+
+  <address>
+        <postal>
+          <street>170 West Tasman Dr.</street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95134</code>
+
+          <country>USA</country>
+        </postal>
+
+        <email>bfussell@cisco.com</email>
+
+       <!-- uri and facsimile elements may also be added -->
+     </address>
+   </author>
+
+   <date year="2016"/>
+
+   <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
+        in the current day for you. If only the current year is specified, xml2rfc will fill 
+	 in the current day and month for you. If the year is not the current one, it is 
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to 
+	 specify just the year. -->
+
+   <!-- Meta-data Declarations -->
+
+   <area>General</area>
+
+   <workgroup>Internet Engineering Task Force</workgroup>
+
+   <!-- WG name at the upperleft corner of the doc,
+        IETF is fine for individual submissions.  
+	 If this element is not present, the default is "Network Working Group",
+        which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+   <keyword>template</keyword>
+
+   <!-- Keywords will be incorporated into HTML output
+        files in a meta tag but they have no effect on text or nroff
+        output. If you submit your draft to the RFC Editor, the
+        keywords will be used for the search engine. -->
+
+   <abstract>
+     <t>This document defines the Automated Cryptographic Validation Protocol(ACVP).</t>
+   </abstract>
+ </front>
+
+ <middle>
+   <section title="Introduction">
+     <t>ACVP enables communication between a cryptographic module that is embedded inside of a device or otherwise running on a platform accessible via computer network, and an external testing system, using standard network communication interfaces and protocols.  This communication protocol can also be used to validate the correctness of the implementations of the algorithms in the cryptographic module with a validation authority.
+This document describes how ACVP is structured with respect to the client-server model, the messaging protocol, optional features and flows.</t>
+
+     <section title="Requirements Language">
+       <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+       "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+       document are to be interpreted as described in <xref target="RFC2119">RFC 2119</xref>.</t>
+     </section>
+   </section>
+
+   <section anchor="caps_reg" title="Overview">
+	    <t>ACVP has the following goals:</t>
+	    <t><list style="symbols">
+<t>	To work in situations where the testing system is remote from the cryptographic module, e.g. running as a process on a separate device.</t>
+<t>	To enable automated testing that can take place with a minimum of human interaction.</t>
+<t>	To enable the testing system to discover the capabilities of the module being tested; that is, the particular algorithms and parameters that the module supports.</t>
+<t>	To provide extensibility that can be used to introduce tests for new algorithms, and new tests for existing algorithms.</t>
+<t>	To be compatible with emerging automated validation systems wherever possible, especially the FIPS-140 Cryptographic Algorithm Validation Program.</t>
+<t>	To provide a standard communication method so that vendors can utilize the same testing service for FIPS-140, 3rd party crypto verification and product FCS readiness testing.</t>
+	   </list></t>
+
+<t>ACVP defines how to communicate a request (to execute a cryptographic operation) to a cryptographic module, and how to communicate the corresponding response (containing the output of that operation) back to a testing system.  It defines a transport (based on HTTP or HTTPS), an encoding and message format (which is negotiated), and a set of message exchanges.  Each vector test set corresponds to a single message exchange driven from the client associated with the module under test.
+ACVP does not define the cryptographic algorithms, nor does it detail the precise conditions for a response to be acceptable.  Instead, it references existing specifications for those algorithms, and defines a mapping between the data on the wire and the algorithm testing specification.
+ACVP does not define detailed conformance criteria, such as those in FIPS-140.  Instead, it aims to be independent of particular conformance criteria, so that it can be used in multiple domains with different (even potentially conflicting) conformance criteria.
+ACVP does not define an interface that can be used to manage or control a cryptographic module.</t>
+        <section title="Audience">
+	<t>This document is written to address multiple audiences:</t>
+	    <t><list style="symbols">
+<t>	Crypto module developers who require validation testing</t>
+<t>	Crypto validation organizations who will perform validation testing</t>
+<t>	Crypto module customers that desire validation testing results or verifiable artifacts of testing</t>
+	   </list></t>
+	 </section>
+
+        <section title="Goals">
+	<t>The goals for this document are to provide a messaging protocol that can be used with existing authentication and communication protocols to provide a way to test crypto modules.
+The following functions are outside the scope of this document:</t>
+	    <t><list style="symbols">
+<t>	The API to the cryptographic module</t>
+<t>	How the KATs are generated</t>
+<t>	How the results/artifacts are stored or managed</t>
+<t>	Authentication used</t>
+<t>	Scalability</t>
+<t>	Management interface</t>
+	   </list></t>
+	 <t>With that in mind there are several expectations when building a server used as a validation authority.  A validation authority shall use HTTPS, TLS 1.2 or greater and mutual authentication. Therefore a client that expects to be used with a validation authority shall have the same requirements.  A server, proxy or client developed for the purposes of internal organizational testing only may chose not to include some of those features.</t>
+	 </section>
+
+        <section title="Terminology">
+	<t> TBD </t>
+	</section>
+   </section>
+
+
+   <section title="Architecture">
+     <figure align="center" anchor="xml_figure1">
+       <preamble>Server/Client Architecture</preamble>
+
+       <artwork align="left"><![CDATA[
+
+                           +----------------------------------------+
+                           |                    +-----------------+ |
++----------+               | Entropy ---------->| DRBG----Encrypt | |
+| ACV      |               |                    |         Auth    | |
+| Server   |<=============>| +--------+         |                 | |
++----------+               | | ACV    |<------->| PKI-----Key Est | |
+                           | | Client |    ^    |         Sign    | |
+                           | +--------+    |    |                 | |
+                           |            Crypto  | Crypto Module   | |
+                           |            Module  +-----------------+ |
+                           |              API                       |
+                           |                                        |
+                           |        Device Under Test (DUT)         |
+                           +----------------------------------------+
+
+
+           ]]></artwork>
+
+     </figure>
+
+         <section title="Server/Client Architecture">
+         <t>A server client model is used where the roles are defined as:</t>
+	    <t><list style="symbols">
+<t>	ACV Client - resides in, or accessible from, the device under test and communicates with the ACV server using Java Script Object Notation (JSON) as well as the crypto module using product specific methods.</t>
+<t>	ACV Server - Sends JSON formatted messaging and KATs to the ACV client and processes KAT responses.</t>
+<t>	ACV Proxy - Resides between the ACV server and ACV client to proxy the connection for the client.  This is particularly useful when the client does not support TLS, key management or have signature capabilities and they are required by the server.  An example architecture is provided in Figure 2.</t>
+<t> Device Under Test - contains the ACV client and the crypto module under test which can include various algorithms and functions that encrypt/decrypt, generate keys, signatures, perform varifications and DRBG functions.</t>
+<t> Crpyographic Module API - This is the interface to the crypto module from the ACV Client.  This interface is environment specific and will vary depending on the API available on the crypto module.</t>
+	   </list></t> 
+	   </section>
+
+     <section title="Server/Proxy Architecture">
+     <figure align="center" anchor="xml_figure2">
+       <preamble>Server/Proxy Architecture</preamble>
+
+       <artwork align="left"><![CDATA[
+
+
+                +-----------------------------------------------------+                           
+                |                         +-------------------------+ |
++----------+    |     +----------+        |                         | |
+| ACV      |    |     | ACV      |        |                         | |
+| Server   |<========>| Proxy    |<======>| +--------+   +--------+ | |
++----------+    |     +----------+        | | ACV    |<->| Crypto | | |
+                |                         | | Client |   | Module | | |
+                |                         | +--------+   +--------+ | |
+                |                         |                         | |
+                |                         |      DUT                | |
+                |                         +-------------------------+ |
+                | Vendor/Customer Premise                             |
+                +-----------------------------------------------------+
+
+           ]]></artwork>
+
+     </figure>
+     </section>
+    </section>
+
+        <section title="ACV Protocol">
+	   <t>The ACV protocol will utilize existing mechanisms for transport coordinated with JSON formatted messaging.</t>
+    <figure align="center" anchor="xml_figure3">
+       <preamble>Protocol Layering</preamble>
+
+       <artwork align="left"><![CDATA[
++-----------------------------------------------+
+| JSON Formatted ACVP request/response messages |
++-----------------------------------------------+
+| HTTP[S] message transfer and signaling        |
++-----------------------------------------------+
+| TLS for transport security(recommended)       |
++-----------------------------------------------+
+| TCP for transport                             |
+|_______________________________________________|
+
+           ]]></artwork>
+
+     </figure>
+	<section title="HTTP URI Hierarchy">
+	<figure align="center" anchor="xml_figure4">
+
+       <artwork align="left"><![CDATA[
+
+          +---------------------------------------------+
+             server              path prefix
+          +----------------+---+---------------+-----------+
+  https://my-acvpserver.com:123/validation/acvp/register
+          +----------------+---+---------------+-----------+ 
+                            port                operation
+
+           ]]></artwork>
+         
+           </figure>
+         </section>
+
+	<section title="HTTP URI Operations">
+	<t>Operations and their corresponding operation names</t>
+
+        <texttable anchor="uri_table" title="">
+          <ttcol align="left">Operation</ttcol>
+          <ttcol align="left">Operation Path</ttcol>
+		  <ttcol align="left">HTTP Method</ttcol>
+          <ttcol align="left">Details</ttcol>
+
+	  <c>Registration and DUT Capabilities</c>
+	  <c>/register</c>
+	  <c>POST</c>
+	  <c><xref target="reg_capex" /></c>
+	  <c/><c/><c/>
+
+	  <c>Vector Set download request</c>
+	  <c>/vectors</c>
+	  <c>GET</c>
+	  <c><xref target="vector_dl" /></c>
+	  <c/><c/><c/>
+	  
+	  <c>Submit Vector Test Results</c>
+	  <c>/vectors</c>
+	  <c>POST</c>
+	  <c><xref target="vector_dl2" /></c>
+	  <c/><c/><c/>
+
+	  <c>Request Validation Results</c>
+	  <c>/results</c>
+	  <c>GET</c>
+	  <c><xref target="results_req" /></c>
+	  <c/><c/><c/>
+
+	  <c>Request server to cancel session</c>
+	  <c>/cancel</c>
+	  <c>POST</c>
+	  <c><xref target="optional_flows" /></c>
+
+        </texttable>
+	<t>The operation path is appended to the path prefix to form
+	   the URI used with HTTP GET or POST to perform the desired ACVP
+	   operation.  An example valid URI absolute path for the "/register"
+	   operation is "/validation/acvp/register".  To register a DUT
+           the ACVP client would use the following HTTP request-line:</t>
+
+	   <t>POST /validation/acvp/register HTTP/1.1</t>
+
+	   <t>Likewise, to request a specific vector set from the server the ACVP client  
+	   would use the following request-line:</t>
+
+	   <t>GET /validation/acvp/vectors?vsId=1 HTTP/1.1</t>
+
+
+       </section>
+
+     </section>
+
+       <section title="Security">
+           <t>It is recommended that HTTPS and TLS 1.2 or greater be used in order to enforce a secure communication method.  However, not all internal environments will have TLS, so HTTP with some level of authentication may be the only option.</t>
+       </section>
+
+       <section title="Authentication">
+           <t>It is recommended that an authentication scheme be used.  Depending on the target environment and usage objectives, that can be as weak as basic HTTP authentication or as strong as TLS mutual certificate authentication. Details of the authentication schemes will not be discussed here, but should be agreed upon between the client and server owning entities including the servers owned by the validation authorities. 
+For the purposes of the message flow examples, no authentication will be used.</t>
+       </section>
+
+	<section title="Traceability">
+	    <t> TBD </t>
+       </section>
+
+	<section title="Encoding">
+	    <t>The encoding used for the request/response messaging will be JSON. The data will be identified by:
+Content-type: application/json
+In order to allow environment specific extensions to a particular version of the ACV protocol, a top-level JSON keyword, extensions will be used to extend the OE description and/or the capabilities.  Extensions may be ignored by the ACV server.
+Vector and vector response data will be JSON encoded.</t>
+       </section>
+
+	<section title="Versioning">
+	    <t>The version of the ACVP protocol will be carried with each message and will contain a simple major.minor format.  Major version changes will not be backward compatible, however additions and enhancements that do not disrupt compatibility will be indicated with a minor version change.
+A server may accept a down-level version from the client if it can process at a lower level.  If not, it will reject the session.  All subsequent messages will carry the negotiated version value.</t>
+       </section>
+
+     <section title="Messaging">
+
+	<section title="Product Registration/Capabilities Exchange">
+	  <t>The product registration message will include many of the normal cryptographic algorithm identification line items that are found when filling out a testing form. This pre-test message will carry the Company name, primary contact (OE information) as well as a detailed list of the supported cryptographic algorithms to be tested during a session.  The server will return the vector test list to the client.  It will consist of a list of vector set IDs (vsId) each of which represent a set of test vectors which can be used to request the test vectors at a later time.</t>
+
+       </section>
+
+       <section title="Known Answer Test (KAT) Exchange">
+         <t>The KAT exchange consists of the ACV client requesting a particular set of vectors selected from the vector test list.  The server responds with the test vectors.  Once the client has run the vectors the response data will be returned to the server for processing.  The client will repeat this process until all of the tests in the session test list have been processed.  The client may request results from the server at any time, however if test sets have not been completed the overall status will be incomplete.</t>
+       </section>
+     </section>
+
+     <section title="Message Formats">
+
+
+       <t>Servers may require a contextual path in the URI prior to the service section and clients/proxies must be able to support it.</t>
+
+<t>Unique variable definitions to identify the vector set, device and session include:</t>
+	    <t><list style="symbols">
+<t>	Session - represented by a JSON Web Token(JWT).  Within the JWT, the JWT ID(JTI) will be a unique identifier that will be generated by the server and can be used as a session ID.</t>
+<t>	Vector Set - represented by the VS-ID which represents a specific CAVS vector request file, e.g. gcmEncryptIntIV128.req. Passed to the client as part of the capabilities exchange.</t>
+	   </list></t> 
+<t>JWT example:</t>
+     <figure align="center" anchor="xml_json1">
+       <artwork align="left"><![CDATA[
+{
+"alg" : "none"
+}
+   {
+      "iss" : "nist.org",
+      "exp" : 1426420800,
+      "company" : "MyCompany",
+      "jti" : 0987654321,
+      "pkey" : "cc74f56acdba635079383a03941d68db55c7b3c2fcd0f9716c9b62d56d3f8f546e9ec0244203b6ab4a82c08a46b1dbc243c6434861e31ab51065f41dbce00482498d4474d1ed3b09dc727af6b9c788fdb5da283c5a98cf8ac9e473f34644c6bbfc146e28f8158f725ce25bcb73e0a2c05378739d101df15a0c1297a1a2e3abc7912e24caba5465e78f694ad0d3cf48f2f01c4580d774d592684756efbdf0cc7648470dd78a3b38973b18946e71c8feaf2f28b93a2ff36b1cc31236e5845145899e8a0438aeb1073bc0d23d5c7898845d5227867a38234739595d55a44e41a39feff8eb447757fc6b246d92f02fe43b46e46c7403a5966f40ba4e01ca64e955c5"
+   }
+   {
+   Empty octet string (since alg is none).
+   }
+           ]]></artwork>
+     </figure>
+    
+<t>The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values.  Key agreement would follow RFC7518.
+</t>
+
+<t> The first four claims are required, however "pkey" is an optional private claim used to pass the key used for encrypting the database at the server.  Enabling this option is discussed further in <xref target="reg_capex"/></t>
+
+     <section title="Establish Connection HTTPS GET/200 OK">
+<t>Establish the connection, send POST and receive 200 OK response with JWT from server.</t>
+
+     <figure align="center" anchor="xml_json2">
+       <artwork align="left"><![CDATA[
+POST /validation/acvp/register HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Capabilities information(see next section)
+
+..authentication happens here..
+
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: (length of JWT)
+{
+"accessToken" : 
+"eyJhbGciOiJIUzI1NiIsI.eyJpc3MiOiJodHRwczotcGxlL.mFrs3Zo8eaSNcxiNfvRh9dqKP4F1cB",
+}
+
+Once the session is established the client must include the JWT with 
+each message.
+
+           ]]></artwork>
+     </figure>
+
+<t>The authentication mechanism will be defined by the server.</t>
+ 
+
+
+     </section>
+
+
+     <section anchor="reg_capex" title="Product Registration with Capabilities">
+     <t>POST the registration to the server consisting of the ACVP version, Operating Environment (OE), vector encoding, capabilities and any extensions. In addition there are a few parameters that specify session specific information:</t>
+
+     <t><list style="symbols">
+
+     <t>certificateRequest - If an algorithm certificate is not desired for this registration populate the field "certificateRequest"  with "no", otherwise "yes".</t> 
+     <t>debugRequest - If this vector session is for the purposes of testing the client or DUT prior to a certificate request and desires the answers to the vectors as well, indicate with "yes", otherwise omit the keyword or indicate with "no"</t>
+     <t>production - If this is a production environment indicate so with "yes", otherwise omit this keyword or indicate with "no".  A production environment may not be able to support intermediate value tests and therefore those tests will be excluded.</t>
+     <t>encryptAtRest - The client may request the server to encrypt all data at rest by registering "encryptAtRest" with "yes". Omitting the "encryptAtRest" field or registering with "no" will indicate to the server that no encryption is require for the data at rest.</t>
+	   </list></t> 
+
+<t>Note that when a certificate request is made production and debugRequest shall be omitted or set to "no". Conversely if no certificate is requested, the operationalEnvironment section may be omitted.</t>
+
+
+
+     <figure align="center" anchor="xml_json3">
+       <artwork align="left"><![CDATA[
+
+POST /validation/acvp/register HTTP1.1
+User Agent:
+Host: www.my-acvpserver.com
+Accept: 
+{
+"operation" : "register",
+"acvVersion" : "0.2",
+"certificateRequest" : "yes",
+"debugRequest" : "no",
+"production" : "no",
+"encryptAtRest" : "yes",
+"oeInformation" : {
+"vendorName" : "Cisco",
+"vendorURL" : "www.cisco.com",
+"contact" : "John Doe",
+"contactEmail" : "johndoe@cisco.com",
+"moduleName" : "Cisco ACV Test Module 1.0",
+"moduleType" : "Software",
+"operationalEnvironment" : {
+"moduleVersion" : "1.0",
+"processor" : "Intel Woodcrest",
+"operatingSystem" : "Linux 3.1"
+     {
+     "implementationDescription" : 
+          "Sample crypto module for demonstrating ACV protocol."
+     },
+                            },
+                   },
+"capabilityExchange" : {
+"algorithms" : [
+         {
+"algorithm" : "AES-GCM",
+"direction" : "encrypt,decrypt",
+"ivGen" : "internal",
+"ivGenMode" : "8.2.1",
+"keyLen" : [
+            128,
+            256
+             ],
+"tagLen" : [
+            96
+               ],
+"ivLen" : [
+            96
+               ],
+"ptLen" : [
+            0,
+            128,
+            136
+               ],
+"aadLen" : [
+            128,
+            136
+               ]
+          }
+       ]
+   }
+}
+           ]]></artwork>
+     </figure>
+
+<t>Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.</t>
+
+     <figure align="center" anchor="xml_json4">
+       <artwork align="left"><![CDATA[
+200 OK Response:
+{ 
+"version" : "0.2", 
+"capabilityResponse" : { "vectorSets" : [
+                       {"vsId":1437},
+                       {"vsId":1438}] } , 
+"testSession" :       {"testId":458} , 
+"accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ" 
+}
+           ]]></artwork>
+     </figure>
+
+
+	</section>
+
+     <section anchor="vector_dl" title="Vector Set Download Request">
+	 <t>
+	     After registration, the server provides a list of vector sets to the client, each identified
+	     by a VS-ID.  The client shall download, process, and upload test results for each vector set, one at a time. Note that the client shall upload 
+	     complete test results for each processed vector set, i.e. containing a result for every test case in the vector set.
+	 </t>
+	 <figure align="center" anchor="xml_json5">
+	    <artwork align="left"><![CDATA[
+GET /validation/acvp/vectors?vsId=1437  HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Authorization: Bearer JWT
+            ]]></artwork>
+	 </figure>
+
+	 <t>The server will respond with the vector set associated with the vsId for the client to process.  The actual test group content contained in the response will vary depending on the specific sub-specification of the algorithm type being tested.</t>
+
+
+
+
+	 <figure align="center" anchor="xml_json6">
+	    <artwork align="left"><![CDATA[
+
+200 OK Response:
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+  "acv_version": "0.2",
+  "vs_id": 1437,
+  "algorithm": "AES-GCM",
+  "direction": "encrypt",
+  "test_groups": [
+    {
+      "keyLen": 128,
+      "ivLen": 96,
+      "ptLen": 0,
+      "aadLen": 128,
+      "tagLen": 128,
+      "tests": [
+        {
+          "tcId": 12340,
+          "key": "30BA1DBCB530347A148FB286D9A59757",
+          "pt": "",
+          "aad": "6CA553A59DFBD8F7E0DA619470F8986C"
+        },
+        {
+          "tcId": 12341,
+          "key": "AB7BB9349285B3E7403E99FED8B5060E",
+          "pt": "",
+          "aad": "79504FF995F70FFD328D7070CCBD62F1"
+        }.....
+
+	<With debugRequest set iv, ct and tag would be included>
+
+            ]]></artwork>
+	 </figure>
+
+
+	 <t>
+	     If the server did not have enough time to generate the vector set for a given test session, 
+	     the server may reply:
+	 </t>
+	<figure align="center" anchor="xml_json7">
+	    <artwork align="left"><![CDATA[
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+"vs_id": 1437,
+"version" : 0.2,
+"retry" : 10
+}
+           ]]></artwork>
+	</figure>
+	<t>
+	    Where the retry value represents the number of seconds for the client to wait before retrying the request.
+	    The server may set the retry value based on the current server load and expected processing time to
+	    generate the vector set.
+	</t>
+     </section>
+
+	<section anchor="vector_dl2" title="Submit Test Results">
+	 <t>The client will send this request to submit the test results for an individual vector set.</t>
+
+     <figure align="center" anchor="xml_json8">
+       <artwork align="left"><![CDATA[
+   POST /validation/acvp/vectors?vs_id=1437 HTTP1.1
+   User Agent: acvp-client/0.2
+   Host: www.my-acvpserver.com
+   Authorization: Bearer JWT
+   Accept:   
+   {
+   "acvVersion": "0.2",
+   "vsId": 1437,
+   "testResults": [
+   {
+   "tcId": 12340,
+   "iv": "01020304C077A707E56C22AC",
+   "ct": "",
+   "tag": "53B15E85E377F8B5B6BFC2DE915FD622"
+   },
+   {
+   "tcId": 12341,
+   "iv": "01020304D666587803BCBAD7",
+   "ct": "",
+   "tag": "E7B1F2D77D82C6EB3C9CEFF16C376D9C"
+   }, …..
+           ]]></artwork>
+     </figure>
+      </section>
+	 
+     <section anchor="results_req" title="Validation Results Request">
+	 <t>The client will send this request to learn the results for an individual vector set.</t>
+
+     <figure align="center" anchor="xml_json9">
+       <artwork align="left"><![CDATA[
+GET /validation/acvp/results?vsId=1437 HTTP1.1
+User Agent:
+Host: www.my-acvpserver.com
+Accept: /
+
+
+Response to GET is:
+
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+"version" : "0.2",
+"results" : {
+    "vsId" : 1437,
+    "disposition" : "incomplete",
+    "tests" : [
+            { "tcId" : 12340, "result" : "passed", "reason" : ""},
+            { "tcId" : 12341, "result" : "incomplete", "reason" : ""},
+            { "tcId" : 12342, "result" : "failed", "reason" : "Authentication tag mismatch"}
+              ]
+   }
+} 
+           ]]></artwork>
+     </figure>
+
+<t>The results request is an optional flow since some clients may not require success/fail information. Another possibility is to provide an out of band management session on the server may provide access to algorithm test results.</t>
+
+<t>Disposition is defined overall for the entire vector set as:</t>
+	    <t><list style="symbols">
+<t>FAIL indicates at least one test case has failed.</t>
+<t>UNRECEIVED indicates the server has not received responses from the client for all the test cases.</t>
+<t>INCOMPLETE indicates not all tests have been processed by the server, however none have failed thus far.</t>
+<t>EXPIRED indicates not all the test case responses were received from the client prior to expiry.</t>
+<t>PASSED indicates all test cases have been processed by the server and have passed.</t>
+
+	   </list></t> 
+<t>Result is defined for individual test cases:</t>
+	    <t><list style="symbols">
+<t>FAIL indicates the test case has failed.</t>
+<t>UNRECEIVED indicates the server has not received a response from the client for the test case.</t>
+<t>INCOMPLETE indicates the server has not processed the test case.</t>
+<t>EXPIRED indicates the client did not send the test case response to the server prior to expiry.</t>
+<t>PASSED indicates the test case passed.</t>
+<t>REASON provides additional detail for the test result.</t>
+	   </list></t> 
+      </section>
+
+     <section anchor="optional_flows" title="Optional Flows">
+<t>The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</t>
+     <figure align="center" anchor="xml_json10">
+       <artwork align="left"><![CDATA[
+POST /validation/acvp/cancel HTTP1.1
+User Agent: acvp-client/0.2
+Host: www.my-acvpserver.com
+Authorization: Bearer JWT
+           ]]></artwork>
+     </figure>
+<t>The server response will always be 200 OK.</t>
+      </section>
+    </section>
+
+
+
+   <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+
+   <?rfc needLines="8" ?>
+
+   <section title="Vector Set Expiration">
+       <t>
+	   Vector sets can expire.  For example, in terms of a validation authority use, the vector sets are one-time 
+	   use only.  Old vector sets can never be reused to obtain a new validation certificate for an algorithm
+	   implementation or to update an existing certificate. Expiration is a server specific definition which depends
+	   on database costs, need for artifacts, etc. If the vector set has expired, the server will reply with an
+	   expired response when the client attempts to download the vector set:
+       </t>
+	<figure align="center" anchor="xml_json11">
+	<artwork align="left"><![CDATA[
+HTTP 1.1 200 OK
+Status: 200 OK
+Content-Type: application/json
+Content-Length: <length of results>
+{
+"version" : "0.2",
+"vsId" : <vs-id>,
+"status" : "expired"
+}
+           ]]></artwork>
+	</figure>
+
+       <t>The ACVP protocol requires server implementations to generate KAT values and retain the data while the ACVP
+	   client processes and returns the results.  Some crypto modules implementing the client-side ACVP protocol may
+	   not return results immediately.  The ACVP protocol design implies the server must retain the KAT values to
+	   verify the client KAT responses at some time in the future.  However, some KAT vector sets are fairly large,
+	   which could place significant storage requirements on ACVP server implementations.  To alleviate long term
+	   storage requirements, ACVP allows for an expiration timestamp to be set when a KAT vector set is generated
+	   by the server. 
+       </t>
+       <t>The vector set expiration timestamp must be included by the server in the vector set when the client downloads
+	   the vector set.  The server may change the expiration timestamp of a previously issued vector set to  
+	   extend its lifetime subject to server policy.  The expiration timestamp must be in the 'expiry' 
+	   JSON value, which is included in the JSON encoded vector set.  The expiry JSON value will be a string 
+	   value of the UTC timestamp using form "YYYY-MM-DD HH:MM:SS".  The following figure shows a partial JSON 
+	   encoded vector set that contains the expiry value.
+       </t>
+
+       <figure align="center" anchor="xml_json12">
+            <artwork><![CDATA[
+                {
+                  "acvVersion": "0.2",
+				  "vsId": 1437,
+				  "expiry": "2018-12-31 23:59:59",
+                  "algorithm": "AES-GCM",
+                  "direction": "encrypt",
+                  "testGroups": [
+                    {
+                      "keyLen": 128,
+                      "ivLen": 96,
+                      "ptLen": 0,
+                      "aadLen": 128,
+                      "tagLen": 128,
+                      "tests": [
+                        {
+                          "tcId": 12340,
+                          "key": "1529BAC6229586F057FAA59353851686",
+                          "pt": "",
+                          "aad": "4B11160620475D8EE440C3795CF62D26"
+                        },
+			.
+			.
+			.
+						<remainder of vector set omitted from figure>
+			.
+			.
+			.
+
+	    ]]></artwork>
+	</figure>
+	<section title="Resending Test Responses">
+	    <t>
+		When one or more test cases fails, the client will need to correct the issue in the crypto module
+		and send the responses again.  The resending of responses for failed test cases will occur for
+		an entire vector set.  Therefore, even if only a single test case in the vector set failed, the client
+		will need to download, process, and upload responses to the server for the entire vector set
+		(presumably after the problem has been corrected in the DUT).  The resending of vector set
+		responses must occur prior to expiry.
+	    </t>
+	</section>
+   </section>
+
+   <section title="Error Codes">
+   <t>Errors will follow HTTP[S] numbering scheme.  In addition errors as well as 200 messages may carry JSON encoded information that describes in detail the error and any associated troubleshooting information.  A non-exhaustive list of JSON encoded error messages are in Appendix B.</t>
+   </section>
+
+   <section title="Other Considerations">
+   <t>When an ACVP client is attached to a cryptographic module that is in use, access to ACVP MUST be controlled so that only an administrator or other authorized user can send and receive ACVP messages.  This is because an attacker that has access to ACVP can potentially use it to probe for weaknesses in the cryptographic module.</t>
+   </section>
+
+   <section anchor="Acknowledgements" title="Acknowledgements">
+     <t>Original ACVP created by David McGrew, Bill Hudson and 
+        Anthony Grieco of Cisco Systems.</t>
+   </section>
+
+   <!-- Possibly a 'Contributors' section ... -->
+
+   <section anchor="IANA" title="IANA Considerations">
+     <t>This memo includes no request to IANA.</t>
+   </section>
+
+ </middle>
+
+ <!--  *****BACK MATTER ***** -->
+
+ <back>
+   <!-- References split into informative and normative -->
+
+   <!-- There are 2 ways to insert reference entries from the citation libraries:
+    1. define an ENTITY at the top, and use "ampersand character"RFC2629; here (as shown)
+    2. simply use a PI "less than character"?rfc include="reference.RFC.2119.xml"?> here
+       (for I-Ds: include="reference.I-D.narten-iana-considerations-rfc2434bis.xml")
+
+    Both are cited textually in the same manner: by using xref elements.
+    If you use the PI option, xml2rfc will, by default, try to find included files in the same
+    directory as the including file. You can also define the XML_LIBRARY environment variable
+    with a value containing a set of directories to search.  These can be either in the local
+    filing system or remote ones accessed by http (http://domain/dir/... ).-->
+
+   <references title="Normative References">
+     <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+     &RFC2119;
+
+   </references>
+
+    <section anchor="app-reg-ex" title="JSON Formatting Guidelines">
+      <t>All JSON keywords shall use lower camelCase format with no underscores or hyphens
+and use the following characters only a-z, A-Z, 0-9. Keywords shall abbreviate common words and
+phrases wherever possible for brevity.</t>
+
+<t>For example:
+
+password length - pwLen
+plain text length - ptLen
+</t>
+
+<t>Keywords should be chosen such that they are informative and brief, for example:
+</t>
+
+<t>
+{
+"acvVersion" : "0.2",
+"results" : {
+"disposition" : "incomplete",
+} 
+</t>
+<t>Metadata assigned to the keyword may use any format which best reflects the
+information being represented including hyphens, underscores alternating
+case, numbers, etc. However, brevity should be a major consideration, for example:</t>
+<t>
+"algorithms" : [
+         {
+              "algorithm" : "AES-GCM",
+              "mode" : "modes",
+              "ivGen" : "internal",
+              "ivGenMode" : "8.2.1",
+         }
+
+All metadata representing strings or big numbers shall use double quotes at both ends. 
+Big numbers require conversion from strings to whatever format is used by the DUT.
+Numerical values of integer size or with decimal points may use quotations if those
+values are generally used as a string, for example the acvVersion would generally be
+used in displaying information not in any mathematical operations.  Something like
+keyLen or ptLen values would be better used without quotes to avoid having to convert the
+string to an integer for use in the code.
+
+</t>
+
+</section>
+
+<section anchor="app-reg-ex2" title="JSON Encoded Error Messages">
+      <t> TBD </t>
+
+</section>	  
+	  
+   <!-- Change Log
+
+v00 2006-03-15  EBD   Initial version
+
+v01 2006-04-03  EBD   Moved PI location back to position 1 -
+                     v3.1 of XMLmind is better with them at this location.
+v02 2007-03-07  AH    removed extraneous nested_list attribute,
+                     other minor corrections
+v03 2007-03-09  EBD   Added comments on null IANA sections and fixed heading capitalization.
+                     Modified comments around figure to reflect non-implementation of
+                     figure indent control.  Put in reference using anchor="DOMINATION".
+                     Fixed up the date specification comments to reflect current truth.
+v04 2007-03-09 AH     Major changes: shortened discussion of PIs,
+                     added discussion of rfc include.
+v05 2007-03-10 EBD    Added preamble to C program example to tell about ABNF and alternative 
+                     images. Removed meta-characters from comments (causes problems).
+
+v06 2010-04-01 TT     Changed ipr attribute values to latest ones. Changed date to
+                     year only, to be consistent with the comments. Updated the 
+                     IANA guidelines reference from the I-D to the finished RFC.  -->
+ </back>
+</rfc>
