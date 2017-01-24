@@ -234,7 +234,7 @@ The following functions are outside the scope of this document:</t>
 +-----------------------------------------------+
 | HTTP[S] message transfer and signaling        |
 +-----------------------------------------------+
-| TLS for transport security(optional)          |
+| TLS for transport security(recommended)       |
 +-----------------------------------------------+
 | TCP for transport                             |
 |_______________________________________________|
@@ -265,25 +265,36 @@ The following functions are outside the scope of this document:</t>
         <texttable anchor="uri_table" title="">
           <ttcol align="left">Operation</ttcol>
           <ttcol align="left">Operation Path</ttcol>
+	  <ttcol align="left">HTTP Method</ttcol>	
           <ttcol align="left">Details</ttcol>
 
 	  <c>Registration and DUT Capabilities</c>
 	  <c>/register</c>
+	  <c>POST</c>	
 	  <c><xref target="reg_capex" /></c>
 	  <c/><c/><c/>
 
-	  <c>Vector set download request</c>
+	  <c>Vector Set download request</c>
 	  <c>/vectors</c>
+	  <c>GET</c>
 	  <c><xref target="vector_dl" /></c>
 	  <c/><c/><c/>
-
-	  <c>Request results from Server</c>
+		
+	  <c>Submit Vector Test Results</c>
+	  <c>/vectors</c>
+	  <c>POST</c>
+	  <c><xref target="vector_dl2" /></c>
+	  <c/><c/><c/>
+	  	
+	  <c>Request Validation Results</c>
 	  <c>/results</c>
+	  <c>GET</c>	
 	  <c><xref target="results_req" /></c>
 	  <c/><c/><c/>
 
 	  <c>Request server to cancel session</c>
 	  <c>/cancel</c>
+	  <c>POST</c>	
 	  <c><xref target="optional_flows" /></c>
 
         </texttable>
@@ -306,16 +317,16 @@ The following functions are outside the scope of this document:</t>
      </section>
 
        <section title="Security">
-           <t>It is recommended that HTTPS is used in order to enforce a secure communication method.  Not all environments will have TLS so HTTP with some level of authentication may be the only option.</t>
+           <t>It is recommended that HTTPS and TLS 1.2 or greater be used in order to enforce a secure communication method.  Not all environments will have TLS so HTTP with some level of authentication may be the only option.</t>
        </section>
 
        <section title="Authentication">
-           <t>It is recommended that an authentication scheme be used.  Depending on the target environment that can be as weak as basic HTTP authentication or as strong as TLS mutual certificate authentication. Definition of an authentication scheme will not be discussed here, but should be agreed upon between the client and server owning entities including the servers owned by the validation authorities. 
+           <t>It is recommended that an authentication scheme be used.  Depending on the target environment and usage objectives, that can be as weak as basic HTTP authentication or as strong as TLS mutual certificate authentication. Definition of an authentication scheme will not be discussed here, but should be agreed upon between the client and server owning entities including the servers owned by the validation authorities. 
 For the purposes of the message flow examples, no authentication will be used.</t>
        </section>
 
 	<section title="Traceability">
-	    <t> TBD</t>
+	    <t> TBD </t>
        </section>
 
 	<section title="Encoding">
@@ -337,7 +348,7 @@ A server may accept a down-level version from the client if it can process at a 
 
        </section>
 
-       <section title="KAT Exchange">
+       <section title="Known Answer Test (KAT) Exchange">
          <t>The KAT exchange consists of the ACV client requesting a particular set of vectors selected from the vector test list.  The server responds with the test vectors.  Once the client has run the vectors the response data will be returned to the server for processing.  The client will repeat this process until all of the tests in the session test list have been processed.  The client may request results from the server at any time, however if test sets have not been completed the overall status will be incomplete.</t>
        </section>
      </section>
@@ -416,12 +427,12 @@ each message.
      <t><list style="symbols">
 
      <t>certificateRequest - If an algorithm certificate is not desired for this registration populate the field "certificateRequest"  with "no", otherwise "yes".</t> 
-     <t>responseRequest - If this vector session is for the purposes of testing the client or DUT prior to a certificate request and desires the responses to the vectors as well, indicate with "yes", otherwise omit the keyword or indicate with "no"</t>
+     <t>debugRequest - If this vector session is for the purposes of testing the client or DUT prior to a certificate request and desires the answers to the vectors as well, indicate with "yes", otherwise omit the keyword or indicate with "no"</t>
      <t>production - If this is a production environment indicate so with "yes", otherwise omit this keyword or indicate with "no".  A production environment may not be able to support intermediate value tests and therefore those tests will be excluded.</t>
      <t>encryptAtRest - The client may request the server to encrypt all data at rest by registering "encryptAtRest" with "yes". Omitting the "encryptAtRest" field or registering with "no" will indicate to the server that no encryption is require for the data at rest.</t>
 	   </list></t> 
 
-<t>Note that when a certificate request is made production and responseRequest shall be omitted or set to "no". Conversely if no certificate is requested, the operationalEnvironment section may be omitted.</t>
+<t>Note that when a certificate request is made, production and debugRequest shall be omitted or set to "no". Conversely if no certificate is requested, the operationalEnvironment section may be omitted.</t>
 
 
 
@@ -436,7 +447,7 @@ Accept:
 "operation" : "register",
 "acvVersion" : "0.2",
 "certificateRequest" : "yes",
-"responseRequest" : "no",
+"debugRequest" : "no",
 "production" : "no",
 "encryptAtRest" : "yes",
 "oeInformation" : {
@@ -523,7 +534,7 @@ Authorization: Bearer JWT
             ]]></artwork>
 	 </figure>
 
-	 <t>The server will respond with the vector set associated with the vsId for the client to process</t>
+	 <t>The server will respond with the vector set associated with the vsId for the client to process.  The actual test group content contained in the response will vary depending on the specific sub-specification of the algorithm type being tested.</t>
 
 
 
@@ -561,7 +572,7 @@ Content-Length: <length of results>
           "aad": "79504FF995F70FFD328D7070CCBD62F1"
         }.....
 
-	<With requestResponse set iv, ct and tag would be included>
+	<With debugRequest set iv, ct and tag would be included>
 
             ]]></artwork>
 	 </figure>
@@ -591,10 +602,40 @@ Content-Length: <length of results>
 	</t>
      </section>
 
-     <section anchor="results_req" title="Test Results Request">
-	 <t>The client will send this request to learn the results for an individual vector set.</t>
+    <section anchor="vector_dl2" title="Submit Test Results">
+	 <t>The client will send this request to submit the test results for an individual vector set.</t>
 
      <figure align="center" anchor="xml_json8">
+       <artwork align="left"><![CDATA[
+   POST /validation/acvp/vectors?vs_id=1437 HTTP1.1
+   User Agent: acvp-client/0.2
+   Host: www.my-acvpserver.com
+   Authorization: Bearer JWT
+   Accept:   
+   {
+   "acvVersion": "0.2",
+   "vsId": 1437,
+   "testResults": [
+   {
+   "tcId": 12340,
+   "iv": "01020304C077A707E56C22AC",
+   "ct": "",
+   "tag": "53B15E85E377F8B5B6BFC2DE915FD622"
+   },
+   {
+   "tcId": 12341,
+   "iv": "01020304D666587803BCBAD7",
+   "ct": "",
+   "tag": "E7B1F2D77D82C6EB3C9CEFF16C376D9C"
+   }, …..
+           ]]></artwork>
+     </figure>
+      </section>
+	      
+     <section anchor="results_req" title="Validation Results Request">
+	 <t>The client will send this request to learn the validation results for an individual vector set.</t>
+
+     <figure align="center" anchor="xml_json9">
        <artwork align="left"><![CDATA[
 GET /validation/acvp/results?vsId=1437 HTTP1.1
 User Agent:
@@ -647,7 +688,7 @@ Content-Length: <length of results>
 
      <section anchor="optional_flows" title="Optional Flows">
 <t>The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</t>
-     <figure align="center" anchor="xml_json9">
+     <figure align="center" anchor="xml_json10">
        <artwork align="left"><![CDATA[
 POST /validation/acvp/cancel HTTP1.1
 User Agent: acvp-client/0.2
@@ -673,7 +714,7 @@ Authorization: Bearer JWT
 	   on database costs, need for artifacts, etc. If the vector set has expired, the server will reply with an
 	   expired response when the client attempts to download the vector set:
        </t>
-	<figure align="center" anchor="xml_json10">
+	<figure align="center" anchor="xml_json11">
 	<artwork align="left"><![CDATA[
 HTTP 1.1 200 OK
 Status: 200 OK
@@ -696,14 +737,14 @@ Content-Length: <length of results>
 	   by the server. 
        </t>
        <t>The vector set expiration timestamp must be included by the server in the vector set when the client downloads
-	   the vector set.  The server may change the expiration timestamp of a previously issued vector set to either 
-	   extend or shorten its lifetime subject to server policy.  The expiration timestamp must be in the 'expiry' 
+	   the vector set.  The server may change the expiration timestamp of a previously issued vector set to  
+	   extend its lifetime subject to server policy.  The expiration timestamp must be in the 'expiry' 
 	   JSON value, which is included in the JSON encoded vector set.  The expiry JSON value will be a string 
 	   value of the UTC timestamp using form "YYYY-MM-DD HH:MM:SS".  The following figure shows a partial JSON 
 	   encoded vector set that contains the expiry value.
        </t>
 
-       <figure>
+       <figure align="center" anchor="xml_json12">
             <artwork><![CDATA[
                 {
                   "acvVersion": "0.2",
@@ -735,7 +776,7 @@ Content-Length: <length of results>
 
 	    ]]></artwork>
 	</figure>
-	<section title="Resending test responses">
+	<section title="Resending Test Responses">
 	    <t>
 		When one or more test cases fails, the client will need to correct the issue in the crypto module
 		and send the responses again.  The resending of responses for failed test cases will occur for
@@ -748,7 +789,7 @@ Content-Length: <length of results>
    </section>
 
    <section title="Error Codes">
-   <t>Errors will follow HTTP[S] numbering scheme.  In addition errors as well as 200 messages may carry JSON encoded information that describes in detail the error and any associated troubleshooting information.  A non-exhaustive list of JSON encoded error messages are in Appendix 2.</t>
+   <t>Errors will follow HTTP[S] numbering scheme.  In addition errors as well as 200 messages may carry JSON encoded information that describes in detail the error and any associated troubleshooting information.  A non-exhaustive list of JSON encoded error messages are in Appendix B.</t>
    </section>
 
    <section title="Other Considerations">
@@ -835,6 +876,11 @@ string to an integer for use in the code.
 
 </section>
 
+<section anchor="app-reg-ex2" title="JSON Encoded Error Messages">
+      <t> TBD </t>
+
+</section>	  
+	  	 
    <!-- Change Log
 
 v00 2006-03-15  EBD   Initial version
