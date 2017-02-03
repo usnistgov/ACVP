@@ -387,15 +387,15 @@
 		groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
 	        in the vector set.  For instance, all test vectors that use the same key size would be grouped
 	        together.  The Test Group JSON object contains meta data that applies to all test vectors within
-	        the group.  The following table describes the secure hash JSON elements of the Test Group JSON object.</t>
+	        the group.  The following table describes the secure hash and CMAC JSON elements of the Test Group JSON object.</t>
 	    <texttable anchor="vs_tg_table" title="Test Group JSON Object">
 		<ttcol align="left">JSON Value</ttcol>
 		<ttcol align="left">Description</ttcol>
 		<ttcol align="left">JSON type</ttcol>
 		<ttcol align="left">Optional</ttcol>
 
-		<c>type</c>
-		<c>Type of test: short, long or MonteCarlo</c>
+		<c>testType</c>
+		<c>Test category type (KAT or MCT for SHA. ver or gen for CMAC)</c>
 		<c>value</c>
 		<c>No</c>
 		<c/><c/><c/><c/>
@@ -584,6 +584,66 @@
       </reference>
     </references>
 
+    <references title="Informative References">
+      <reference anchor="SHAVS">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>The Secure Hash Algorithm Validation System (SHAVS)</title>
+
+          <author initials="LEB" surname="Lawrence E. Bassham III">
+            <organization>NIST</organization>
+          </author>
+
+          <date year="2014" />
+        </front>
+      </reference>
+
+      <reference anchor="SHA3VS">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>The Secure Hash Algorithm 3 Validation System (SHA3VS)</title>
+
+          <author initials="LEB" surname="Lawrence E. Bassham III">
+            <organization>NIST</organization>
+          </author>
+
+          <date year="2016" />
+        </front>
+      </reference>
+
+      <reference anchor="HMACVS">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>The Keyed-Hash Message Authentication Code Validation System (HMACVS)</title>
+
+          <author initials="LEB" surname="Lawrence E. Bassham III">
+            <organization>NIST</organization>
+          </author>
+
+          <date year="2016" />
+        </front>
+      </reference>
+
+      <reference anchor="CMACVS">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+        <front>
+          <title>The CMAC Validation System (CMACVS)</title>
+
+          <author initials="SSK" surname="Sharon S. Keller">
+            <organization>NIST</organization>
+          </author>
+
+          <date year="2011" />
+        </front>
+      </reference>
+
+    </references>
+
+
     <section anchor="app-reg-ex" title="Example Secure Hash Capabilities JSON Object">
       <t>The following is a example JSON object advertising support for SHA-256.</t>
       <figure>
@@ -638,7 +698,7 @@
                   "algorithm": "SHA-256",
                   "testGroups": [
                     {
-                      "type": "long",
+                      "testType": "KAT",
                       "tests": [
                         {
                           "tcId": 2170,
@@ -656,6 +716,31 @@
                 }
             ]]></artwork>
     </figure>
+
+      <t>The following is a example JSON object for secure hash Monte Carlo test vectors sent from the ACVP server to the crypto module.</t>
+      <figure>
+        <artwork><![CDATA[
+                {
+                  "acvVersion": "0.2",
+                  "vsId": 1564,
+                  "algorithm": "SHA-1",
+                  "testGroups": [
+                    {
+                      "testType": "MCT",
+                      "tests": [
+                        {
+                          "tcId": 2175,
+                          "len": 20,
+                          "seed": "331b04d56f6e3ed5af349bf1fd9f9591b6ec886e",
+                        },
+                      ]
+                    }
+                  ]
+                }
+            ]]></artwork>
+    </figure>
+
+
       <t>The following is a example JSON object for HMAC test vectors sent from the ACVP server to the crypto module.</t>
       <figure>
         <artwork><![CDATA[
@@ -694,7 +779,7 @@
                   "algorithm": "CMAC-TDES",
                   "testGroups": [
                     {
-                      "type": "gen",
+                      "testType": "gen",
                       "tests": [
                         {
                           "tcId": 2175,
@@ -742,6 +827,35 @@
 
             ]]></artwork>
     </figure>
+
+
+      <t>The following is a example JSON object for secure hash MCT test results sent from the crypto module to the ACVP server. Reduced to 2 iterations for brevity.</t>
+      <figure>
+        <artwork><![CDATA[
+                {
+                    "acvVersion": "0.2",
+                    "vsId": 1564,
+                    "testResults": [
+                        {
+                            "tcId": 2175,
+			    "resultsArray": [
+			      {
+			        "count" : 0,
+				"md": "23d1f8655a7c9c2bc3bb56868483611e67cb1b3a"
+			      },
+			      {
+			        "count" : 1,
+				"md" : "d3d672efb8e569dc7a37c991a9fc51282412196f"
+			      }
+			   ]
+                        }
+                    ]
+                }
+
+            ]]></artwork>
+    </figure>
+
+
       <t>The following is a example JSON object for HMAC test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
