@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+]>
+<?xml-stylesheet type='text/css' href='rfc7749.css' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-ietf-acvp-subhashmac-00" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  	<front>
+	    <!-- The abbreviated title is used in the page header - it is only necessary if the
+	         full title is longer than 39 characters -->
+
+	    <title abbrev="Sym Alg JSON">ACVP Hash Message Authentication Code (HMAC) Algorithm JSON Specification</title>
+
+	    <!-- add 'role="editor"' below for the editors if appropriate -->
+
+	    <!-- Another author who claims to be an editor -->
+
+	    <author fullname="Barry Fussell" initials="B.F." role="editor"
+	            surname="Fussell">
+	      	<organization>Cisco Systems, Inc.</organization>
+
+	      	<address>
+	        	<postal>
+	          		<street>170 West Tasman Dr.</street>
+
+	          		<!-- Reorder these if your country does things differently -->
+
+	          		<city>San Jose</city>
+			        <region>CA</region>
+	          		<code>95134</code>
+	          		<country>USA</country>
+	        	</postal>
+
+	        	<email>bfussell@cisco.com</email>
+
+	        	<!-- uri and facsimile elements may also be added -->
+	      	</address>
+	    </author>
+
+	    <date month="June" year="2016" />
+
+	    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+	         in the current day for you. If only the current year is specified, xml2rfc will fill
+		 in the current day and month for you. If the year is not the current one, it is
+		 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+		 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+		 specify just the year. -->
+
+	    <!-- Meta-data Declarations -->
+
+	    <area>General</area>
+
+	    <workgroup>TBD</workgroup>
+
+	    <!-- WG name at the upperleft corner of the doc,
+	         IETF is fine for individual submissions.
+		 If this element is not present, the default is "Network Working Group",
+	         which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+	    <keyword>acvp</keyword>
+	    <keyword>crypto</keyword>
+
+	    <!-- Keywords will be incorporated into HTML output
+	         files in a meta tag but they have no effect on text or nroff
+	         output. If you submit your draft to the RFC Editor, the
+	         keywords will be used for the search engine. -->
+
+	    <abstract>
+	      	<t>This document defines the JSON schema for using hash and MAC algorithms with the ACVP specification.</t>
+	    </abstract>
+  	</front>
+
+  	<middle>
+	    <section title="Introduction">
+	      	<t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically
+	      		verify the cryptographic implementation of a software or hardware crypto module.
+	            The ACVP specification defines how a crypto module communicates with an ACVP	              
+	            server, including crypto capabilities negotiation, session management, authentication,
+		        vector processing and more.  The ACVP specification does not define algorithm specific
+		      	JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications
+		      	define the constructs for testing individual crypto algorithms.  Each sub-specification
+		      	addresses a specific class of crypto algorithms.  This sub-specification defines the JSON
+		      	constructs for testing hash and MAC crypto algorithms using ACVP.</t>
+
+	    	<section title="Requirements Language">
+	        	<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+	        	"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+				document are to be interpreted in <xref target="RFC2119">RFC 2119</xref>.</t>
+	    	</section>
+	 	</section>
+
+		<section anchor="caps_reg" title="Capabilities Registration">
+		    <t>ACVP requires crypto modules to register their capabilities.  This allows the crypto
+			module to advertise support for specific algorithms, notifying the ACVP server which
+			algorithms need test vectors generated for the validation process.  This section
+		    describes the constructs for advertising support of hash algorithms to the ACVP server.</t>
+
+		    <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms'
+			value of the ACVP registration message.  The 'algorithms' value is an array, where each
+			array element is an individual JSON object defined in this section.  The 'algorithms'
+			value is part of the 'capability_exchange' element of the ACVP JSON registration message.
+			See the ACVP specification for details on the registration message.
+
+			Each algorithm capability advertised is a self-contained JSON object.  The following
+			JSON values are used for hash algorithm capabilities:</t>
+
+			<section anchor="prereq_algs" title="Required Prerequisite Algorithms for MAC Validations">
+			    <t>Each MAC implementation relies on other cryptographic primitives.
+			    For example, CMAC uses an underlying SHA algorithm. Each of these underlying algorithm primitives 
+			    must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
+			    <texttable anchor="rereqs_table" title="Required MAC Prerequisite Algorithms JSON Values">
+		        	<ttcol align="left">JSON Value</ttcol>
+		          	<ttcol align="left">Description</ttcol>
+		          	<ttcol align="left">JSON type</ttcol>
+		          	<ttcol align="left">Valid Values</ttcol>
+		          	<ttcol align="left">Optional</ttcol>
+		          
+		          	<c>algorithm</c>
+		          	<c>a prerequisite algorithm</c>
+		          	<c>value</c>
+		          	<c>AES, SHA, TDES</c>
+		          	<c>No</c>
+		          	
+		          	<c>valValue</c>
+		          	<c>algorithm validation number</c>
+		          	<c>value</c>
+		          	<c>actual number or "same"</c>
+		          	<c>No</c>
+		          	
+		          	<c>prereqAlgVal</c>
+		          	<c>prerequistie algorithm validation</c>
+		          	<c>object with algorithm and valValue properties</c>
+		          	<c>see above</c>
+		          	<c>No</c>
+			 	</texttable>
+			</section>
+
+		    <section anchor="mac_caps_reg" title="MAC Algorithm Capabilities Registration">
+		        <t>Each algorithm capability advertised is a self-contained JSON object using the following values.</t>
+		        <texttable anchor="caps_table2" title="MAC Algorithm Capabilities JSON Values">
+		          	<ttcol align="left">JSON Value</ttcol>
+		          	<ttcol align="left">Description</ttcol>
+		          	<ttcol align="left">JSON type</ttcol>
+		          	<ttcol align="left">Valid Values</ttcol>
+		          	<ttcol align="left">Optional</ttcol>
+
+		          	<c>algorithm</c>
+			  		<c>The MAC algorithm and mode to be validated.</c>
+		          	<c>value</c>
+		          	<c>See <xref target="supported_algs2" /></c>
+		          	<c>No</c>
+			  	
+		          	<c>prereqVals</c>
+		          	<c>prerequistie algorithm validations</c>
+		          	<c>array of prereqAlgVal objects</c>
+		          	<c>See <xref target="prereq_algs" /></c>
+		          	<c>No</c>
+			  
+		          	<c>keyRange1</c>
+			  		<c>If IUT supports key sizes(KS) less than Block size(BS), enter 2 distinct key sizes (in Bytes). If IUT only supports one KS less than BS, enter a single size in the array and do not pass keyrange2 or keyblock field.</c>
+		          	<c>array</c>
+		          	<c>0-65536</c>
+		          	<c>Yes</c>
+
+		          	<c>keyRange2</c>
+			  		<c>If IUT supports key sizes(KS) greater than Block size(BS), enter 2 distinct key sizes (in Bytes). If IUT only supports one KS greater than BS, enter the size in the array and do not pass keyrange1 or keyblock field.</c>
+		          	<c>array</c>
+		          	<c>0-65536</c>
+		          	<c>Yes</c>
+
+		          	<c>keyBlock</c>
+		          	<c>Implementation supports keysize equal blocksize</c>
+		          	<c>value</c>
+		          	<c>yes, no</c>
+		          	<c>Yes</c>
+
+		          	<c>macLen</c>
+			  		<c>The supported mac sizes in bytes. (range dependent on SHA size)</c>
+		          	<c>array</c>
+		          	<c>0-65536</c>
+		          	<c>No</c>
+
+		          	<c>inEmpty</c>
+		          	<c>Implementation does not accept Null (zero-length) messages</c>
+		          	<c>value</c>
+		          	<c>yes, no</c>
+		          	<c>Yes</c>
+
+		          	<c>msgLen</c>
+			  		<c>The CMAC message lengths supported</c>
+		          	<c>array</c>
+		          	<c>0-65536</c>
+		          	<c>Yes</c>
+		        </texttable>
+
+				<t>Note: Some optional values are required depending on the algorithm. Failure to provide these values will result in the ACVP server returning an error to the ACVP client during registration.</t>
+
+		        <t>macLen for CMAC contains an array of 3 values defined by these rules:</t>
+			    <t>
+			    	<list style="symbols">
+						<t>The smallest CMAC length supported</t>
+						<t>A second CMAC length supported</t>
+						<t>The largest CMAC length supported</t>
+			    	</list>
+			    </t>
+
+		        <t>msgLen for CMAC contains an array of 5 values defined by these rules:</t>
+			    <t>
+			    	<list style="symbols">
+						<t>Two message lengths divisible by block size</t>
+						<t>Two message lengths NOT divisible by block size</t>
+						<t>The largest message length supported</t>
+			    	</list>
+			    </t>
+			</section>
+
+			<section anchor="supported_algs" title="Supported Hash Algorithms">
+			    <t>The following hash algorithms may be advertised by the ACVP compliant crypto module:</t>
+			    <t>
+			    	<list style="symbols">
+						<t>SHA-1</t>
+						<t>SHA-224</t>
+						<t>SHA-256</t>
+						<t>SHA-384</t>
+						<t>SHA-512</t>
+						<t>SHA-512-224</t>
+						<t>SHA-512-256</t>
+						<t>SHA3-224</t>
+						<t>SHA3-256</t>
+						<t>SHA3-384</t>
+						<t>SHA3-512</t>
+						<t>SHAKE-128</t>
+						<t>SHAKE-256</t>
+				    </list>
+			    </t>
+			</section>
+
+			<section anchor="supported_algs2" title="Supported MAC Algorithms">
+			    <t>The following hash algorithms may be advertised by the ACVP compliant crypto module:</t>
+			    <t>
+			    	<list style="symbols">
+						<t>HMAC-SHA-1</t>
+						<t>HMAC-SHA-224</t>
+						<t>HMAC-SHA-256</t>
+						<t>HMAC-SHA-384</t>
+						<t>HMAC-SHA-512</t>
+						<t>CMAC-AES-128</t>
+						<t>CMAC-AES-192</t>
+						<t>CMAC-AES-256</t>
+						<t>CMAC-TDES</t>
+			    	</list>
+			    </t>
+			</section>
+	    </section>
+
+	    <section anchor="test_vectors" title="Test Vectors">
+			<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
+		    the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
+		    sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
+		    crypto algorithm, such as SHA-1, SHA-224, SHA-256, etc.  This section
+			describes the JSON schema for a test vector set used with hash crypto algorithms.</t>
+
+			<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
+			vector set as well as individual test vectors to be processed by the ACVP client.  The following table
+			describes the JSON elements at the top level of the hierarchy.</t>
+
+			<texttable anchor="vs_top_table" title="Vector Set JSON Object">
+	          	<ttcol align="left">JSON Value</ttcol>
+	          	<ttcol align="left">Description</ttcol>
+	          	<ttcol align="left">JSON type</ttcol>
+
+		  		<c>acvVersion</c>
+		  		<c>Protocol version identifier</c>
+	          	<c>value</c>
+		  		
+		  		<c>vsId</c>
+		  		<c>Unique numeric identifier for the vector set</c>
+	          	<c>value</c>
+
+		  		<c>algorithm</c>
+		  		<c>The hash algorithm and mode used for the test vectors.  See <xref target="supported_algs" /> and <xref target="supported_algs2" /> for possible values.</c>
+	          	<c>value</c>
+
+		  		<c>testGroups</c>
+		  		<c>Array of test group JSON objects, which are defined in <xref target="tgjs" /></c>
+	          	<c>array</c>
+			</texttable>
+
+			<section title="Test Groups JSON Schema" anchor="tgjs">
+			    <t>The testGroups element at the top level in the test vector JSON object is an array of test
+				groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
+		        in the vector set.  For instance, all test vectors that use the same key size would be grouped
+		        together.  The Test Group JSON object contains meta data that applies to all test vectors within
+		        the group.  The following table describes the secure hash and CMAC JSON elements of the Test Group JSON object.</t>
+		    	<texttable anchor="vs_tg_table" title="Test Group JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<ttcol align="left">Optional</ttcol>
+
+					<c>testType</c>
+					<c>Test category type (ver or gen for CMAC)</c>
+					<c>value</c>
+					<c>No</c>
+
+					<c>tests</c>
+					<c>Array of individual test vector JSON objects, which are defined in <xref target="tvjs" /></c>
+					<c>array</c>
+					<c>No</c>
+		    	</texttable>
+
+				<t>The following table describes the message authentication JSON elements of the Test Group JSON object.</t>
+		    	<texttable anchor="vs_tg_table2" title="Test Group JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<ttcol align="left">Optional</ttcol>
+
+					<c>hLen</c>
+					<c>Length of MAC in bytes to generate</c>
+					<c>value</c>
+					<c>No</c>
+
+					<c>tests</c>
+					<c>Array of individual test vector JSON objects, which are defined in <xref target="tvjs" /></c>
+					<c>array</c>
+					<c>No</c>
+		    	</texttable>
+			</section>
+
+			<section title="Test Case JSON Schema" anchor="tvjs">
+			    <t>Each test group contains an array of one or more test cases.  Each test case is a JSON object
+				that represents a single test vector to be processed by the ACVP client.  The following table describes
+		    	the JSON elements for each message authentication test vector.</t>
+		    	<texttable anchor="vs_tc_table2" title="Test Case JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<ttcol align="left">Optional</ttcol>
+
+					<c>tcId</c>
+					<c>Numeric identifier for the test case, unique across the entire vector set.</c>
+					<c>value</c>
+					<c>No</c>
+
+					<c>type</c>
+					<c>CMAC type of test, generation or verification</c>
+					<c>value</c>
+					<c>Yes</c>
+
+					<c>keyLen</c>
+					<c>Length of key in bytes to use</c>
+					<c>value</c>
+					<c>No</c>
+
+					<c>key</c>
+					<c>Value of the key</c>
+					<c>value</c>
+					<c>No</c>
+
+					<c>key2</c>
+					<c>Value of the key</c>
+					<c>value</c>
+					<c>Yes</c>
+
+					<c>key3</c>
+					<c>Value of the key</c>
+					<c>value</c>
+					<c>Yes</c>
+
+					<c>msg</c>
+					<c>Value of the message</c>
+					<c>value</c>
+					<c>No</c>
+
+					<c>mac</c>
+					<c>MAC value generated</c>
+					<c>value</c>
+					<c>Yes</c>
+		    	</texttable>
+			</section>
+	    </section>
+
+	    <section anchor="vector_responses" title="Test Vector Responses">
+			<t>After the ACVP client downloads and processes a vector set, it must send the response vectors
+			back to the ACVP server.  The following table describes the JSON object that represents a vector set response.</t>
+
+			<texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
+	          	<ttcol align="left">JSON Value</ttcol>
+	          	<ttcol align="left">Description</ttcol>
+	          	<ttcol align="left">JSON type</ttcol>
+
+		  		<c>acvVersion</c>
+		  		<c>Protocol version identifier</c>
+	          	<c>value</c>
+
+		  		<c>vsId</c>
+		  		<c>Unique numeric identifier for the vector set</c>
+	          	<c>value</c>
+
+		  		<c>testResults</c>
+		  		<c>Array of JSON objects that represent each test vector result, which uses the same
+		      	JSON schema as defined in <xref target="tvjs" /> </c>
+	          	<c>array</c>
+			</texttable>
+	    </section>
+
+	    <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+
+	    <section anchor="Acknowledgements" title="Acknowledgements">
+	      	<t>TBD...</t>
+	    </section>
+
+	    <!-- Possibly a 'Contributors' section ... -->
+
+	    <section anchor="IANA" title="IANA Considerations">
+	      	<t>This memo includes no request to IANA.</t>
+	    </section>
+
+	    <section anchor="Security" title="Security Considerations">
+	      	<t>Security considerations are addressed by the ACVP specification.</t>
+	    </section>
+  	</middle>
+
+  <!--  *****BACK MATTER ***** -->
+
+  	<back>
+    	<references title="Normative References">
+      		<!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+      		&RFC2119;
+
+	      	<reference anchor="ACVP">
+        	<!-- the following is the minimum to make xml2rfc happy -->
+
+        		<front>
+          			<title>ACVP Specification</title>
+          			<author initials="authInitials" surname="authSurName">
+            			<organization>NIST</organization>
+          			</author>
+          			<date year="2016" />
+        		</front>
+      		</reference>
+    	</references>
+
+    	<references title="Informative References">
+	      	<reference anchor="HMACVS">
+        		<!-- the following is the minimum to make xml2rfc happy -->
+
+        		<front>
+          			<title>The Keyed-Hash Message Authentication Code Validation System (HMACVS)</title>
+          			<author initials="LEB" surname="Lawrence E. Bassham III">
+            			<organization>NIST</organization>
+          			</author>
+          			<date year="2016" />
+        		</front>
+      		</reference>
+
+      		<reference anchor="CMACVS">
+        		<!-- the following is the minimum to make xml2rfc happy -->
+        		<front>
+          			<title>The CMAC Validation System (CMACVS)</title>
+          			<author initials="SSK" surname="Sharon S. Keller">
+            			<organization>NIST</organization>
+          			</author>
+          			<date year="2011" />
+        		</front>
+      		</reference>
+    	</references>
+
+    	<section anchor="app-reg-ex" title="Example Secure Hash Capabilities JSON Object">
+      		<t>The following is a example JSON object advertising support for HMAC-SHA-1.</t>
+      		<figure>
+        		<artwork>
+<![CDATA[{
+    "algorithm": "HMAC-SHA-256",
+    "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"}],
+    "keySize1": [ 32, 56],
+    "keySize2": [192, 256],
+    "keyBlock": "yes",
+    "macLen": [20]
+}]]>
+				</artwork>
+    		</figure>
+      		<t>The following is a example JSON object advertising support for CMAC-TDES.</t>
+      		<figure>
+        		<artwork>
+<![CDATA[{
+    "algorithm": "CMAC-TDES",
+    "prereqVals" : [
+    	{"algorithm" : "AES", "valValue" : "123456"},
+        {"algorithm" : "TDES", "valValue" : "123456"}],
+    "inEmpty": "yes",
+	"macLen" : [0, 8],
+	"msgLen" : [0, 32, 15, 31, 40]
+}]]>
+				</artwork>
+    		</figure>
+    	</section>
+    	<section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
+      		<t>The following is a example JSON object for HMAC test vectors sent from the ACVP server to the crypto module.</t>
+      		<figure>
+        		<artwork>
+<![CDATA[{
+    "acvVersion": "0.2",
+    "vsId": 1565,
+    "algorithm": "HMAC-SHA-1",
+    "testGroups": [
+    {
+        "hLen": 20,
+        "tests": [
+        {
+            "tcId": 2172,
+            "keyLen": 32,
+            "key": "f8561d1477e58cb6061e709be60a40ab7468503eb6f3ff8234e3321c09b60212",
+            "msg": "5f4e900a8c223ad9fc834a4deefb33df8d6081bedafc6915e6eaa58c44c37f11be7b2bd8478559a0313e0b39a088a4433fb5423831a84ead4b3652d480d20a469c6abdff368ccdaadfcd8e20a06b542ba431d08f319b9c4bdd3b141cfe5b684362e4ef88407fbe7f6ff97a0ad6ec6a1f249cd0cbc11f7a7704c1946ba6a6c090"
+        },
+        {
+            "tcId": 2173,
+            "keyLen": 32,
+            "key": "c9ba74509181091ccf2159d9cada77e4be00384cca4f36ce097f1b0400181cd9",
+            "msg": "e249dbff751ef43598aab6fb642eb1b18731a33148729a5fc52059027f4dfdd219a1e0d15d4bbedf803d1689a799d323a9662c161788c97a7aef27e8db0e3d89898f607316456436a36204b15dea832b4867949f3cdf78562d0366bbafa92f6cb87c228da8f22d61887f461b8f0909f1eb9ba373be5dee1b66c4dd2501061ba0"
+        }]
+    }]
+}]]>
+				</artwork>
+       		</figure>
+      		<t>The following is a example JSON object for CMAC test vectors sent from the ACVP server to the crypto module.</t>
+      		<figure>
+	        	<artwork>
+<![CDATA[{
+    "acvVersion": "0.2",
+    "vsId": 1566,
+    "algorithm": "CMAC-TDES",
+    "testGroups": [
+    {
+        "testType": "gen",
+        "tests": [
+        {
+            "tcId": 2175,
+            "keyLen": 3,
+	    	"macLen" : 5,
+            "key": "c479f813ad1a45d5",
+            "key2": "dc43459da4c85e85",
+            "key3": "1cda518af886bf1f",
+            "msg": "00"
+        },
+        {
+            "tcId": 2176,
+            "keyLen": 3,
+			"macLen" : 5,
+            "key": "731331866754588f",
+            "key2": "d332ef51e0ce1925",
+            "key3": "d586cba70440f44f",
+            "msg": "00"
+        }]
+    }]
+}]]>
+				</artwork>
+    		</figure>
+    	</section>
+    	<section anchor="app-results-ex" title="Example Test Results JSON Object">
+      		<t>The following is a example JSON object for HMAC test results sent from the crypto module to the ACVP server.</t>
+      		<figure>
+        		<artwork>
+<![CDATA[{
+    "acvVersion": "0.2",
+    "vsId": 1565,
+    "testResults": [
+    {
+        "tcId": 2172,
+        "mac": "eb0326e5edcf9465fc01c773262011a3059cfd97"
+    },
+    {
+        "tcId": 2173,
+        "mac": "feb3ff7b06eb7f62e9d19c331abbe2d183d2bc7a"
+    }]
+}]]>
+				</artwork>
+       		</figure>
+      		<t>The following is a example JSON object for CMAC test results sent from the crypto module to the ACVP server.</t>
+      		<figure>
+        		<artwork>
+<![CDATA[{
+    "acvVersion": "0.2",
+    "vsId": 1566,
+    "testResults": [
+    {
+        "tcId": 2175,
+        "mac": "fea01c84a7"
+    },
+    {
+        "tcId": 2176,
+        "mac": "164bdb8582"
+    }]
+}]]>
+				</artwork>
+    		</figure>
+    	</section>
+  	</back>
+</rfc>
