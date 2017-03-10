@@ -24,7 +24,7 @@ If you would like to talk to our developers, you may want to send email to our m
 
 # Licensing terms
 
-This data was developed by employees of the National Institute of Standards and Technology (NIST), an agency of the Federal Government in collaboration with 
+This data was developed by employees of the National Institute of Standards and Technology (NIST), an agency of the Federal Government, in collaboration with 
 third-party contributers. Pursuant to title 17 United States Code Section 105, works of NIST employees are not subject to copyright protection in the 
 United States and are considered to be in the public domain. The data is provided by NIST as a public service and is expressly provided "AS IS." 
 NIST MAKES NO WARRANTY OF ANY KIND, EXPRESS, IMPLIED OR STATUTORY, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTY OF MERCHANTABILITY, 
