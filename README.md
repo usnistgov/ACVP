@@ -45,4 +45,8 @@ Please explicitly acknowledge the National Institute of Standards and Technology
 Permission to use this data is contingent upon your acceptance of the terms of this agreement and upon your providing appropriate acknowledgments of 
 NIST's creation of the data.
 
+  - Citation format:
+
+    - Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date). 
+
 
