@@ -1,0 +1,504 @@
+
+
+
+
+TBD                                                         C. Celi, Ed.
+Internet-Draft            National Institute of Standards and Technology
+Intended status: Informational                             February 2017
+Expires: August 5, 2017
+
+
+          ACVP Secure Hash Algorithm (SHA) JSON Specification
+                       draft-ietf-acvp-subsha-00
+
+Abstract
+
+   This document defines the JSON schema for using SHA1 and SHA2 with
+   the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on August 5, 2017.
+
+Copyright Notice
+
+   Copyright (c) 2017 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Celi                     Expires August 5, 2017                 [Page 1]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
+     2.1.  HASH Algorithm Capabilities Registration  . . . . . . . .   3
+   3.  Supported Hash Algorithms . . . . . . . . . . . . . . . . . .   3
+   4.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     4.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   4
+     4.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .   5
+     4.3.  Test Vector Responses . . . . . . . . . . . . . . . . . .   6
+     4.4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . .   6
+     4.5.  IANA Considerations . . . . . . . . . . . . . . . . . . .   6
+     4.6.  Security Considerations . . . . . . . . . . . . . . . . .   6
+   5.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
+     5.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Example Secure Hash Capabilities JSON Object . . . .   7
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   7
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   8
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   9
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing hash and
+   MAC crypto algorithms using ACVP.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
+
+2.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+
+
+
+Celi                     Expires August 5, 2017                 [Page 2]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of hash algorithms to the ACVP
+   server.
+
+   The algorithm capabilities are advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each algorithm capability advertised is a
+   self-contained JSON object.  The following JSON values are used for
+   hash algorithm capabilities:
+
+2.1.  HASH Algorithm Capabilities Registration
+
+   +-----------+------------------------+-------+-----------+----------+
+   | JSON      | Description            | JSON  | Valid     | Optional |
+   | Value     |                        | type  | Values    |          |
+   +-----------+------------------------+-------+-----------+----------+
+   | algorithm | The hash algorithm and | value | See       | No       |
+   |           | mode to be validated.  |       | Section 3 |          |
+   | inBit     | Implementation does    | value | yes, no   | No       |
+   |           | accept bit-oriented    |       |           |          |
+   |           | messages               |       |           |          |
+   | inEmpty   | Implementation does    | value | yes, no   | No       |
+   |           | accept null (zero-     |       |           |          |
+   |           | length) messages       |       |           |          |
+   +-----------+------------------------+-------+-----------+----------+
+
+             Table 1: Hash Algorithm Capabilities JSON Values
+
+3.  Supported Hash Algorithms
+
+   The following hash algorithms may be advertised by this ACVP
+   compliant crypto module:
+
+   o  SHA-1
+
+   o  SHA-224
+
+   o  SHA-256
+
+   o  SHA-384
+
+   o  SHA-512
+
+   o  SHA-512/224
+
+
+
+Celi                     Expires August 5, 2017                 [Page 3]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+   o  SHA-512/256
+
+   Other hash algorithms may be advertised by the ACVP elsewhere.
+
+4.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual crypto algorithm, such as SHA-1,
+   SHA-224, SHA-256, etc.  This section describes the JSON schema for a
+   test vector set used with hash crypto algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+   +------------+----------------------------------------------+-------+
+   | JSON Value | Description                                  | JSON  |
+   |            |                                              | type  |
+   +------------+----------------------------------------------+-------+
+   | acvVersion | Protocol version identifier                  | value |
+   | vsId       | Unique numeric identifier for the vector set | value |
+   | algorithm  | The hash algorithm and mode used for the     | value |
+   |            | test vectors. See Section 3 for possible     |       |
+   |            | values.                                      |       |
+   | testGroups | Array of test group JSON objects, which are  | array |
+   |            | defined in Section 4.1                       |       |
+   +------------+----------------------------------------------+-------+
+
+                      Table 2: Vector Set JSON Object
+
+4.1.  Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  The Test Group JSON object contains meta data that
+   applies to all test vectors within the group.  The following table
+   describes the secure hash JSON elements of the Test Group JSON
+   object.
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2017                 [Page 4]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+   +----------+--------------------------------+-------+---------------+
+   | JSON     | Description                    | JSON  | Optional      |
+   | Value    |                                | type  |               |
+   +----------+--------------------------------+-------+---------------+
+   | testType | Test category type. For        | value | No            |
+   |          | Algorithm Functional Tests     |       |               |
+   |          | (also known as short and long  |       |               |
+   |          | message): 'functional'. Or for |       |               |
+   |          | Monte Carlo: 'montecarlo'.     |       |               |
+   | tests    | Array of individual test case  | array | No            |
+   |          | JSON objects, which are        |       |               |
+   |          | defined in Section 4.2         |       |               |
+   | inBit    | States that each test case in  | value | No            |
+   |          | the group is bit-oriented (yes |       |               |
+   |          | or no)                         |       |               |
+   | inEmpty  | States that the empty message  | value | No for        |
+   |          | is included in the group       |       | functional    |
+   |          |                                |       | message       |
+   |          |                                |       | tests. Yes    |
+   |          |                                |       | for all       |
+   |          |                                |       | others.       |
+   +----------+--------------------------------+-------+---------------+
+
+                      Table 3: Test Group JSON Object
+
+4.2.  Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each secure hash test vector for the listed algorithms
+   in Section 3.
+
+   +--------+---------------------------------------+-------+----------+
+   | JSON   | Description                           | JSON  | Optional |
+   | Value  |                                       | type  |          |
+   +--------+---------------------------------------+-------+----------+
+   | tcId   | Numeric identifier for the test case, | value | No       |
+   |        | unique across the entire vector set.  |       |          |
+   | len    | Length of the message or seed         | value | No       |
+   | msg    | Value of the message or seed          | value | No       |
+   | md     | Hash value generated                  | value | Yes      |
+   +--------+---------------------------------------+-------+----------+
+
+                      Table 4: Test Case JSON Object
+
+
+
+
+
+
+Celi                     Expires August 5, 2017                 [Page 5]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+4.3.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +-------------+---------------------------------------------+-------+
+   | JSON Value  | Description                                 | JSON  |
+   |             |                                             | type  |
+   +-------------+---------------------------------------------+-------+
+   | acvVersion  | Protocol version identifier                 | value |
+   | vsId        | Unique numeric identifier for the vector    | value |
+   |             | set                                         |       |
+   | testResults | Array of JSON objects that represent each   | array |
+   |             | test vector result, which uses the same     |       |
+   |             | JSON schema as defined in Section 4.2       |       |
+   +-------------+---------------------------------------------+-------+
+
+                 Table 5: Vector Set Response JSON Object
+
+4.4.  Acknowledgements
+
+   TBD...
+
+4.5.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+4.6.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+5.  References
+
+5.1.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2017                 [Page 6]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+5.2.  Informative References
+
+   [SHAVS]    Lawrence E. Bassham III, LEB., "The Secure Hash Algorithm
+              Validation System (SHAVS)", 2014.
+
+Appendix A.  Example Secure Hash Capabilities JSON Object
+
+   The following is a example JSON object advertising support for SHA-
+   256.
+
+
+   {
+           "algorithm": "SHA-256",
+           "inBit": "yes",
+           "inEmpty": "yes"
+   }
+
+
+Appendix B.  Example Test Vectors JSON Object
+
+   The following is an example JSON object for secure hash test vectors
+   sent from the ACVP server to the crypto module.
+
+
+   {
+           "acvVersion": "0.2",
+           "vsId": 1564,
+           "algorithm": "SHA-512/224",
+           "testGroups": [
+           {
+                   "testType": "functional",
+                   "tests": [
+                   {
+                           "tcId": 0,
+                           "len": 0,
+                           "msg": "00"
+                   },
+                   {
+                           "tcId": 1,
+                           "len": 1,
+                           "msg": "80"
+                   }]
+           }]
+   }
+
+   The following is another example JSON object for secure hash test
+   vectors sent from the ACVP server to the crypto module.
+
+
+
+
+Celi                     Expires August 5, 2017                 [Page 7]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+{
+        "acvVersion": "0.2",
+        "vsId": 1564,
+        "algorithm": "SHA-256",
+        "testGroups": [
+    {
+        "testType": "functional",
+        "tests": [
+        {
+                "tcId": 2170,
+                "len": 1304,
+                "msg": "7f65733c73c6d9b06838ca3fd3f0fed4c642c58bba59ed0c8b2ae618c4aa24611d3fc59f427574e0d6f38d1fb8ad8119855b7d5c5e2946a1ebb0685b9f258f903ed035e89dc07d04aabe5f10ab7f069ccb1e76a7d2c972fd34ba9dc44d68df51ebff0a400d0ebec3ea808a3a35ce5304a073fa959f9f39c96e2fce7855dddc4b2bb48ece19c8fdc6a02354c4dd0232fa0c424f4e4c1563ada1f943a23feb4d2706d707"
+        },
+        {
+                "tcId": 2171,
+                "len": 2096,
+                "msg": "e2c3b1a24fbc47a05acbc950e3a32baa968ea1e2610fb2322bc68ed9c395a1641601682ca6db8420371f0dc4cb1c287ad1d5dc019aa8213b0c2d3a339a61455e74041121fa3f2f94778a4c860ccdbec1eac55c8ec4aa937c850fb65e3e0996936293538a3531718482d42e9c8cfe13054826ca94c95e2f7efc33a96295d5bb8a4978d66e3ef97279c0c55d1035f752d153c0cd18900c1ec8da62bc48890cddcb927943d5fddf59fb99247eeaeeffa1aa735b0e2401fc87e28864971701f823dfa35f42c75a2b4f9075bb3c309e5f281a10be34bf047593556c01e1d7e4dfb64de6f17a4d3d247bc2bc503cec2f6011a892b2e8f281c16aa8f00143901c0abd9dc1f9946e8e13"
+        }]
+    }]
+}
+
+   The following is an example JSON object for secure hash Monte Carlo
+   test vectors sent from the ACVP server to the crypto module.
+
+
+   {
+       "acvVersion": "0.2",
+       "vsId": 1564,
+       "algorithm": "SHA-1",
+       "testGroups": [
+       {
+           "testType": "montecarlo",
+           "tests": [
+           {
+               "tcId": 2175,
+               "len": 20,
+               "seed": "331b04d56f6e3ed5af349bf1fd9f9591b6ec886e",
+           }]
+       }]
+   }
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for secure hash test results
+   sent from the crypto module to the ACVP server.
+
+
+
+
+
+
+Celi                     Expires August 5, 2017                 [Page 8]
+
+Internet-Draft                Sym Alg JSON                 February 2017
+
+
+{
+    "acvVersion": "0.2",
+    "vsId": 1564,
+    "testResults": [
+    {
+        "tcId": 2170,
+        "md": "7115011d389f379798455039d5da962a077d1620d52d7e983af9b49e3c4283f3"
+    },
+    {
+        "tcId": 2171,
+        "md": "79820a5256eb1371cf8bc94fa17eaedc25aa5d28ae8706cbf77b9a6e3a79acd5"
+    }]
+}
+
+   The following is a example JSON object for secure hash Monte Carlo
+   test results sent from the crypto module to the ACVP server.  Reduced
+   to 2 iterations for brevity.
+
+
+{
+    "acvVersion": "0.2",
+    "vsId": 1564,
+    "testResults": [
+    {
+        "tcId": 2175,
+        "resultsArray": [
+                "md": "23d1f8655a7c9c2bc3bb56868483611e67cb1b3a",
+                        "md": "d3d672efb8e569dc7a37c991a9fc51282412196f"
+        ]
+    }]
+}
+
+Author's Address
+
+   Christopher Celi (editor)
+   National Institute of Standards and Technology
+   100 Bureau Drive
+   Gaithersburg, MD  20899
+   USA
+
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2017                 [Page 9]
