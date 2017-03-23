@@ -71,7 +71,7 @@
      </address>
    </author>
 
-   <date year="2016"/>
+   <date year="2017"/>
 
    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
         in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -250,7 +250,7 @@ The following functions are outside the scope of this document:</t>
           +---------------------------------------------+
              server              path prefix
           +----------------+---+---------------+-----------+
-  https://my-acvpserver.com:123/validation/acvp/register
+  https://acvp.nist.gov:123/validation/acvp/register
           +----------------+---+---------------+-----------+ 
                             port                operation
 
@@ -271,31 +271,31 @@ The following functions are outside the scope of this document:</t>
 	  <c>Registration and DUT Capabilities</c>
 	  <c>/register</c>
 	  <c>POST</c>	
-	  <c><xref target="reg_capex" /></c>
+	  <c><xref target="reg_capex"/></c>
 	  <c/><c/><c/><c/>
 
 	  <c>Vector Set download request</c>
 	  <c>/vectors</c>
 	  <c>GET</c>
-	  <c><xref target="vector_dl" /></c>
+	  <c><xref target="vector_dl"/></c>
 	  <c/><c/><c/><c/>
 		
 	  <c>Submit Vector Test Results</c>
 	  <c>/vectors</c>
 	  <c>POST</c>
-	  <c><xref target="vector_dl2" /></c>
+	  <c><xref target="vector_dl2"/></c>
 	  <c/><c/><c/><c/>
 	  	
 	  <c>Request Validation Results</c>
 	  <c>/results</c>
 	  <c>GET</c>	
-	  <c><xref target="results_req" /></c>
+	  <c><xref target="results_req"/></c>
 	  <c/><c/><c/><c/>
 
 	  <c>Request server to cancel session</c>
 	  <c>/cancel</c>
 	  <c>POST</c>	
-	  <c><xref target="optional_flows" /></c>
+	  <c><xref target="optional_flows"/></c>
 
         </texttable>
 	<t>The operation path is appended to the path prefix to form
@@ -304,12 +304,12 @@ The following functions are outside the scope of this document:</t>
 	   operation is "/validation/acvp/register".  To register a DUT
            the ACVP client would use the following HTTP request-line:</t>
 
-	   <t>POST /validation/acvp/register HTTP/1.1</t>
+	   <t>POST /validation/acvp/register HTTP/1.2</t>
 
 	   <t>Likewise, to request a specific vector set from the server the ACVP client  
 	   would use the following request-line:</t>
 
-	   <t>GET /validation/acvp/vectors?vsId=1 HTTP/1.1</t>
+	   <t>GET /validation/acvp/vectors?vsId=1 HTTP/1.2</t>
 
 
        </section>
@@ -370,7 +370,7 @@ A server may accept a down-level version from the client if it can process at a 
 "alg" : "none"
 }
    {
-      "iss" : "nist.org",
+      "iss" : "nist.gov",
       "exp" : 1426420800,
       "company" : "MyCompany",
       "jti" : 0987654321,
@@ -392,14 +392,14 @@ A server may accept a down-level version from the client if it can process at a 
 
      <figure align="center" anchor="xml_json2">
        <artwork align="left"><![CDATA[
-POST /validation/acvp/register HTTP1.1
+POST /validation/acvp/register HTTP1.2
 User Agent: acvp-client/0.2
-Host: www.my-acvpserver.com
+Host: www.acvp.nist.gov
 Capabilities information(see next section)
 
 ..authentication happens here..
 
-HTTP 1.1 200 OK
+HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: (length of JWT)
@@ -438,10 +438,9 @@ each message.
 
      <figure align="center" anchor="xml_json3">
        <artwork align="left"><![CDATA[
-
-POST /validation/acvp/register HTTP1.1
+POST /validation/acvp/register HTTP1.2
 User Agent:
-Host: www.my-acvpserver.com
+Host: www.acvp.nist.gov
 Accept: 
 {
 "operation" : "register",
@@ -451,22 +450,35 @@ Accept:
 "production" : "no",
 "encryptAtRest" : "yes",
 "oeInformation" : {
-"vendorName" : "Cisco",
-"vendorURL" : "www.cisco.com",
-"contact" : "John Doe",
-"contactEmail" : "johndoe@cisco.com",
-"moduleName" : "Cisco ACV Test Module 1.0",
-"moduleType" : "Software",
-"operationalEnvironment" : {
-"moduleVersion" : "1.0",
-"processor" : "Intel Woodcrest",
-"operatingSystem" : "Linux 3.1"
-     {
-     "implementationDescription" : 
-          "Sample crypto module for demonstrating ACV protocol."
-     },
-                            },
-                   },
+    "vendor": {
+        "name" : "Cisco",
+        "website": "www.cisco.com",
+        "contact": [{
+            "name" : "John Doe",
+            "email" : "johndoe@cisco.com"
+        }]
+    },
+    "module": {
+      "name": "Cisco ACV Test Module",
+      "version": "1.0",
+      "type": "Software"
+    },
+    "operationalEnvironment" : {
+        "dependencies" : [{
+            "type" : "software",
+            "name" : "Linux 3.1",
+            "cpe"  : "cpe-2.3:o:ubuntu:linux:3.1"
+        },{
+            "type" : "processor",
+            "manufacturer" : "Intel",
+            "family" : "ARK",
+            "name" : "Xeon",
+            "series" : "5100",
+            "features" : [ "rdrand" ]
+        }]
+    },
+    "implementationDescription" : "Sample crypto module for demonstrating ACV protocol."
+},
 "capabilityExchange" : {
 "algorithms" : [
          {
@@ -487,16 +499,16 @@ Accept:
             96
                ],
 "ivLen" : [
-            96
+             96
                ],
-"ptLen" : [
-            0,
-            128,
-            136
+ "ptLen" : [
+             0,
+             128,
+             136
                ],
-"aadLen" : [
-            128,
-            136
+ "aadLen" : [
+             128,
+             136
                ]
           }
        ]
@@ -532,9 +544,9 @@ Accept:
 	 </t>
 	 <figure align="center" anchor="xml_json5">
 	    <artwork align="left"><![CDATA[
-GET /validation/acvp/vectors?vsId=1437  HTTP1.1
+GET /validation/acvp/vectors?vsId=1437  HTTP1.2
 User Agent: acvp-client/0.2
-Host: www.my-acvpserver.com
+Host: www.acvp.nist.gov
 Authorization: Bearer JWT
             ]]></artwork>
 	 </figure>
@@ -590,7 +602,7 @@ Content-Length: <length of results>
 	 </t>
 	<figure align="center" anchor="xml_json7">
 	    <artwork align="left"><![CDATA[
-HTTP 1.1 200 OK
+HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
@@ -613,9 +625,9 @@ Content-Length: <length of results>
 
      <figure align="center" anchor="xml_json8">
        <artwork align="left"><![CDATA[
-   POST /validation/acvp/vectors?vsId=1437 HTTP1.1
+   POST /validation/acvp/vectors?vsId=1437 HTTP1.2
    User Agent: acvp-client/0.2
-   Host: www.my-acvpserver.com
+   Host: www.acvp.nist.gov
    Authorization: Bearer JWT
    Accept:   
    {
@@ -643,15 +655,15 @@ Content-Length: <length of results>
 
      <figure align="center" anchor="xml_json9">
        <artwork align="left"><![CDATA[
-GET /validation/acvp/results?vsId=1437 HTTP1.1
+GET /validation/acvp/results?vsId=1437 HTTP1.2
 User Agent:
-Host: www.my-acvpserver.com
+Host: www.acvp.nist.gov
 Accept: /
 
 
 Response to GET is:
 
-HTTP 1.1 200 OK
+HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
@@ -696,9 +708,9 @@ Content-Length: <length of results>
 <t>The cancel URI can be used by the client to free a session.  The server is responsible for maintaining any database information for traceability or debugging purposes it desires.  This may be important for those cases where there are test failures.</t>
      <figure align="center" anchor="xml_json10">
        <artwork align="left"><![CDATA[
-POST /validation/acvp/cancel HTTP1.1
+POST /validation/acvp/cancel HTTP1.2
 User Agent: acvp-client/0.2
-Host: www.my-acvpserver.com
+Host: www.acvp.nist.gov
 Authorization: Bearer JWT
            ]]></artwork>
      </figure>
@@ -722,7 +734,7 @@ Authorization: Bearer JWT
        </t>
 	<figure align="center" anchor="xml_json11">
 	<artwork align="left"><![CDATA[
-HTTP 1.1 200 OK
+HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
