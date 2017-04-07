@@ -22,6 +22,9 @@ If you want to contribute, please follow the simple rules below and send us pull
 
 If you would like to talk to our developers, you may want to send email to our mailing list algotest@nist.gov. You may also report bugs or request new tests.
 
+If you would like to try the algorithm testing service with ACVP, it is at acvts.nist.gov/acvp/. Please read the specification carefully. 
+
+
 # Licensing terms
 
 This data was developed by employees of the National Institute of Standards and Technology (NIST), an agency of the Federal Government, in collaboration with 
