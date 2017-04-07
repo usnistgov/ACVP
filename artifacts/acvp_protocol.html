@@ -418,7 +418,7 @@
 
   <meta name="dct.creator" content="Fussell, B., Ed." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-acvp-protocol-0.3" />
-  <meta name="dct.issued" scheme="ISO8601" content="2017-3-24" />
+  <meta name="dct.issued" scheme="ISO8601" content="2017-4-4" />
   <meta name="dct.abstract" content="This document defines the Automated Cryptographic Validation Protocol(ACVP)." />
   <meta name="description" content="This document defines the Automated Cryptographic Validation Protocol(ACVP)." />
 
@@ -439,10 +439,10 @@
 </tr>
 <tr>
   <td class="left">Intended status: Informational</td>
-  <td class="right">March 24, 2017</td>
+  <td class="right">April 4, 2017</td>
 </tr>
 <tr>
-  <td class="left">Expires: September 25, 2017</td>
+  <td class="left">Expires: October 6, 2017</td>
   <td class="right"></td>
 </tr>
 
@@ -463,7 +463,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 25, 2017.</p>
+<p>This Internet-Draft will expire on October 6, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -638,15 +638,16 @@
 <div id="xml_figure4"/>
 <pre>
 
-          +---------------------------------------------+
-             server              path prefix
-          +----------------+---+---------------+-----------+
-  https://acvp.nist.gov:123/validation/acvp/register
-          +----------------+---+---------------+-----------+ 
-                            port                operation
+          +-------------------------------------------------+
+          server path prefix
+          +-------------+----+------------------------------+
+  https://acvts.nist.gov/acvp/validation/acvp/register
+          +-------------+----+------------------------------+ 
+                        context         operation
 
            </pre>
 <p class="figure">Figure 4</p>
+<p id="rfc.section.4.1.p.1">Note that deployments utilizing ACV Proxy server may use a different protocol, e.g., HTTP, and custom URI path prefix, context and port number to interact with the DUT.</p>
 <h1 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a> HTTP URI Operations</h1>
 <p id="rfc.section.4.2.p.1">Operations and their corresponding operation names</p>
 <div id="rfc.table.1"/>
@@ -782,8 +783,7 @@
 <div id="xml_json2"/>
 <pre>
 POST /validation/acvp/register HTTP1.2
-User Agent: acvp-client/0.3
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Capabilities information(see next section)
 
 ..authentication happens here..
@@ -819,17 +819,17 @@ each message.
 <pre>
 POST /validation/acvp/register HTTP1.2
 User Agent:
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Accept: 
-{
-"operation" : "register",
-"acvVersion" : "0.3",
-"certificateRequest" : "yes",
-"debugRequest" : "no",
-"production" : "no",
-"encryptAtRest" : "yes",
-"oeInformation" : {
-    "vendor": {
+[
+ { "acvVersion": "0.3" },
+ { "operation" : "register",
+   "certificateRequest" : "yes",
+   "debugRequest" : "no",
+   "production" : "no",
+   "encryptAtRest" : "yes",
+   "oeInformation" : {
+     "vendor": {
         "name" : "Cisco",
         "website": "www.cisco.com",
         "contact": [{
@@ -857,42 +857,43 @@ Accept:
         }]
     },
     "implementationDescription" : "Sample crypto module for demonstrating ACV protocol."
-},
-"capabilityExchange" : {
-"algorithms" : [
+  },
+  "capabilityExchange" : {
+  "algorithms" : [
          {
-"algorithm" : "AES-GCM",
-"prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
+  "algorithm" : "AES-GCM",
+  "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
                 {"algorithm" : "DRBG", "valValue" : "123456"}],
-"direction": [
+  "direction": [
     "encrypt",
     "decrypt"
-],
-"ivGen" : "internal",
-"ivGenMode" : "8.2.1",
-"keyLen" : [
+  ],
+  "ivGen" : "internal",
+  "ivGenMode" : "8.2.1",
+  "keyLen" : [
             128,
             256
              ],
-"tagLen" : [
+  "tagLen" : [
             96
                ],
-"ivLen" : [
+  "ivLen" : [
              96
                ],
- "ptLen" : [
+  "ptLen" : [
              0,
              128,
              136
                ],
- "aadLen" : [
+  "aadLen" : [
              128,
              136
                ]
-          }
-       ]
-   }
-}
+         }
+      ]
+    }
+  }
+]
            </pre>
 <p class="figure">Figure 7</p>
 <p id="rfc.section.11.2.p.4">Successful response from server is 200 OK and a set of vector set identifiers.  The extensions section is optional and can be implementation specific for value add. Follow on versions could include protocol information.</p>
@@ -900,14 +901,15 @@ Accept:
 <div id="xml_json4"/>
 <pre>
 200 OK Response:
-{ 
-"acvVersion" : "0.3", 
-"capabilityResponse" : { "vectorSets" : [
+[
+  { "acvVersion": "0.3" },
+  { "capabilityResponse" : { "vectorSets" : [
                        {"vsId":1437},
                        {"vsId":1438}] } , 
-"testSession" :       {"testId":458} , 
-"accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ" 
-}
+    "testSession" :       {"testId":458} , 
+    "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ" 
+  }
+]
            </pre>
 <p class="figure">Figure 8</p>
 <h1 id="rfc.section.11.3"><a href="#rfc.section.11.3">11.3.</a> <a href="#vector_dl" id="vector_dl">Vector Set Download Request</a></h1>
@@ -916,8 +918,7 @@ Accept:
 <div id="xml_json5"/>
 <pre>
 GET /validation/acvp/vectors?vsId=1437  HTTP1.2
-User Agent: acvp-client/0.3
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Authorization: Bearer JWT
             </pre>
 <p class="figure">Figure 9</p>
@@ -930,13 +931,13 @@ Authorization: Bearer JWT
 Status: 200 OK
 Content-Type: application/json
 Content-Length: &lt;length of results&gt;
-{
-  "acvVersion": "0.3",
-  "vsId": 1437,
-  "algorithm": "AES-GCM",
-  "direction": "encrypt",
-  "testGroups": [
+[
+ { "acvVersion": "0.3" },
+ { "vsId": 1437,
+   "algorithm": "AES-GCM",
+   "testGroups": [
     {
+      "direction": "encrypt",
       "keyLen": 128,
       "ivLen": 96,
       "ptLen": 0,
@@ -956,6 +957,7 @@ Content-Length: &lt;length of results&gt;
           "pt": "",
           "aad": "79504FF995F70FFD328D7070CCBD62F1"
         }.....
+]
 
 	&lt;With debugRequest set iv, ct and tag would be included&gt;
 
@@ -969,11 +971,12 @@ HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: &lt;length of results&gt;
-{
-"vsId": 1437,
-"acvVersion" : 0.3,
-"retry" : 10
-}
+[
+  { "acvVersion": "0.3" },
+  { "vsId": 1437,
+    "retry" : 10
+  }
+]
            </pre>
 <p class="figure">Figure 11</p>
 <p id="rfc.section.11.3.p.4">Where the retry value represents the number of seconds for the client to wait before retrying the request.  The server may set the retry value based on the current server load and expected processing time to generate the vector set.  </p>
@@ -982,14 +985,13 @@ Content-Length: &lt;length of results&gt;
 <div id="rfc.figure.12"/>
 <div id="xml_json8"/>
 <pre>
-   POST /validation/acvp/vectors?vsId=1437 HTTP1.2
-   User Agent: acvp-client/0.3
-   Host: www.acvp.nist.gov
-   Authorization: Bearer JWT
-   Accept:   
-   {
-   "acvVersion": "0.3",
-   "vsId": 1437,
+POST /validation/acvp/vectors?vsId=1437 HTTP1.2
+Host: www.acvts.nist.gov/acvp
+Authorization: Bearer JWT
+Accept:   
+[
+ { "acvVersion": "0.3" },
+ { "vsId": 1437,
    "testResults": [
    {
    "tcId": 12340,
@@ -1003,6 +1005,7 @@ Content-Length: &lt;length of results&gt;
    "ct": "",
    "tag": "E7B1F2D77D82C6EB3C9CEFF16C376D9C"
    }, ...
+]
            </pre>
 <p class="figure">Figure 12</p>
 <h1 id="rfc.section.11.5"><a href="#rfc.section.11.5">11.5.</a> <a href="#results_req" id="results_req">Validation Results Request</a></h1>
@@ -1012,7 +1015,7 @@ Content-Length: &lt;length of results&gt;
 <pre>
 GET /validation/acvp/results?vsId=1437 HTTP1.2
 User Agent:
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Accept: /
 
 
@@ -1022,18 +1025,18 @@ HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: &lt;length of results&gt;
-{
-"acvVersion" : "0.3",
-"results" : {
-    "vsId" : 1437,
-    "disposition" : "incomplete",
-    "tests" : [
+[
+  { "acvVersion": "0.3" },
+  { "results" : {
+      "vsId" : 1437,
+      "disposition" : "incomplete",
+      "tests" : [
             { "tcId" : 12340, "result" : "passed", "reason" : ""},
             { "tcId" : 12341, "result" : "incomplete", "reason" : ""},
             { "tcId" : 12342, "result" : "failed", "reason" : "Authentication tag mismatch"}
               ]
    }
-} 
+]
            </pre>
 <p class="figure">Figure 13</p>
 <p id="rfc.section.11.5.p.2">The results request is an optional flow since some clients may not require success/fail information. Another possibility is to provide an out of band management session on the server may provide access to algorithm test results.</p>
@@ -1064,8 +1067,7 @@ Content-Length: &lt;length of results&gt;
 <div id="xml_json10"/>
 <pre>
 POST /validation/acvp/cancel HTTP1.2
-User Agent: acvp-client/0.3
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Authorization: Bearer JWT
            </pre>
 <p class="figure">Figure 14</p>
@@ -1079,11 +1081,12 @@ HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: &lt;length of results&gt;
-{
-"acvVersion" : "0.3",
-"vsId" : &lt;vs-id&gt;,
-"status" : "expired"
-}
+[
+  { "acvVersion": "0.3" },
+  { "vsId" : &lt;vs-id&gt;,
+    "status" : "expired"
+  }
+]
            </pre>
 <p class="figure">Figure 15</p>
 <p id="rfc.section.12.p.2">The ACVP protocol requires server implementations to generate test values and retain the data while the ACVP client processes and returns the results.  Some crypto modules implementing the client-side ACVP protocol may not return results immediately.  The ACVP protocol design implies the server must retain the test values to verify the client test responses at some time in the future.  However, some test vector sets are fairly large, which could place significant storage requirements on ACVP server implementations.  To alleviate long term storage requirements, ACVP allows for an expiration timestamp to be set when a test vector set is generated by the server.  </p>
@@ -1091,14 +1094,14 @@ Content-Length: &lt;length of results&gt;
 <div id="rfc.figure.16"/>
 <div id="xml_json12"/>
 <pre>
-                {
-                  "acvVersion": "0.3",
-		  "vsId": 1437,
+              [
+                { "acvVersion": "0.3" },
+                { "vsId": 1437,
 		  "expiry": "2018-12-31 23:59:59",
                   "algorithm": "AES-GCM",
-                  "direction": "encrypt",
                   "testGroups": [
                     {
+                      "direction": "encrypt",
                       "keyLen": 128,
                       "ivLen": 96,
                       "ptLen": 0,
@@ -1118,6 +1121,7 @@ Content-Length: &lt;length of results&gt;
 			.
 			.
 			.
+          ]
 
 	    </pre>
 <p class="figure">Figure 16</p>
@@ -1146,7 +1150,7 @@ Content-Length: &lt;length of results&gt;
 <p id="rfc.section.A.p.1">All JSON keywords shall use lower camelCase format with no underscores or hyphens and use the following characters only a-z, A-Z, 0-9. Keywords shall abbreviate common words and phrases wherever possible for brevity.</p>
 <p id="rfc.section.A.p.2">For example: password length - pwLen plain text length - ptLen </p>
 <p id="rfc.section.A.p.3">Keywords should be chosen such that they are informative and brief, for example: </p>
-<p id="rfc.section.A.p.4">{ "acvVersion" : "0.3", "results" : { "disposition" : "incomplete", } </p>
+<p id="rfc.section.A.p.4">[ { "acvVersion": "0.3" }, { "results" : { "disposition" : "incomplete", } } ] </p>
 <p id="rfc.section.A.p.5">Metadata assigned to the keyword may use any format which best reflects the information being represented including hyphens, underscores alternating case, numbers, etc. However, brevity should be a major consideration, for example:</p>
 <p id="rfc.section.A.p.6">"algorithms" : [ { "algorithm" : "AES-GCM", "mode" : "modes", "ivGen" : "internal", "ivGenMode" : "8.2.1", } All metadata representing strings or big numbers shall use double quotes at both ends.  Big numbers require conversion from strings to whatever format is used by the DUT.  Numerical values of integer size or with decimal points may use quotations if those values are generally used as a string, for example the acvVersion would generally be used in displaying information not in any mathematical operations.  Something like keyLen or ptLen values would be better used without quotes to avoid having to convert the string to an integer for use in the code.  </p>
 <h1 id="rfc.appendix.B"><a href="#rfc.appendix.B">Appendix B.</a> <a href="#app-reg-ex2" id="app-reg-ex2">JSON Encoded Error Messages</a></h1>
