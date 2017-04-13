@@ -39,7 +39,7 @@
     <!-- The abbreviated title is used in the page header - it is only necessary if the
          full title is longer than 39 characters -->
 
-    <title abbrev="Sym Alg JSON">ACVP Secure Hash and Message Authentication Algorithm JSON Specification</title>
+    <title abbrev="Sym Alg JSON">ACVP Message Authentication Algorithm JSON Specification</title>
 
     <!-- add 'role="editor"' below for the editors if appropriate -->
 
@@ -99,7 +99,7 @@
          keywords will be used for the search engine. -->
 
     <abstract>
-      <t>This document defines the JSON schema for using hash and MAC algorithms with the ACVP specification.</t>
+      <t>This document defines the JSON schema for using HMAC and CMAC algorithms with the ACVP specification.</t>
     </abstract>
   </front>
 
@@ -113,7 +113,7 @@
 	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications
 	      define the constructs for testing individual crypto algorithms.  Each sub-specification
 	      addresses a specific class of crypto algorithms.  This sub-specification defines the JSON
-	      constructs for testing hash and MAC crypto algorithms using ACVP.</t>
+	      constructs for testing HMAC and CMAC crypto algorithms using ACVP.</t>
 
       <section title="Requirements Language">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -127,7 +127,7 @@
     <t>ACVP requires crypto modules to register their capabilities.  This allows the crypto
 	module to advertise support for specific algorithms, notifying the ACVP server which
 	algorithms need test vectors generated for the validation process.  This section
-    describes the constructs for advertising support of hash algorithms to the ACVP server.</t>
+    describes the constructs for advertising support of HMAC and CMAC algorithms to the ACVP server.</t>
 
     <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms'
 	value of the ACVP registration message.  The 'algorithms' value is an array, where each
@@ -135,8 +135,7 @@
 	value is part of the 'capability_exchange' element of the ACVP JSON registration message.
 	See the ACVP specification for details on the registration message.
 
-	Each algorithm capability advertised is a self-contained JSON object.  The following
-	JSON values are used for hash algorithm capabilities:</t>
+	Each algorithm capability advertised is a self-contained JSON object. </t>
 
 
 	<section anchor="prereq_algs" title="Required Prerequisite Algorithms for MAC Validations">
@@ -259,7 +258,7 @@
 	</section>
 
 	<section anchor="supported_algs" title="Supported MAC Algorithms">
-	    <t>The following hash algorithms may be advertised by the ACVP compliant crypto module:</t>
+	    <t>The following algorithms may be advertised by the ACVP compliant crypto module:</t>
 	    <t><list style="symbols">
 		<t>HMAC-SHA-1</t>
 		<t>HMAC-SHA2-224</t>
@@ -284,8 +283,8 @@
 	<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
 	    the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
 	    sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
-	    crypto algorithm, such as SHA-1, SHA2-224, SHA3-256, etc.  This section
-	describes the JSON schema for a test vector set used with hash crypto algorithms.</t>
+	    crypto algorithm, such as HMAC-SHA-1, HMAC-SHA2-224, CMAC-AES-128, etc.  This section
+	describes the JSON schema for a test vector set used with HMAC and CMAC crypto algorithms.</t>
 
 	<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
 	vector set as well as individual test vectors to be processed by the ACVP client.  The following table
@@ -307,7 +306,7 @@
 	  <c/><c/><c/>
 
 	  <c>algorithm</c>
-	  <c>The hash algorithm and mode used for the test vectors.  See <xref target="supported_algs" /> for possible values.</c>
+	  <c>The algorithm and mode used for the test vectors.  See <xref target="supported_algs" /> for possible values.</c>
           <c>value</c>
 	  <c/><c/><c/>
 
@@ -321,7 +320,7 @@
 		groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
 	        in the vector set.  For instance, all test vectors that use the same key size would be grouped
 	        together.  The Test Group JSON object contains meta data that applies to all test vectors within
-	        the group.  The following table describes the secure hash and CMAC JSON elements of the Test Group JSON object.</t>
+	        the group.  The following table describes the secure HMAC and CMAC JSON elements of the Test Group JSON object.</t>
 	    <texttable anchor="vs_tg_table" title="Test Group JSON Object">
 		<ttcol align="left">JSON Value</ttcol>
 		<ttcol align="left">Description</ttcol>
@@ -329,7 +328,7 @@
 		<ttcol align="left">Optional</ttcol>
 
 		<c>testType</c>
-		<c>Test category type (algorithm functional test or montecarlo test for SHA. ver or gen for CMAC)</c>
+		<c>Test category type (ver or gen for CMAC)</c>
 		<c>value</c>
 		<c>No</c>
 		<c/><c/><c/><c/>
@@ -364,39 +363,8 @@
 	<section title="Test Case JSON Schema" anchor="tvjs">
 	    <t>Each test group contains an array of one or more test cases.  Each test case is a JSON object
 		that represents a single test vector to be processed by the ACVP client.  The following table describes
-	    the JSON elements for each secure hash test vector.</t>
-	    <texttable anchor="vs_tc_table" title="Test Case JSON Object">
-		<ttcol align="left">JSON Value</ttcol>
-		<ttcol align="left">Description</ttcol>
-		<ttcol align="left">JSON type</ttcol>
-		<ttcol align="left">Optional</ttcol>
+	    the JSON elements for each secure MAC test vector.</t>
 
-		<c>tcId</c>
-		<c>Numeric identifier for the test case, unique across the entire vector set.</c>
-		<c>value</c>
-		<c>No</c>
-		<c/><c/><c/><c/>
-
-		<c>len</c>
-		<c>Length of the message or seed</c>
-		<c>value</c>
-		<c>No</c>
-		<c/><c/><c/><c/>
-
-		<c>msg</c>
-		<c>Value of the message or seed</c>
-		<c>value</c>
-		<c>No</c>
-		<c/><c/><c/><c/>
-
-		<c>md</c>
-		<c>Hash value generated</c>
-		<c>value</c>
-		<c>Yes</c>
-	    </texttable>
-
-            <t>The following table describes
-	    the JSON elements for each message authentication test vector.</t>
 	    <texttable anchor="vs_tc_table2" title="Test Case JSON Object">
 		<ttcol align="left">JSON Value</ttcol>
 		<ttcol align="left">Description</ttcol>
@@ -578,7 +546,7 @@
     </references>
 
 
-    <section anchor="app-reg-ex" title="Example Secure Hash Capabilities JSON Object">
+    <section anchor="app-reg-ex" title="Example MAC Capabilities JSON Object">
       <t>The following is an example JSON object advertising support for HMAC-SHA-1.</t>
       <figure>
         <artwork><![CDATA[
