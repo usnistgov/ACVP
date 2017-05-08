@@ -12,6 +12,28 @@ of cryptographic algorithms.
 The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and 
 validation of standardized algorithm test evidence.
 
+# Status
+If you would like to try the algorithm testing service with ACVP, it is at acvts.nist.gov/acvp/. Please read the specification carefully. The latest version is 0.3. 
+The server currently allows validation of the following algorithms:
+
+    - AES-GCM
+    - AES-ECB
+    - AES-CBC
+    - AES-CFB1
+    - AES-CFB8
+    - AES-CFB128
+    - AES-OFB
+    - AES-CCM
+    - TDES-CBC
+    - TDES-ECB
+    - SHA-1
+    - SHA-224
+    - SHA-256
+    - SHA-384
+    - SHA-512
+
+We are working on support for several other algorithms, stay tuned for updates. 
+
 # Contribution guidelines:
 
 If you want to contribute, please follow the simple rules below and send us pull requests. 
@@ -21,9 +43,6 @@ If you want to contribute, please follow the simple rules below and send us pull
     - The running of the MakeFile (or its Windows equivalent) ensures that all artifacts (HTML and TXT) are kept up to date with src.
 
 If you would like to talk to our developers, you may want to send email to our mailing list algotest@nist.gov. You may also report bugs or request new tests.
-
-If you would like to try the algorithm testing service with ACVP, it is at acvts.nist.gov/acvp/. Please read the specification carefully. 
-
 
 # Licensing terms
 
