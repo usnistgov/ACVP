@@ -810,6 +810,46 @@ Content-Length: <length of results>
    <t>Errors will follow HTTP[S] numbering scheme.  In addition errors as well as 200 messages may carry JSON encoded information that describes in detail the error and any associated troubleshooting information.  A non-exhaustive list of JSON encoded error messages are in Appendix B.</t>
    </section>
 
+
+<section title="Endianness, Hex/Bitstring Parsing, and General Guidelines">
+  <section title="Endianness">
+    <t>
+      HexStrings should be considered in big endian order, unless otherwise specified for the algorithm.
+    </t>
+    <t>
+      The hex string "FA" (assuming all bits are considered) should represent the bits 11111010 (in MSb) or the value 250.
+    </t>
+  </section>
+  <section title="Hex to Bitstring Parsing">
+    <t>
+      "valueLen" will be used as the example, but it can apply to any bit length registration/vector set/etc parameters.
+    </t>
+    <t>
+      When a "value" is provided along with a "valueLen", the "valueLen" MUST be considered when parsing the hex string represented in "value", EXCEPT in empty bitstring cases, which MUST be represented as an empty string "".
+      Parsing Hex strings into Bit strings is especially important for algorithms such as the SHA variations that may only include a portion of bits from the provided hex string.  When only a portion of bits from a Hex string are considered, bits for use in the bitstring should be taken from the most significant bits, meaning the lesser significant bits are the bits that are dropped.
+    </t>
+    <section title="Hex string parsing examples">
+      <t><list style="symbols">
+        <t>
+          valueLen: 8, value: "FA", should be parsed as the bits 11111010, or the value 250.
+        </t>
+        <t>
+          valueLen: 7, value: "FA", should be parsed as the bits 1111101, or the value 125.
+        </t>            
+        <t>
+          valueLen: 5, value: "FA", should be parsed as the bits 11111, or the value 31.
+        </t>
+        <t>
+          valueLen: 3, value: "FA", should be parsed as the bits 111, or the value 7.
+        </t>
+        <t>
+          valueLen: 0, value: "", MUST be interpreted as an empty bit string.
+        </t>
+      </list></t>
+    </section>
+  </section>
+</section>
+
    <section title="Other Considerations">
    <t>When an ACVP client is attached to a cryptographic module that is in use, access to ACVP MUST be controlled so that only an administrator or other authorized user can send and receive ACVP messages.  This is because an attacker that has access to ACVP can potentially use it to probe for weaknesses in the cryptographic module.</t>
    </section>
