@@ -243,21 +243,23 @@ The following functions are outside the scope of this document:</t>
 
      </figure>
 	<section title="HTTP URI Hierarchy">
+	
 	<figure align="center" anchor="xml_figure4">
 
        <artwork align="left"><![CDATA[
 
-          +---------------------------------------------+
-             server              path prefix
-          +----------------+---+---------------+-----------+
-  https://acvp.nist.gov:123/validation/acvp/register
-          +----------------+---+---------------+-----------+ 
-                            port                operation
+          +-------------------------------------------------+
+          server path prefix
+          +-------------+----+------------------------------+
+  https://acvts.nist.gov/acvp/validation/acvp/register
+          +-------------+----+------------------------------+ 
+                        context         operation
 
            ]]></artwork>
          
-           </figure>
-         </section>
+  </figure>
+<t>Note that deployments utilizing ACV Proxy server may use a different protocol, e.g., HTTP, and custom URI path prefix, context and port number to interact with the DUT.</t>
+  </section>
 
 	<section title="HTTP URI Operations">
 	<t>Operations and their corresponding operation names</t>
@@ -393,8 +395,7 @@ A server may accept a down-level version from the client if it can process at a 
      <figure align="center" anchor="xml_json2">
        <artwork align="left"><![CDATA[
 POST /validation/acvp/register HTTP1.2
-User Agent: acvp-client/0.3
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Capabilities information(see next section)
 
 ..authentication happens here..
@@ -440,17 +441,17 @@ each message.
        <artwork align="left"><![CDATA[
 POST /validation/acvp/register HTTP1.2
 User Agent:
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Accept: 
-{
-"operation" : "register",
-"acvVersion" : "0.3",
-"certificateRequest" : "yes",
-"debugRequest" : "no",
-"production" : "no",
-"encryptAtRest" : "yes",
-"oeInformation" : {
-    "vendor": {
+[
+ { "acvVersion": "0.3" },
+ { "operation" : "register",
+   "certificateRequest" : "yes",
+   "debugRequest" : "no",
+   "production" : "no",
+   "encryptAtRest" : "yes",
+   "oeInformation" : {
+     "vendor": {
         "name" : "Cisco",
         "website": "www.cisco.com",
         "contact": [{
@@ -478,42 +479,43 @@ Accept:
         }]
     },
     "implementationDescription" : "Sample crypto module for demonstrating ACV protocol."
-},
-"capabilityExchange" : {
-"algorithms" : [
+  },
+  "capabilityExchange" : {
+  "algorithms" : [
          {
-"algorithm" : "AES-GCM",
-"prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
+  "algorithm" : "AES-GCM",
+  "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
                 {"algorithm" : "DRBG", "valValue" : "123456"}],
-"direction": [
+  "direction": [
     "encrypt",
     "decrypt"
-],
-"ivGen" : "internal",
-"ivGenMode" : "8.2.1",
-"keyLen" : [
+  ],
+  "ivGen" : "internal",
+  "ivGenMode" : "8.2.1",
+  "keyLen" : [
             128,
             256
              ],
-"tagLen" : [
+  "tagLen" : [
             96
                ],
-"ivLen" : [
+  "ivLen" : [
              96
                ],
- "ptLen" : [
+  "ptLen" : [
              0,
              128,
              136
                ],
- "aadLen" : [
+  "aadLen" : [
              128,
              136
                ]
-          }
-       ]
-   }
-}
+         }
+      ]
+    }
+  }
+]
            ]]></artwork>
      </figure>
 
@@ -522,14 +524,15 @@ Accept:
      <figure align="center" anchor="xml_json4">
        <artwork align="left"><![CDATA[
 200 OK Response:
-{ 
-"acvVersion" : "0.3", 
-"capabilityResponse" : { "vectorSets" : [
+[
+  { "acvVersion": "0.3" },
+  { "capabilityResponse" : { "vectorSets" : [
                        {"vsId":1437},
                        {"vsId":1438}] } , 
-"testSession" :       {"testId":458} , 
-"accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ" 
-}
+    "testSession" :       {"testId":458} , 
+    "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ" 
+  }
+]
            ]]></artwork>
      </figure>
 
@@ -545,8 +548,7 @@ Accept:
 	 <figure align="center" anchor="xml_json5">
 	    <artwork align="left"><![CDATA[
 GET /validation/acvp/vectors?vsId=1437  HTTP1.2
-User Agent: acvp-client/0.3
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Authorization: Bearer JWT
             ]]></artwork>
 	 </figure>
@@ -563,13 +565,13 @@ Authorization: Bearer JWT
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
-{
-  "acvVersion": "0.3",
-  "vsId": 1437,
-  "algorithm": "AES-GCM",
-  "direction": "encrypt",
-  "testGroups": [
+[
+ { "acvVersion": "0.3" },
+ { "vsId": 1437,
+   "algorithm": "AES-GCM",
+   "testGroups": [
     {
+      "direction": "encrypt",
       "keyLen": 128,
       "ivLen": 96,
       "ptLen": 0,
@@ -589,6 +591,7 @@ Content-Length: <length of results>
           "pt": "",
           "aad": "79504FF995F70FFD328D7070CCBD62F1"
         }.....
+]
 
 	<With debugRequest set iv, ct and tag would be included>
 
@@ -606,11 +609,12 @@ HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
-{
-"vsId": 1437,
-"acvVersion" : 0.3,
-"retry" : 10
-}
+[
+  { "acvVersion": "0.3" },
+  { "vsId": 1437,
+    "retry" : 10
+  }
+]
            ]]></artwork>
 	</figure>
 	<t>
@@ -625,14 +629,13 @@ Content-Length: <length of results>
 
      <figure align="center" anchor="xml_json8">
        <artwork align="left"><![CDATA[
-   POST /validation/acvp/vectors?vsId=1437 HTTP1.2
-   User Agent: acvp-client/0.3
-   Host: www.acvp.nist.gov
-   Authorization: Bearer JWT
-   Accept:   
-   {
-   "acvVersion": "0.3",
-   "vsId": 1437,
+POST /validation/acvp/vectors?vsId=1437 HTTP1.2
+Host: www.acvts.nist.gov/acvp
+Authorization: Bearer JWT
+Accept:   
+[
+ { "acvVersion": "0.3" },
+ { "vsId": 1437,
    "testResults": [
    {
    "tcId": 12340,
@@ -646,6 +649,7 @@ Content-Length: <length of results>
    "ct": "",
    "tag": "E7B1F2D77D82C6EB3C9CEFF16C376D9C"
    }, ...
+]
            ]]></artwork>
      </figure>
       </section>
@@ -657,7 +661,7 @@ Content-Length: <length of results>
        <artwork align="left"><![CDATA[
 GET /validation/acvp/results?vsId=1437 HTTP1.2
 User Agent:
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Accept: /
 
 
@@ -667,40 +671,40 @@ HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
-{
-"acvVersion" : "0.3",
-"results" : {
-    "vsId" : 1437,
-    "disposition" : "incomplete",
-    "tests" : [
+[
+  { "acvVersion": "0.3" },
+  { "results" : {
+      "vsId" : 1437,
+      "disposition" : "incomplete",
+      "tests" : [
             { "tcId" : 12340, "result" : "passed", "reason" : ""},
             { "tcId" : 12341, "result" : "incomplete", "reason" : ""},
             { "tcId" : 12342, "result" : "failed", "reason" : "Authentication tag mismatch"}
               ]
    }
-} 
+]
            ]]></artwork>
      </figure>
 
 <t>The results request is an optional flow since some clients may not require success/fail information. Another possibility is to provide an out of band management session on the server may provide access to algorithm test results.</t>
 
-<t>Disposition is defined overall for the entire vector set as:</t>
+<t>"disposition" is defined overall for the entire vector set as:</t>
 	    <t><list style="symbols">
-<t>FAIL indicates at least one test case has failed.</t>
-<t>UNRECEIVED indicates the server has not received responses from the client for all the test cases.</t>
-<t>INCOMPLETE indicates not all tests have been processed by the server, however none have failed thus far.</t>
-<t>EXPIRED indicates not all the test case responses were received from the client prior to expiry.</t>
-<t>PASSED indicates all test cases have been processed by the server and have passed.</t>
+<t>"fail" indicates at least one test case has failed.</t>
+<t>"unreceived" indicates the server has not received responses from the client for all the test cases.</t>
+<t>"incomplete" indicates not all tests have been processed by the server, however none have failed thus far.</t>
+<t>"expired" indicates not all the test case responses were received from the client prior to expiry.</t>
+<t>"passed" indicates all test cases have been processed by the server and have passed.</t>
 
 	   </list></t> 
-<t>Result is defined for individual test cases:</t>
+<t>"result" is defined for individual test cases:</t>
 	    <t><list style="symbols">
-<t>FAIL indicates the test case has failed.</t>
-<t>UNRECEIVED indicates the server has not received a response from the client for the test case.</t>
-<t>INCOMPLETE indicates the server has not processed the test case.</t>
-<t>EXPIRED indicates the client did not send the test case response to the server prior to expiry.</t>
-<t>PASSED indicates the test case passed.</t>
-<t>REASON provides additional detail for the test result.</t>
+<t>"fail" indicates the test case has failed.</t>
+<t>"unreceived" indicates the server has not received a response from the client for the test case.</t>
+<t>"incomplete" indicates the server has not processed the test case.</t>
+<t>"expired" indicates the client did not send the test case response to the server prior to expiry.</t>
+<t>"passed" indicates the test case passed.</t>
+<t>"reason" provides additional detail for the test result.</t>
 	   </list></t> 
       </section>
 
@@ -709,8 +713,7 @@ Content-Length: <length of results>
      <figure align="center" anchor="xml_json10">
        <artwork align="left"><![CDATA[
 POST /validation/acvp/cancel HTTP1.2
-User Agent: acvp-client/0.3
-Host: www.acvp.nist.gov
+Host: www.acvts.nist.gov/acvp
 Authorization: Bearer JWT
            ]]></artwork>
      </figure>
@@ -738,11 +741,12 @@ HTTP 1.2 200 OK
 Status: 200 OK
 Content-Type: application/json
 Content-Length: <length of results>
-{
-"acvVersion" : "0.3",
-"vsId" : <vs-id>,
-"status" : "expired"
-}
+[
+  { "acvVersion": "0.3" },
+  { "vsId" : <vs-id>,
+    "status" : "expired"
+  }
+]
            ]]></artwork>
 	</figure>
 
@@ -764,14 +768,14 @@ Content-Length: <length of results>
 
        <figure align="center" anchor="xml_json12">
             <artwork><![CDATA[
-                {
-                  "acvVersion": "0.3",
-		  "vsId": 1437,
+              [
+                { "acvVersion": "0.3" },
+                { "vsId": 1437,
 		  "expiry": "2018-12-31 23:59:59",
                   "algorithm": "AES-GCM",
-                  "direction": "encrypt",
                   "testGroups": [
                     {
+                      "direction": "encrypt",
                       "keyLen": 128,
                       "ivLen": 96,
                       "ptLen": 0,
@@ -791,6 +795,7 @@ Content-Length: <length of results>
 			.
 			.
 			.
+          ]
 
 	    ]]></artwork>
 	</figure>
@@ -904,11 +909,13 @@ plain text length - ptLen
 </t>
 
 <t>
-{
-"acvVersion" : "0.3",
-"results" : {
-"disposition" : "incomplete",
-} 
+[
+   { "acvVersion": "0.3" },
+   { "results" : {
+        "disposition" : "incomplete",
+      }
+   }
+] 
 </t>
 <t>Metadata assigned to the keyword may use any format which best reflects the
 information being represented including hyphens, underscores alternating
