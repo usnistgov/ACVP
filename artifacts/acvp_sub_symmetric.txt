@@ -240,6 +240,12 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | AEAD         |              |            |          |
    |             | algorithms   |              |            |          |
    |             |              |              |            |          |
+   | saltGen     | Salt         | value        | internal,  | Yes      |
+   |             | generation   |              | external   |          |
+   |             | method for   |              |            |          |
+   |             | AES-XPN mode |              |            |          |
+   |             | only.        |              |            |          |
+   |             |              |              |            |          |
    | aadLen      | The          | range or     | 0-65536    | Yes      |
    |             | supported    | array        |            |          |
    |             | AAD lengths  |              |            |          |
@@ -268,12 +274,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             |              |              |            |          |
    | keyingOptio | The Keying   | array        | 1, 2       | Yes      |
    | n           | Option used  |              |            |          |
-   |             | in TDES.     |              |            |          |
-   |             | Keying       |              |            |          |
-   |             | option 1 (1) |              |            |          |
-   |             | is 3         |              |            |          |
-   |             | distinct     |              |            |          |
-   |             | keys (K1,    |              |            |          |
 
 
 
@@ -282,6 +282,12 @@ Foley                   Expires December 3, 2016                [Page 5]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   |             | in TDES.     |              |            |          |
+   |             | Keying       |              |            |          |
+   |             | option 1 (1) |              |            |          |
+   |             | is 3         |              |            |          |
+   |             | distinct     |              |            |          |
+   |             | keys (K1,    |              |            |          |
    |             | K2, K3).     |              |            |          |
    |             | Keying       |              |            |          |
    |             | Option 2 (2) |              |            |          |
@@ -319,12 +325,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    Some algorithms allow ranges of data, IV and AAD lengths.  This table
    outlines the allowed values.
-
-
-
-
-
-
 
 
 
@@ -415,6 +415,8 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  AES-GCM
 
+   o  AES-XPN
+
    o  AES-CCM
 
    o  AES-XTS
@@ -441,14 +443,14 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    o  TDES-CFB-P64
 
-   o  TDES-OFB
-
 
 
 Foley                   Expires December 3, 2016                [Page 8]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   o  TDES-OFB
 
    o  TDES-OFB-I
 
@@ -496,8 +498,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    object is an array of test groups.  Test vectors are grouped into
    similar test cases to reduce the amount of data transmitted in the
    vector set.  For instance, all test vectors that use the same key
-   size would be grouped together.  The Test Group JSON object contains
-   meta data that applies to all test vectors within the group.  The
 
 
 
@@ -506,6 +506,8 @@ Foley                   Expires December 3, 2016                [Page 9]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
    following table describes the JSON elements of the Test Group JSON
    object.
 
@@ -515,6 +517,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
    +-----------+------------------------------------+-------+----------+
    | direction | The encryption direction: encrypt  | value | No       |
    |           | or decrypt                         |       |          |
+   |           |                                    |       |          |
+   | ivGen     | IV generation method (Required for | value | Yes      |
+   |           | AES-GCM and AES-XPN)               |       |          |
+   |           |                                    |       |          |
+   | ivGenMode | IV generation method (Required for | value | Yes      |
+   |           | AES-GCM and AES-XPN w/ internal    |       |          |
+   |           | ivGen)                             |       |          |
+   |           |                                    |       |          |
+   | saltGen   | Salt generation method (Required   | value | Yes      |
+   |           | AES-XPN)                           |       |          |
    |           |                                    |       |          |
    | keyLen    | Length of key in bits to use       | value | No       |
    |           |                                    |       |          |
@@ -545,18 +557,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 Foley                   Expires December 3, 2016               [Page 10]
 
 Internet-Draft                Sym Alg JSON                     June 2016
@@ -578,6 +578,9 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |          |                                     |       |          |
    | iv       | IV to use                           | value | Yes      |
    |          |                                     |       |          |
+   | salt     | The salt to use in AES-XPN          | value | Yes      |
+   |          | (required for AES-XPN only)         |       |          |
+   |          |                                     |       |          |
    | pt       | Plaintext to use                    | value | Yes      |
    |          |                                     |       |          |
    | ct       | Ciphertext to use                   | value | Yes      |
@@ -595,9 +598,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    send the response vectors back to the ACVP server.  The following
    table describes the JSON object that represents a vector set
    response.
-
-
-
 
 
 
@@ -632,9 +632,11 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |              | same JSON schema as defined in Section   |         |
    |              | 3.2                                      |         |
    |              |                                          |         |
-   | decryptFail  | For AES-GCM and AES-CCM decrypt failures | boolean |
-   |              | are part of the test. For these cases    | true    |
-   |              | the JSON reponse should include the      |         |
+   | decryptFail  | Some test cases included with decrypt    | boolean |
+   |              | operations in AES-GCM, AES-CCM, AES-XPN, | true    |
+   |              | AES-KW, AES-KWP, and TDES-KW will have   |         |
+   |              | expected failures. For these cases the   |         |
+   |              | JSON reponse should include the          |         |
    |              | decryptFail keyword, see Appendix F      |         |
    |              |                                          |         |
    | resultsArray | Array of JSON objects that represent     | array   |
@@ -662,8 +664,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 8.1.  Normative References
 
    [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
-
-
 
 
 
