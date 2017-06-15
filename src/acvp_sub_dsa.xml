@@ -27,7 +27,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-acvp-subdsa-0.3" ipr="trust200902">
+<rfc category="info" docName="draft-ietf-acvp-subdsa-0.4" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN"
@@ -248,11 +248,11 @@
 	<section anchor="supported_types" title="Supported DSA2 Functions">
 	    <t>The following DSA2 method types may be advertised by the ACVP compliant crypto module:</t>
 	    <t><list style="symbols">
-		<t>PQGGen</t>
-		<t>PQGVer</t>
-		<t>KeyPair</t>
-		<t>SigGen</t>
-		<t>SigVer</t>
+		<t>pqgGen</t>
+		<t>pqgVer</t>
+		<t>keyPair</t>
+		<t>sigGen</t>
+		<t>sigVer</t>
 	    </list></t>
 	</section>
 
@@ -334,6 +334,12 @@
           <c>sha</c>
 	  <c>SHA version used</c>
 	  <c>array</c>
+          <c>Yes</c>
+	  <c/><c/><c/><c/>
+
+          <c>modulo</c>
+	  <c>modulo for this test group</c>
+	  <c>value</c>
           <c>Yes</c>
 	  <c/><c/><c/><c/>
 
@@ -513,8 +519,8 @@
 	  <c>Yes</c>
 	  <c/><c/><c/><c/>
 
-	  <c>results</c>
-	  <c>The Pass or Fail result of the verify</c>
+	  <c>sigResult</c>
+	  <c>The pass or fail result of the verify</c>
 	  <c>value</c>
 	  <c>Yes</c>
 	</texttable>
@@ -559,8 +565,11 @@
       </reference>
     </references>
 
-    <section anchor="app-reg-ex" title="Example DSA2 Capabilities JSON Object">
-      <t>The following is a example JSON object advertising support for SHA-256.</t>
+    <section anchor="app-reg-ex" title="Example DSA2 JSON Object">
+      <t>The following sections contain example JSON for the various DSA modes: keyPair, sigGen, sigVer, pqgGen and pqgVer. Note that all binary HEX representations are in big-endian format.</t>
+
+    <section anchor="app-reg-ex0" title="Example DSA2 Capabilities JSON Object">
+      <t>The following is a example JSON object advertising support for all DSA modes.</t>
       <figure>
         <artwork><![CDATA[
 
@@ -570,7 +579,7 @@
                 "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"},
 			        {"algorithm" : "DRBG", "valValue" : "123456"}],
                 "methods": [
-			      { "type" : "PQGGen",
+			      { "type" : "pqgGen",
 			        "genPQ" : ["provable", "probable"],
 			        "genG" : ["unverifiable", "canonical"],
 			        "lnInfo" : [
@@ -580,7 +589,7 @@
 				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]}
 				       ]
                               },
-			      { "type" : "PQGVer",
+			      { "type" : "pqgVer",
 			        "genPQ" : ["provable", "probable"],
 			        "genG" : ["unverifiable", "canonical"],
 			        "lnInfo" : [
@@ -589,29 +598,95 @@
 				        { "ln" : "2048-256", 
 				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]}
 				       ]
+                              },
+			      { "type" : "sigGen",
+			        "lnInfo" : [
+			                { "ln" : "2048-224", 
+				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]},
+				        { "ln" : "2048-256", 
+				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]}
+				       ]
+                              },
+			      { "type" : "sigVer",
+			        "lnInfo" : [
+			                { "ln" : "2048-224", 
+				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]},
+				        { "ln" : "2048-256", 
+				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]}
+				       ]
+                              }
+			      { "type" : "keyPair",
+		                "ln" : ["2048-224", "2048-256", "3072-256"]
                               }
 			   ] 
             }
             ]]></artwork>
     </figure>
     </section>
-    <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
-      <t>The following is a example JSON object for DSA2 test vectors sent from the ACVP server to the crypto module.</t>
+    <section anchor="app-vs-ex1" title="Example Test DSA2 Generate JSON Object">
+      <t>The following is a example JSON object for DSA2 generate test vectors sent from the ACVP server to the crypto module and the response.</t>
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.3" },
+                { "acvVersion": "0.4" },
                 { "vsId": 1564,
                   "algorithm": "DSA2",
                   "testGroups": [
                     {
-                      "type": "PQGVer",
+                      "type": "pqgGen",
 		      "genPQ" : "probable",
 		      "ln" : "2048-224", 
 		      "sha" : "SHA-224",
                       "tests": [
                         {
                           "tcId": 2170,
+			  "num" : 5,
+                        },
+                      ]
+                    }
+                  ]
+                }
+             ]
+            ]]></artwork>
+      </figure>
+
+      <t>The following is a example JSON object for DSA2 test results sent from the crypto module to the ACVP server.</t>
+      <figure>
+        <artwork><![CDATA[
+              [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                    "testResults": [
+                        {
+                            "tcId": 2170,
+                            "p" : "858d21ba756acdeb70f3d629de6607c49b5f31e36f55a9832b296b9b447ce1b34ce969592a4807ad8152bfa2fbc2a944f8c864764892646ee3bdb7234812bd66ddde3defd6e25bc31e6317c96744e5bb1134330ea87773002504cdb1f73b23c2f2e9c5b80aa9cf40910ececdf9047d905794dccefcae2d9d2c524c5a50dd089ae72a3a8f07f113fb3925195b091e9f876c96654b243180c39676b2380904bd19f2213b2336cfa4c1e01b8846cd2861bc9b79968ea871cf30d673af77f49eea890d94c2803d878a2b682e95e41e781cfd861987785b36c181a84befbfa8cab3998f751e266b08dbcce9652009d249788db0fae76f453ea79cfa405c499d37b5d3",
+                            "q" : "ac992559af42b8899330a59f68c875066e19592faee08bb20ce413c5",
+                            "seed" : "63f2a8a2b17e910695fd86980b027e7c328debc98a4a9fb209de7029",
+                            "counter" : 263
+                        }
+                    ]
+                }
+             ]
+            ]]></artwork>
+        </figure>
+    </section>
+    <section anchor="app-vs-ex2" title="Example Test DSA2 Verify JSON Object">
+      <t>The following is a example JSON object for DSA2 verify test vectors sent from the ACVP server to the crypto module and the response.</t>
+      <figure>
+        <artwork><![CDATA[
+              [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                  "algorithm": "DSA2",
+                  "testGroups": [
+                    {
+                      "type": "pqgVer",
+		      "genPQ" : "probable",
+		      "ln" : "2048-224", 
+		      "sha" : "SHA-224",
+                      "tests": [
+                        {
+                          "tcId": 2171,
 			  "p" : "c92bd1ea2bbc438a85cf5d40e2a526b5db6d77082c7f086f264c9c70f6561ee438d2c381817be12e0cde6556a97e4624b43f6f6a3688c2791ccb84bb75f19eeb85656534b02738a952ea6aaeeb0625831f6640b869146a0bb5c0664503126f1e80f3033da0e7573ca0c91bbcda2618e2978c3ba3d9e73c125b4548a10a8b3d6ef1ad5ecba64298fd5f19f7062d882c044ffbf64c81f91542f7aff72dea711d0bf6b37402266050670e2f605c74aefb220ac6dbdb05842cf71d0967a292dd36656a2e58a52f1f84f54bab94f83b8d462f3d1bb79582e00389ee088767ab2a95f987daa86966d342d58cf71f8b419e85403a19025d595f1e60245b87264a93047d",
 			  "q" : "ba15474ce0d94df493534038946932162cb58f8a56832e7b2bc92c07",
 			  "seed" : "09f16b3b6fbd738c9155fe15c2ad77933cc83e6d861b290a036cdf6a",
@@ -624,18 +699,17 @@
              ]
             ]]></artwork>
       </figure>
-    </section>
-    <section anchor="app-results-ex" title="Example Test Results JSON Object">
+
       <t>The following is a example JSON object for DSA2 test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.3" },
+                { "acvVersion": "0.4" },
                 { "vsId": 1564,
                     "testResults": [
                         {
-                            "tcId": 2170,
-			    "result" : "False"
+                            "tcId": 2171,
+			    "sigResult" : "fail"
                         }
                     ]
                 }
@@ -643,5 +717,139 @@
             ]]></artwork>
         </figure>
     </section>
+    <section anchor="app-vs-ex3" title="Example Test DSA2 Generation JSON Object">
+      <t>The following is a example JSON object for DSA2 generation test vectors sent from the ACVP server to the crypto module and the response.</t>
+      <figure>
+        <artwork><![CDATA[
+             [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                  "algorithm": "DSA2",
+                  "testGroups": [
+                    {
+                      "type": "sigGen",
+		      "ln" : "2048-224", 
+		      "sha" : "SHA-224",
+                      "tests": [
+                        {
+                          "tcId": 2172,
+	                  "msg" : "9e4ece82e3c8e00ade2d7d24f2957032baa644a8cb76ba9d21a2163c70dbe0e1c2fd74039e7f778ca044a17999a0e2853ad19f1e6b326d8ac8f3e8548f147636bfa3e97639a4986ad921fed02b2c2fa5c7503ebd700953d1608c4a1312f309ee5101a7571f5c559508cf4473307fbd78884cdf3975acf25d17e5d264cc763793"
+                        }]
+                   }]
+              }]
+            ]]></artwork>
+        </figure>
+
+      <t>The following is a example JSON object for DSA2 generation test results sent from the crypto module to the ACVP server.</t>
+      <figure>
+        <artwork><![CDATA[
+              [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                    "testResults": [
+                        {
+                            "tcId": 2172,
+                            "p":  "858d21ba756acdeb70f3d629de6607c49b5f31e36f55a9832b296b9b447ce1b34ce969592a4807ad8152bfa2fbc2a944f8c864764892646ee3bdb7234812bd66ddde3defd6e25bc31e6317c96744e5bb1134330ea87773002504cdb1f73b23c2f2e9c5b80aa9cf40910ececdf9047d905794dccefcae2d9d2c524c5a50dd089ae72a3a8f07f113fb3925195b091e9f876c96654b243180c39676b2380904bd19f2213b2336cfa4c1e01b8846cd2861bc9b79968ea871cf30d673af77f49eea890d94c2803d878a2b682e95e41e781cfd861987785b36c181a84befbfa8cab3998f751e266b08dbcce9652009d249788db0fae76f453ea79cfa405c499d37b5d3",
+                            "q" : "ac992559af42b8899330a59f68c875066e19592faee08bb20ce413c5",
+                            "g" : "7fcfabe3dd90a7f877d3389c7af03e584dc3519432c9b393bb21c65646b22d4c8be20f450b782f728aa2454795f3cb63f488040e3c9775b214837161283de0530e6e02c3a022bf6ff5b3c249ad1d94cd7cfc49ef8ce5124ce726005fafd31095a608df2b2cba186786f22b180a234e1cface566b95c047d3192d91511ba5f6a09b68f21df844d5a8e5ac816ae04c2fae247e987bcd460ad88a83e56f4e3ec97e3ca1cd19c76260f461ea5338eaeb092156dcc1d226cb104f4543880c1d0e7210b29488b943d67b6a9e427f0c290439c216368da8104b3de5ad6cb6e65b3c0d97998214fba7690006d7910203ffb8d2fcc0cb94bf738bbb85a501508441bb1052",
+                            "y" : "70a89e1b6b6db695ab0d2225ce650f8f53dc4afc0e34329f5e7f5a1bbbae82eba0f741402c2a180469601a41fa34b2077b64c823255141858b079d2604fab2676692b1e05b9dd6feb17c09961d6ff8d0eb816d38a948bbb428642b6f3020a29e9fdc3b7eda624c883a8e61d78749f2c395bebae694af6d60a25b3d933c83efb5102b618ff042f4560c535adc03f2a78e573d625180cc977e89cf7098fbfce8d78d9574a6c3efcf771e70881a0b298a9373a2b76728a63f342340e133a15ccc4479a4cd2b31dd23a2c6879b300615d0ee647584b89e7f47245aea6bc7a66372a6bab2a99a1c0c7067676d6e780012bbb318844536a0756d13b576f7829b189e8b",
+                            "r" : "0dfe65ce3a33aac243341eec0ae80d1c7b570911b950963ef9d80ebc",
+                            "s" : "4c03c9685639b55b446130df087077cba28abf3aeedb01b604f54fdc"
+                        }
+                    ]
+                }
+             ]
+          ]]></artwork>
+      </figure>
+    </section>
+    <section anchor="app-vs-ex4" title="Example Test DSA2 Generation JSON Object">
+      <t>The following is a example JSON object for DSA2 generation test vectors sent from the ACVP server to the crypto module and the response.</t>
+      <figure>
+        <artwork><![CDATA[
+             [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                  "algorithm": "DSA2",
+                  "testGroups": [
+                    {
+                      "type": "sigVer",
+	              "genPQ" : "provable",
+		      "modulo" : 2048,
+                      "n" : "b601f0e72aaddc16bf706cb547c2fbcb5f771aa88c063964b2d60f873ca00eb2ca5fe8703280c64fc9a55527df4747501ebe9ee67c12b1024b9b5b02ec2a5e5eda31784b035b095a1be3f9129ef38547b104333e6954709e9cd1e571ef5aafd5ab70c5efa777f56214633c0d5f6d026bda33b1d5d28f23c23f42a73f484304f6434bbe76fe972edb58118e4dd1c043ca80ccbc6c438381678847aef6dd30a81d7b3e7248448229f6fb7ccf37d2fd154c3ae39e953571bb867bafda8185a99f6de0d964092cde022f5f1b797fa00699eef7347b887d186d583b9c7bc209cb22448bfb810d0bc1099e8082bf96771c8fbde6929a825f7ce98eb3ba13f78a9f0c17"
+                      "tests": [
+                        {
+                          "tcId": 2173,
+                          "sha" : "SHA-1",
+                          "e" : "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010001",
+                          "msg" : "40d40db43aedf3af7ebbfb83836beee2fe6cced5aa23bd0a44e11b6fda12ef0046b788dcf616649feeaf50ec0f73d1499931c330ef5140629ac4c37f913b8dd4b7974874a6a1eb8aabfcdded11585df5a3e7218e6c153d8ac174473c82f5b9429c5e96a2d2f85119be88eaaf12815a8f24783116aad87e2ac1d7efcd35a939f1",
+                          "s" : "618461dabf3f7a997bdb30f0002787f3484c32c748b54b1b7d14169c84d69aea210bb451b394662f38ba303f6558231719a996d581d7f349320946252d8e64f16e86e962e28bc3fda47a182e4c4d6f987959dbdb97728c8a1c4243e2064888c5f975c380e91e8bde87db399b8aefdddb52b962f10218c27f3bd6d0b27f173b6aecb22901b0fe88dc145e56f4cc660c10f2a239e980d12c4af2392af78478a2f3d2a0c03f1f47aad89eda2bda734a5063b6804fb7607c7cc063a4e6301436574b36ac6fb24bf66717ab8bf67908d843db6ffab6c4a3c36d3e06cca012623df6e812ed38036fddf35f06bc3fc3b666f90ed19fafe309579c8fea884ccbb763b19d"
+                        }]
+                   }]
+              }]
+            ]]></artwork>
+        </figure>
+
+      <t>The following is a example JSON object for DSA2 generation test results sent from the crypto module to the ACVP server.</t>
+      <figure>
+        <artwork><![CDATA[
+              [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                    "testResults": [
+                        {
+                            "tcId": 2173,
+                            "sigResult" : "pass"
+                        }
+                    ]
+                }
+             ]
+          ]]></artwork>
+      </figure>
+    </section>
+    <section anchor="app-vs-ex5" title="Example Test DSA2 Generation JSON Object">
+      <t>The following is a example JSON object for DSA2 generation test vectors sent from the ACVP server to the crypto module and the response.</t>
+      <figure>
+        <artwork><![CDATA[
+             [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                  "algorithm": "DSA2",
+                  "testGroups": [
+                    {
+                      "type": "keyPair",
+		      "ln" : "2048-224", 
+		      "sha" : "SHA-224",
+                      "tests": [
+                        {
+                          "tcId": 2171,
+	                  "num" : 10
+                        }]
+                   }]
+              }]
+            ]]></artwork>
+        </figure>
+
+      <t>The following is a example JSON object for DSA2 generation test results sent from the crypto module to the ACVP server.</t>
+      <figure>
+        <artwork><![CDATA[
+              [
+                { "acvVersion": "0.4" },
+                { "vsId": 1564,
+                    "testResults": [
+                        {
+                            "tcId": 2171,
+                            "p" : "858d21ba756acdeb70f3d629de6607c49b5f31e36f55a9832b296b9b447ce1b34ce969592a4807ad8152bfa2fbc2a944f8c864764892646ee3bdb7234812bd66ddde3defd6e25bc31e6317c96744e5bb1134330ea87773002504cdb1f73b23c2f2e9c5b80aa9cf40910ececdf9047d905794dccefcae2d9d2c524c5a50dd089ae72a3a8f07f113fb3925195b091e9f876c96654b243180c39676b2380904bd19f2213b2336cfa4c1e01b8846cd2861bc9b79968ea871cf30d673af77f49eea890d94c2803d878a2b682e95e41e781cfd861987785b36c181a84befbfa8cab3998f751e266b08dbcce9652009d249788db0fae76f453ea79cfa405c499d37b5d3",
+                            "q" : "ac992559af42b8899330a59f68c875066e19592faee08bb20ce413c5",
+                            "g" : "7fcfabe3dd90a7f877d3389c7af03e584dc3519432c9b393bb21c65646b22d4c8be20f450b782f728aa2454795f3cb63f488040e3c9775b214837161283de0530e6e02c3a022bf6ff5b3c249ad1d94cd7cfc49ef8ce5124ce726005fafd31095a608df2b2cba186786f22b180a234e1cface566b95c047d3192d91511ba5f6a09b68f21df844d5a8e5ac816ae04c2fae247e987bcd460ad88a83e56f4e3ec97e3ca1cd19c76260f461ea5338eaeb092156dcc1d226cb104f4543880c1d0e7210b29488b943d67b6a9e427f0c290439c216368da8104b3de5ad6cb6e65b3c0d97998214fba7690006d7910203ffb8d2fcc0cb94bf738bbb85a501508441bb1052",
+                            "x" : "6bc06142d13d991a272148f57fc9b2fd68ff306bca708865d38c6ed8",
+                            "y" : "70a89e1b6b6db695ab0d2225ce650f8f53dc4afc0e34329f5e7f5a1bbbae82eba0f741402c2a180469601a41fa34b2077b64c823255141858b079d2604fab2676692b1e05b9dd6feb17c09961d6ff8d0eb816d38a948bbb428642b6f3020a29e9fdc3b7eda624c883a8e61d78749f2c395bebae694af6d60a25b3d933c83efb5102b618ff042f4560c535adc03f2a78e573d625180cc977e89cf7098fbfce8d78d9574a6c3efcf771e70881a0b298a9373a2b76728a63f342340e133a15ccc4479a4cd2b31dd23a2c6879b300615d0ee647584b89e7f47245aea6bc7a66372a6bab2a99a1c0c7067676d6e780012bbb318844536a0756d13b576f7829b189e8b"
+                        }
+                    ]
+                }
+             ]
+          ]]></artwork>
+      </figure>
+    </section>
+   </section>
   </back>
 </rfc>
