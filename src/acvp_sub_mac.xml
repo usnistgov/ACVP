@@ -27,7 +27,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-acvp-subhashmac-0.3" ipr="trust200902">
+<rfc category="info" docName="draft-ietf-acvp-submac-0.4" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN"
@@ -195,44 +195,37 @@
 	  <c/><c/><c/><c/><c/>
 
           <c>keyRange1</c>
-	  <c>If IUT supports key sizes(KS) less than Block size(BS), enter 2 distinct key sizes (in Bytes). If IUT only supports one KS less than BS, enter a single size in the array and do not pass keyrange2 or keyblock field.</c>
+	  <c>If IUT supports key sizes(KS) less than Block size(BS), enter 2 distinct key sizes. If IUT only supports one KS less than BS, enter a single size in the array and do not pass keyrange2 or keyblock field.</c>
           <c>array</c>
-          <c>0-65536</c>
+          <c>0-524288</c>
           <c>Yes</c>
 	  <c/><c/><c/><c/><c/>
 
           <c>keyRange2</c>
-	  <c>If IUT supports key sizes(KS) greater than Block size(BS), enter 2 distinct key sizes (in Bytes). If IUT only supports one KS greater than BS, enter the size in the array and do not pass keyrange1 or keyblock field.</c>
+	  <c>If IUT supports key sizes(KS) greater than Block size(BS), enter 2 distinct key sizes. If IUT only supports one KS greater than BS, enter the size in the array and do not pass keyrange1 or keyblock field.</c>
           <c>array</c>
-          <c>0-65536</c>
+          <c>0-524288</c>
           <c>Yes</c>
 	  <c/><c/><c/><c/><c/>
 
           <c>keyBlock</c>
           <c>Implementation supports keysize equal blocksize</c>
-          <c>value</c>
-          <c>yes, no</c>
+          <c>boolean</c>
+          <c>true/false</c>
           <c>Yes</c>
 	  <c/><c/><c/><c/><c/>
 
           <c>macLen</c>
-	  <c>The supported mac sizes in bytes. (range dependent on SHA size)</c>
+	  <c>The supported mac sizes. (range dependent on SHA size)</c>
           <c>array</c>
-          <c>0-65536</c>
+          <c>8-524288</c>
           <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>inEmpty</c>
-          <c>Implementation does not accept Null (zero-length) messages</c>
-          <c>value</c>
-          <c>yes, no</c>
-          <c>Yes</c>
 	  <c/><c/><c/><c/><c/>
 
           <c>msgLen</c>
 	  <c>The CMAC message lengths supported</c>
           <c>array</c>
-          <c>0-65536</c>
+          <c>0-524288</c>
           <c>Yes</c>
 
         </texttable>
@@ -248,8 +241,9 @@
 		<t>The largest CMAC length supported</t>
 	    </list></t>
 
-        <t>msgLen for CMAC contains an array of 5 values defined by these rules:</t>
+        <t>msgLen for CMAC contains an array of up to 6 values defined by these rules:</t>
 	    <t><list style="symbols">
+    <t>The smallest message length supported</t>
 		<t>Two message lengths divisible by block size</t>
 		<t>Two message lengths NOT divisible by block size</t>
 		<t>The largest message length supported</t>
@@ -346,8 +340,20 @@
 		<ttcol align="left">JSON type</ttcol>
 		<ttcol align="left">Optional</ttcol>
 
-		<c>hLen</c>
-		<c>Length of MAC in bytes to generate</c>
+		<c>keyLen</c>
+		<c>Length of key in bits to use</c>
+		<c>value</c>
+		<c>No</c>
+		<c/><c/><c/><c/>    
+
+		<c>msgLen</c>
+		<c>Length of message/hash in bits</c>
+		<c>value</c>
+		<c>No</c>
+		<c/><c/><c/><c/>    
+
+    <c>macLen</c>
+		<c>Length of MAC in bits to generate/verify</c>
 		<c>value</c>
 		<c>No</c>
 		<c/><c/><c/><c/>
@@ -373,18 +379,6 @@
 
 		<c>tcId</c>
 		<c>Numeric identifier for the test case, unique across the entire vector set.</c>
-		<c>value</c>
-		<c>No</c>
-		<c/><c/><c/><c/>
-
-		<c>type</c>
-		<c>CMAC type of test, generation or verification</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>keyLen</c>
-		<c>Length of key in bytes to use</c>
 		<c>value</c>
 		<c>No</c>
 		<c/><c/><c/><c/>
@@ -564,10 +558,10 @@
             {
                 "algorithm": "HMAC-SHA2-256",
                 "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"}],
-                "keySize1": [ 32, 56],
-                "keySize2": [192, 256],
-                "keyBlock": "yes",
-                "macLen": [20]
+                "keySize1": [ 256, 448 ],
+                "keySize2": [ 1536, 2048],
+                "keyBlock": true,
+                "macLen": [ 160 ]
             }
             ]]></artwork>
     </figure>
@@ -580,9 +574,8 @@
                 "algorithm": "CMAC-TDES",
                 "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
 		                {"algorithm" : "TDES", "valValue" : "123456"}],
-                "inEmpty": "yes",
-		"macLen" : [0, 8],
-		"msgLen" : [0, 32, 15, 31, 40]
+		"macLen" : [ 8, 64],
+		"msgLen" : [ 0, 256, 120, 248, 320 ]
             }
             ]]></artwork>
     </figure>
@@ -592,22 +585,22 @@
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.3" },
+                { "acvVersion": "0.4" },
                 { "vsId": 1565,
                   "algorithm": "HMAC-SHA-1",
                   "testGroups": [
                     {
-                      "hLen": 20,
+                      "keyLen": 256,
+                      "msgLen": 160,
+                      "macLen" : 80,
                       "tests": [
                         {
                           "tcId": 2172,
-                          "keyLen": 32,
                           "key": "f8561d1477e58cb6061e709be60a40ab7468503eb6f3ff8234e3321c09b60212",
                           "msg": "5f4e900a8c223ad9fc834a4deefb33df8d6081bedafc6915e6eaa58c44c37f11be7b2bd8478559a0313e0b39a088a4433fb5423831a84ead4b3652d480d20a469c6abdff368ccdaadfcd8e20a06b542ba431d08f319b9c4bdd3b141cfe5b684362e4ef88407fbe7f6ff97a0ad6ec6a1f249cd0cbc11f7a7704c1946ba6a6c090"
                         },
                         {
                           "tcId": 2173,
-                          "keyLen": 32,
                           "key": "c9ba74509181091ccf2159d9cada77e4be00384cca4f36ce097f1b0400181cd9",
                           "msg": "e249dbff751ef43598aab6fb642eb1b18731a33148729a5fc52059027f4dfdd219a1e0d15d4bbedf803d1689a799d323a9662c161788c97a7aef27e8db0e3d89898f607316456436a36204b15dea832b4867949f3cdf78562d0366bbafa92f6cb87c228da8f22d61887f461b8f0909f1eb9ba373be5dee1b66c4dd2501061ba0"
                         }
@@ -621,37 +614,60 @@
       <t>The following is an example JSON object for CMAC test vectors sent from the ACVP server to the crypto module.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                { "acvVersion": "0.3" },
-                { "vsId": 1566,
-                  "algorithm": "CMAC-TDES",
-                  "testGroups": [
-                    {
-                      "testType": "gen",
-                      "tests": [
-                        {
-                          "tcId": 2175,
-                          "keyLen": 3,
-			  "macLen" : 5,
-                          "key": "c479f813ad1a45d5",
-                          "key2": "dc43459da4c85e85",
-                          "key3": "1cda518af886bf1f",
-                          "msg": "00"
-                        },
-                        {
-                          "tcId": 2176,
-                          "keyLen": 3,
-			  "macLen" : 5,
-                          "key": "731331866754588f",
-                          "key2": "d332ef51e0ce1925",
-                          "key3": "d586cba70440f44f",
-                          "msg": "00"
-                        }
-                      ]
-                    }
-                  ]
-                }
-             ]
+[{
+  "acvVersion": "0.4"
+},
+	{
+		"vsId": 1566,
+		"algorithm": "CMAC-TDES",
+		"testGroups": [{
+			"testType": "gen",
+			"keyLen": 3,
+			"msgLen": 0,
+			"macLen": 40,
+			"tests": [{
+					"tcId": 2175,
+					"key": "c479f813ad1a45d5",
+					"key2": "dc43459da4c85e85",
+					"key3": "1cda518af886bf1f",
+					"msg": ""
+				},
+				{
+					"tcId": 2176,
+					"key": "731331866754588f",
+					"key2": "d332ef51e0ce1925",
+					"key3": "d586cba70440f44f",
+					"msg": ""
+				}
+			]
+		},
+{
+			"testType": "ver",
+			"keyLen": 3,
+			"msgLen": 0,
+			"macLen": 40,
+			"tests": [{
+					"tcId": 2177,
+					"key": "d586cba70440f44f",
+					"key2": "d332ef51e0ce1925",
+					"key3": "dc43459da4c85e85",
+					"msg": ""
+          "mac": "cafecafecafecafecafecafecafecafecafecafe"
+				},
+				{
+					"tcId": 2177,
+					"key": "dc43459da4c85e85",
+					"key2": "c479f813ad1a45d5",
+					"key3": "1cda518af886bf1f",
+					"msg": ""
+          "mac": "cafecafecafecafecafecafecafecafecafecafe"
+				}
+			]
+		}    
+    {
+    }]
+	}
+]
             ]]></artwork>
     </figure>
     </section>
@@ -660,7 +676,7 @@
       <figure>
         <artwork><![CDATA[
               [
-                  { "acvVersion": "0.3" },
+                  { "acvVersion": "0.4" },
                   { "vsId": 1565,
                     "testResults": [
                         {
@@ -670,7 +686,8 @@
                        {
                             "tcId": 2173,
                             "mac": "feb3ff7b06eb7f62e9d19c331abbe2d183d2bc7a"
-                       }
+                       },
+                       
                     ]
                 }
              ]
@@ -680,7 +697,7 @@
       <figure>
         <artwork><![CDATA[
               [
-                  { "acvVersion": "0.3" },
+                  { "acvVersion": "0.4" },
                   { "vsId": 1566,
                     "testResults": [
                         {
@@ -690,7 +707,15 @@
                        {
                             "tcId": 2176,
                             "mac": "164bdb8582"
-                       }
+                       },
+                       {
+                            "tcId": 2177,
+                            "result": "fail"
+                       },
+                       {
+                            "tcId": 2178,
+                            "result": "fail"
+                       },
                     ]
                 }
              ]
