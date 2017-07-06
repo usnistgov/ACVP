@@ -816,41 +816,138 @@ Content-Length: <length of results>
    </section>
 
 
-<section title="Endianness, Hex/Bitstring Parsing, and General Guidelines">
-  <section title="Endianness">
+<section title="Custom Specification Objects">
+  <section title="BitString">
     <t>
-      HexStrings should be considered in big endian order, unless otherwise specified for the algorithm.
+      Bitstrings are used to communicate a string of bits between the ACVP server and IUT.
     </t>
-    <t>
-      The hex string "FA" (assuming all bits are considered) should represent the bits 11111010 (in MSb) or the value 250.
-    </t>
+    <section title="Endianness">
+      <t>
+        BitStrings should be considered in big endian order, unless otherwise specified by the algorithm.
+      </t>
+      <t>
+        The hex string "FA" (assuming all bits are considered) should represent the bits 11111010 (in MSb) or the value 250.
+      </t>
+    </section>
+    <section title="Hex to Bitstring Parsing">
+      <t>
+        "valueLen" will be used as the example, but it can apply to any bit length registration/vector set/etc parameters.
+      </t>
+      <t>
+        When a "value" is provided along with a "valueLen", the "valueLen" MUST be considered when parsing the hex string represented in "value", EXCEPT in empty bitstring cases, which MUST be represented as an empty string "".
+        Parsing Hex strings into Bit strings is especially important for algorithms such as the SHA variations that may only include a portion of bits from the provided hex string.  When only a portion of bits from a Hex string are considered, bits for use in the bitstring should be taken from the most significant bits, meaning the lesser significant bits are the bits that are dropped.
+      </t>
+      <section title="Hex string parsing examples">
+        <t><list style="symbols">
+          <t>
+            valueLen: 8, value: "FA", should be parsed as the bits 11111010, or the value 250.
+          </t>
+          <t>
+            valueLen: 7, value: "FA", should be parsed as the bits 1111101, or the value 125.
+          </t>            
+          <t>
+            valueLen: 5, value: "FA", should be parsed as the bits 11111, or the value 31.
+          </t>
+          <t>
+            valueLen: 3, value: "FA", should be parsed as the bits 111, or the value 7.
+          </t>
+          <t>
+            valueLen: 0, value: "", MUST be interpreted as an empty bit string.
+          </t>
+        </list></t>
+      </section>
+    </section>
   </section>
-  <section title="Hex to Bitstring Parsing">
+  <section title="Range">
     <t>
-      "valueLen" will be used as the example, but it can apply to any bit length registration/vector set/etc parameters.
+      The Range object can be used to convey a range of values.  It contains its own set of properties made up of "min", "max", and "increment".
     </t>
+    <section title="Range JSON examples">
+      <t> 
+        A range object specifying a minimum of 0, a maximum of 8, with an increment of 1.  This range object includes the values 1, 2, 3, 4, 5, 6, 7, and 8.
+      </t>
+      <figure align="center" anchor="xml_json13">
+        <artwork>
+          <![CDATA[
+          {
+            "myRange" : 
+            {  
+              "min" : 1,
+              "max" : 8,
+              "increment" : 1
+            }
+          }
+          ]]>
+        </artwork>
+      </figure>
+      <t> 
+        A range object specifying a minimum of 0, a maximum of 8, with an increment of 2.  This range object includes the values 0, 2, 4, 6, and 8.
+      </t>
+      <figure align="center" anchor="xml_json14">
+        <artwork>
+          <![CDATA[
+          {
+            "myRange" : 
+            {  
+              "min" : 0,
+              "max" : 8,
+              "increment" : 2
+            }
+          }
+          ]]>
+        </artwork>
+      </figure>
+    </section>
+  </section>
+  <section title="Domain">
     <t>
-      When a "value" is provided along with a "valueLen", the "valueLen" MUST be considered when parsing the hex string represented in "value", EXCEPT in empty bitstring cases, which MUST be represented as an empty string "".
-      Parsing Hex strings into Bit strings is especially important for algorithms such as the SHA variations that may only include a portion of bits from the provided hex string.  When only a portion of bits from a Hex string are considered, bits for use in the bitstring should be taken from the most significant bits, meaning the lesser significant bits are the bits that are dropped.
+      The Domain object can be used to specify a set of values similar to Range, albeit with more control.  A domain can be made up of an array of objects, where those objects can be literal values, and/or Range objects.
     </t>
-    <section title="Hex string parsing examples">
-      <t><list style="symbols">
-        <t>
-          valueLen: 8, value: "FA", should be parsed as the bits 11111010, or the value 250.
-        </t>
-        <t>
-          valueLen: 7, value: "FA", should be parsed as the bits 1111101, or the value 125.
-        </t>            
-        <t>
-          valueLen: 5, value: "FA", should be parsed as the bits 11111, or the value 31.
-        </t>
-        <t>
-          valueLen: 3, value: "FA", should be parsed as the bits 111, or the value 7.
-        </t>
-        <t>
-          valueLen: 0, value: "", MUST be interpreted as an empty bit string.
-        </t>
-      </list></t>
+    <section title="Domain JSON examples">
+      <t>
+        Several sample domain objects that state 0, 8, 16, 32, 96, 128, 192, and 256 are valid values.
+      </t>
+      <figure align="center" anchor="xml_json15">
+        <artwork>
+          <![CDATA[
+          {
+            "myDomain" : 
+            [
+              {  
+                "min" : 0,
+                "max" : 16,
+                "increment" : 8
+              },
+              32,
+              96,
+              {  
+                "min" : 128,
+                "max" : 256,
+                "increment" : 64
+              }
+            ]
+          }
+          ]]>
+        </artwork>
+      </figure>
+
+      <figure align="center" anchor="xml_json16">
+        <artwork>
+          <![CDATA[
+          {
+            "myDomain" : 
+            [
+              0, 8, 16, 32, 96, 128, 192, 256
+            ]
+          }
+          ]]>
+        </artwork>
+      </figure>
+    </section>
+    <section title="Additional Domain Information">
+      <t>
+        Because the Domain is an array of objects consisting of (potentially) both literals and ranges, algorithms that use an array of integers can be used interchangably with the Domain object.
+      </t>
     </section>
   </section>
 </section>
