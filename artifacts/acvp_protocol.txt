@@ -4,8 +4,8 @@
 
 Internet Engineering Task Force                          B. Fussell, Ed.
 Internet-Draft                                             Cisco Systems
-Intended status: Informational                            April 21, 2017
-Expires: October 23, 2017
+Intended status: Informational                              July 6, 2017
+Expires: January 7, 2018
 
 
               Automated Cryptographic Validation Protocol
@@ -31,9 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-
-   This Internet-Draft will expire on October 23, 2017.
-
+   This Internet-Draft will expire on January 7, 2018.
 
 Copyright Notice
 
@@ -55,11 +53,9 @@ Copyright Notice
 
 
 
-
-Fussell                 Expires October 23, 2017                [Page 1]
+Fussell                  Expires January 7, 2018                [Page 1]
 
-Internet-Draft              Abbreviated Title                 April 2017
-
+Internet-Draft              Abbreviated Title                  July 2017
 
 
 Table of Contents
@@ -94,29 +90,31 @@ Table of Contents
    12. Vector Set Expiration . . . . . . . . . . . . . . . . . . . .  18
      12.1.  Resending Test Responses . . . . . . . . . . . . . . . .  20
    13. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  20
-   14. Endianness, Hex/Bitstring Parsing, and General Guidelines . .  21
-     14.1.  Endianness . . . . . . . . . . . . . . . . . . . . . . .  21
-     14.2.  Hex to Bitstring Parsing . . . . . . . . . . . . . . . .  21
-       14.2.1.  Hex string parsing examples  . . . . . . . . . . . .  21
-   15. Other Considerations  . . . . . . . . . . . . . . . . . . . .  22
-   16. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  22
-   17. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  22
-   18. Normative References  . . . . . . . . . . . . . . . . . . . .  22
-   Appendix A.  JSON Formatting Guidelines . . . . . . . . . . . . .  22
-   Appendix B.  JSON Encoded Error Messages  . . . . . . . . . . . .  23
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  23
+   14. Custom Specification Objects  . . . . . . . . . . . . . . . .  21
+     14.1.  BitString  . . . . . . . . . . . . . . . . . . . . . . .  21
+       14.1.1.  Endianness . . . . . . . . . . . . . . . . . . . . .  21
+       14.1.2.  Hex to Bitstring Parsing . . . . . . . . . . . . . .  21
+         14.1.2.1.  Hex string parsing examples  . . . . . . . . . .  21
+     14.2.  Range  . . . . . . . . . . . . . . . . . . . . . . . . .  22
+       14.2.1.  Range JSON examples  . . . . . . . . . . . . . . . .  22
+     14.3.  Domain . . . . . . . . . . . . . . . . . . . . . . . . .  23
+       14.3.1.  Domain JSON examples . . . . . . . . . . . . . . . .  23
+       14.3.2.  Additional Domain Information  . . . . . . . . . . .  24
+   15. Other Considerations  . . . . . . . . . . . . . . . . . . . .  24
+   16. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  24
+   17. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  24
+   18. Normative References  . . . . . . . . . . . . . . . . . . . .  24
+   Appendix A.  JSON Formatting Guidelines . . . . . . . . . . . . .  24
+   Appendix B.  JSON Encoded Error Messages  . . . . . . . . . . . .  25
 
 
 
-
-
-
-
-
-Fussell                 Expires November 14, 2017               [Page 2]
+Fussell                  Expires January 7, 2018                [Page 2]
 
-Internet-Draft              Abbreviated Title                   May 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
+
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  25
 
 1.  Introduction
 
@@ -126,14 +124,6 @@ Internet-Draft              Abbreviated Title                   May 2017
    using standard network communication interfaces and protocols.  This
    communication protocol can also be used to validate the correctness
    of the implementations of the algorithms in the cryptographic module
-
-
-
-Fussell                 Expires October 23, 2017                [Page 2]
-
-Internet-Draft              Abbreviated Title                 April 2017
-
-
    with a validation authority.  This document describes how ACVP is
    structured with respect to the client-server model, the messaging
    protocol, optional features and flows.
@@ -172,16 +162,16 @@ Internet-Draft              Abbreviated Title                 April 2017
 
    ACVP defines how to communicate a request (to execute a cryptographic
    operation) to a cryptographic module, and how to communicate the
+
+
+
+Fussell                  Expires January 7, 2018                [Page 3]
+
+Internet-Draft              Abbreviated Title                  July 2017
+
+
    corresponding response (containing the output of that operation) back
    to a testing system.  It defines a transport (based on HTTP or
-
-
-
-Fussell                 Expires November 14, 2017               [Page 3]
-
-Internet-Draft              Abbreviated Title                   May 2017
-
-
    HTTPS), an encoding and message format (which is negotiated), and a
    set of message exchanges.  Each vector test set corresponds to a
    single message exchange driven from the client associated with the
@@ -190,15 +180,6 @@ Internet-Draft              Abbreviated Title                   May 2017
    to be acceptable.  Instead, it references existing specifications for
    those algorithms, and defines a mapping between the data on the wire
    and the algorithm testing specification.  ACVP does not define
-
-
-
-
-Fussell                 Expires October 23, 2017                [Page 3]
-
-Internet-Draft              Abbreviated Title                 April 2017
-
-
    detailed conformance criteria, such as those in FIPS-140.  Instead,
    it aims to be independent of particular conformance criteria, so that
    it can be used in multiple domains with different (even potentially
@@ -236,20 +217,18 @@ Internet-Draft              Abbreviated Title                 April 2017
 
    o  Management interface
 
+
+
+
+
+Fussell                  Expires January 7, 2018                [Page 4]
+
+Internet-Draft              Abbreviated Title                  July 2017
+
+
    With that in mind there are several expectations when building a
    server used as a validation authority.  A validation authority shall
    use HTTPS, TLS 1.2 or greater and mutual authentication.  Therefore a
-
-
-
-
-
-Fussell                 Expires October 23, 2017                [Page 4]
-
-Internet-Draft              Abbreviated Title                 April 2017
-
-
-
    client that expects to be used with a validation authority shall have
    the same requirements.  A server, proxy or client developed for the
    purposes of internal organizational testing only may chose not to
@@ -295,17 +274,17 @@ Internet-Draft              Abbreviated Title                 April 2017
    o  ACV Server - Sends JSON formatted messaging and test data to the
       ACV client and processes test responses.
 
+
+
+
+Fussell                  Expires January 7, 2018                [Page 5]
+
+Internet-Draft              Abbreviated Title                  July 2017
+
+
    o  ACV Proxy - Resides between the ACV server and ACV client to proxy
       the connection for the client.  This is particularly useful when
       the client does not support TLS, key management or have signature
-
-
-
-Fussell                 Expires October 23, 2017                [Page 5]
-
-Internet-Draft              Abbreviated Title                 April 2017
-
-
       capabilities and they are required by the server.  An example
       architecture is provided in Figure 2.
 
@@ -354,17 +333,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-
-
-
-
-
-
-
-
-Fussell                 Expires October 23, 2017                [Page 6]
+Fussell                  Expires January 7, 2018                [Page 6]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
                              Protocol Layering
@@ -418,32 +389,30 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-
-Fussell                 Expires October 23, 2017                [Page 7]
+Fussell                  Expires January 7, 2018                [Page 7]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
-   +--------------------------+-------------+-----------+--------------+
-   | Operation                | Operation   | HTTP      | Details      |
-   |                          | Path        | Method    |              |
-   +--------------------------+-------------+-----------+--------------+
-   | Registration and DUT     | /register   | POST      | Section 11.2 |
-   | Capabilities             |             |           |              |
-   |                          |             |           |              |
-   | Vector Set download      | /vectors    | GET       | Section 11.3 |
-   | request                  |             |           |              |
-   |                          |             |           |              |
-   | Submit Vector Test       | /vectors    | POST      | Section 11.4 |
-   | Results                  |             |           |              |
-   |                          |             |           |              |
-   | Request Validation       | /results    | GET       | Section 11.5 |
-   | Results                  |             |           |              |
-   |                          |             |           |              |
-   | Request server to cancel | /cancel     | POST      | Section 11.6 |
-   | session                  |             |           |              |
-   +--------------------------+-------------+-----------+--------------+
-
+   +---------------------------+--------------+-----------+------------+
+   | Operation                 | Operation    | HTTP      | Details    |
+   |                           | Path         | Method    |            |
+   +---------------------------+--------------+-----------+------------+
+   | Registration and DUT      | /register    | POST      | Section    |
+   | Capabilities              |              |           | 11.2       |
+   |                           |              |           |            |
+   | Vector Set download       | /vectors     | GET       | Section    |
+   | request                   |              |           | 11.3       |
+   |                           |              |           |            |
+   | Submit Vector Test        | /vectors     | POST      | Section    |
+   | Results                   |              |           | 11.4       |
+   |                           |              |           |            |
+   | Request Validation        | /results     | GET       | Section    |
+   | Results                   |              |           | 11.5       |
+   |                           |              |           |            |
+   | Request server to cancel  | /cancel      | POST      | Section    |
+   | session                   |              |           | 11.6       |
+   +---------------------------+--------------+-----------+------------+
 
                                   Table 1
 
@@ -476,10 +445,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-
-Fussell                 Expires October 23, 2017                [Page 8]
+Fussell                  Expires January 7, 2018                [Page 8]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    discussed here, but should be agreed upon between the client and
@@ -533,9 +501,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-Fussell                 Expires October 23, 2017                [Page 9]
+Fussell                  Expires January 7, 2018                [Page 9]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
 10.2.  Test Exchange
@@ -589,10 +557,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-Fussell                 Expires October 23, 2017               [Page 10]
+Fussell                  Expires January 7, 2018               [Page 10]
 
-Internet-Draft              Abbreviated Title                 April 2017
-
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    The first four claims are required, however "pkey" is an optional
@@ -646,10 +613,9 @@ each message.
 
 
 
-Fussell                 Expires October 23, 2017               [Page 11]
+Fussell                  Expires January 7, 2018               [Page 11]
 
-Internet-Draft              Abbreviated Title                 April 2017
-
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    o  production - If this is a production environment indicate so with
@@ -703,10 +669,9 @@ Accept:
 
 
 
-
-Fussell                 Expires October 23, 2017               [Page 12]
+Fussell                  Expires January 7, 2018               [Page 12]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
             "family" : "ARK",
@@ -760,10 +725,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-Fussell                 Expires October 23, 2017               [Page 13]
+Fussell                  Expires January 7, 2018               [Page 13]
 
-Internet-Draft              Abbreviated Title                 April 2017
-
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    Successful response from server is 200 OK and a set of vector set
@@ -817,9 +781,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-Fussell                 Expires October 23, 2017               [Page 14]
+Fussell                  Expires January 7, 2018               [Page 14]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    200 OK Response:
@@ -873,10 +837,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-
-Fussell                 Expires October 23, 2017               [Page 15]
+Fussell                  Expires January 7, 2018               [Page 15]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    HTTP 1.2 200 OK
@@ -930,10 +893,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-
-Fussell                 Expires October 23, 2017               [Page 16]
+Fussell                  Expires January 7, 2018               [Page 16]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
 11.5.  Validation Results Request
@@ -987,10 +949,9 @@ Content-Length: <length of results>
 
 
 
-Fussell                 Expires October 23, 2017               [Page 17]
+Fussell                  Expires January 7, 2018               [Page 17]
 
-Internet-Draft              Abbreviated Title                 April 2017
-
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    o  "expired" indicates not all the test case responses were received
@@ -1044,10 +1005,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-Fussell                 Expires October 23, 2017               [Page 18]
+Fussell                  Expires January 7, 2018               [Page 18]
 
-Internet-Draft              Abbreviated Title                 April 2017
-
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    HTTP 1.2 200 OK
@@ -1101,9 +1061,9 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-Fussell                 Expires October 23, 2017               [Page 19]
+Fussell                  Expires January 7, 2018               [Page 19]
 
-Internet-Draft              Abbreviated Title                 April 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
 
                  [
@@ -1157,27 +1117,30 @@ Internet-Draft              Abbreviated Title                 April 2017
 
 
 
-
-Fussell                 Expires October 23, 2017               [Page 20]
+Fussell                  Expires January 7, 2018               [Page 20]
 
-Internet-Draft              Abbreviated Title                 April 2017
-
+Internet-Draft              Abbreviated Title                  July 2017
 
 
    information.  A non-exhaustive list of JSON encoded error messages
    are in Appendix B.
 
-14.  Endianness, Hex/Bitstring Parsing, and General Guidelines
+14.  Custom Specification Objects
 
-14.1.  Endianness
+14.1.  BitString
 
-   HexStrings should be considered in big endian order, unless otherwise
-   specified for the algorithm.
+   Bitstrings are used to communicate a string of bits between the ACVP
+   server and IUT.
+
+14.1.1.  Endianness
+
+   BitStrings should be considered in big endian order, unless otherwise
+   specified by the algorithm.
 
    The hex string "FA" (assuming all bits are considered) should
    represent the bits 11111010 (in MSb) or the value 250.
 
-14.2.  Hex to Bitstring Parsing
+14.1.2.  Hex to Bitstring Parsing
 
    "valueLen" will be used as the example, but it can apply to any bit
    length registration/vector set/etc parameters.
@@ -1193,7 +1156,7 @@ Internet-Draft              Abbreviated Title                 April 2017
    bits, meaning the lesser significant bits are the bits that are
    dropped.
 
-14.2.1.  Hex string parsing examples
+14.1.2.1.  Hex string parsing examples
 
    o  valueLen: 8, value: "FA", should be parsed as the bits 11111010,
       or the value 250.
@@ -1207,18 +1170,131 @@ Internet-Draft              Abbreviated Title                 April 2017
    o  valueLen: 3, value: "FA", should be parsed as the bits 111, or the
       value 7.
 
+
+
+
+Fussell                  Expires January 7, 2018               [Page 21]
+
+Internet-Draft              Abbreviated Title                  July 2017
+
+
    o  valueLen: 0, value: "", MUST be interpreted as an empty bit
       string.
 
+14.2.  Range
+
+   The Range object can be used to convey a range of values.  It
+   contains its own set of properties made up of "min", "max", and
+   "increment".
+
+14.2.1.  Range JSON examples
+
+   A range object specifying a minimum of 0, a maximum of 8, with an
+   increment of 1.  This range object includes the values 1, 2, 3, 4, 5,
+   6, 7, and 8.
+
+
+             {
+               "myRange" :
+               {
+                 "min" : 1,
+                 "max" : 8,
+                 "increment" : 1
+               }
+             }
+
+
+                                 Figure 17
+
+   A range object specifying a minimum of 0, a maximum of 8, with an
+   increment of 2.  This range object includes the values 0, 2, 4, 6,
+   and 8.
+
+
+             {
+               "myRange" :
+               {
+                 "min" : 0,
+                 "max" : 8,
+                 "increment" : 2
+               }
+             }
+
+
+                                 Figure 18
 
 
 
 
 
-Fussell                 Expires November 14, 2017              [Page 21]
+
+
+Fussell                  Expires January 7, 2018               [Page 22]
 
-Internet-Draft              Abbreviated Title                   May 2017
+Internet-Draft              Abbreviated Title                  July 2017
 
+
+14.3.  Domain
+
+   The Domain object can be used to specify a set of values similar to
+   Range, albeit with more control.  A domain can be made up of an array
+   of objects, where those objects can be literal values, and/or Range
+   objects.
+
+14.3.1.  Domain JSON examples
+
+   Several sample domain objects that state 0, 8, 16, 32, 96, 128, 192,
+   and 256 are valid values.
+
+
+             {
+               "myDomain" :
+               [
+                 {
+                   "min" : 0,
+                   "max" : 16,
+                   "increment" : 8
+                 },
+                 32,
+                 96,
+                 {
+                   "min" : 128,
+                   "max" : 256,
+                   "increment" : 64
+                 }
+               ]
+             }
+
+
+                                 Figure 19
+
+
+             {
+               "myDomain" :
+               [
+                 0, 8, 16, 32, 96, 128, 192, 256
+               ]
+             }
+
+
+                                 Figure 20
+
+
+
+
+
+
+
+Fussell                  Expires January 7, 2018               [Page 23]
+
+Internet-Draft              Abbreviated Title                  July 2017
+
+
+14.3.2.  Additional Domain Information
+
+   Because the Domain is an array of objects consisting of (potentially)
+   both literals and ranges, algorithms that use an array of integers
+   can be used interchangably with the Domain object.
 
 15.  Other Considerations
 
@@ -1261,17 +1337,17 @@ Appendix A.  JSON Formatting Guidelines
 
    Metadata assigned to the keyword may use any format which best
    reflects the information being represented including hyphens,
+
+
+
+
+Fussell                  Expires January 7, 2018               [Page 24]
+
+Internet-Draft              Abbreviated Title                  July 2017
+
+
    underscores alternating case, numbers, etc.  However, brevity should
    be a major consideration, for example:
-
-
-
-
-
-Fussell                 Expires October 23, 2017               [Page 21]
-
-Internet-Draft              Abbreviated Title                 April 2017
-
 
    "algorithms" : [ { "algorithm" : "AES-GCM", "mode" : "modes", "ivGen"
    : "internal", "ivGenMode" : "8.2.1", } All metadata representing
@@ -1321,8 +1397,4 @@ Author's Address
 
 
 
-
-
-
-Fussell                 Expires October 23, 2017               [Page 22]
-
+Fussell                  Expires January 7, 2018               [Page 25]
