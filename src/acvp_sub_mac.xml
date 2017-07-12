@@ -181,7 +181,7 @@
           <ttcol align="left">Optional</ttcol>
 
           <c>algorithm</c>
-	  <c>The MAC algorithm and mode to be validated.</c>
+	        <c>The MAC algorithm and mode to be validated.</c>
           <c>value</c>
           <c>See <xref target="supported_algs" /></c>
           <c>No</c>
@@ -191,6 +191,13 @@
           <c>prerequistie algorithm validations, See <xref target="app-reg-ex" /> for examples</c>
           <c>array of prereqAlgVal objects</c>
           <c>See <xref target="prereq_algs" /></c>
+          <c>No</c>
+	  <c/><c/><c/><c/><c/>
+
+          <c>direction</c>
+	        <c>The MAC direction(s) to test. Only applies to CMAC.</c>
+          <c>array</c>
+          <c>gen, ver</c>
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
@@ -215,18 +222,18 @@
           <c>Yes</c>
 	  <c/><c/><c/><c/><c/>
 
+          <c>msgLen</c>
+	  <c>The CMAC message lengths supported.  Min/max/increment and values must be mod 8.</c>
+          <c>Domain</c>
+          <c>0-524288</c>
+          <c>Yes</c>
+
           <c>macLen</c>
-	  <c>The supported mac sizes. (range dependent on SHA size)</c>
-          <c>array</c>
+	  <c>The supported mac sizes. Min/max/increment and values must be mod 8. (range dependent on SHA size).</c>
+          <c>Domain</c>
           <c>8-524288</c>
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
-
-          <c>msgLen</c>
-	  <c>The CMAC message lengths supported</c>
-          <c>array</c>
-          <c>0-524288</c>
-          <c>Yes</c>
 
         </texttable>
 
@@ -322,7 +329,13 @@
 		<ttcol align="left">Optional</ttcol>
 
 		<c>testType</c>
-		<c>Test category type (ver or gen for CMAC, gen for HMAC)</c>
+		<c>Test category type (AFT)</c>
+		<c>value</c>
+		<c>No</c>
+		<c/><c/><c/><c/>
+
+		<c>direction</c>
+		<c>The direction of the tests - gen or ver - only applies to CMAC</c>
 		<c>value</c>
 		<c>No</c>
 		<c/><c/><c/><c/>
@@ -552,6 +565,21 @@
             }
             ]]></artwork>
     </figure>
+      <t>The following is an example JSON object advertising support for CMAC-AES-128.</t>
+      <figure>
+        <artwork><![CDATA[
+
+
+            {
+                "algorithm": "CMAC-AES-128",
+                "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
+		                {"algorithm" : "TDES", "valValue" : "123456"}],
+                "direction" : [ "gen", "ver" ],
+                "macLen" : [ 64 ],
+                "msgLen" : [ 0 ]
+            }
+            ]]></artwork>
+    </figure>    
       <t>The following is an example JSON object advertising support for CMAC-TDES.</t>
       <figure>
         <artwork><![CDATA[
@@ -561,8 +589,9 @@
                 "algorithm": "CMAC-TDES",
                 "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
 		                {"algorithm" : "TDES", "valValue" : "123456"}],
-		"macLen" : [ 8, 64],
-		"msgLen" : [ 0, 256, 120, 248, 320 ]
+                "direction" : [ "gen", "ver" ],
+                "macLen" : [ 8, 64 ],
+                "msgLen" : [ 0, 256, 120, 248, 320 ]
             }
             ]]></artwork>
     </figure>
@@ -571,89 +600,143 @@
       <t>The following is an example JSON object for HMAC test vectors sent from the ACVP server to the crypto module.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                { "acvVersion": "0.4" },
-                { "vsId": 1565,
-                  "algorithm": "HMAC-SHA-1",
-                  "testGroups": [
-                    {
-                      "testType": "gen",
-                      "keyLen": 256,
-                      "msgLen": 160,
-                      "macLen" : 80,
-                      "tests": [
-                        {
-                          "tcId": 2172,
-                          "key": "f8561d1477e58cb6061e709be60a40ab7468503eb6f3ff8234e3321c09b60212",
-                          "msg": "5f4e900a8c223ad9fc834a4deefb33df8d6081bedafc6915e6eaa58c44c37f11be7b2bd8478559a0313e0b39a088a4433fb5423831a84ead4b3652d480d20a469c6abdff368ccdaadfcd8e20a06b542ba431d08f319b9c4bdd3b141cfe5b684362e4ef88407fbe7f6ff97a0ad6ec6a1f249cd0cbc11f7a7704c1946ba6a6c090"
-                        },
-                        {
-                          "tcId": 2173,
-                          "key": "c9ba74509181091ccf2159d9cada77e4be00384cca4f36ce097f1b0400181cd9",
-                          "msg": "e249dbff751ef43598aab6fb642eb1b18731a33148729a5fc52059027f4dfdd219a1e0d15d4bbedf803d1689a799d323a9662c161788c97a7aef27e8db0e3d89898f607316456436a36204b15dea832b4867949f3cdf78562d0366bbafa92f6cb87c228da8f22d61887f461b8f0909f1eb9ba373be5dee1b66c4dd2501061ba0"
-                        }
-                      ]
-                    }
-                  ]
-                }
-             ]
+[
+	{
+		"acvVersion": "0.4"
+	},
+	{
+		"vsId": 1565,
+		"algorithm": "HMAC-SHA-1",
+		"testGroups": [{
+			"testType": "AFT",
+			"keyLen": 256,
+			"msgLen": 160,
+			"macLen": 80,
+			"tests": [{
+					"tcId": 2172,
+					"key": "f8561d1477e58cb6061e709be60a40ab7468503eb6f3ff8234e3321c09b60212",
+					"msg": "5f4e900a8c223ad9fc834a4deefb33df8d6081bedafc6915e6eaa58c44c37f11be7b2bd8478559a0313e0b39a088a4433fb5423831a84ead4b3652d480d20a469c6abdff368ccdaadfcd8e20a06b542ba431d08f319b9c4bdd3b141cfe5b684362e4ef88407fbe7f6ff97a0ad6ec6a1f249cd0cbc11f7a7704c1946ba6a6c090"
+				},
+				{
+					"tcId": 2173,
+					"key": "c9ba74509181091ccf2159d9cada77e4be00384cca4f36ce097f1b0400181cd9",
+					"msg": "e249dbff751ef43598aab6fb642eb1b18731a33148729a5fc52059027f4dfdd219a1e0d15d4bbedf803d1689a799d323a9662c161788c97a7aef27e8db0e3d89898f607316456436a36204b15dea832b4867949f3cdf78562d0366bbafa92f6cb87c228da8f22d61887f461b8f0909f1eb9ba373be5dee1b66c4dd2501061ba0"
+				}
+			]
+		}]
+	}
+]
             ]]></artwork>
        </figure>
-      <t>The following is an example JSON object for CMAC test vectors sent from the ACVP server to the crypto module.</t>
+<t>The following is an example JSON object for CMAC-AES-128 test vectors sent from the ACVP server to the crypto module.</t>
       <figure>
         <artwork><![CDATA[
-[{
-  "acvVersion": "0.4"
-},
+[
+	{
+		"acvVersion": "0.4"
+	},
+	{
+		"vsId": 3500,
+		"algorithm": "CMAC-AES-128",
+		"testGroups": [{
+			"testType": "AFT",
+			"direction": "gen",
+			"keyLen": 128,
+			"msgLen": 0,
+			"macLen": 64,
+			"tests": [{
+					"tcId": 2750,
+					"key": "f28effca41cb11819a81eb3ebf3b7e83",
+					"msg": ""
+				},
+				{
+					"tcId": 2751,
+					"key": "ab566f4af532efc8bc56555fe07696fd",
+					"msg": ""
+				}
+			]
+		}]
+	},
+	{
+		"testType": "AFT",
+		"direction": "ver",
+		"keyLen": 127,
+		"msgLen": 0,
+		"macLen": 64,
+		"tests": [{
+				"tcId": 2752,
+				"key": "ac7165b3778dd93f5e7e532ad2c1eb7b",
+				"msg": "",
+				"mac": "2eef1e38fcc7c568"
+			},
+			{
+				"tcId": 2753,
+				"key": "eb87fb7a5fb60caecb9b23564befe513",
+				"msg": "",
+				"mac": "cafecafecafecafe"
+			}
+		]
+	}
+]
+            ]]></artwork>
+    </figure>       
+      <t>The following is an example JSON object for CMAC-TDES test vectors sent from the ACVP server to the crypto module.</t>
+      <figure>
+        <artwork><![CDATA[
+[
+	{
+		"acvVersion": "0.4"
+	},
 	{
 		"vsId": 1566,
 		"algorithm": "CMAC-TDES",
 		"testGroups": [{
-			"testType": "gen",
-			"keyLen": 3,
-			"msgLen": 0,
-			"macLen": 40,
-			"tests": [{
-					"tcId": 2175,
-					"key": "c479f813ad1a45d5",
-					"key2": "dc43459da4c85e85",
-					"key3": "1cda518af886bf1f",
-					"msg": ""
-				},
-				{
-					"tcId": 2176,
-					"key": "731331866754588f",
-					"key2": "d332ef51e0ce1925",
-					"key3": "d586cba70440f44f",
-					"msg": ""
-				}
-			]
-		},
-{
-			"testType": "ver",
-			"keyLen": 3,
-			"msgLen": 0,
-			"macLen": 40,
-			"tests": [{
-					"tcId": 2177,
-					"key": "d586cba70440f44f",
-					"key2": "d332ef51e0ce1925",
-					"key3": "dc43459da4c85e85",
-					"msg": ""
-          "mac": "cafecafecafecafecafecafecafecafecafecafe"
-				},
-				{
-					"tcId": 2177,
-					"key": "dc43459da4c85e85",
-					"key2": "c479f813ad1a45d5",
-					"key3": "1cda518af886bf1f",
-					"msg": ""
-          "mac": "cafecafecafecafecafecafecafecafecafecafe"
-				}
-			]
-		}    
-    {
-    }]
+				"testType": "AFT",
+				"direction": "gen",
+				"keyLen": 3,
+				"msgLen": 0,
+				"macLen": 40,
+				"tests": [{
+						"tcId": 2175,
+						"key": "c479f813ad1a45d5",
+						"key2": "dc43459da4c85e85",
+						"key3": "1cda518af886bf1f",
+						"msg": ""
+					},
+					{
+						"tcId": 2176,
+						"key": "731331866754588f",
+						"key2": "d332ef51e0ce1925",
+						"key3": "d586cba70440f44f",
+						"msg": ""
+					}
+				]
+			},
+			{
+				"testType": "AFT",
+				"direction": "ver",
+				"keyLen": 3,
+				"msgLen": 0,
+				"macLen": 40,
+				"tests": [{
+						"tcId": 2177,
+						"key": "d586cba70440f44f",
+						"key2": "d332ef51e0ce1925",
+						"key3": "dc43459da4c85e85",
+						"msg": "",
+						"mac": "cafecafecafecafecafecafecafecafecafecafe"
+					},
+					{
+						"tcId": 2177,
+						"key": "dc43459da4c85e85",
+						"key2": "c479f813ad1a45d5",
+						"key3": "1cda518af886bf1f",
+						"msg": "",
+						"mac": "cafecafecafecafecafecafecafecafecafecafe"
+					}
+				]
+			}
+		]
 	}
 ]
             ]]></artwork>
@@ -663,50 +746,83 @@
       <t>The following is an example JSON object for HMAC test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.4" },
-                  { "vsId": 1565,
-                    "testResults": [
-                        {
-                            "tcId": 2172,
-                            "mac": "eb0326e5edcf9465fc01c773262011a3059cfd97"
-                        },
-                       {
-                            "tcId": 2173,
-                            "mac": "feb3ff7b06eb7f62e9d19c331abbe2d183d2bc7a"
-                       },
-                       
-                    ]
-                }
-             ]
+[
+	{
+		"acvVersion": "0.4"
+	},
+	{
+		"vsId": 1565,
+		"testResults": [{
+				"tcId": 2172,
+				"mac": "eb0326e5edcf9465fc01c773262011a3059cfd97"
+			},
+			{
+				"tcId": 2173,
+				"mac": "feb3ff7b06eb7f62e9d19c331abbe2d183d2bc7a"
+			}
+		]
+	}
+]
             ]]></artwork>
        </figure>
-      <t>The following is an example JSON object for CMAC test results sent from the crypto module to the ACVP server.</t>
+<t>The following is an example JSON object for CMAC-AES-128 test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.4" },
-                  { "vsId": 1566,
-                    "testResults": [
-                        {
-                            "tcId": 2175,
-                            "mac": "fea01c84a7"
-                        },
-                       {
-                            "tcId": 2176,
-                            "mac": "164bdb8582"
-                       },
-                       {
-                            "tcId": 2177,
-                            "result": "fail"
-                       },
-                       {
-                            "tcId": 2178,
-                            "result": "fail"
-                       },
-                    ]
-                }
-             ]
+[
+	{
+		"acvVersion": "0.4"
+	},
+	{
+		"vsId": 3500,
+		"testResults": [{
+				"tcId": 2750,
+				"mac": "e77145f0d6c77ad5"
+			},
+			{
+				"tcId": 2751,
+				"mac": "6b078f7e53b6d183"
+			},
+			{
+				"tcId": 2752,
+				"result": "pass"
+			},
+			{
+				"tcId": 2753,
+				"result": "fail"
+			}
+		]
+	}
+]
+            ]]></artwork>
+    </figure>       
+      <t>The following is an example JSON object for CMAC-TDES test results sent from the crypto module to the ACVP server.</t>
+      <figure>
+        <artwork><![CDATA[
+[
+	{
+		"acvVersion": "0.4"
+	},
+	{
+		"vsId": 1566,
+		"testResults": [{
+				"tcId": 2175,
+				"mac": "fea01c84a7"
+			},
+			{
+				"tcId": 2176,
+				"mac": "164bdb8582"
+			},
+			{
+				"tcId": 2177,
+				"result": "fail"
+			},
+			{
+				"tcId": 2178,
+				"result": "fail"
+			}
+		]
+	}
+]
             ]]></artwork>
     </figure>
     </section>
