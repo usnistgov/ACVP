@@ -46,7 +46,7 @@
 
     <!-- Another author who claims to be an editor -->
 
-    <author fullname="Apostol Vassilev" initials="A.V." role="editor" surname="Vassilev">
+    <author fullname="Apostol Vassilev" initials="A." role="editor" surname="Vassilev">
       <organization>National Institute of Standards and Technology</organization>
 
       <address>
@@ -70,7 +70,7 @@
       </address>
     </author>
 
-    <date month="May" year="2017"/>
+    <date month="August" year="2017"/>
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
          in the current day for you. If only the current year is specified, xml2rfc will fill
@@ -144,7 +144,6 @@
 	    <texttable anchor="algs_table" title="Supported RSA Algorithm Modes JSON Values">
           <ttcol align="left">JSON algorithm value</ttcol>
           <ttcol align="left">JSON mode value</ttcol>
-          <c>"RSA"</c>
           <c>"keyGen"</c>
           <c/>
           <c>"sigGen"</c>
@@ -160,7 +159,7 @@
 	</section>
 	<section anchor="prereq_algs" title="Required Prerequisite Algorithms for RSA Mode Validations">
 	    <t>Each RSA Mode implementation relies on other cryptographic primitives (algorithms) - see <xref target="FIPS186-4"/>. 
-	    For example, a keyGen implementation uses underlying DRBG and hash algorithms. In some case, a single RSA Mode implementation may use several primitives of the same type. 
+	    For example, a keyGen implementation uses underlying DRBG and hash algorithms. In some cases, a single RSA Mode implementation may use several primitives of the same type. 
 	    For example, two different DRBG implementations may be used in the keyGen algorithms in Appendix B.3.3 in <xref target="FIPS186-4"/>, one in step 4.2 and another in step 5.2. 
 	    Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
 	    <texttable anchor="prereqs_table" title="Required RSA Modes Prerequisite Algorithms JSON Values">
@@ -233,6 +232,16 @@
           <c/>
           <c/>
           <c/>
+          <c>mode</c>
+	  <c>The RSA algorithm mode to be validated</c>
+          <c>value</c>
+          <c>"keyGen", "sigGen", "sigVer", "legacySigVer", "componentSigPrimitive", "componentDecPrimitive"</c>
+          <c>No</c>
+         <c/>
+         <c/>
+          <c/>
+          <c/>
+          <c/>
           <c>prereqVals</c>
 	       <c>The prerequisite algorithm validations</c>
           <c>array of prereqAlgVal objects - see <xref target="prereq_algs"/></c>
@@ -243,47 +252,26 @@
           <c/>
           <c/>
           <c/>
-          <c>capSpecs</c>
-	       <c>The capabilities of a particular RSA mode</c>
-          <c>an array of objects specific to the mode being specified</c>
-          <c>array</c>
-          <c>No</c>
-         <c/>
-         <c/>
-          <c/>
-          <c/>
-          <c/>
-         <c>modeSpecs</c>
-	       <c>The RSA mode and its capabilities</c>
-          <c>an object with "mode" and "capSpecs" properties</c>
-          <c>object</c>
-          <c>No</c>
-         <c/>
-         <c/>
-          <c/>
-          <c/>
-          <c/>
          <c>algSpecs</c>
-	       <c>Array of modeSpecs</c>
-          <c>array of modeSpecs objects, each identified uniquely by the "mode" property</c>
-          <c>See <xref target="algs_table"/> and <xref target="supported_mods"/></c>
+	       <c>Array of JSON objects</c>
+          <c>array of JSON objects, each with fields pertaining to the global RSA mode indicated above and identified uniquely by the combination of the RSA "mode" and indicated properties</c>
+          <c>See <xref target="algs_table"/> and <xref target="supported_modes"/></c>
           <c>No</c>          
           </texttable>    
    </section>
-	<section anchor="supported_mods" title="Supported RSA Modes Capabilities">
-    <t>The RSA mode capabilities are advertised as arrays of JSON objects within the 'modeSpecs'
-	value of the ACVP registration message - see <xref target="caps_table"/>. The 'modeSpecs' value is an array, where each
-	array element is an array of individual JSON objects corresponding to a particular RSA mode defined in this section.  The 'modeSpecs'
+	<section anchor="supported_modes" title="Supported RSA Modes Capabilities">
+    <t>The RSA mode capabilities are advertised as JSON objects within the 'algSpecs'
+	value of the ACVP registration message - see <xref target="caps_table"/>. The 'algSpecs' value is an array, where each
+	array element is a JSON object corresponding to a particular RSA mode defined in this section.  The 'algSpecs'
 	value is part of the 'capability_exchange' element of the ACVP JSON registration message.
 	See the ACVP specification for details on the registration message.</t>
 
-	<t>Each RSA mode capabilities are advertised as an array of self-contained JSON objects.</t>
+	<t>Each RSA mode's capabilities are advertised as JSON objects.</t>
 	<section anchor="mode_keyGen" title="The keyGen Mode Capabilities">
-	  <t>The RSA keyGen mode capabilities are advertised as an array of JSON objects within the array of 'modeSpecs'
-	value of the ACVP registration message. as part of the 'capability_exchange' element of the ACVP JSON registration message.
-	See the ACVP specification for details on the registration message.</t>
+	  <t>The RSA keyGen mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array
+	in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
 
-	<t>Each RSA keyGen mode capability is advertised as a self-contained JSON object.</t>
+	<t>Each RSA keyGen mode capability set is advertised as a self-contained JSON object.</t>
 	
 	    <t>The following subsections define the capabilities that may be advertised by the ACVP compliant crypto modules.</t>
           <section anchor="mode_keyGenProvPrim" title="keyGen With Provable Primes or Provable Primes with Conditions Capabilities">
@@ -304,7 +292,7 @@
           <c/>
           <c/>
           <c/>
-          <c>hashAlg</c>
+          <c>hashAlgs</c>
           <c>Supported hash algorithms for provable prime generation - see <xref target="FIPS186-4"/>, Appendix B.3.2 or Appendix B.3.4</c>
           <c>array</c>
           <c>any non-empty subset of {"SHA-1", "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
@@ -316,7 +304,7 @@
           <c/>
           <c>singleCap</c>
           <c>A testable combination of modulus and hash values</c>
-          <c>object with "modulo" and "hashAlg" properties</c>
+          <c>object with "modulo" and "hashAlgs" properties</c>
           <c>see above</c>
           <c>Yes</c>
           <c/>
@@ -395,7 +383,7 @@
 	            <c/>
 	            <c/>
 	            <c/>
-	            <c>hashAlg</c>
+	            <c>hashAlgs</c>
 	            <c>Supported hash algorithms for provable prime generation - see <xref target="FIPS186-4"/>, Appendix B.3.6</c>
 	            <c>array</c>
 	            <c>any non-empty subset of {"SHA-1", "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
@@ -417,7 +405,7 @@
 	            <c/>
 	            <c>singleCap</c>
 	            <c>A testable combination of modulus, hash algorithm, and primality test rounds</c>
-	            <c>object with "modulo", "hashAlg", and "primeTest" properties</c>
+	            <c>object with "modulo", "hashAlgs", and "primeTest" properties</c>
 	            <c>see above</c>
 	            <c>Yes</c>
 	            <c/>
@@ -511,14 +499,14 @@
           </section>
 	</section>
 	<section anchor="mode_sigGen" title="The sigGen Mode Capabilities">
-	  <t>The RSA sigGen mode capabilities are advertised as an array of JSON objects within the array of 'modeSpecs'
-	value of the ACVP registration message. as part of the 'capability_exchange' element of the ACVP JSON registration message.
+	  <t>The RSA sigGen mode capabilities are advertised as JSON objects within the 'algSpecs' array
+	as part of the 'capability_exchange' element of the ACVP JSON registration message.
 	See the ACVP specification for details on the registration message.</t>
 
-	<t>Each RSA sigGen mode capability is advertised as a self-contained JSON object.</t>
+	<t>Each RSA sigGen mode capability is advertised as a self-contained JSON object consisting of the algorithm, mode, and algSpecs array.  The algSpecs array may contain multiple elements, each pertaining to a sigType that is supported by the client for the RSA mode being advertised.</t>
 	 <t>The following subsections define the capabilities that may be advertised by the ACVP compliant crypto modules.</t>
           <section anchor="mode_sigGenCap" title="sigGen Capabilities">
-          <t>The following key generation with provable primes capabilities may be advertised by the ACVP compliant crypto module:</t>
+          <t>The following RSA signature generation capabilities may be advertised by the ACVP compliant crypto module:</t>
          <texttable anchor="sigGenRSAMod" title="Supported RSA sigGen moduli and hash options JSON Values ">
           <ttcol align="left">JSON value</ttcol>
           <ttcol align="left">Description</ttcol>
@@ -527,8 +515,18 @@
          <ttcol align="left">Optional</ttcol>
           <c>sigType</c>
           <c>supported RSA signature types  - see <xref target="FIPS186-4"/>, Section 5</c>
+          <c>value</c>
+          <c>one of {"ANSX9.31", "PKCS1v1.5", "PSS"}</c>
+          <c>No</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>capSigType</c>
+          <c>capabilites supported for this sigType  - see <xref target="FIPS186-4"/>, Section 5</c>
           <c>array</c>
-          <c>any non-empty subset of {"ANSX9.31", "PKCS1v1.5", "PSS"}</c>
+          <c>modulo, hashAlgs, and optionally the saltLens object</c>
           <c>No</c>
           <c/>
           <c/>
@@ -537,8 +535,8 @@
           <c/>
           <c>modulo</c>
           <c>supported RSA moduli for signature generation - see <xref target="FIPS186-4"/>, Section 5</c>
-          <c>array</c>
-          <c>any non-empty subset of {2048, 3072, 4096}</c>
+          <c>value</c>
+          <c>one of the supported modulo sizes {2048, 3072, 4096}</c>
           <c>No</c>
           <c/>
           <c/>
@@ -546,7 +544,7 @@
           <c/>
           <c/>
           <c>hashAlgs</c>
-          <c>supported hash algorithms for signature generation - see <xref target="SP800-131A"/>, Section 9</c>
+          <c>supported hash algorithms for signature generation for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
           <c>array</c>
           <c>any non-empty subset of {"SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
           <c>No</c>
@@ -556,23 +554,23 @@
           <c/>
           <c/>
           <c>saltLens</c>
-          <c>supported salt lengths for PKCS1PSS signature generation - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
+          <c>supported salt lengths for PSS signature generation - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
           <c>array</c>
           <c>array of values for each hash algorithm used subject to the constraint in the note below.</c>
           <c>Yes</c>
           </texttable>
-          <t>Note: the salt length for each hash algorithm used in PKCS1PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.</t>
+          <t>Note: the salt length for each hash algorithm used in PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.</t>
           </section>
 	</section>
 		<section anchor="mode_sigVer" title="The sigVer Mode Capabilities">
-	  <t>The RSA sigVer mode capabilities are advertised as an array of JSON objects within the array of 'modeSpecs'
-	value of the ACVP registration message. as part of the 'capability_exchange' element of the ACVP JSON registration message.
+	  <t>The RSA sigVer mode capabilities are advertised as JSON objects within the array of 'algSpecs'
+	as part of the 'capability_exchange' element of the ACVP JSON registration message.
 	See the ACVP specification for details on the registration message.</t>
 
-	<t>Each RSA sigVer mode capability is advertised as a self-contained JSON object.</t>
+	<t>Each RSA sigVer mode capability is advertised as a self-contained JSON object consisting of the algorithm, mode, and algSpecs array.  The algSpecs array may contain multiple elements, each pertaining to a sigType that is supported by the client for the RSA mode being advertised.</t>
 <t>The following subsections define the capabilities that may be advertised by the ACVP compliant crypto modules.</t>
           <section anchor="mode_sigVerCap" title="sigVer Capabilities">
-          <t>The following key generation with provable primes capabilities may be advertised by the ACVP compliant crypto module:</t>
+          <t>The following RSA signature verification capabilities may be advertised by the ACVP compliant crypto module:</t>
          <texttable anchor="sigVerRSAMod" title="Supported RSA sigVer moduli and hash options JSON Values ">
           <ttcol align="left">JSON value</ttcol>
           <ttcol align="left">Description</ttcol>
@@ -581,8 +579,18 @@
          <ttcol align="left">Optional</ttcol>
           <c>sigType</c>
           <c>supported RSA signature types  - see <xref target="FIPS186-4"/>, Section 5</c>
+          <c>value</c>
+           <c>one of {"ANSX9.31", "PKCS1v1.5", "PSS"}</c>
+          <c>No</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>capSigType</c>
+          <c>RSA signature verification parameters  - see <xref target="FIPS186-4"/>, Section 5</c>
           <c>array</c>
-           <c>any non-empty subset of {"ANSX9.31", "PKCS1v1.5", "PSS"}</c>
+           <c>modulo, hashAlgs, and saltLens (when sigType is PSS)</c>
           <c>No</c>
           <c/>
           <c/>
@@ -590,9 +598,9 @@
           <c/>
           <c/>
           <c>modulo</c>
-          <c>supported RSA moduli for signature verification - see <xref target="FIPS186-4"/>, Section 5</c>
-          <c>array</c>
-          <c>any non-empty subset of {2048, 3072, 4096}</c>
+          <c>supported RSA modulo for signature verification - see <xref target="FIPS186-4"/>, Section 5</c>
+          <c>value</c>
+          <c>any one of the supported modulo sizes {2048, 3072, 4096}</c>
           <c>No</c>
           <c/>
           <c/>
@@ -600,7 +608,7 @@
           <c/>
           <c/>
           <c>hashAlgs</c>
-          <c>supported hash algorithms for signature verification - see <xref target="SP800-131A"/>, Section 9</c>
+          <c>supported hash algorithms for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
           <c>array</c>
           <c>any non-empty subset of {"SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
           <c>No</c>
@@ -610,7 +618,7 @@
           <c/>
           <c/>
           <c>saltLens</c>
-          <c>supported salt lengths for PKCS1PSS signature verification - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
+          <c>supported salt lengths for PSS signature verification - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
           <c>array</c>
           <c>array of values for each hash algorithm used subject to the constraint in the note below.</c>
           <c>Yes</c>
@@ -619,18 +627,12 @@
           </section>
 	</section>
 		<section anchor="mode_legacySigVer" title="The legacySigVer Mode Capabilities">
-	  <t>The RSA legacySigVer mode capabilities are advertised as an array of JSON objects within the array of 'modeSpecs'
-	value of the ACVP registration message. as part of the 'capability_exchange' element of the ACVP JSON registration message.
+	  <t>The RSA legacySigVer mode capabilities are advertised as JSON objects within the array of 'algSpecs'
+	as part of the 'capability_exchange' element of the ACVP JSON registration message.
 	See the ACVP specification for details on the registration message.</t>
 
-	<t>Each RSA legacySigVer mode capability is advertised as a self-contained JSON object.</t>
-	 <t>The RSA sigVer mode capabilities are advertised as an array of JSON objects within the array of 'modeSpecs'
-	value of the ACVP registration message. as part of the 'capability_exchange' element of the ACVP JSON registration message.
-	See the ACVP specification for details on the registration message.</t>
-
-	<t>Each RSA legacySigVer mode capability is advertised as a self-contained JSON object.</t>
+	<t>Each RSA legacySigVer mode capability is advertised as a self-contained JSON object consisting of the algorithm, mode, and algSpecs array.  The algSpecs array may contain multiple elements, each pertaining to a sigType that is supported by the client for the RSA mode being advertised.</t>
 <t>The following subsections define the capabilities that may be advertised by the ACVP compliant crypto modules.</t>
-          <t>The following key generation with provable primes capabilities may be advertised by the ACVP compliant crypto module:</t>
          <texttable anchor="legacySigVerRSAMod" title="Supported RSA legacySigVer moduli and hash options JSON Values ">
           <ttcol align="left">JSON value</ttcol>
           <ttcol align="left">Description</ttcol>
@@ -638,9 +640,19 @@
          <ttcol align="left">Valid values</ttcol>
          <ttcol align="left">Optional</ttcol>
           <c>sigType</c>
-          <c>supported legacy RSA signature types  - see <xref target="SP800-131A"/>, Section 5</c>
+          <c>supported RSA legacy signature types  - see <xref target="FIPS186-4"/>, Section 5</c>
+          <c>value</c>
+           <c>one of {"ANSX9.31", "PKCS1v1.5", "PSS"}</c>
+          <c>No</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>capSigType</c>
+          <c>RSA legacy signature verification parameters  - see <xref target="FIPS186-4"/>, Section 5</c>
           <c>array</c>
-           <c>any non-empty subset of {"ANSX9.31", "PKCS1v1.5", "PSS"}</c>
+           <c>modulo, hashAlgs, and saltLens (when sigType is PSS)</c>
           <c>No</c>
           <c/>
           <c/>
@@ -648,9 +660,9 @@
           <c/>
           <c/>
           <c>modulo</c>
-          <c>supported RSA moduli for signature verification - see <xref target="SP800-131A"/></c>
-          <c>array</c>
-          <c>any non-empty subset of {1024, 1536, 2048, 3072, 4096}</c>
+          <c>supported RSA modulo for signature verification - see <xref target="FIPS186-4"/>, Section 5</c>
+          <c>value</c>
+          <c>any one of the supported modulo sizes {2048, 3072, 4096}</c>
           <c>No</c>
           <c/>
           <c/>
@@ -658,9 +670,9 @@
           <c/>
           <c/>
           <c>hashAlgs</c>
-          <c>supported hash algorithms for signature verification - see <xref target="SP800-131A"/>, Section 9</c>
+          <c>supported hash algorithms for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
           <c>array</c>
-          <c>any non-empty subset of {"SHA-1", "SHA-256", "SHA-384", "SHA-512"}</c>
+          <c>any non-empty subset of {"SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
           <c>No</c>
           <c/>
           <c/>
@@ -668,7 +680,7 @@
           <c/>
           <c/>
           <c>saltLens</c>
-          <c>supported salt lengths for PKCS1PSS signature verification - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
+          <c>supported salt lengths for PSS signature verification - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
           <c>array</c>
           <c>array of values for each hash algorithm used subject to the constraint in the note below.</c>
           <c>Yes</c>
@@ -676,18 +688,18 @@
           <t>Note: the salt length for each hash algorithm used in PKCS1PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.</t>
 	</section>
 	<section anchor="mode_componentSigPrimitive" title="The componentSigPrimitive Mode Capabilities">
-	  <t>The RSA componentSigPrimitive mode capability (otherwise known as RSASP1 in <xref target="RFC3447"/>) is advertised as a JSON object within the array of 'modeSpecs'
-	value of the ACVP registration message, as part of the 'capability_exchange' element of the ACVP JSON registration message. In this mode, the only tested capability
+	  <t>The RSA componentSigPrimitive mode capabilities (otherwise known as RSASP1 in <xref target="RFC3447"/>) are advertised as JSON objects within the array of 'algSpecs'
+	as part of the 'capability_exchange' element of the ACVP JSON registration message.
+	See the ACVP specification for details on the registration message. In this mode, the only tested capability
 	is the correct expontiation 's = msg^d mod n', where 'msg' is a message between '0' and 'n - 1', 'd' is the private exponent and 'n' is the modulus, all supplied by the testing ACVP server. 
 	Only 2048-bit RSA keys are allowed for this capability. There are no properties specified for this capability. 
 	See <xref target="app-testcomponentsigprimitive-ex"/> for additional details on constraints for 'msg' and 'n'.
 	See the ACVP specification for details on the registration message.</t>
 
-	<t>Each RSA componentSigPrimitive mode capability is advertised as a self-contained JSON object.</t>
 	</section>
 	<section anchor="mode_componentDecPrimitive" title="The componentDecPrimitive Mode Capabilities">
-<t>The RSA componentDecPrimitive mode capability is advertised a JSON object within the array of 'modeSpecs'
-	value of the ACVP registration message. as part of the 'capability_exchange' element of the ACVP JSON registration message. In this mode, the only tested capability
+<t>The RSA componentDecPrimitive mode capabilities are advertised as JSON objects within the array of 'algSpecs'
+	as part of the 'capability_exchange' element of the ACVP JSON registration message. In this mode, the only tested capability
 	is the correct expontiation 's = msg^d mod n', where 'msg' is a message, 'd' is the private exponent and ''n is the modulus. See <xref target="SP800-56B"/>, Section 7.1.2 for details.</t>
 	
 	<t>In testing, only 'msg' is supplied by the ACVP server. 
@@ -697,18 +709,16 @@
 	The client must first check if  '0 &lt; msg &lt; n-1' and return an error if this is not the case. The client returns a value 's' only when 
 	'msg' is in the proper range for the size of the selected modulus 'n'. See the ACVP specification for details on the registration message.</t>
 
-	<t>Each RSA componentDecPrimitive mode capability is advertised as a self-contained JSON object.</t>
 	</section>
-		
 </section>   
     </section>
 
     <section anchor="test_vectors" title="Test Vectors">
-	<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
+	<t>The ACVP server provides test vectors to the ACVP client, which are then processed by the client and returned to
 	    the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
 	    sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
-	    algorithm, such as Hash_DRBG, etc.  This section
-	describes the JSON schema for a test vector set used with DRBG algorithms.</t>
+	    algorithm and mode, such as {"algorithm": "RSA, "mode": "sigGen"}, etc.  This section
+	describes the JSON schema for test vector sets used with the RSA algorithm and modes.</t>
 
 	<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
 	vector set as well as individual test vectors to be processed by the ACVP client.  The following table
@@ -738,9 +748,6 @@
 <c/>
 <c/>
 <c/>
-	  <c>mode</c>
-	  <c>The RSA mode.</c>
-	  <c>"KeyGen", "SigGen", or "SigVer"</c>
 	  <c/>
 	  <c/>
 	  <c/>     
@@ -760,6 +767,14 @@
 		<ttcol align="left">Description</ttcol>
 		<ttcol align="left">JSON type</ttcol>
 		<ttcol align="left">Optional</ttcol>
+	<c>mode</c>
+	<c>The RSA mode.</c>
+	<c>"KeyGen", "SigGen", or "SigVer"</c>
+    <c>No</c>
+    <c/>
+    <c/>
+    <c/>
+    <c/>
     <c>modulo</c>
     <c>RSA modulus</c>
     <c>value</c>
@@ -1119,28 +1134,24 @@
         <artwork><![CDATA[
    {
       "algorithm": "RSA",
+      "mode": "keyGen",
       "prereqVals": [{"algorithm": "DRBG", "valValue": "1234"}, {"algorithm": "SHA", "valValue": "5678"}],
       "algSpecs" : 
       [
-         {"modeSpecs" : {
-              "mode": "keyGen",
-              "capSpecs" :  {
-                      "pubExp" : "fixed",
-                      "fixedPubExpVal" : "010001",
-                      "infoGeneratedByServer": true,
-                      "randPQ" : "B.3.2",
-                      "capProvPrime" : 
-                            [
-                                {   "modulo" : 2048,
-                                    "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
-                                {   "modulo" : 3072,
-                                    "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
-                                {   "modulo" : 4096,
-                                    "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]}
-                            ]
-                      }
-                }
-          }
+         {  "pubExp" : "fixed",
+            "fixedPubExpVal" : "010001",
+            "infoGeneratedByServer": true,
+            "randPQ" : "B.3.2",
+            "capProvPrime" : 
+              [
+                {   "modulo" : 2048,
+                    "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
+                {   "modulo" : 3072,
+                    "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
+                {   "modulo" : 4096,
+                    "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]}
+              ]
+         }
       ]
    }
 ]]></artwork>
@@ -1153,36 +1164,22 @@
         <artwork><![CDATA[
    {
     "algorithm":"RSA",
-    "prereqVals":[
-      {
-        "algorithm":"DRBG",
-        "valValue":"123456"
-      },
-      {
-        "algorithm":"SHA",
-        "valValue":"7890"
-      }
-    ],
-    "algSpecs":[
-      {
-        "modeSpecs": {
-          "mode":"keyGen",
-          "capSpecs": {
-            "pubExp": "fixed",
-            "fixedPubExpVal":"010001",
-            "randPQ": "B.3.3",
-            "capProbPrime":[{
-              "modulo": 2048,
-              "primeTest":["tblC2"]
-            },
-            {
-              "modulo": 3072,
-              "primeTest":["tblC2", "tblC3"]
-            }]
-          }
+    "mode":"keyGen",
+    "prereqVals":[{"algorithm":"DRBG", "valValue":"123456"}, {"algorithm":"SHA", "valValue":"7890"}],
+    "algSpecs":
+    [
+       {  "pubExp": "fixed",
+          "fixedPubExpVal":"010001",
+          "randPQ": "B.3.3",
+          "capProbPrime":
+            [
+              {  "modulo": 2048,
+                 "primeTest":["tblC2"]},
+              {  "modulo": 3072,
+                 "primeTest":["tblC2", "tblC3"]}
+            ]
         }
-      }
-    ]
+     ]
   }
 ]]></artwork>
     </figure>
@@ -1196,31 +1193,27 @@
         <artwork><![CDATA[
    {
       "algorithm": "RSA",
-       "prereqVals": [{"algorithm": "DRBG", "valValue": "same"}, {"algorithm": "SHA", "valValue": "same"}],
+      "mode": "keyGen",
+      "prereqVals": [{"algorithm": "DRBG", "valValue": "same"}, {"algorithm": "SHA", "valValue": "same"}],
       "algSpecs" : 
       [
-         {"modeSpecs" : {
-           "mode": "keyGen",
-           "capSpecs" : {
-               "pubExp" : "fixed",
-               "fixedPubExpVal" : "010001",
-               "infoGeneratedByServer": false,
-               "randPQ" : "B.3.5",
-               "capsProvProbPrime" : 
-                    [
-                        {"modulo" : 2048,
-                         "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
-                         "primeTest": ["tblC2", "tblC3"]},
-                       {"modulo" : 3072,
-                         "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
-                         "primeTest": ["tblC2"]},
-                       {"modulo" : 4096,
-                         "hashAlgs" : ["SHA-512"],
-                         "primeTest": ["tblC3"]},
-                    ]
-              }
-          }
-        }
+         {  "pubExp" : "fixed",
+            "fixedPubExpVal" : "010001",
+            "infoGeneratedByServer": false,
+            "randPQ" : "B.3.5",
+            "capsProvProbPrime" : 
+              [
+                { "modulo" : 2048,
+                  "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
+                  "primeTest": ["tblC2", "tblC3"]},
+                { "modulo" : 3072,
+                  "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
+                  "primeTest": ["tblC2"]},
+                { "modulo" : 4096,
+                  "hashAlgs" : ["SHA-512"],
+                  "primeTest": ["tblC3"]}
+              ]
+         }
       ]
    }
 ]]></artwork>
@@ -1233,44 +1226,34 @@
         <artwork><![CDATA[
    {
       "algorithm": "RSA",
+      "mode": "sigGen",
       "prereqVals": [{"algorithm": "DRBG", "valValue": "same"}, {"algorithm": "SHA", "valValue": "same"}],
       "algSpecs" : 
       [
-         {"modeSpecs" : {
-               "mode": "sigGen",
-               "capSpecs" : {
-                  "sigType" : "ANSX9.31",
-                  "capSigType" :
-                  [
-                      {"modulo" : 2048,
-                        "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                      {"modulo" : 3072,
-                        "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                      {"modulo" : 4096,
-                        "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
-                  ]
-              }
-        }},
-         {"modeSpecs" : {
-               "mode": "sigGen",
-               "capSpecs" : {
-                  "sigType" : "PKCS1v1.5",
-                  "capSigType" :
-                  [
-                      {"modulo" : 2048,
-                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                      {"modulo" : 3072,
-                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                      {"modulo" : 4096,
-                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
-                  ]
-              }
-         }},
-        {"modeSpecs" : {
-            "mode": "sigGen",
-            "capSpecs" : {
-                "sigType" : "PSS",
-                "capSigType" :
+         {  "sigType" : "ANSX9.31",
+            "capSigType" :
+                [
+                    { "modulo" : 2048,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    { "modulo" : 3072,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    { "modulo" : 4096,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                 ]
+         },
+         {  "sigType" : "PKCS1v1.5",
+            "capSigType" :
+                [
+                    { "modulo" : 2048,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    { "modulo" : 3072,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    { "modulo" : 4096,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                 ]
+         },
+         {  "sigType" : "PSS",
+            "capSigType" :
                 [
                     { "modulo" : 2048,
                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
@@ -1282,8 +1265,7 @@
                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
                       "saltLens" : [28, 32, 64]}
                 ]
-            }
-         }}
+         }
       ]
    }
 ]]></artwork>
@@ -1295,78 +1277,110 @@
         <artwork><![CDATA[
    {
       "algorithm": "RSA",
+      "mode": "sigVer",
       "prereqVals": [{"algorithm": "DRBG", "valValue": "123456"}, {"algorithm": "DRBG", "valValue": "654321"}, {"algorithm": "SHA", "valValue": "7890"}],
       "algSpecs" : 
       [
-        {"modeSpecs" : {
-            "mode": "sigVer",
-            "capSpecs" : {
-               
-                 "sigType" : "ANSX9.31",
-                 "capSigType" :
-                [
-                  {"modulo" : 2048,
+         {  "sigType" : "ANSX9.31",
+            "capSigType" :
+               [
+                  { "modulo" : 2048,
                     "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  {"modulo" : 3072,
+                  { "modulo" : 3072,
                     "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  {"modulo" : 4096,
+                  { "modulo" : 4096,
                     "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
                ]
-            }
-          }},
-      {"modeSpecs" : {
-            "mode": "sigVer",
-            "capSpecs" : {
-                "sigType" : "PKCS1v1.5",
-                 "capSigType" :
+         },
+         {  "sigType" : "PKCS1v1.5",
+            "capSigType" :
                 [
-                  {"modulo" : 2048,
+                  { "modulo" : 2048,
                     "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  {"modulo" : 3072,
+                  { "modulo" : 3072,
                     "hashSigVer" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  {"modulo" : 4096,
+                  { "modulo" : 4096,
                     "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
                 ]
-            }
-         }},
-      {"modeSpecs" : {
-            "mode": "sigVer",
-            "capSpecs" : {
-                "sigType" : "PKCS1PSS",
-                "capSigType" :
-                  [
-                    { "modulo" : 2048,
+         },
+         {  "sigType" : "PSS",
+            "capSigType" :
+                [
+                  { "modulo" : 2048,
                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
                       "saltLens" : [28, 32, 64]},
-                    { "modulo" : 3072,
+                  { "modulo" : 3072,
                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
                       "saltLens" : [28, 32, 64]},
-                    { "modulo" : 4096,
+                  { "modulo" : 4096,
                       "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
                       "saltLens" : [28, 32, 64]}
                  ]
-            }
-       }}
-    ]
+          }
+      ]
    }
 ]]></artwork>
     </figure>
     </section>
         <section anchor="app-cap-legacysigverex" title="Example RSA legacySigVer Capabilities JSON Objects">
-      <t>The format and structure of the RSA legacySigVer capabilities JSON objects follow very closely those of the RSA sigVer capabilties JSON objects with the obvious changes from moduloSigVer, hashSigVer and saltSigver to modLegacySigVer, hashLegacySigVer, and saltLegacySugVer and the corresponding parameter ranges adjustments.</t>
-</section>
+      <t>The following is an example JSON object advertising support for RSA legacySigVer according to <xref target="FIPS186-4"/>.</t>
+      <figure>
+        <artwork><![CDATA[
+   {
+      "algorithm": "RSA",
+      "mode": "legacySigVer",
+      "prereqVals": [{"algorithm": "DRBG", "valValue": "123456"}, {"algorithm": "DRBG", "valValue": "654321"}, {"algorithm": "SHA", "valValue": "7890"}],
+      "algSpecs" : 
+      [
+         {  "sigType" : "ANSX9.31",
+            "capSigType" :
+               [
+                  { "modulo" : 2048,
+                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                  { "modulo" : 3072,
+                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                  { "modulo" : 4096,
+                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+               ]
+         },
+         {  "sigType" : "PKCS1v1.5",
+            "capSigType" :
+                [
+                  { "modulo" : 2048,
+                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                  { "modulo" : 3072,
+                    "hashSigVer" : ["SHA-224", "SHA-256", "SHA-512"]},
+                  { "modulo" : 4096,
+                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                ]
+         },
+         {  "sigType" : "PSS",
+            "capSigType" :
+                [
+                  { "modulo" : 2048,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
+                      "saltLens" : [28, 32, 64]},
+                  { "modulo" : 3072,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
+                      "saltLens" : [28, 32, 64]},
+                  { "modulo" : 4096,
+                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
+                      "saltLens" : [28, 32, 64]}
+                 ]
+          }
+      ]
+   }
+]]></artwork>
+    </figure>
+    </section>
+
     <section anchor="app-cap-componentsigverex" title="Example componentSigPrimitive Capabilities JSON Objects">
       <t>The following is an example JSON object advertising support for RSA componentSigPrimitive according to <xref target="FIPS186-4"/>.</t>
       <figure>
         <artwork><![CDATA[
    {
       "algorithm": "RSA",
-      "algSpecs" : 
-      [
-       {"modeSpecs" : {
-           "mode": "componentSigPrimitive"
-         }}
-      ]
+      "mode": "componentSigPrimitive"
    }
 ]]></artwork>
     </figure>
@@ -1377,13 +1391,14 @@
         <artwork><![CDATA[
    {
       "algorithm": "RSA",
-      "prereqVals": [{"algorithm": "DRBG", "valValue": "123456"}, {"algorithm": "DRBG", "valValue": "654321"}, {"algorithm": "SHA", "valValue": "7890"}],
-      "algSpecs" : 
-      [
-        {"modeSpecs" : {
-            "mode": "componentDecPrimitive"
-         }}
-      ]
+      "mode": "componentDecPrimitive",
+      "prereqVals": 
+        [
+            {"algorithm": "DRBG", "valValue": "123456"}, 
+            {"algorithm": "DRBG", "valValue": "654321"}, 
+            {"algorithm": "SHA", "valValue": "7890"}
+        ],
+      "algSpecs" : [{}]
    }
 ]]></artwork>
     </figure>
@@ -1398,21 +1413,21 @@
  [
    { "acvVersion": "0.4" },
    { "vsId": 1133,
-      "algorithm": "RSA",
-      "mode": "keyGen",
-      "testGroups" : [
+     "algorithm": "RSA",
+     "mode": "keyGen",
+     "testGroups" : [
              {           
                  "infoGeneratedByServer": false,
                  "pubExp" : "random",
                  "randPQ" : "B.3.2",
                  "modulo" : 2048,
-                 "hashAlg" : "SHA-256"
+                 "hashAlg" : "SHA-256",
                  "tests" : [
                     {
-                      "tcId" : 1145,
+                      "tcId" : 1145
                     },
                     {
-                      "tcId" : 1146,
+                      "tcId" : 1146
                     }
                  ]
              },
@@ -1421,13 +1436,13 @@
                 "pubExp": "random",
                 "randPQ": "B.3.2",
                 "modulo" : 3072,
-                "hashAlg" : "SHA-256"
+                "hashAlg" : "SHA-256",
                 "tests": [
                   {
-                    "tcId": 1147,
+                    "tcId": 1147
                   },
                   {
-                    "tcId": 1148,
+                    "tcId": 1148
                   }
                 ]
               },
@@ -1436,13 +1451,13 @@
                  "pubExp" : "random",
                  "randPQ" : "B.3.4",
                  "modulo" : 2048,
-                 "hashAlg" : "SHA-256"
+                 "hashAlg" : "SHA-256",
                  "tests" : [
                     {
-                      "tcId" : 1149,
+                      "tcId" : 1149
                     },
                     {
-                      "tcId" : 1150,
+                      "tcId" : 1150
                     }
                  ]
              },
@@ -1451,13 +1466,13 @@
                 "pubExp": "random",
                 "randPQ": "B.3.4",
                 "modulo" : 3072,
-                "hashAlg" : "SHA-256"
+                "hashAlg" : "SHA-256",
                 "tests": [
                   {
-                    "tcId": 1151,
+                    "tcId": 1151
                   },
                   {
-                    "tcId": 1152,
+                    "tcId": 1152
                   }
                 ]
               },
@@ -1466,13 +1481,13 @@
                  "pubExp" : "random",
                  "randPQ" : "B.3.5",
                  "modulo" : 2048,
-                 "hashAlg" : "SHA-256"
+                 "hashAlg" : "SHA-256",
                  "tests" : [
                     {
-                      "tcId" : 1153,
+                      "tcId" : 1153
                     },
                     {
-                      "tcId" : 1154,
+                      "tcId" : 1154
                     }
                  ]
              },
@@ -1481,13 +1496,13 @@
                 "pubExp": "random",
                 "randPQ": "B.3.5",
                 "modulo" : 3072,
-                "hashAlg" : "SHA-256"
+                "hashAlg" : "SHA-256",
                 "tests": [
                   {
-                    "tcId": 1155,
+                    "tcId": 1155
                   },
                   {
-                    "tcId": 1156,
+                    "tcId": 1156
                   }
                 ]
               },
@@ -1496,13 +1511,13 @@
                  "pubExp" : "random",
                  "randPQ" : "B.3.6",
                  "modulo" : 2048,
-                 "hashAlg" : "SHA-256"
+                 "hashAlg" : "SHA-256",
                  "tests" : [
                     {
-                      "tcId" : 1157,
+                      "tcId" : 1157
                     },
                     {
-                      "tcId" : 1158,
+                      "tcId" : 1158
                     }
                  ]
              },
@@ -1511,13 +1526,13 @@
                 "pubExp": "random",
                 "randPQ": "B.3.6",
                 "modulo" : 3072,
-                "hashAlg" : "SHA-256"
+                "hashAlg" : "SHA-256",
                 "tests": [
                   {
-                    "tcId": 1159,
+                    "tcId": 1159
                   },
                   {
-                    "tcId": 1160,
+                    "tcId": 1160
                   }
                 ]
               },
@@ -1591,9 +1606,9 @@
                     }
                  ]
              }
-     ]
-   }
- ]
+         ]
+      }
+   ]
 ]]></artwork>
     </figure>
     <t>Note that this example has "infoGeneratedByServer" set to false. This means the client is responsible for providing the details by running an instance of the appropriate
@@ -1619,7 +1634,7 @@
                     {
                       "tcId" : 1165,
                       "message" : "f648ffc4ed74845803fec53ba865d3889b3892e402d96c5eba814698ec84b32ce1d7684917cff19d942ba2787a55cf2edce540bdd067dfafc55eb442178913c7e164144813f2446dc4ba9aa0c90fad708695233304016df04420b27cd31b08e29ff9ea080965e7903bb297fdbc1cd31741512590c7307ee7ded0278d48c4fa47"
-                    },
+                    }
                  ]
              },
              {
@@ -1641,10 +1656,10 @@
                    {
                      "tcId" : 1167,
                      "message" : "5af283b1b76ab2a695d794c23b35ca7371fc779e92ebf589e304c7f923d8cf976304c19818fcd89d6f07c8d8e08bf371068bdf28ae6ee83b2e02328af8c0e2f96e528e16f852f1fc5455e4772e288a68f159ca6bdcf902b858a1f94789b3163823e2d0717ff56689eec7d0e54d93f520d96e1eb04515abc70ae90578ff38d31b"
-                   },
+                   }
                 ]
              },
-             {
+             {,
                 "sigType" : "PKCS1v1.5",
                 "hashAlg" : "SHA-256",
                 "modulo" : 3072,
@@ -1696,8 +1711,8 @@
       "testGroups" : [
              {
                  "sigType" : "ANSX9.31",
-                 "modulo" : 2048,
                  "hashAlg" : "SHA-256",
+                 "modulo" : 2048,
                  "e" : "166f67",
                  "n" : "944ded6daaf602e1771eaa49c02fcbaca0bdd70c8ed571ad5a0f499090f08d103b6181f573667aa8c03700af024de08535d56579ae98c7af3569dec4b8b9e418814a680f0506e3828a32280f8830a3612b9b9dc5c41408cc5fcee98bbbc7a1e871d088b73cca1114916025767fb9ec5efea72dd98757d6b9ae78f682e8ca6e7cb6ac4f626596fb37d18a61d34cef2783a96ba7d8e091c564dbefb69ac7a1db2e8aaf857a43edbc688d153ab768e14b7fa6dbdc686882f261c0c72af090acffc91b481915151dc977be3b584dcd25d9a77a0b983721647e2ac7b93754c20213de0b2bc3174062a22e48275cedba9c0d23a2dc9aecb430b0d7eeff5d67a05d140d",
                  "tests" : [
@@ -1733,7 +1748,7 @@
                       "tcId" : 1176,
                       "message" : "95123c8d1b236540b86976a11cea31f8bd4e6c54c235147d20ce722b03a6ad756fbd918c27df8ea9ce3104444c0bbe877305bc02e35535a02a58dcda306e632ad30b3dc3ce0ba97fdf46ec192965dd9cd7f4a71b02b8cba3d442646eeec4af590824ca98d74fbca934d0b6867aa1991f3040b707e806de6e66b5934f05509bea",
                       "signature" : "51265d96f11ab338762891cb29bf3f1d2b3305107063f5f3245af376dfcc7027d39365de70a31db05e9e10eb6148cb7f6425f0c93c4fb0e2291adbd22c77656afc196858a11e1c670d9eeb592613e69eb4f3aa501730743ac4464486c7ae68fd509e896f63884e9424f69c1c5397959f1e52a368667a598a1fc90125273d9341295d2f8e1cc4969bf228c860e07a3546be2eeda1cde48ee94d062801fe666e4a7ae8cb9cd79262c017b081af874ff00453ca43e34efdb43fffb0bb42a4e2d32a5e5cc9e8546a221fe930250e5f5333e0efe58ffebf19369a3b8ae5a67f6a048bc9ef915bda25160729b508667ada84a0c27e7e26cf2abca413e5e4693f4a9405"
-                    },
+                    }
                  ]
              },
              {
@@ -1761,7 +1776,7 @@
                       "tcId" : 1178,
                       "message" : "dfc22604b95d15328059745c6c98eb9dfb347cf9f170aff19deeec555f22285a6706c4ecbf0fb1458c60d9bf913fbae6f4c554d245d946b4bc5f34aec2ac6be8b33dc8e0e3a9d601dfd53678f5674443f67df78a3a9e0933e5f158b169ac8d1c4cd0fb872c14ca8e001e542ea0f9cfda88c42dcad8a74097a00c22055b0bd41f",
                       "signature" : "992d48b21bb3d2219b44e8fcc8633cf3aeb591de90f4386496ac7ecd284cb63d7dff81a50b8c4fed9f2ef737692ea6be05248ca138947b49b4e7f3cce6640e049ac2154c40f57e22fa14f97e7a9507e1dc98b206ce6ea0e180039199d1be0a15d1f5093a459e5101aaca2a23cb1f59cad2f1fb99dc956b9d4344bad2c1121d63b915004acbfc7ac60ac9a7b0b1c6812b30bfe087f7f0c7d1625f9c4f458515e11478e3604aa39d14d08bea30b01fcd6189e6f9b701d360e4714d45556b29815c8d8fa8e46e10749ba5e8d445a4c0f487e70ab5890b7ccc1651282a54e87e7db4bb2f7d4a671e71c43c55cf6486416f171d1955037474d06a71dd078767848e5d"
-                    },
+                    }
                  ]
              },
              {
@@ -1778,8 +1793,8 @@
                     }
                  ]
              }
-       ]
-    }
+          ]
+      }
   ]
 
 ]]></artwork>
@@ -1815,7 +1830,7 @@
                     }
                  ]
              }
-       ]
+        ]
     }
   ]
 ]]></artwork>
@@ -1862,7 +1877,7 @@
                 { "acvVersion": "0.4" },
                 { "vsId": 1133,
                     "algorithm": "RSA",
-                    "mode": "keyGen",
+                    "mode": keyGen,
                     "testResults": [
                     {
                       "tcId" : 1111,
@@ -1918,15 +1933,15 @@
                     },
                     {
                       "tcId" : 1116,
-                     "e" : "10000021",
-                     "seed" : "242d14906b68f64a8836c27ce91913b042098806d2a8566035805c48",
-                     "bitlens" : [272, 205, 296, 157],
-                     "xP" : "f668821d6bb49e9912a731ae34b81d3ed4ef145c20611c5679d8905674bf12110a86647940d29e00b608492fae3363965459642f6c937dda770deb0cc274e42d20a47621780b32308300753bc3047f355228620a8f911dcf16bcd2a0e69ed6a4592f69cf9c8625458bef538e27d59ee4140c78d20ba7a86c4335b71c0499aeb1",
-                     "p" : "f668821d6bb49e9912a731ae34b81d3ed4ef145c20611c5679d8905674bf12110a86647940d29e00b608492fae3363965459642f6c937dda770deb0cc274e42d20a476a8e12548377aa723701a557177e2a9bd6355ef5ccd8e08dcb009137e9c07fcddd38a76d30057d121a8031dad5f5268755312b4f2893fcd6f00664e728b",
-                     "xQ" : "bf9a574cd234bc407e59e9177e78a35d7d156fd466f05b9a3aec3242e284ed941c433b0ed69c4fffbc2e661cef93413fceb16096438429ccf48fbad655e3f57c5d2135604c33f3191a1f49adfbf3407e0ad1301606e98001f4e604ddcc21dc8dd2286d641871b4412e76568f8f780e42d83ee8fade1d6d9405115d1c1addec05",
-                     "q" : "bf9a574cd234bc407e59e9177e78a35d7d156fd466f05b9a3aec3242e284ed941c433b0ed69c4fffbc2e661cef93413fceb16096438429ccf48fbad655e3f57c5d2135604c34d8427eab6551ce39b6d480881e0566b9da47b2c13081d106effd4e03b58403f0699fa5adf1015a56d3371e9d69ff22587be9e83befd19ae4b4d9",
-                     "n" : "b86c87f9aea1aa7b5c253966047466b0ae29fdbacabeb7eaed820b7f87b664749bfaba791d7a0bfd25cbb4251da58fbb2ab9725c2c873f2b545eaa7409f1124e2d84cdb5c71583fc433a2fa44c6e8e006caaadb07b4996a67ee01df45b70bf94dd0f1bd13c60935f012899edde57c9af80ad362440e804767e4837fbf98847e5e33c534fb86601958adea41ed278203e99d717917fe9d719fcefb3b04f0edb4f44831b52f20c5ac410ea96723fe5bc0afb4dc7d3bf617dd3760b396436cf613444b9abcaa82bd7e0f3174df6dbe320616a2bcb774fbc4633ea783dacffd557706f6f64a8821805d40fd627f3deaa99d4da4a4f571fe7332cc219f68682d4d3d3",
-                     "d" : "1d26dc09539115a27d95980819d439c5b3f2517f63ed7a66f2382d138027102fcf89fb46c823899e36ee5f07da691ec2f9fbc0e28b1408c179658c9d5d7f114207acf5f0ab17f6bd369e09fcdba00a0851aad795a0ab31f0136a7d9e7a7a781594738cca7838f8cb3b755529c684ca4632adfb6b2b9de2b2b5408f81447e55e79df1197c07e1312980c30cdb9e989697152f0b69fd42e32e2982ccbd6ba40814d63fdf858e82dc4cfe7e4aed2ad6e77af3d977cedfc2900de774c0539901d71802cfa4b28b4e0f747718fcb0bd433a952bca8d1634e3e037f70d2d6135ede9832a4b81f65fd04b5e67182508b44b841e940f16f0e26f1167cfb1ab6b1d62b901"
+                      "e" : "10000021",
+                      "seed" : "242d14906b68f64a8836c27ce91913b042098806d2a8566035805c48",
+                      "bitlens" : [272, 205, 296, 157],
+                      "xP" : "f668821d6bb49e9912a731ae34b81d3ed4ef145c20611c5679d8905674bf12110a86647940d29e00b608492fae3363965459642f6c937dda770deb0cc274e42d20a47621780b32308300753bc3047f355228620a8f911dcf16bcd2a0e69ed6a4592f69cf9c8625458bef538e27d59ee4140c78d20ba7a86c4335b71c0499aeb1",
+                      "p" : "f668821d6bb49e9912a731ae34b81d3ed4ef145c20611c5679d8905674bf12110a86647940d29e00b608492fae3363965459642f6c937dda770deb0cc274e42d20a476a8e12548377aa723701a557177e2a9bd6355ef5ccd8e08dcb009137e9c07fcddd38a76d30057d121a8031dad5f5268755312b4f2893fcd6f00664e728b",
+                      "xQ" : "bf9a574cd234bc407e59e9177e78a35d7d156fd466f05b9a3aec3242e284ed941c433b0ed69c4fffbc2e661cef93413fceb16096438429ccf48fbad655e3f57c5d2135604c33f3191a1f49adfbf3407e0ad1301606e98001f4e604ddcc21dc8dd2286d641871b4412e76568f8f780e42d83ee8fade1d6d9405115d1c1addec05",
+                      "q" : "bf9a574cd234bc407e59e9177e78a35d7d156fd466f05b9a3aec3242e284ed941c433b0ed69c4fffbc2e661cef93413fceb16096438429ccf48fbad655e3f57c5d2135604c34d8427eab6551ce39b6d480881e0566b9da47b2c13081d106effd4e03b58403f0699fa5adf1015a56d3371e9d69ff22587be9e83befd19ae4b4d9",
+                      "n" : "b86c87f9aea1aa7b5c253966047466b0ae29fdbacabeb7eaed820b7f87b664749bfaba791d7a0bfd25cbb4251da58fbb2ab9725c2c873f2b545eaa7409f1124e2d84cdb5c71583fc433a2fa44c6e8e006caaadb07b4996a67ee01df45b70bf94dd0f1bd13c60935f012899edde57c9af80ad362440e804767e4837fbf98847e5e33c534fb86601958adea41ed278203e99d717917fe9d719fcefb3b04f0edb4f44831b52f20c5ac410ea96723fe5bc0afb4dc7d3bf617dd3760b396436cf613444b9abcaa82bd7e0f3174df6dbe320616a2bcb774fbc4633ea783dacffd557706f6f64a8821805d40fd627f3deaa99d4da4a4f571fe7332cc219f68682d4d3d3",
+                      "d" : "1d26dc09539115a27d95980819d439c5b3f2517f63ed7a66f2382d138027102fcf89fb46c823899e36ee5f07da691ec2f9fbc0e28b1408c179658c9d5d7f114207acf5f0ab17f6bd369e09fcdba00a0851aad795a0ab31f0136a7d9e7a7a781594738cca7838f8cb3b755529c684ca4632adfb6b2b9de2b2b5408f81447e55e79df1197c07e1312980c30cdb9e989697152f0b69fd42e32e2982ccbd6ba40814d63fdf858e82dc4cfe7e4aed2ad6e77af3d977cedfc2900de774c0539901d71802cfa4b28b4e0f747718fcb0bd433a952bca8d1634e3e037f70d2d6135ede9832a4b81f65fd04b5e67182508b44b841e940f16f0e26f1167cfb1ab6b1d62b901"
                     },
                     {
                       "tcId" : 1117,
@@ -2041,7 +2056,7 @@
                       "d" : "1f5201b880a206cb123fb73afc2f266baac9c431afd3c584eb12abd3c6aaa106bc1eb9b034dc7b61803ca7a3a74e371f865de8af27e7d97c5287c9ed91f5c1da02ba44156aa857136685c03256fb9586567fa73a5a17c341d073aae3758fc3676f3fc87bbc2dd684915ec6c3370fa349e2b6bed9e82a8f5fb2ea3bea65a3818968081bdd80f7e046c6b5b8bdac85120d95c243725162cfc9034ae14634d14674e0c0c10f1a5e93af74152d67bf872e039fead73755c8e28f2da34f3b7eb1286deda90e09514a281cb7013a519b93e1b347728fa56543e0c3348d646e67b7f6d2481c41f6c02454cc9e6ed07b1ecf1a44857802191da376bae5027d4c3b0c6473"
                    },
                   {
-                    "tcId" : 1130,
+                      "tcId" : 1130,
                       "e" : "e66d81",
                       "p" : "fb61c111b038153b645cdd3103fc5eb3e9ab09b64d11de97a08662c569fb22456203fa5fc6b7e41a8e83fe995eeaea9cca670575a662447d39012aa093a051e781df6018c0ea8ab76d49353363074e92f070dfe3c3c8964acad4532da8bea7b0944ffd229f06da23abe7b050418abe4b44513777b988ab30ee696ef053e23ca5",
                       "q" : "c0ef0f196921eea05721308d4edca39afd20d0dbd6c6c446571f69d6c873838558c8bd2e3a5bee4b7d32de9819caf9f07d3807a16616081275263789adb5c1d092f9d0001486fde649998d15650b1e442e0076cacf5b276d6d52cbbe1ec713237ff0f59460967515914aed67eb806e92bc9a0affb27de9c5c74fa9aefa357627",
@@ -2075,51 +2090,41 @@
             <figure>
         <artwork><![CDATA[
              [
-                  { "acvVersion": "0.4" },
-                  { "vsId": 1163,
-                    "algorithm": "RSA",
-                    "mode": "sigGen",
-                    "testResults": [
+                { "acvVersion": "0.4" },
+                { "vsId": 1163,
+                  "algorithm": "RSA",
+                  "mode": "sigGen",
+                  "testResults": [
                     {
                       "tcId" : 1165,
-                      "n" :"a674f0f2a01fa0a987d0ef355f36cbd7eda5a931d5eca30b18fc237a481fcea435fe514166db877ca1e645204b0e1e2a8e5f7fcf28a98306c70424f0f4025c7d8c6d89063ac7847bf52eb1f2852bdd5cc03c1cbf63875b5062f4d22b290526a5fecfe343d39c3b46626b63e91670802b4d7a066973474a757d3e5957ddc020afddbeef963643b237651f7bd58d9af4ea67da7de5620539fb904c5a0243388498013470de777c8f11924add97fa1fb11b51cab46ea38adf995ad5efd0958a98cbf022dfb0d4b128917e4b513f120629051307b4d9d1014a28c55c93aaff59f47a7c0472a8b7a1ad5dbf07252c4b2602278fe18a77ec8acb8798f9f8b720dafe03",
                       "e" : "f3e7af",
+                      "n" :"a674f0f2a01fa0a987d0ef355f36cbd7eda5a931d5eca30b18fc237a481fcea435fe514166db877ca1e645204b0e1e2a8e5f7fcf28a98306c70424f0f4025c7d8c6d89063ac7847bf52eb1f2852bdd5cc03c1cbf63875b5062f4d22b290526a5fecfe343d39c3b46626b63e91670802b4d7a066973474a757d3e5957ddc020afddbeef963643b237651f7bd58d9af4ea67da7de5620539fb904c5a0243388498013470de777c8f11924add97fa1fb11b51cab46ea38adf995ad5efd0958a98cbf022dfb0d4b128917e4b513f120629051307b4d9d1014a28c55c93aaff59f47a7c0472a8b7a1ad5dbf07252c4b2602278fe18a77ec8acb8798f9f8b720dafe03",
                       "signature" : "4d4ea9c758775fa7e90977ac8ef2249be7a8c3f2288ef36b59f9efe8b0175f5a7405970cc1884820fc9adbadf7b17cb258293b0cfcea119bacd5f7e1de4aa99757d2cb65bd21f58adaef0754bf84e84dfc05ce1ea9fe40dcb5cf8221ce1a4a99acde9e84a2214b7a3e57d7b92d59a003b83af7b0108e9ee6c73580004244506ef3cab5bd1ddfc319a474492645b1815349f77a9f581b5f1b84e5ea03f48f2f12fffeb62e84535094277544dabe3e119b42e46f16f579b3c4d9dea86cbd616ba2e04706072293cd7eabcd667ee06bacb435004f3e8be90727e44416b6be1672ef465e01645ea38f4f899c6f6ac5f8c5c6cebdec629a00df53a923d3359821ea4d"
-                    }
+                    },
                     {
                       "tcId" : 1166,
-                      "n" : "9ef147700655a568cfffaef293b86e35f562ce3e4326bba11a049fc4e4b766270608e12d5f09dcbf4f295131a8fb0bb5875a6394bdf129e307cabb5861710a956aa9411533d46994b678aee60b5927d065b6bc3130d0bd36135a46d5153dc530e619eae17b06a6db2d75a4b31e32539a89bf1b2b350c7eccc02a573af7d0d34d98e037698301c84d3e9ae66ee5e3429bd27c908140167d3c0ec4bf7b37a4eb60456d12752bee1e0aa705d184a11917bfbe8a73c07f42ee1957fdf30c5a331f7335bf113e215c0a4c9f89099b94ce74ed76e380ecc7cea221d8bcd961cd014762f9d12049d4288f585249c9536ca8abbc2b6ea63afd9bdee0aff6ee91a2f31ca82aaa778159fa8b9bd5e72268bf89afee45494653de7764948b9b877fab124b3b66cc4ff7fb56ba4140936514436aedd2cdc34c032c5b3c385db4f8b658ed5027001d9084064de2f11bd10ef2e290e421d3f8fdd2d217dc6f5aba8d709b6b25c17c0a4825a1e3633005380f16f51614aa3a7bab5169cf840f272919a28a765ba5",
                       "e" : "ebda09",
+                      "n" : "9ef147700655a568cfffaef293b86e35f562ce3e4326bba11a049fc4e4b766270608e12d5f09dcbf4f295131a8fb0bb5875a6394bdf129e307cabb5861710a956aa9411533d46994b678aee60b5927d065b6bc3130d0bd36135a46d5153dc530e619eae17b06a6db2d75a4b31e32539a89bf1b2b350c7eccc02a573af7d0d34d98e037698301c84d3e9ae66ee5e3429bd27c908140167d3c0ec4bf7b37a4eb60456d12752bee1e0aa705d184a11917bfbe8a73c07f42ee1957fdf30c5a331f7335bf113e215c0a4c9f89099b94ce74ed76e380ecc7cea221d8bcd961cd014762f9d12049d4288f585249c9536ca8abbc2b6ea63afd9bdee0aff6ee91a2f31ca82aaa778159fa8b9bd5e72268bf89afee45494653de7764948b9b877fab124b3b66cc4ff7fb56ba4140936514436aedd2cdc34c032c5b3c385db4f8b658ed5027001d9084064de2f11bd10ef2e290e421d3f8fdd2d217dc6f5aba8d709b6b25c17c0a4825a1e3633005380f16f51614aa3a7bab5169cf840f272919a28a765ba5",
                       "signature" : "165e7194850b81151f9389e055e82836ceedcf5f9f10426901765b694dab813eda7a5ba6702957d5b9265cad8714abf3d30fecad94823a0ddccb5d3d1ff8e7dcdf2ccf11811c3d33602533a37ce538e9540360ed2243271929a40869dbe5870f2cb6afba5042d3a9726207805fa8fd81b0cf53b0af4c3ccc285989366609911cb121b947295040a51f4a35d6d7ac4d6c4381f0e93263b3d5976354c40deeaf6b1cfe6fed3c87082eaa0393a110fbce327d68d598f9e610ba20ff2a2dc7290c8eefd1998a52e6dd63a00270f299276a176052270e5eaeb5dd1a8d0904d8d0d76d883130d7faaf99a22e2440c4e54af31b6369b4dc7a5f724389b38f22260f90157e0e7ca0a67a09529b55cafca7fefe43a93aaeae0658cc409a33fc312b3eb5afe16ae692dcfde374d74fcec50054330dba7208cda87c27692954f5969da59707f695a3804e18f4c0d1b7d8d7fd7f6250e1cb4231ef240d690f3e9154d27529736fbcdb05a691c28ee1c085654411ba2f3ee65b298b56ff08b6a4dc29240df29c"
-                    }
-                 ]
-             }
-              {
-                 "sigType" : "PKCS1v1.5",
-                 "tests" : [
+                    },
                     {
                       "tcId" : 1167,
                       "e" : "260445",
                       "n" : "cea80475324c1dc8347827818da58bac069d3419c614a6ea1ac6a3b510dcd72cc516954905e9fef908d45e13006adf27d467a7d83c111d1a5df15ef293771aefb920032a5bb989f8e4f5e1b05093d3f130f984c07a772a3683f4dc6fb28a96815b32123ccdd13954f19d5b8b24a103e771a34c328755c65ed64e1924ffd04d30b2142cc262f6e0048fef6dbc652f21479ea1c4b1d66d28f4d46ef7185e390cbfa2e02380582f3188bb94ebbf05d31487a09aff01fcbb4cd4bfd1f0a833b38c11813c84360bb53c7d4481031c40bad8713bb6b835cb08098ed15ba31ee4ba728a8c8e10f7294e1b4163b7aee57277bfd881a6f9d43e02c6925aa3a043fb7fb78d",
                       "signature" : "6b8be97d9e518a2ede746ff4a7d91a84a1fc665b52f154a927650db6e7348c69f8c8881f7bcf9b1a6d3366eed30c3aed4e93c203c43f5528a45de791895747ade9c5fa5eee81427edee02082147aa311712a6ad5fb1732e93b3d6cd23ffd46a0b3caf62a8b69957cc68ae39f9993c1a779599cdda949bdaababb77f248fcfeaa44059be5459fb9b899278e929528ee130facd53372ecbc42f3e8de2998425860406440f248d817432de687112e504d734028e6c5620fa282ca07647006cf0a2ff83e19a916554cc61810c2e855305db4e5cf893a6a96767365794556ff033359084d7e38a8456e68e21155b76151314a29875feee09557161cbc654541e89e42"
-                    }
+                    },
                     {
                       "tcId" : 1168,
                       "e" : "eaf05d",
                       "n" : "dca98304b729e819b340e26cecb730aecbd8930e334c731493b180de970e6d3bc579f86c8d5d032f8cd33c4397ee7ffd019d51b0a7dbe4f52505a1a34ae35d23cfaaf594419d509f469b1369589f9c8616a7d698513bc1d423d70070d3d72b996c23abe68b22ccc39aabd16507124042c88d4da6a7451288ec87c9244be226aac02d1817682f80cc34c6eaf37ec84d247aaedebb56c3bbcaffb5cf42f61fe1b7f3fc89748e213973bf5f679d8b8b42a47ac4afd9e51e1d1214dfe1a7e1169080bd9ad91758f6c0f9b22ae40af6b41403d8f2d96db5a088daa5ef8683f86f501f7ad3f358b6337da55c6cfc003197420c1c75abdb7be1403ea4f3e64259f5c6da3325bb87d605b6e14b5350e6e1455c9d497d81046608e38795dc85aba406c9de1f4f9990d5153b98bbabbdcbd6bb18854312b2da48b411e838f26ae3109f104dfd1619f991824ec819861e5199f26bb9b3b299bfa9ec2fd691271b58a8adecbf0ff627b54336f3df7003d70e37d11ddbd930d9aba7e88ed401acb44092fd53d5",
                       "signature" : "d1d21b8dfa55f0681e8fa86135cf292d71b7669713c291d8f8dc246464de3bbb961b596dfc8fda6c823c384008d05bcb3dccc36accf1b2bede1a95e52258d7d1bdf1fc44e18072abd45c1392015ee71692690ef8cdaaed337dd8546783f961bb9620eb5c7b8b6716e8c600351fab7765ee38a15d32d8a2c0949825c49a7f25eedd9be7b807bbfd517913786620d249823dae6fe2fd39ac639dd74821b0c120b42f31c2c639d2c61b395f09f86851bc809b34c4981ac65cf25b2e8adcbce190ef2ef67a0189039c9110f26701c3eed731c8d9ead178220ffcac7f0f678aa22268e1d01942ec51e80eef06e2112830855e87bafe8cc9c22fd737c7abbca5eb7a221d3835a86610d24b507b5dcb4618aa421f63a5609ef5d68f5760fddf970135602efad0851bbff98fe87fa58bc365f38ee7ec8ef5aab17fd11d89d91ef4c604e0d1f001d0e08869df9225e3b4cef52ff86815e13b3efdf45776f9353769a8a51fe7d891a7ef7035eecfa259848738376886edc91cc78f6da31c2f07ee362c3d82"
-                    }
-                 ]
-             }
-             {
-                 "sigType" : "PSS",
-                 "tests" : [
+                    },
                     {
                       "tcId" : 1169,
                       "e" : "86c94f",
                       "n" : "c5062b58d8539c765e1e5dbaf14cf75dd56c2e13105fecfd1a930bbb5948ff328f126abe779359ca59bca752c308d281573bc6178b6c0fef7dc445e4f826430437b9f9d790581de5749c2cb9cb26d42b2fee15b6b26f09c99670336423b86bc5bec71113157be2d944d7ff3eebffb28413143ea36755db0ae62ff5b724eecb3d316b6bac67e89cacd8171937e2ab19bd353a89acea8c36f81c89a620d5fd2effea896601c7f9daca7f033f635a3a943331d1b1b4f5288790b53af352f1121ca1bef205f40dc012c412b40bdd27585b946466d75f7ee0a7f9d549b4bece6f43ac3ee65fe7fd37123359d9f1a850ad450aaf5c94eb11dea3fc0fc6e9856b1805ef",
                       "signature" : "8b46f2c889d819f860af0a6c4c889e4d1436c6ca174464d22ae11b9ccc265d743c67e569accbc5a80d4dd5f1bf4039e23de52aece40291c75f8936c58c9a2f77a780bbe7ad31eb76742f7b2b8b14ca1a7196af7e673a3cfc237d50f615b75cf4a7ea78a948bedaf9242494b41e1db51f437f15fd2551bb5d24eefb1c3e60f03694d0033a1e0a9b9f5e4ab97d457dff9b9da516dc226d6d6529500308ed74a2e6d9f3c10595788a52a1bc0664aedf33efc8badd037eb7b880772bdb04a6046e9edeee4197c25507fb0f11ab1c9f63f53c8820ea8405cfd7721692475b4d72355fa9a3804f29e6b6a7b059c4441d54b28e4eed2529c6103b5432c71332ce742bcc"
-                    }
+                    },
                     {
                       "tcId" : 1170,
                       "e" : "1415a7",
@@ -2141,49 +2146,34 @@
     { "vsId": 1173,
       "algorithm": "RSA",
       "mode": "sigVer",
-      "testGroups" : [
-             {
-                 "sigType" : "ANSX9.31",
-                 "tests" : [
-                    {
-                      "tcId" : 1174,
-                      "sigResult" : "failed"
-                    },
-                    {
-                      "tcId" : 1175,
-                      "sigResult" : "failed"
-                    }
-                 ]
-             },
+      "testResults" : [
               {
-                 "sigType" : "PKCS1v1.5",
-                 "tests" : [
-                    {
-                      "tcId" : 1176,
-                      "sigResult" : "passed"
-                    },
-                    {
-                      "tcId" : 1177,
-                      "sigResult" : "failed"
-                    }
-                 ]
-             },
-             {
-                 "sigType" : "PSS",
-                 "tests" : [
-                    {
-                      "tcId" : 1178,
-                      "sigResult" : "failed"
-                    },
-                    {
-                      "tcId" : 1179,
-                      "sigResult" : "failed"
-                    }
-                 ]
-             }
-       ]
+                "tcId" : 1174,
+                "sigResult" : "failed"
+              },
+              {
+                "tcId" : 1175,
+                "sigResult" : "failed"
+              },
+              {
+                "tcId" : 1176,
+                "sigResult" : "passed"
+              },
+              {
+                "tcId" : 1177,
+                "sigResult" : "failed"
+              },
+              {
+                "tcId" : 1178,
+                "sigResult" : "failed"
+              },
+              {
+                "tcId" : 1179,
+                "sigResult" : "failed"
+              }
+        ]
     }
-  ]
+]
             ]]></artwork>
     </figure>
           </section>
@@ -2194,27 +2184,23 @@
       <t>The following is a example JSON object for RSA componentSigPrimitive test results sent from the crypto module to the ACVP server.</t>
             <figure>
         <artwork><![CDATA[
- [
+[
     { "acvVersion": "0.4" },
-    { "vsId": 1193,
+    { "vsId": 47,
       "algorithm": "RSA",
       "mode": "componentSigPrimitive",
-      "testGroups" : [
-             {
-                 "tests" : [
-                    {
-                      "tcId" : 1194,
-                      "signature" : "a60b879a8fa382fdf4f9040da5f2e9f1700d246724eb5d0c7d0d696bf0b34c414be597d97b6cb478da28676aa944cb18f473e41225b08e22585af5c50673b21fd45f6e675bf248ae78eecb37bab2733e1dc1b6dfd71ef7c0371249601c0a9c76ea343c602b8583622957d3a669cc00088282b39ef95005e4278a3e2cfabbe863ca5ad3d02673f607a5e8c815d8067ddd065e9fd7fa2f045ed777c3d07366573e6aa1973f9810cbc115543568f5a38a3555b5ede680a1cd2b6a86bbd06360d4f7e36f96ba9bb4d5c6386f921135109a2fc417c9ea04e1656191c0af93880af5aad6d8ce194635306a525c5f82e82773e2c7997d66009e6f4e4e2189858751c039"
-                    },
-                    {
-                      "tcId" : 1195,
-                      "sigResult" : "failed"
-                    }
-                 ]
-             }
-       ]
+      "testResults" : [
+                {
+                 "tcId" : 1194,
+                 "signature" : "a60b879a8fa382fdf4f9040da5f2e9f1700d246724eb5d0c7d0d696bf0b34c414be597d97b6cb478da28676aa944cb18f473e41225b08e22585af5c50673b21fd45f6e675bf248ae78eecb37bab2733e1dc1b6dfd71ef7c0371249601c0a9c76ea343c602b8583622957d3a669cc00088282b39ef95005e4278a3e2cfabbe863ca5ad3d02673f607a5e8c815d8067ddd065e9fd7fa2f045ed777c3d07366573e6aa1973f9810cbc115543568f5a38a3555b5ede680a1cd2b6a86bbd06360d4f7e36f96ba9bb4d5c6386f921135109a2fc417c9ea04e1656191c0af93880af5aad6d8ce194635306a525c5f82e82773e2c7997d66009e6f4e4e2189858751c039"
+                },
+                {
+                 "tcId" : 1195,
+                 "sigResult" : "failed"
+                }
+            ]
     }
-  ]
+]
             ]]></artwork>
     </figure>
           </section>
@@ -2222,30 +2208,26 @@
       <t>The following is a example JSON object for RSA componentDecPrimitive test results sent from the crypto module to the ACVP server.</t>
             <figure>
         <artwork><![CDATA[
- [
+[
     { "acvVersion": "0.4" },
-    { "vsId": 1194,
+    { "vsId": 48,
       "algorithm": "RSA",
-      "mode": "componentDecPrimitive",
-      "testGroups" : [
+            "mode": "componentDecPrimitive",
+      "testResults" : [
              {           
-                 "tests" : [
-                    {
-                      "tcId" : 1196,
-                      "e" : "010001",
-                      "n" : "d0c112f0bee36235d9fe635e895ffb28760e96321c588bd3ed508d165c361f81215ac593b1d67fae791e78fab00ca984ffa85a189b8862cf00d365aa02ac098e9dda175c96241ad39e4bae1829f7fb8df5b49ddcaefbe2c5fb38bda7660a985fe494a7517dc558484a89edc4a374364c1cfd64befed2077b8108e9d1375880c402817d179a4115e76632430b836e77c048f0c43e329386aecf4287c885b5fd3dc39a33309f788a953adb8b643342d5d6991df43fdddbcb8ed733cf342bb60262f202590738d073c204a99ffdef4b8cadc8424f217527fdb09f9d370da7084ac06fe3bf67f6b0f078b6d0324da9d0936e60c96174da5a4e690ac7d6799bfddddd",
-                      "d" : "2cde66ea08797aad3cf8fcd63fbc39d15948aad743f8f33afeaddad964c1fc5506bc8a2d83e2a90870ff8ffcbff4c4c5f1a6779104f3145bce5f61a160582668b93c7c5b79e8f23c2c70b34f7dcbcf8d9473791fcb1b98433a0b58d63f6c45128d60b732e08fd779184e5ba4f18603baa9db7bf9426f95cca1b02f03793c2456b979b72d631f9b1b8682bdb0e4e8b75b5d9851a05ef91713320c6de7bc54ad27053c029041779fde5b09159f40f1b65d2cfd3c4b2b82c1009c6549aa506ca63d6f973815d945bb42b172e80896f3b53a4d9d420eb502afa96554dd74e10080d36cfd76e071c4efe8611651493b212e7bf192c12304a249f03ec7b7a4d4948361",
-                      "signature" : "a60b879a8fa382fdf4f9040da5f2e9f1700d246724eb5d0c7d0d696bf0b34c414be597d97b6cb478da28676aa944cb18f473e41225b08e22585af5c50673b21fd45f6e675bf248ae78eecb37bab2733e1dc1b6dfd71ef7c0371249601c0a9c76ea343c602b8583622957d3a669cc00088282b39ef95005e4278a3e2cfabbe863ca5ad3d02673f607a5e8c815d8067ddd065e9fd7fa2f045ed777c3d07366573e6aa1973f9810cbc115543568f5a38a3555b5ede680a1cd2b6a86bbd06360d4f7e36f96ba9bb4d5c6386f921135109a2fc417c9ea04e1656191c0af93880af5aad6d8ce194635306a525c5f82e82773e2c7997d66009e6f4e4e2189858751c039"
-                    },
-                    {
-                      "tcId" : 1197,
-                      "sigResult" : "failed"
-                    }
-                 ]
+                "tcId" : 1196,
+                "e" : "010001",
+                "n" : "d0c112f0bee36235d9fe635e895ffb28760e96321c588bd3ed508d165c361f81215ac593b1d67fae791e78fab00ca984ffa85a189b8862cf00d365aa02ac098e9dda175c96241ad39e4bae1829f7fb8df5b49ddcaefbe2c5fb38bda7660a985fe494a7517dc558484a89edc4a374364c1cfd64befed2077b8108e9d1375880c402817d179a4115e76632430b836e77c048f0c43e329386aecf4287c885b5fd3dc39a33309f788a953adb8b643342d5d6991df43fdddbcb8ed733cf342bb60262f202590738d073c204a99ffdef4b8cadc8424f217527fdb09f9d370da7084ac06fe3bf67f6b0f078b6d0324da9d0936e60c96174da5a4e690ac7d6799bfddddd",
+                "d" : "2cde66ea08797aad3cf8fcd63fbc39d15948aad743f8f33afeaddad964c1fc5506bc8a2d83e2a90870ff8ffcbff4c4c5f1a6779104f3145bce5f61a160582668b93c7c5b79e8f23c2c70b34f7dcbcf8d9473791fcb1b98433a0b58d63f6c45128d60b732e08fd779184e5ba4f18603baa9db7bf9426f95cca1b02f03793c2456b979b72d631f9b1b8682bdb0e4e8b75b5d9851a05ef91713320c6de7bc54ad27053c029041779fde5b09159f40f1b65d2cfd3c4b2b82c1009c6549aa506ca63d6f973815d945bb42b172e80896f3b53a4d9d420eb502afa96554dd74e10080d36cfd76e071c4efe8611651493b212e7bf192c12304a249f03ec7b7a4d4948361",
+                "signature" : "a60b879a8fa382fdf4f9040da5f2e9f1700d246724eb5d0c7d0d696bf0b34c414be597d97b6cb478da28676aa944cb18f473e41225b08e22585af5c50673b21fd45f6e675bf248ae78eecb37bab2733e1dc1b6dfd71ef7c0371249601c0a9c76ea343c602b8583622957d3a669cc00088282b39ef95005e4278a3e2cfabbe863ca5ad3d02673f607a5e8c815d8067ddd065e9fd7fa2f045ed777c3d07366573e6aa1973f9810cbc115543568f5a38a3555b5ede680a1cd2b6a86bbd06360d4f7e36f96ba9bb4d5c6386f921135109a2fc417c9ea04e1656191c0af93880af5aad6d8ce194635306a525c5f82e82773e2c7997d66009e6f4e4e2189858751c039"
+             },
+             {
+                "tcId" : 1197,
+                "sigResult" : "failed"
              }
-       ]
+        ]
     }
-  ]
+]
             ]]></artwork>
     </figure>
           </section>          
