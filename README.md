@@ -13,7 +13,7 @@ The development of an Automated Cryptographic Validation Protocol (ACVP) that en
 validation of standardized algorithm test evidence.
 
 # Status
-If you would like to try the algorithm testing service with ACVP, it is at acvts.nist.gov/acvp/. Please read the specification carefully. The latest version is 0.3. 
+If you would like to try the algorithm testing service with ACVP, it is at demo.acvts.nist.gov/acvp/. Please read the specification carefully. The latest version is 0.4. 
 The server currently allows validation of the following algorithms:
 
     - AES-GCM
@@ -31,6 +31,22 @@ The server currently allows validation of the following algorithms:
     - SHA-256
     - SHA-384
     - SHA-512
+    - SHA-512/224
+    - SHA-512/256
+    - AES-KW
+    - TDES-KW
+    - TDES-OFB
+    - HMAC-SHA-1
+    - HMAC-SHA2-224
+    - HMAC-SHA2-256
+    - HMAC-SHA2-384
+    - HMAC-SHA2-512
+    - HMAC-SHA2-512/224
+    - HMAC-SHA2-512/256
+    - HMAC-SHA3-224
+    - HMAC-SHA3-256
+    - HMAC-SHA3-384
+    - HMAC-SHA3-512
 
 We are working on support for several other algorithms, stay tuned for updates. 
 
