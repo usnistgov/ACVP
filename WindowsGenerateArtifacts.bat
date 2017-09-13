@@ -38,5 +38,5 @@ xml2rfc --html src/acvp_sub_rsa.xml -o artifacts/acvp_sub_rsa.html
 xml2rfc src/acvp_sub_rsa.xml -o artifacts/acvp_sub_rsa.txt
 xml2rfc --html src/acvp_sub_kas_ecc.xml -o artifacts/acvp_sub_kas_ecc.html
 xml2rfc src/acvp_sub_kas_ecc.xml -o artifacts/acvp_sub_kas_ecc.txt
-xml2rfc --html src/acvp_sub_kas_fcc.xml -o artifacts/acvp_sub_kas_fcc.html
-xml2rfc src/acvp_sub_kas_fcc.xml -o artifacts/acvp_sub_kas_fcc.txt
+xml2rfc --html src/acvp_sub_kas_ffc.xml -o artifacts/acvp_sub_kas_ffc.html
+xml2rfc src/acvp_sub_kas_ffc.xml -o artifacts/acvp_sub_kas_ffc.txt
