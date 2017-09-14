@@ -47,8 +47,14 @@ The server currently allows validation of the following algorithms:
     - HMAC-SHA3-256
     - HMAC-SHA3-384
     - HMAC-SHA3-512
+    - SHA3-224
+    - SHA3-256
+    - SHA3-384
+    - SHA3-512
+    - SHAKE-128
+    - SHAKE-256
 
-We are working on support for several other algorithms, stay tuned for updates. 
+We continue to work on adding support for additional algorithms, so stay tuned for updates. 
 
 # Contribution guidelines:
 
