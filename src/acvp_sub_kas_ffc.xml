@@ -380,19 +380,19 @@
           <ttcol align="left">Valid Values</ttcol>
           <ttcol align="left">Optional</ttcol>
 
-          <c>hashAlg</c>
-	  <c>The hash algorithms to use for DSA (and noKdfNoKc)</c>
-	  <c>array</c>
-	  <c>See <xref target="supported_hashAlg"/></c>	
-          <c>Yes</c>
-	  <c/><c/><c/><c/><c/>
+			<c>hashAlg</c>
+			<c>The hash algorithms to use for DSA (and noKdfNoKc)</c>
+			<c>array</c>
+			<c>See <xref target="supported_hashAlg"/></c>	
+				<c>Yes</c>
+			<c/><c/><c/><c/><c/>
 
-          <c>macOption</c>
-	  <c>The macOption(s) to use with "kdfNoKc" and/or "kdfKc"</c>
-	  <c>object</c>
-	  <c>See <xref target="supported_macOption"/></c>	
-          <c>Yes</c>
-	  <c/><c/><c/><c/><c/>          
+			<c>macOption</c>
+			<c>The macOption(s) to use with "kdfNoKc" and/or "kdfKc"</c>
+			<c>object</c>
+			<c>See <xref target="supported_macOption"/></c>	
+				<c>Yes</c>
+			<c/><c/><c/><c/><c/>          
 
         </texttable>
 	</section>
@@ -449,36 +449,102 @@
           <ttcol align="left">Valid Values</ttcol>
           <ttcol align="left">Optional</ttcol>
 
-          <c>keyLen</c>
-	  <c>The supported keyLens for the selected MAC.</c>
-	  <c>Domain</c>
-	  <c>
-	  	  AES based MACs limited to 128, 192, 256.  HashAlg based MACs mod 8.  
-	  	  All keySizes minimum must conform to parameter set requirements See <xref target="parameter_set_details"/>. 
-	  </c>	
-          <c>No</c>
-	  <c/><c/><c/><c/><c/>
+			<c>keyLen</c>
+			<c>The supported keyLens for the selected MAC.</c>
+			<c>Domain</c>
+			<c>
+				AES based MACs limited to 128, 192, 256.  HashAlg based MACs mod 8.  
+				All keySizes minimum must conform to parameter set requirements See <xref target="parameter_set_details"/>. 
+			</c>	
+				<c>No</c>
+			<c/><c/><c/><c/><c/>
 
-          <c>nonceLen</c>
-	  <c>The nonce len for use with AES-CCM mac</c>
-	  <c>value</c>
-	  <c>Input as bits, 56-104, odd byte values only (7-13). Additionally minimum must conform to parameter set requirements See <xref target="parameter_set_details"/>.</c>	
-          <c>Yes (required for AES-CCM)</c>
-	  <c/><c/><c/><c/><c/>
+				<c>nonceLen</c>
+			<c>The nonce len for use with AES-CCM mac</c>
+			<c>value</c>
+			<c>Input as bits, 56-104, odd byte values only (7-13). Additionally minimum must conform to parameter set requirements See <xref target="parameter_set_details"/>.</c>	
+				<c>Yes (required for AES-CCM)</c>
+			<c/><c/><c/><c/><c/>
 
-          <c>macLen</c>
-	  <c>The mac len for use with mac</c>
-	  <c>value</c>
-	  <c>Input as bits, mod 8, minimum must conform to parameter set requirements See <xref target="parameter_set_details"/>, maximum may not exceed block size..</c>	
-          <c>Yes (required for AES-CCM)</c>
-	  <c/><c/><c/><c/><c/>
+				<c>macLen</c>
+			<c>The mac len for use with mac</c>
+			<c>value</c>
+			<c>Input as bits, mod 8, minimum must conform to parameter set requirements See <xref target="parameter_set_details"/>, maximum may not exceed block size..</c>	
+				<c>Yes (required for AES-CCM)</c>
+			<c/><c/><c/><c/><c/>
 
         </texttable>
 	</section>
 
 	<section anchor="supported_kdfOption" title="Supported KAS FFC KDF Options">
-	    <t>TODO</t>
+	    <t>The following MAC options are available for registration under a "kdfNoKc" and "kdfKc" kasMode:</t>
+	    <t><list style="symbols">
+	    	<t>concatenation</t>
+			<t>asn1</t>
+		</list></t>
+
+        <texttable anchor="kdfOption_details_table" title="KAS FFC KDF Option Details Capabilities JSON Values">
+          <ttcol align="left">JSON Value</ttcol>
+          <ttcol align="left">Description</ttcol>
+          <ttcol align="left">JSON type</ttcol>
+          <ttcol align="left">Valid Values</ttcol>
+          <ttcol align="left">Optional</ttcol>
+
+			<c>oiPattern</c>
+			<c>The OI pattern to use for constructing OtherInformation.</c>
+			<c>value</c>
+			<c>See <xref target="oiPatternConstruction"/>.</c>	
+				<c>No</c>
+			<c/><c/><c/><c/><c/>
+
+        </texttable>
 	</section>	
+
+	<section anchor="oiPatternConstruction" title="Other Information Construction">
+	<t>
+		Some IUTs require a specific pattern for the OtherInfo portion of the KDFs for KAS.  An "oiPattern" is specified in the KDF registration to accommodate such requirements. Regardless of the oiPattern specified, the OI bitlength must be 240 for FFC, and 376 for ECC.  The OI will be padded with random bits (or the most significant bits utilized) when the specified OI pattern does not meet the bitlength requirement
+	</t>
+
+	<t>Pattern candidates:</t>
+		<t><list style="symbols">
+			<t>literal[123456789ABCDEF]
+				<list style="symbols">
+					<t>uses the specified hex within "[]".  literal[123456789ABCDEF] substitutes "123456789ABCDEF" in place of the field</t>
+				</list>
+			</t>
+			<t>uPartyInfo
+				<list style="symbols">
+					<t>uPartyId { || dkmNonce }
+					<list style="symbols">
+							<t>dkmNonce is provided by party u for static schemes</t>
+					</list></t>
+				</list>
+			</t>
+			<t>vPartyInfo
+				<list style="symbols">
+					<t>vPartyId</t>
+				</list>
+			</t>
+			<t>counter
+				<list style="symbols">
+					<t>32bit counter starting at "1" (0x00000001)</t>
+				</list>
+			</t>
+		</list></t>
+
+		<t>Example (Note that party U is the server in this case "434156536964", party V is the IUT "a1b2c3d4e5", using an FFC non-static scheme):</t>
+
+			<t><list style="symbols">
+				<t>"oiPattern" : "literal[123456789CAFECAFE]||uPartyInfo||vPartyInfo"</t>
+			</list></t>
+			
+		<t>Evaluated as:</t>
+			<t><list style="symbols">
+				<t>"123456789CAFECAFE434156536964a1b2c3d4e5b16c5f78ef56e8c14a561"</t>
+				<t>"b16c5f78ef56e8c14a561" are random bits applied to meet length requirements</t>
+			</list></t>
+
+	</section>		
 
 	<section anchor="supported_kcOption" title="Supported KAS FFC KC Options">
 	    <t>TODO</t>
