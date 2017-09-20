@@ -76,19 +76,20 @@ Table of Contents
      2.11. Supported Hash Algorithm Methods  . . . . . . . . . . . .   9
      2.12. Supported KAS FFC MAC Options . . . . . . . . . . . . . .  10
      2.13. Supported KAS FFC KDF Options . . . . . . . . . . . . . .  11
-     2.14. Supported KAS FFC KC Options  . . . . . . . . . . . . . .  11
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  12
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  12
-     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  14
-   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  16
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  17
-   Appendix A.  Example KAS FFC Capabilities JSON Object . . . . . .  17
-   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  18
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  19
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  20
+     2.14. Other Information Construction  . . . . . . . . . . . . .  12
+     2.15. Supported KAS FFC KC Options  . . . . . . . . . . . . . .  13
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  13
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  14
+     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  15
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  18
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  18
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  18
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  18
+   Appendix A.  Example KAS FFC Capabilities JSON Object . . . . . .  18
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  19
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  20
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  21
 
 1.  Introduction
 
@@ -104,7 +105,6 @@ Table of Contents
    specification addresses a specific class of crypto algorithms.  This
    sub-specification defines the JSON constructs for testing KAS FFC
    algorithms using ACVP.
-
 
 
 
@@ -365,7 +365,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |              | "kdfNoKc"            |        | 2.13    |          |
    |              |                      |        |         |          |
    | kcOption     | The kc options for   | object | Section | No       |
-   |              | "kdfNoKc"            |        | 2.14    |          |
+   |              | "kdfNoKc"            |        | 2.15    |          |
    |              |                      |        |         |          |
    | parameterSet | The parameterSet     | object | Section | No       |
    |              | options for          |        | 2.7     |          |
@@ -602,12 +602,12 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 2.13.  Supported KAS FFC KDF Options
 
-   TODO
+   The following MAC options are available for registration under a
+   "kdfNoKc" and "kdfKc" kasMode:
 
-2.14.  Supported KAS FFC KC Options
+   o  concatenation
 
-   TODO
-
+   o  asn1
 
 
 
@@ -617,6 +617,73 @@ Fussell                 Expires December 3, 2016               [Page 11]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
+
+   +-----------+------------------------+-------+-----------+----------+
+   | JSON      | Description            | JSON  | Valid     | Optional |
+   | Value     |                        | type  | Values    |          |
+   +-----------+------------------------+-------+-----------+----------+
+   | oiPattern | The OI pattern to use  | value | See       | No       |
+   |           | for constructing       |       | Section   |          |
+   |           | OtherInformation.      |       | 2.14.     |          |
+   |           |                        |       |           |          |
+   +-----------+------------------------+-------+-----------+----------+
+
+       Table 10: KAS FFC KDF Option Details Capabilities JSON Values
+
+2.14.  Other Information Construction
+
+   Some IUTs require a specific pattern for the OtherInfo portion of the
+   KDFs for KAS.  An "oiPattern" is specified in the KDF registration to
+   accommodate such requirements.  Regardless of the oiPattern
+   specified, the OI bitlength must be 240 for FFC, and 376 for ECC.
+   The OI will be padded with random bits (or the most significant bits
+   utilized) when the specified OI pattern does not meet the bitlength
+   requirement
+
+   Pattern candidates:
+
+   o  literal[123456789ABCDEF]
+
+      *  uses the specified hex within "[]".  literal[123456789ABCDEF]
+         substitutes "123456789ABCDEF" in place of the field
+
+   o  uPartyInfo
+
+      *  uPartyId { || dkmNonce }
+
+         +  dkmNonce is provided by party u for static schemes
+
+   o  vPartyInfo
+
+      *  vPartyId
+
+   o  counter
+
+      *  32bit counter starting at "1" (0x00000001)
+
+   Example (Note that party U is the server in this case "434156536964",
+   party V is the IUT "a1b2c3d4e5", using an FFC non-static scheme):
+
+   o  "oiPattern" : "literal[123456789CAFECAFE]||uPartyInfo||vPartyInfo"
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 12]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   Evaluated as:
+
+   o  "123456789CAFECAFE434156536964a1b2c3d4e5b16c5f78ef56e8c14a561"
+
+   o  "b16c5f78ef56e8c14a561" are random bits applied to meet length
+      requirements
+
+2.15.  Supported KAS FFC KC Options
+
+   TODO
 
 3.  Test Vectors
 
@@ -650,7 +717,18 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | defined in Section 3.1                      |        |
    +------------+---------------------------------------------+--------+
 
-                     Table 10: Vector Set JSON Object
+                     Table 11: Vector Set JSON Object
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 13]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
 3.1.  Test Groups JSON Schema
 
@@ -666,14 +744,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    The test group for KAS FFC is as follows:
 
    +---------+-------------------------+--------------------+----------+
-
-
-
-Fussell                 Expires December 3, 2016               [Page 12]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    | JSON    | Description             | JSON type          | Optional |
    | Value   |                         |                    |          |
    +---------+-------------------------+--------------------+----------+
@@ -708,6 +778,14 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |         | supported               | recipient          |          |
    |         |                         |                    |          |
    | kcType  | Key confirmation types  | unilateral and/or  | Yes      |
+
+
+
+Fussell                 Expires December 3, 2016               [Page 14]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    |         | supported               | bilateral          |          |
    |         |                         |                    |          |
    | p       | Domain parameter for    | value              | Yes      |
@@ -722,18 +800,10 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | tests   | Array of individual     | array              | No       |
    |         | test vector JSON        |                    |          |
    |         | objects, which are      |                    |          |
-
-
-
-Fussell                 Expires December 3, 2016               [Page 13]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    |         | defined in Section 3.2  |                    |          |
    +---------+-------------------------+--------------------+----------+
 
-                    Table 11: Vector Group JSON Object
+                    Table 12: Vector Group JSON Object
 
 3.2.  Test Case JSON Schema
 
@@ -764,6 +834,14 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |                      | MacData field           |       |          |
    |                      |                         |       |          |
    | nonceNoKc            | The 16 byte nonce       | value | Yes      |
+
+
+
+Fussell                 Expires December 3, 2016               [Page 15]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    |                      | concatenated to the     |       |          |
    |                      | "Standard Test          |       |          |
    |                      | Message".  Used for No  |       |          |
@@ -778,14 +856,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | staticXIut           | The IUT DSA static      | value | Yes      |
    |                      | private key             |       |          |
    |                      |                         |       |          |
-
-
-
-Fussell                 Expires December 3, 2016               [Page 14]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    | staticYIut           | The IUT DSA static      | value | Yes      |
    |                      | public key              |       |          |
    |                      |                         |       |          |
@@ -820,6 +890,14 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |                      | to be used in the       |       |          |
    |                      | MacData field           |       |          |
    |                      |                         |       |          |
+
+
+
+Fussell                 Expires December 3, 2016               [Page 16]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    | nonceDkmIut          | ONLY USED BY STATIC     | value | Yes      |
    |                      | SCHEME. The nonce       |       |          |
    |                      | supplied by the         |       |          |
@@ -834,14 +912,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |                      | used in the OI field in |       |          |
    |                      | the PartyUInfo field.   |       |          |
    |                      | Specified in decimal    |       |          |
-
-
-
-Fussell                 Expires December 3, 2016               [Page 15]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    |                      | format.                 |       |          |
    |                      |                         |       |          |
    | nonceEphemeralDkm    | ONLY USED BY C(1,2) and | value | Yes      |
@@ -873,7 +943,16 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |                      | server.                 |       |          |
    +----------------------+-------------------------+-------+----------+
 
-                      Table 12: Test Case JSON Object
+                      Table 13: Test Case JSON Object
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 17]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
 4.  Test Vector Responses
 
@@ -881,22 +960,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    send the response vectors back to the ACVP server.  The following
    table describes the JSON object that represents a vector set
    response.
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016               [Page 16]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
    +-------------+--------------------------------------------+--------+
    | JSON Value  | Description                                | JSON   |
@@ -911,7 +974,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             | test vector result, Section 3.2            |        |
    +-------------+--------------------------------------------+--------+
 
-                 Table 13: Vector Set Response JSON Object
+                 Table 14: Vector Set Response JSON Object
 
 5.  Acknowledgements
 
@@ -942,14 +1005,7 @@ Appendix A.  Example KAS FFC Capabilities JSON Object
 
 
 
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016               [Page 17]
+Fussell                 Expires December 3, 2016               [Page 18]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -1005,7 +1061,7 @@ Appendix B.  Example Test Vectors JSON Object
 
 
 
-Fussell                 Expires December 3, 2016               [Page 18]
+Fussell                 Expires December 3, 2016               [Page 19]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -1061,7 +1117,7 @@ Appendix C.  Example Test Results JSON Object
 
 
 
-Fussell                 Expires December 3, 2016               [Page 19]
+Fussell                 Expires December 3, 2016               [Page 20]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
@@ -1117,4 +1173,4 @@ Author's Address
 
 
 
-Fussell                 Expires December 3, 2016               [Page 20]
+Fussell                 Expires December 3, 2016               [Page 21]
