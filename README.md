@@ -64,7 +64,7 @@ If you want to contribute, please follow the simple rules below and send us pull
   - Prior to commit, merge, pull request, `WindowsGenerateArtifacts.bat` (Windows) or `MakeFile` (non-Windows) should be run.
     - The running of the MakeFile (or its Windows equivalent) ensures that all artifacts (HTML and TXT) are kept up to date with src.
 
-If you would like to talk to our developers, you may want to send email to our mailing list algotest@nist.gov. You may also report bugs or request new tests.
+If you would like to talk to our developers, you may want to send email to our mailing list algotest@list.nist.gov. You may also report bugs or request new tests.
 
 # Licensing terms
 
