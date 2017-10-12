@@ -144,6 +144,7 @@
 	    <texttable anchor="algs_table" title="Supported RSA Algorithm Modes JSON Values">
           <ttcol align="left">JSON algorithm value</ttcol>
           <ttcol align="left">JSON mode value</ttcol>
+	        <c>"RSA"</c>
           <c>"keyGen"</c>
           <c/>
           <c>"sigGen"</c>
@@ -292,7 +293,7 @@
           <c/>
           <c/>
           <c/>
-          <c>hashAlgs</c>
+          <c>hashAlg</c>
           <c>Supported hash algorithms for provable prime generation - see <xref target="FIPS186-4"/>, Appendix B.3.2 or Appendix B.3.4</c>
           <c>array</c>
           <c>any non-empty subset of {"SHA-1", "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
@@ -304,7 +305,7 @@
           <c/>
           <c>singleCap</c>
           <c>A testable combination of modulus and hash values</c>
-          <c>object with "modulo" and "hashAlgs" properties</c>
+          <c>object with "modulo" and "hashAlg" properties</c>
           <c>see above</c>
           <c>Yes</c>
           <c/>
@@ -383,7 +384,7 @@
 	            <c/>
 	            <c/>
 	            <c/>
-	            <c>hashAlgs</c>
+	            <c>hashAlg</c>
 	            <c>Supported hash algorithms for provable prime generation - see <xref target="FIPS186-4"/>, Appendix B.3.6</c>
 	            <c>array</c>
 	            <c>any non-empty subset of {"SHA-1", "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
@@ -405,7 +406,7 @@
 	            <c/>
 	            <c>singleCap</c>
 	            <c>A testable combination of modulus, hash algorithm, and primality test rounds</c>
-	            <c>object with "modulo", "hashAlgs", and "primeTest" properties</c>
+	            <c>object with "modulo", "hashAlg", and "primeTest" properties</c>
 	            <c>see above</c>
 	            <c>Yes</c>
 	            <c/>
@@ -471,7 +472,7 @@
           <c/>
           <c/>
           <c>capProvPrimes</c>
-          <c>Capabilities for all supported moduli and hash algorithms (see <xref target="keyGenProvPrim_modulitable"/>)</c>
+          <c>Capabilities for all supported moduli and hash algorithms for a single Provable mode (see <xref target="keyGenProvPrim_modulitable"/>)</c>
           <c>array</c>
           <c/>
           <c>Yes</c>
@@ -480,21 +481,11 @@
           <c/>
           <c/>
           <c/>
-          <c>modProbPrime</c>
-          <c>See <xref target="keyGenProbPrim_modulitable"/></c>
-          <c>array</c>
-          <c>see <xref target="keyGenProbPrim_modulitable"/></c>
-          <c>Yes</c>
-          <c/>
-         <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>primeTest</c>
-          <c>See <xref target="keyGenProbPrim_modulitable"/></c>
-          <c>value</c>
-          <c>see <xref target="keyGenProbPrim_modulitable"/></c>
-          <c>Yes</c>
+	         <c>capProbPrimes</c>
+	         <c>Capabilities for all supported moduli and hash algorithms for a single Probable mode (see <xref target="keyGenProbPrim_modulitable"/>)</c>
+	         <c>array</c>
+	         <c/>
+	         <c>Yes</c>
           </texttable>
           </section>
 	</section>
@@ -526,7 +517,7 @@
           <c>capSigType</c>
           <c>capabilites supported for this sigType  - see <xref target="FIPS186-4"/>, Section 5</c>
           <c>array</c>
-          <c>modulo, hashAlgs, and optionally the saltLens object</c>
+          <c>a single modulo with an array of at least one hashPair</c>
           <c>No</c>
           <c/>
           <c/>
@@ -543,7 +534,17 @@
           <c/>
           <c/>
           <c/>
-          <c>hashAlgs</c>
+           <c>hashPair</c>
+           <c>supported hash algorithms and optional salt length for signature generation for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
+           <c>array</c>
+           <c>an array of objects containing a hashAlg and an optional saltLen</c>
+           <c>No</c>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+          <c>hashAlg</c>
           <c>supported hash algorithms for signature generation for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
           <c>array</c>
           <c>any non-empty subset of {"SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
@@ -553,7 +554,7 @@
           <c/>
           <c/>
           <c/>
-          <c>saltLens</c>
+          <c>saltLen</c>
           <c>supported salt lengths for PSS signature generation - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
           <c>array</c>
           <c>array of values for each hash algorithm used subject to the constraint in the note below.</c>
@@ -577,53 +578,64 @@
           <ttcol align="left">JSON type</ttcol>
          <ttcol align="left">Valid values</ttcol>
          <ttcol align="left">Optional</ttcol>
-          <c>sigType</c>
-          <c>supported RSA signature types  - see <xref target="FIPS186-4"/>, Section 5</c>
-          <c>value</c>
+           <c>sigType</c>
+           <c>supported RSA signature types  - see <xref target="FIPS186-4"/>, Section 5</c>
+           <c>value</c>
            <c>one of {"ANSX9.31", "PKCS1v1.5", "PSS"}</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>capSigType</c>
-          <c>RSA signature verification parameters  - see <xref target="FIPS186-4"/>, Section 5</c>
-          <c>array</c>
-           <c>modulo, hashAlgs, and saltLens (when sigType is PSS)</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>modulo</c>
-          <c>supported RSA modulo for signature verification - see <xref target="FIPS186-4"/>, Section 5</c>
-          <c>value</c>
-          <c>any one of the supported modulo sizes {2048, 3072, 4096}</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>hashAlgs</c>
-          <c>supported hash algorithms for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
-          <c>array</c>
-          <c>any non-empty subset of {"SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>saltLens</c>
-          <c>supported salt lengths for PSS signature verification - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
-          <c>array</c>
-          <c>array of values for each hash algorithm used subject to the constraint in the note below.</c>
-          <c>Yes</c>
-          </texttable>
-          <t>Note: the salt length for each hash algorithm used in PKCS1PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.</t>
+           <c>No</c>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c>capSigType</c>
+           <c>capabilites supported for this sigType  - see <xref target="FIPS186-4"/>, Section 5</c>
+           <c>array</c>
+           <c>a single modulo with an array of at least one hashPair</c>
+           <c>No</c>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c>modulo</c>
+           <c>supported RSA moduli for signature verification - see <xref target="FIPS186-4"/>, Section 5</c>
+           <c>value</c>
+           <c>one of the supported modulo sizes {1024, 2048, 3072, 4096}</c>
+           <c>No</c>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c>hashPair</c>
+           <c>supported hash algorithms and optional salt length for signature verification for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
+           <c>array</c>
+           <c>an array of objects containing a hashAlg and an optional saltLen</c>
+           <c>No</c>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c>hashAlg</c>
+           <c>supported hash algorithms for signature generation for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
+           <c>array</c>
+           <c>any non-empty subset of {"SHA-1", "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
+           <c>No</c>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c/>
+           <c>saltLen</c>
+           <c>supported salt lengths for PSS signature verification - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
+           <c>array</c>
+           <c>array of values for each hash algorithm used subject to the constraint in the note below.</c>
+           <c>Yes</c>
+         </texttable>
+            <t>Note: the salt length for each hash algorithm used in PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.
+            The exception to this rule is using "SHA-512" with a modulo of 1024. The maximum salt length for this combination is 62 bytes instead of the expected 64 bytes.</t>
           </section>
 	</section>
 		<section anchor="mode_legacySigVer" title="The legacySigVer Mode Capabilities">
@@ -652,7 +664,7 @@
           <c>capSigType</c>
           <c>RSA legacy signature verification parameters  - see <xref target="FIPS186-4"/>, Section 5</c>
           <c>array</c>
-           <c>modulo, hashAlgs, and saltLens (when sigType is PSS)</c>
+           <c>modulo, hashAlg, and saltLen (when sigType is PSS)</c>
           <c>No</c>
           <c/>
           <c/>
@@ -669,7 +681,7 @@
           <c/>
           <c/>
           <c/>
-          <c>hashAlgs</c>
+          <c>hashAlg</c>
           <c>supported hash algorithms for this sigType and modulo - see <xref target="SP800-131A"/>, Section 9</c>
           <c>array</c>
           <c>any non-empty subset of {"SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA-512/224", "SHA-512/256"}</c>
@@ -679,7 +691,7 @@
           <c/>
           <c/>
           <c/>
-          <c>saltLens</c>
+          <c>saltLen</c>
           <c>supported salt lengths for PSS signature verification - see <xref target="FIPS186-4"/>, Section 5.5. See also note below.</c>
           <c>array</c>
           <c>array of values for each hash algorithm used subject to the constraint in the note below.</c>
@@ -748,6 +760,9 @@
 <c/>
 <c/>
 <c/>
+	  <c>mode</c>
+	  <c>The RSA mode used for the test vectors.</c>
+	  <c>"keyGen", "sigGen", "sigVer", "legacySigVer", "componentSigPrimitive", "componentDecPrimitive"</c>
 	  <c/>
 	  <c/>
 	  <c/>     
@@ -767,14 +782,6 @@
 		<ttcol align="left">Description</ttcol>
 		<ttcol align="left">JSON type</ttcol>
 		<ttcol align="left">Optional</ttcol>
-	<c>mode</c>
-	<c>The RSA mode.</c>
-	<c>"KeyGen", "SigGen", or "SigVer"</c>
-    <c>No</c>
-    <c/>
-    <c/>
-    <c/>
-    <c/>
     <c>modulo</c>
     <c>RSA modulus</c>
     <c>value</c>
@@ -803,6 +810,62 @@
 		<c>Fixed or random public exponent</c>
 		<c>"fixed" or "random"</c>
     <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>randPQ</c>
+	      <c>KeyGen mode used</c>
+	      <c>"B.3.2", "B.3.3", "B.3.4", "B.3.5", "B.3.6"</c>
+	      <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>fixedPubExpValue</c>
+	      <c>Fixed public exponent value if pubExp is defined as "fixed"</c>
+	      <c>hex value</c>
+	      <c>Yes</c>	
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>n</c>
+	      <c>Public modulus value n</c>
+	      <c>hex value</c>
+	      <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>e</c>
+	      <c>Public exponent value e</c>
+	      <c>hex value</c>
+	      <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>pubExp</c>
+	      <c>Fixed or random public exponent</c>
+	      <c>"fixed" or "random"</c>
+	      <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>sigType</c>
+	      <c>Type of signature used in the group</c>
+	      <c>"ansx9_31", "pkcs1v15", "pss"</c>
+	      <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>saltLen</c>
+	      <c>The salt length for the group</c>
+	      <c>value</c>
+	      <c>Yes</c>
 	    </texttable>
 
 	</section>
@@ -853,6 +916,22 @@
     <c>the message to be signed</c>
     <c>hex value</c>
     <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>signature</c>
+	      <c>the signature to be verified</c>
+	      <c>hex value</c>
+	      <c>Yes</c>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c/>
+	      <c>salt</c>
+	      <c>the salt value used to sign the message</c>
+	      <c>hex value</c>
+	      <c>Yes</c>
     </texttable>
 	</section>
     </section>
@@ -1145,11 +1224,11 @@
             "capProvPrime" : 
               [
                 {   "modulo" : 2048,
-                    "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
+                    "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
                 {   "modulo" : 3072,
-                    "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
+                    "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]},
                 {   "modulo" : 4096,
-                    "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]}
+                    "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"]}
               ]
          }
       ]
@@ -1204,13 +1283,13 @@
             "capsProvProbPrime" : 
               [
                 { "modulo" : 2048,
-                  "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
+                  "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
                   "primeTest": ["tblC2", "tblC3"]},
                 { "modulo" : 3072,
-                  "hashAlgs" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
+                  "hashAlg" : ["SHA-1", "SHA-224", "SHA-256", "SHA-512"],
                   "primeTest": ["tblC2"]},
                 { "modulo" : 4096,
-                  "hashAlgs" : ["SHA-512"],
+                  "hashAlg" : ["SHA-512"],
                   "primeTest": ["tblC3"]}
               ]
          }
@@ -1234,36 +1313,141 @@
             "capSigType" :
                 [
                     { "modulo" : 2048,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                     { "modulo" : 3072,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                     { "modulo" : 4096,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                  ]
          },
          {  "sigType" : "PKCS1v1.5",
             "capSigType" :
                 [
                     { "modulo" : 2048,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                     { "modulo" : 3072,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                     { "modulo" : 4096,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                  ]
          },
          {  "sigType" : "PSS",
             "capSigType" :
                 [
                     { "modulo" : 2048,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]},
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224",
+                          "saltLen" : 1
+                        },
+                        {
+                          "hashAlg" : "SHA-256",
+                          "saltLen" : 2
+                        },
+                        {
+                          "hashAlg" : "SHA-512",
+                          "saltLen" : 3
+                        }
+                      ]
+                    }
                     { "modulo" : 3072,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]},
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224",
+                          "saltLen" : 4
+                        },
+                        {
+                          "hashAlg" : "SHA-256",
+                          "saltLen" : 5
+                        },
+                        {
+                          "hashAlg" : "SHA-512",
+                          "saltLen" : 6
+                        }
+                      ]
+                    }
                     { "modulo" : 4096,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]}
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224",
+                          "saltLen" : 7
+                        },
+                        {
+                          "hashAlg" : "SHA-256",
+                          "saltLen" : 8
+                        },
+                        {
+                          "hashAlg" : "SHA-512",
+                          "saltLen" : 9
+                        }
+                      ]
+                    }
                 ]
          }
       ]
@@ -1284,37 +1468,142 @@
          {  "sigType" : "ANSX9.31",
             "capSigType" :
                [
-                  { "modulo" : 2048,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  { "modulo" : 3072,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  { "modulo" : 4096,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                    { "modulo" : 2048,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
+                    { "modulo" : 3072,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
+                    { "modulo" : 4096,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                ]
          },
          {  "sigType" : "PKCS1v1.5",
             "capSigType" :
                 [
-                  { "modulo" : 2048,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  { "modulo" : 3072,
-                    "hashSigVer" : ["SHA-224", "SHA-256", "SHA-512"]},
-                  { "modulo" : 4096,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                    { "modulo" : 2048,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
+                    { "modulo" : 3072,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
+                    { "modulo" : 4096,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224"
+                        },
+                        {
+                          "hashAlg" : "SHA-256"
+                        },
+                        {
+                          "hashAlg" : "SHA-512"
+                        }
+                      ]
+                    }
                 ]
          },
          {  "sigType" : "PSS",
             "capSigType" :
                 [
-                  { "modulo" : 2048,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]},
-                  { "modulo" : 3072,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]},
-                  { "modulo" : 4096,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]}
+                    { "modulo" : 2048,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224",
+                          "saltLen" : 1
+                        },
+                        {
+                          "hashAlg" : "SHA-256",
+                          "saltLen" : 2
+                        },
+                        {
+                          "hashAlg" : "SHA-512",
+                          "saltLen" : 3
+                        }
+                      ]
+                    }
+                    { "modulo" : 3072,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224",
+                          "saltLen" : 4
+                        },
+                        {
+                          "hashAlg" : "SHA-256",
+                          "saltLen" : 5
+                        },
+                        {
+                          "hashAlg" : "SHA-512",
+                          "saltLen" : 6
+                        }
+                      ]
+                    }
+                    { "modulo" : 4096,
+                      "hashPair" : [
+                        {
+                          "hashAlg" : "SHA-224",
+                          "saltLen" : 7
+                        },
+                        {
+                          "hashAlg" : "SHA-256",
+                          "saltLen" : 8
+                        },
+                        {
+                          "hashAlg" : "SHA-512",
+                          "saltLen" : 9
+                        }
+                      ]
+                    }
                  ]
           }
       ]
@@ -1336,36 +1625,36 @@
             "capSigType" :
                [
                   { "modulo" : 2048,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"]},
                   { "modulo" : 3072,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"]},
                   { "modulo" : 4096,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                    "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"]}
                ]
          },
          {  "sigType" : "PKCS1v1.5",
             "capSigType" :
                 [
                   { "modulo" : 2048,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"]},
                   { "modulo" : 3072,
-                    "hashSigVer" : ["SHA-224", "SHA-256", "SHA-512"]},
+                    "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"]},
                   { "modulo" : 4096,
-                    "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"]}
+                    "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"]}
                 ]
          },
          {  "sigType" : "PSS",
             "capSigType" :
                 [
                   { "modulo" : 2048,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]},
+                      "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"],
+                      "saltLen" : [28, 32, 64]},
                   { "modulo" : 3072,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]},
+                      "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"],
+                      "saltLen" : [28, 32, 64]},
                   { "modulo" : 4096,
-                      "hashAlgs" : ["SHA-224", "SHA-256", "SHA-512"],
-                      "saltLens" : [28, 32, 64]}
+                      "hashAlg" : ["SHA-224", "SHA-256", "SHA-512"],
+                      "saltLen" : [28, 32, 64]}
                  ]
           }
       ]
