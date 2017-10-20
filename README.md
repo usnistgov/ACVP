@@ -16,6 +16,8 @@ validation of standardized algorithm test evidence.
 If you would like to try the algorithm testing service with ACVP, it is at https://demo.acvts.nist.gov/acvp/. Please read the specification carefully. The latest version is 0.4. 
 The server currently allows validation of the following algorithms:
 
+Block Ciphers and Modes of Operation:
+
     - AES-GCM
     - AES-ECB
     - AES-CBC
@@ -26,6 +28,14 @@ The server currently allows validation of the following algorithms:
     - AES-CCM
     - TDES-CBC
     - TDES-ECB
+    - AES-KW
+    - TDES-KW
+    - TDES-OFB
+    - CMAC-AES
+    - CMAC-TDES
+
+Secure Hash Algorithms
+
     - SHA-1
     - SHA-224
     - SHA-256
@@ -33,11 +43,15 @@ The server currently allows validation of the following algorithms:
     - SHA-512
     - SHA-512/224
     - SHA-512/256
-    - AES-KW
-    - TDES-KW
-    - TDES-OFB
-    - CMAC-AES
-    - CMAC-TDES
+    - SHA3-224
+    - SHA3-256
+    - SHA3-384
+    - SHA3-512
+    - SHAKE-128
+    - SHAKE-256
+
+Message Authentication Algorithms
+
     - HMAC-SHA-1
     - HMAC-SHA2-224
     - HMAC-SHA2-256
@@ -49,12 +63,6 @@ The server currently allows validation of the following algorithms:
     - HMAC-SHA3-256
     - HMAC-SHA3-384
     - HMAC-SHA3-512
-    - SHA3-224
-    - SHA3-256
-    - SHA3-384
-    - SHA3-512
-    - SHAKE-128
-    - SHAKE-256
 
 We continue to work on adding support for additional algorithms, so stay tuned for updates. 
 
