@@ -26,9 +26,14 @@ Block Ciphers and Modes of Operation:
     - AES-CFB128
     - AES-OFB
     - AES-CCM
+    - AES-CTR
+    - AES-XPN
+    - AES-XTS
+    - AES-KW
+    - AES-KWP
     - TDES-CBC
     - TDES-ECB
-    - AES-KW
+    - TDES-CTR
     - TDES-KW
     - TDES-OFB
     - CMAC-AES
