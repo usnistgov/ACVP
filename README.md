@@ -13,8 +13,7 @@ The development of an Automated Cryptographic Validation Protocol (ACVP) that en
 validation of standardized algorithm test evidence.
 
 # Status
-If you would like to try the algorithm testing service with ACVP, it is at https://demo.acvts.nist.gov/acvp/. Please read the specification carefully. The latest version is 0.4. 
-The server currently allows validation of the following algorithms:
+The demo server supports ACVP, version 0.4 and currently allows validation of the following algorithms:
 
 Block Ciphers and Modes of Operation:
 
@@ -70,6 +69,20 @@ Message Authentication Algorithms
     - HMAC-SHA3-512
 
 We continue to work on adding support for additional algorithms, so stay tuned for updates. 
+
+# Accessing the demo server
+
+The protocol spec and development information are available here. The companion ACVP client can be found at https://github.com/cisco/libacvp.
+
+The demo environment is at: https://demo.acvts.nist.gov/acvp/home. You will need to send your CSR to us. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send a request to algotest@list.nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR. 
+
+You are expected to protect the key pair from unauthorized use and to notify NIST in the event the keypair becomes compromised. Also, since we do not have a formal login page the following notice applies when accessing the ACVP system:
+
+“***WARNING***WARNING***WARNING
+You are accessing a U.S. Government information system, which includes: 1) this computer, 2) this computer network, 3) all computers connected to this network, and 4) all devices and storage media attached to this network or to a computer on this network. You understand and consent to the following: you may access this information system for authorized use only; you have no reasonable expectation of privacy regarding any communication of data transiting or stored on this information system; at any time and for any lawful Government purpose, the Government may monitor, intercept, and search and seize any communication or data transiting or stored on this information system; and any communications or data transiting or stored on this information system may be disclosed or used for any lawful Government purpose.
+***WARNING***WARNING***WARNING”
+
+To set expectations, since this is a demo system, it will be in a state of flux and any all data on the system is considered temporary and may be reset to accommodate development of the Automated Cryptographic Validation Protocol (ACVP) service. We will try to keep the demo service relatively stable, but we plan to update it as we continue to add new algorithms and capabilities.
 
 # Contribution guidelines:
 
