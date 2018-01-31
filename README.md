@@ -74,7 +74,7 @@ We continue to work on adding support for additional algorithms, so stay tuned f
 
 The protocol spec and development information are available here. The companion ACVP client can be found at https://github.com/cisco/libacvp.
 
-The demo environment is at: https://demo.acvts.nist.gov/acvp/home. You will need to send your CSR to us. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send a request to algotest@list.nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR. 
+The demo environment is at: https://demo.acvts.nist.gov/acvp/home. You will need to send your CSR to us. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send a request to acvts-demo@nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR. 
 
 You are expected to protect the key pair from unauthorized use and to notify NIST in the event the keypair becomes compromised. Also, since we do not have a formal login page the following notice applies when accessing the ACVP system:
 
