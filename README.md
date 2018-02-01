@@ -31,10 +31,15 @@ Block Ciphers and Modes of Operation:
     - AES-KW
     - AES-KWP
     - TDES-CBC
+    - TDES-CBCI
+    - TDES-CFBP1
+    - TDES-CFBP8
+    - TDES-CFBP64
     - TDES-ECB
     - TDES-CTR
     - TDES-KW
     - TDES-OFB
+    - TDES-OFBI
     - CMAC-AES
     - CMAC-TDES
 
