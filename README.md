@@ -17,31 +17,31 @@ The demo server supports ACVP, version 0.4 and currently allows validation of th
 
 Block Ciphers and Modes of Operation:
 
-    - AES-GCM
-    - AES-ECB
     - AES-CBC
+    - AES-CCM
     - AES-CFB1
     - AES-CFB8
     - AES-CFB128
-    - AES-OFB
-    - AES-CCM
-    - AES-CTR
-    - AES-XPN
-    - AES-XTS
+    - AES-CTR    
+    - AES-ECB
+    - AES-GCM
     - AES-KW
     - AES-KWP
+    - AES-OFB
+    - AES-XPN
+    - AES-XTS
+    - CMAC-AES
+    - CMAC-TDES
     - TDES-CBC
     - TDES-CBCI
     - TDES-CFBP1
     - TDES-CFBP8
     - TDES-CFBP64
-    - TDES-ECB
     - TDES-CTR
+    - TDES-ECB
     - TDES-KW
     - TDES-OFB
     - TDES-OFBI
-    - CMAC-AES
-    - CMAC-TDES
 
 Secure Hash Algorithms
 
