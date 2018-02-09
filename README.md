@@ -5,17 +5,16 @@ Industry Working Group on Automated Cryptographic Algorithm Validation
 The rapid development of cryptographic technology over the last two decades and its adoption in many different technology domains has resulted in a sharp increase in the number and complexity of approved algorithms. The volume of cryptographic algorithm validations has outstripped the available human resources available to test, report, and validate results. The plethora of different algorithms has created a dire need for consistent requesting and reporting of test data and results. We also live in times of unprecedented levels of threats and exploits that require frequent product updates to fix defects and remove security vulnerabilities, which in turn requires much faster turnaround of validation updates than what the existing validation model allows. See the NIST [Automated Cryptographic Validation Testing project](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) for broader context and information. 
 
 # Objective
-The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST validation programs for accelerated test data generation and requisition, reporting of test results, and validation 
-of cryptographic algorithms.
+The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST cryptographic validation programs ([CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#)) for accelerated test data generation and requisition, reporting of test results, and validation of [NIST-approved](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf) cryptographic algorithms.
 
 # Project Goals
 The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and 
-validation of standardized algorithm test evidence.
+validation of standardized algorithm test evidence to facilitate the [modernization](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) of [CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#).
 
 # Status
-The demo server supports ACVP, version 0.4 and currently allows validation of the following algorithms :
+The demo server supports ACVP, version 0.4. We continue to work on supporting additional algorithms and other enhancements, so stay tuned for updates. Currently, the demo server allows validation of the following [NIST-approved](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf) algorithms:
 
-Block Ciphers and Modes of Operation:
+## Block Ciphers and Modes of Operation:
 
 - [AES-CBC](./artifacts/acvp_sub_symmetric.txt)
 - [AES-CCM](./artifacts/acvp_sub_symmetric.txt)
@@ -43,7 +42,7 @@ Block Ciphers and Modes of Operation:
 - [TDES-OFB](./artifacts/acvp_sub_symmetric.txt)
 - [TDES-OFBI](./artifacts/acvp_sub_symmetric.txt)
 
-Secure Hash Algorithms
+## Secure Hash Algorithms
 
 - [SHA-1](./artifacts/acvp_sub_sha.txt)
 - [SHA-224](./artifacts/acvp_sub_sha.txt)
@@ -59,7 +58,7 @@ Secure Hash Algorithms
 - [SHAKE-128](./artifacts/acvp_sub_sha3.txt)
 - [SHAKE-256](./artifacts/acvp_sub_sha3.txt)
 
-Message Authentication Algorithms
+## Message Authentication Algorithms
 
 - [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)
 - [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)
@@ -71,9 +70,7 @@ Message Authentication Algorithms
 - [HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt)
 - [HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt)
 - [HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt)
-
-We continue to work on adding support for additional algorithms, so stay tuned for updates. 
+- [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt) 
 
 # Accessing the demo server
 
