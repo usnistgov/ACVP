@@ -13,65 +13,65 @@ The development of an Automated Cryptographic Validation Protocol (ACVP) that en
 validation of standardized algorithm test evidence.
 
 # Status
-The demo server supports ACVP, version 0.4 and currently allows validation of the following algorithms:
+The demo server supports ACVP, version 0.4 and currently allows validation of the following algorithms :
 
 Block Ciphers and Modes of Operation:
 
-    - AES-CBC
-    - AES-CCM
-    - AES-CFB1
-    - AES-CFB8
-    - AES-CFB128
-    - AES-CTR    
-    - AES-ECB
-    - AES-GCM
-    - AES-KW
-    - AES-KWP
-    - AES-OFB
-    - AES-XPN
-    - AES-XTS
-    - CMAC-AES
-    - CMAC-TDES
-    - TDES-CBC
-    - TDES-CBCI
-    - TDES-CFBP1
-    - TDES-CFBP8
-    - TDES-CFBP64
-    - TDES-CTR
-    - TDES-ECB
-    - TDES-KW
-    - TDES-OFB
-    - TDES-OFBI
+- [AES-CBC](./artifacts/acvp_sub_symmetric.txt)
+- [AES-CCM](./artifacts/acvp_sub_symmetric.txt)
+- [AES-CFB1](./artifacts/acvp_sub_symmetric.txt)
+- [AES-CFB8](./artifacts/acvp_sub_symmetric.txt)
+- [AES-CFB128](./artifacts/acvp_sub_symmetric.txt)
+- [AES-CTR](./artifacts/acvp_sub_symmetric.txt)    
+- [AES-ECB](./artifacts/acvp_sub_symmetric.txt)
+- [AES-GCM](./artifacts/acvp_sub_symmetric.txt)
+- [AES-KW](./artifacts/acvp_sub_symmetric.txt)
+- [AES-KWP](./artifacts/acvp_sub_symmetric.txt)
+- [AES-OFB](./artifacts/acvp_sub_symmetric.txt)
+- [AES-XPN](./artifacts/acvp_sub_symmetric.txt)
+- [AES-XTS](./artifacts/acvp_sub_symmetric.txt)
+- [CMAC-AES](./artifacts/acvp_sub_mac.txt)
+- [CMAC-TDES](./artifacts/acvp_sub_mac.txt)
+- [TDES-CBC](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-CBCI](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-CFBP1](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-CFBP8](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-CFBP64](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-CTR](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-ECB](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-KW](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-OFB](./artifacts/acvp_sub_symmetric.txt)
+- [TDES-OFBI](./artifacts/acvp_sub_symmetric.txt)
 
 Secure Hash Algorithms
 
-    - SHA-1
-    - SHA-224
-    - SHA-256
-    - SHA-384
-    - SHA-512
-    - SHA-512/224
-    - SHA-512/256
-    - SHA3-224
-    - SHA3-256
-    - SHA3-384
-    - SHA3-512
-    - SHAKE-128
-    - SHAKE-256
+- [SHA-1](./artifacts/acvp_sub_sha.txt)
+- [SHA-224](./artifacts/acvp_sub_sha.txt)
+- [SHA-256](./artifacts/acvp_sub_sha.txt)
+- [SHA-384](./artifacts/acvp_sub_sha.txt)
+- [SHA-512](./artifacts/acvp_sub_sha.txt)
+- [SHA-512/224](./artifacts/acvp_sub_sha.txt)
+- [SHA-512/256](./artifacts/acvp_sub_sha.txt)
+- [SHA3-224](./artifacts/acvp_sub_sha3.txt)
+- [SHA3-256](./artifacts/acvp_sub_sha3.txt)
+- [SHA3-384](./artifacts/acvp_sub_sha3.txt)
+- [SHA3-512](./artifacts/acvp_sub_sha3.txt)
+- [SHAKE-128](./artifacts/acvp_sub_sha3.txt)
+- [SHAKE-256](./artifacts/acvp_sub_sha3.txt)
 
 Message Authentication Algorithms
 
-    - HMAC-SHA-1
-    - HMAC-SHA2-224
-    - HMAC-SHA2-256
-    - HMAC-SHA2-384
-    - HMAC-SHA2-512
-    - HMAC-SHA2-512/224
-    - HMAC-SHA2-512/256
-    - HMAC-SHA3-224
-    - HMAC-SHA3-256
-    - HMAC-SHA3-384
-    - HMAC-SHA3-512
+- [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt)
+- [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt)
 
 We continue to work on adding support for additional algorithms, so stay tuned for updates. 
 
