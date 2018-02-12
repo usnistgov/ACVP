@@ -5,19 +5,18 @@ Industry Working Group on Automated Cryptographic Algorithm Validation
 The rapid development of cryptographic technology over the last two decades and its adoption in many different technology domains has resulted in a sharp increase in the number and complexity of approved algorithms. The volume of cryptographic algorithm validations has outstripped the available human resources available to test, report, and validate results. The plethora of different algorithms has created a dire need for consistent requesting and reporting of test data and results. We also live in times of unprecedented levels of threats and exploits that require frequent product updates to fix defects and remove security vulnerabilities, which in turn requires much faster turnaround of validation updates than what the existing validation model allows. See the NIST [Automated Cryptographic Validation Testing project](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) for broader context and information. 
 
 # Objective
-The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST cryptographic validation programs ([CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#)) for accelerated test data generation and requisition, reporting of test results, and validation of [NIST-approved](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf) cryptographic algorithms.
+The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST cryptographic validation programs ([CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#)) for accelerated test data generation and requisition, reporting of test results, and validation of NIST-approved cryptographic algorithms (see FIPS 140-2 [Annex A](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf), [Annex C](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexc.pdf) and [Annex D](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexd.pdf)).
 
 # Project Goals
 The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and 
 validation of standardized algorithm test evidence to facilitate the [modernization](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) of [CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#).
 
 # Status
-The demo server supports ACVP, version 0.4. We continue to work on supporting additional algorithms and other enhancements, so stay tuned for updates. Currently, the demo server allows validation of the following [NIST-approved](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf) algorithms:
+The demo server supports ACVP, version 0.4. We continue to work on supporting additional algorithms and other enhancements, so stay tuned for updates. Currently, the demo server allows validation of the following NIST-approved algorithms:
 
 ## Block Ciphers and Modes of Operation:
 
 - [AES-CBC](./artifacts/acvp_sub_symmetric.txt)
-- [AES-CCM](./artifacts/acvp_sub_symmetric.txt)
 - [AES-CFB1](./artifacts/acvp_sub_symmetric.txt)
 - [AES-CFB8](./artifacts/acvp_sub_symmetric.txt)
 - [AES-CFB128](./artifacts/acvp_sub_symmetric.txt)
@@ -29,8 +28,6 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 - [AES-OFB](./artifacts/acvp_sub_symmetric.txt)
 - [AES-XPN](./artifacts/acvp_sub_symmetric.txt)
 - [AES-XTS](./artifacts/acvp_sub_symmetric.txt)
-- [CMAC-AES](./artifacts/acvp_sub_mac.txt)
-- [CMAC-TDES](./artifacts/acvp_sub_mac.txt)
 - [TDES-CBC](./artifacts/acvp_sub_symmetric.txt)
 - [TDES-CBCI](./artifacts/acvp_sub_symmetric.txt)
 - [TDES-CFBP1](./artifacts/acvp_sub_symmetric.txt)
@@ -60,6 +57,9 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 
 ## Message Authentication Algorithms
 
+- [AES-CCM](./artifacts/acvp_sub_symmetric.txt)
+- [CMAC-AES](./artifacts/acvp_sub_mac.txt)
+- [CMAC-TDES](./artifacts/acvp_sub_mac.txt)
 - [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)
 - [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)
 - [HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt)
