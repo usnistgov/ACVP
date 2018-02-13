@@ -124,3 +124,8 @@ NIST's creation of the data.
     - Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date). 
 
 
+# Related projects
+- [Automated Cryptographic Validation Testing](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing)
+- [Cisco libacvp](https://github.com/cisco/libacvp)
+- [Google Project Wycheproof](https://github.com/google/wycheproof)
+- [Automated Module Validation Protocol](https://github.com/usnistgov/AMVP)
