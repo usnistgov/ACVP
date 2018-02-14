@@ -14,63 +14,30 @@ validation of standardized algorithm test evidence to facilitate the [modernizat
 # Status
 The demo server supports ACVP, version 0.4. We continue to work on supporting additional algorithms and other enhancements, so stay tuned for updates. Currently, the demo server allows validation of the following NIST-approved algorithms:
 
-## Block Ciphers and Modes of Operation:
-
-- [AES-CBC](./artifacts/acvp_sub_symmetric.txt)
-- [AES-CFB1](./artifacts/acvp_sub_symmetric.txt)
-- [AES-CFB8](./artifacts/acvp_sub_symmetric.txt)
-- [AES-CFB128](./artifacts/acvp_sub_symmetric.txt)
-- [AES-CTR](./artifacts/acvp_sub_symmetric.txt)    
-- [AES-ECB](./artifacts/acvp_sub_symmetric.txt)
-- [AES-GCM](./artifacts/acvp_sub_symmetric.txt)
-- [AES-KW](./artifacts/acvp_sub_symmetric.txt)
-- [AES-KWP](./artifacts/acvp_sub_symmetric.txt)
-- [AES-OFB](./artifacts/acvp_sub_symmetric.txt)
-- [AES-XPN](./artifacts/acvp_sub_symmetric.txt)
-- [AES-XTS](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-CBC](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-CBCI](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-CFBP1](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-CFBP8](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-CFBP64](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-CTR](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-ECB](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-KW](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-OFB](./artifacts/acvp_sub_symmetric.txt)
-- [TDES-OFBI](./artifacts/acvp_sub_symmetric.txt)
-
-## Secure Hash Algorithms
-
-- [SHA-1](./artifacts/acvp_sub_sha.txt)
-- [SHA-224](./artifacts/acvp_sub_sha.txt)
-- [SHA-256](./artifacts/acvp_sub_sha.txt)
-- [SHA-384](./artifacts/acvp_sub_sha.txt)
-- [SHA-512](./artifacts/acvp_sub_sha.txt)
-- [SHA-512/224](./artifacts/acvp_sub_sha.txt)
-- [SHA-512/256](./artifacts/acvp_sub_sha.txt)
-- [SHA3-224](./artifacts/acvp_sub_sha3.txt)
-- [SHA3-256](./artifacts/acvp_sub_sha3.txt)
-- [SHA3-384](./artifacts/acvp_sub_sha3.txt)
-- [SHA3-512](./artifacts/acvp_sub_sha3.txt)
-- [SHAKE-128](./artifacts/acvp_sub_sha3.txt)
-- [SHAKE-256](./artifacts/acvp_sub_sha3.txt)
-
-## Message Authentication Algorithms
-
-- [AES-CCM](./artifacts/acvp_sub_symmetric.txt)
-- [CMAC-AES](./artifacts/acvp_sub_mac.txt)
-- [CMAC-TDES](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt)
-- [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt) 
+|Block Cipher Modes| Secure Hash|Message Authentication|DRBG|Digital Signature|Key Agreement|KDF's|
+|------------------|------------|----------------------|----|-----------------|-------------|-----|
+|[AES-CBC](./artifacts/acvp_sub_symmetric.txt)|[SHA-1](./artifacts/acvp_sub_sha.txt)|[AES-CCM](./artifacts/acvp_sub_symmetric.txt)| Coming soon| Coming soon|Coming soon|Coming soon|
+|[AES-CFB1](./artifacts/acvp_sub_symmetric.txt)|[SHA-224](./artifacts/acvp_sub_sha.txt)|[CMAC-AES](./artifacts/acvp_sub_mac.txt)| | | |
+|[AES-CFB8](./artifacts/acvp_sub_symmetric.txt)|[SHA-256](./artifacts/acvp_sub_sha.txt)|[CMAC-TDES](./artifacts/acvp_sub_mac.txt)||||
+|[AES-CFB128](./artifacts/acvp_sub_symmetric.txt)|[SHA-384](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)||||
+|[AES-CTR](./artifacts/acvp_sub_symmetric.txt)|[SHA-512](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)||||
+|[AES-ECB](./artifacts/acvp_sub_symmetric.txt)|[SHA-512/224](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt)||||
+|[AES-GCM](./artifacts/acvp_sub_symmetric.txt)|[SHA-512/256](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt)||||
+|[AES-KW](./artifacts/acvp_sub_symmetric.txt)|[SHA3-224](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt)||||
+|[AES-KWP](./artifacts/acvp_sub_symmetric.txt)|[SHA3-256](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt)||||
+|[AES-OFB](./artifacts/acvp_sub_symmetric.txt)|[SHA3-384](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt)||||
+|[AES-XPN](./artifacts/acvp_sub_symmetric.txt)|[SHA3-512](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt)||||
+|[AES-XTS](./artifacts/acvp_sub_symmetric.txt)|[SHAKE-128](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt)||||
+|[TDES-CBC](./artifacts/acvp_sub_symmetric.txt)|[SHAKE-256](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt)||||
+|[TDES-CBCI](./artifacts/acvp_sub_symmetric.txt)||[HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt)||||
+|[TDES-CFBP1](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-CFBP8](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-CFBP64](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-CTR](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-ECB](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-KW](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-OFB](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-OFBI](./artifacts/acvp_sub_symmetric.txt)||||||
 
 # Accessing the demo server
 
