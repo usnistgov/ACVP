@@ -16,7 +16,7 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 
 |Block Cipher Modes| Secure Hash|Message Authentication|DRBG|Digital Signature|Key Agreement|KDF's|
 |------------------|------------|----------------------|----|-----------------|-------------|-----|
-|[AES-CBC](./artifacts/acvp_sub_symmetric.txt)|[SHA-1](./artifacts/acvp_sub_sha.txt)|[AES-CCM](./artifacts/acvp_sub_symmetric.txt)| Coming soon| Coming soon|Coming soon|Coming soon|
+|[AES-CBC](./artifacts/acvp_sub_symmetric.txt)|[SHA-1](./artifacts/acvp_sub_sha.txt)|[AES-CCM](./artifacts/acvp_sub_symmetric.txt)| ![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|
 |[AES-CFB1](./artifacts/acvp_sub_symmetric.txt)|[SHA-224](./artifacts/acvp_sub_sha.txt)|[CMAC-AES](./artifacts/acvp_sub_mac.txt)| | | |
 |[AES-CFB8](./artifacts/acvp_sub_symmetric.txt)|[SHA-256](./artifacts/acvp_sub_sha.txt)|[CMAC-TDES](./artifacts/acvp_sub_mac.txt)||||
 |[AES-CFB128](./artifacts/acvp_sub_symmetric.txt)|[SHA-384](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)||||
