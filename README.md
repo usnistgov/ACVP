@@ -19,8 +19,8 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 |[AES-CBC](./artifacts/acvp_sub_symmetric.txt)|[SHA-1](./artifacts/acvp_sub_sha.txt)|[AES-CCM](./artifacts/acvp_sub_symmetric.txt)| [ctrDRBG-AES-128](./artifacts/acvp_sub_drbg.txt)|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|
 |[AES-CFB1](./artifacts/acvp_sub_symmetric.txt)|[SHA-224](./artifacts/acvp_sub_sha.txt)|[CMAC-AES](./artifacts/acvp_sub_mac.txt)|[ctrDRBG-AES-192](./artifacts/acvp_sub_drbg.txt) | | |
 |[AES-CFB8](./artifacts/acvp_sub_symmetric.txt)|[SHA-256](./artifacts/acvp_sub_sha.txt)|[CMAC-TDES](./artifacts/acvp_sub_mac.txt)|[ctrDRBG-AES-256](./artifacts/acvp_sub_drbg.txt)|||
-|[AES-CFB128](./artifacts/acvp_sub_symmetric.txt)|[SHA-384](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|||
-|[AES-CTR](./artifacts/acvp_sub_symmetric.txt)|[SHA-512](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)||||
+|[AES-CFB128](./artifacts/acvp_sub_symmetric.txt)|[SHA-384](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)|[ctrDRBG-TDES](./artifacts/acvp_sub_drbg.txt)|||
+|[AES-CTR](./artifacts/acvp_sub_symmetric.txt)|[SHA-512](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|||
 |[AES-ECB](./artifacts/acvp_sub_symmetric.txt)|[SHA-512/224](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt)||||
 |[AES-GCM](./artifacts/acvp_sub_symmetric.txt)|[SHA-512/256](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt)||||
 |[AES-KW](./artifacts/acvp_sub_symmetric.txt)|[SHA3-224](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt)||||
