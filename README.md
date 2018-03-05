@@ -5,75 +5,39 @@ Industry Working Group on Automated Cryptographic Algorithm Validation
 The rapid development of cryptographic technology over the last two decades and its adoption in many different technology domains has resulted in a sharp increase in the number and complexity of approved algorithms. The volume of cryptographic algorithm validations has outstripped the available human resources available to test, report, and validate results. The plethora of different algorithms has created a dire need for consistent requesting and reporting of test data and results. We also live in times of unprecedented levels of threats and exploits that require frequent product updates to fix defects and remove security vulnerabilities, which in turn requires much faster turnaround of validation updates than what the existing validation model allows. See the NIST [Automated Cryptographic Validation Testing project](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) for broader context and information. 
 
 # Objective
-The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST validation programs for accelerated test data generation and requisition, reporting of test results, and validation 
-of cryptographic algorithms.
+The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST cryptographic validation programs ([CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#)) for accelerated test data generation and requisition, reporting of test results, and validation of NIST-approved cryptographic algorithms (see FIPS 140-2 [Annex A](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf), [Annex C](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexc.pdf) and [Annex D](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexd.pdf)).
 
 # Project Goals
 The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and 
-validation of standardized algorithm test evidence.
+validation of standardized algorithm test evidence to facilitate the [modernization](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) of [CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#).
 
 # Status
-The demo server supports ACVP, version 0.4 and currently allows validation of the following algorithms:
+The demo server supports ACVP, version 0.4. We continue to work on supporting additional algorithms and other enhancements, so stay tuned for updates. Currently, the demo server allows validation of the following NIST-approved algorithms:
 
-Block Ciphers and Modes of Operation:
-
-    - AES-CBC
-    - AES-CCM
-    - AES-CFB1
-    - AES-CFB8
-    - AES-CFB128
-    - AES-CTR    
-    - AES-ECB
-    - AES-GCM
-    - AES-KW
-    - AES-KWP
-    - AES-OFB
-    - AES-XPN
-    - AES-XTS
-    - CMAC-AES
-    - CMAC-TDES
-    - TDES-CBC
-    - TDES-CBCI
-    - TDES-CFBP1
-    - TDES-CFBP8
-    - TDES-CFBP64
-    - TDES-CTR
-    - TDES-ECB
-    - TDES-KW
-    - TDES-OFB
-    - TDES-OFBI
-
-Secure Hash Algorithms
-
-    - SHA-1
-    - SHA-224
-    - SHA-256
-    - SHA-384
-    - SHA-512
-    - SHA-512/224
-    - SHA-512/256
-    - SHA3-224
-    - SHA3-256
-    - SHA3-384
-    - SHA3-512
-    - SHAKE-128
-    - SHAKE-256
-
-Message Authentication Algorithms
-
-    - HMAC-SHA-1
-    - HMAC-SHA2-224
-    - HMAC-SHA2-256
-    - HMAC-SHA2-384
-    - HMAC-SHA2-512
-    - HMAC-SHA2-512/224
-    - HMAC-SHA2-512/256
-    - HMAC-SHA3-224
-    - HMAC-SHA3-256
-    - HMAC-SHA3-384
-    - HMAC-SHA3-512
-
-We continue to work on adding support for additional algorithms, so stay tuned for updates. 
+|Block Cipher Modes| Secure Hash|Message Authentication|DRBG|Digital Signature|Key Agreement|KDF's|
+|------------------|------------|----------------------|----|-----------------|-------------|-----|
+|[AES-CBC](./artifacts/acvp_sub_symmetric.txt)|[SHA-1](./artifacts/acvp_sub_sha.txt)|[AES-CCM](./artifacts/acvp_sub_symmetric.txt)| [ctrDRBG-AES-128](./artifacts/acvp_sub_drbg.txt)|[RSA mode: keyGen](./artifacts/acvp_sub_rsa.txt)|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|
+|[AES-CFB1](./artifacts/acvp_sub_symmetric.txt)|[SHA-224](./artifacts/acvp_sub_sha.txt)|[CMAC-AES](./artifacts/acvp_sub_mac.txt)|[ctrDRBG-AES-192](./artifacts/acvp_sub_drbg.txt) |[RSA mode: sigGen](./artifacts/acvp_sub_rsa.txt)| |
+|[AES-CFB8](./artifacts/acvp_sub_symmetric.txt)|[SHA-256](./artifacts/acvp_sub_sha.txt)|[CMAC-TDES](./artifacts/acvp_sub_mac.txt)|[ctrDRBG-AES-256](./artifacts/acvp_sub_drbg.txt)|[RSA mode: sigVer](./artifacts/acvp_sub_rsa.txt)||
+|[AES-CFB128](./artifacts/acvp_sub_symmetric.txt)|[SHA-384](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)|[ctrDRBG-TDES](./artifacts/acvp_sub_drbg.txt)|![Coming Soon](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")||
+|[AES-CTR](./artifacts/acvp_sub_symmetric.txt)|[SHA-512](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)|![alt text](https://github.com/usnistgov/ACVP/blob/master/Panama_P-24.svg.png "Coming soon")|||
+|[AES-ECB](./artifacts/acvp_sub_symmetric.txt)|[SHA-512/224](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt)||||
+|[AES-GCM](./artifacts/acvp_sub_symmetric.txt)|[SHA-512/256](./artifacts/acvp_sub_sha.txt)|[HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt)||||
+|[AES-KW](./artifacts/acvp_sub_symmetric.txt)|[SHA3-224](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt)||||
+|[AES-KWP](./artifacts/acvp_sub_symmetric.txt)|[SHA3-256](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt)||||
+|[AES-OFB](./artifacts/acvp_sub_symmetric.txt)|[SHA3-384](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt)||||
+|[AES-XPN](./artifacts/acvp_sub_symmetric.txt)|[SHA3-512](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt)||||
+|[AES-XTS](./artifacts/acvp_sub_symmetric.txt)|[SHAKE-128](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt)||||
+|[TDES-CBC](./artifacts/acvp_sub_symmetric.txt)|[SHAKE-256](./artifacts/acvp_sub_sha3.txt)|[HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt)||||
+|[TDES-CBCI](./artifacts/acvp_sub_symmetric.txt)||[HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt)||||
+|[TDES-CFBP1](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-CFBP8](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-CFBP64](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-CTR](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-ECB](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-KW](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-OFB](./artifacts/acvp_sub_symmetric.txt)||||||
+|[TDES-OFBI](./artifacts/acvp_sub_symmetric.txt)||||||
 
 # Accessing the demo server
 
@@ -127,3 +91,8 @@ NIST's creation of the data.
     - Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date). 
 
 
+# Related projects
+- [Automated Cryptographic Validation Testing](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing)
+- [Cisco libacvp](https://github.com/cisco/libacvp)
+- [Google Project Wycheproof](https://github.com/google/wycheproof)
+- [Automated Module Validation Protocol](https://github.com/usnistgov/AMVP)
