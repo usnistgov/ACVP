@@ -41,6 +41,16 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 
 # Accessing the demo server
 
+**=====================NOTICE=====================**
+
+Please be aware that during the week of March 12th that a deployment will be performed that will turn-on [the two-factor authentication and associated workflows](https://drive.google.com/open?id=1SQL4I9mAU16NIPGC4hK-dck6vtbNVJpy). By default two-factor authentication and the login workflow will be required but there is a brief transition period available for those who wish to take advantage of it where it can be made optional.
+
+From a practical standpoint not requiring two-factor authentication means that the additional login workflow step will not be required and access to the /validation/acvp/register endpoint will not require an authorization token, although authentication/authorization will still be provided through the TLS certificate. Subsequent interactions for the test session will require the JWT access token returned by the registration but this is no change from now. While not required, the login workflow step will still be available to allow for testing and to make sure that all will work once the two-factor authentication is required.
+
+Please send a note to acvts-demo@nist.gov with your request to make two-factor authentication optional and we will follow-up with you.
+
+**=====================NOTICE=====================**
+
 The protocol spec and development information are available here. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump start your work.
 
 To access the [demo environment](https://demo.acvts.nist.gov/acvp/home) you will need to send your CSR to us. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send a request to acvts-demo@nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR. 
