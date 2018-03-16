@@ -206,8 +206,8 @@
           <c>No</c>
 	  <c/><c/><c/><c/><c/>
 
-          <c>ptLen</c>
-	  <c>The supported plaintext lengths in bits.   This varies depending on the algorithm type, for additional details see <xref target="data_lengths"/></c>
+          <c>dataLen</c>
+	  <c>The supported plain and cipher text lengths in bits.   This varies depending on the algorithm type, for additional details see <xref target="data_lengths"/></c>
           <c>domain</c>
           <c>0-65536</c>
           <c>Yes (See <xref target="data_lengths"/>)</c>
@@ -303,7 +303,7 @@
 	<t>Some algorithms allow ranges of data, IV and AAD lengths.  This table outlines the allowed values.</t>
         <texttable anchor="data_table" title="Symmetric Algorithm Capabilities JSON Values">
           <ttcol align="left">Algorithm</ttcol>
-          <ttcol align="left">ptLen(payload)</ttcol>
+          <ttcol align="left">dataLen(payload)</ttcol>
           <ttcol align="left">IV/Nonce</ttcol>
           <ttcol align="left">Tag</ttcol>
           <ttcol align="left">AAD</ttcol>
@@ -349,15 +349,15 @@
 		<t>AES-KWP</t>
     <t>TDES-ECB</t>
 		<t>TDES-CBC</t>
-		<t>TDES-CBC-I</t>
+		<t>TDES-CBCI</t>
 		<t>TDES-CFB1</t>
 		<t>TDES-CFB8</t>
 		<t>TDES-CFB64</t>
-		<t>TDES-CFB-P1</t>
-		<t>TDES-CFB-P8</t>
-		<t>TDES-CFB-P64</t>
+		<t>TDES-CFBP1</t>
+		<t>TDES-CFBP8</t>
+		<t>TDES-CFBP64</t>
 		<t>TDES-OFB</t>
-		<t>TDES-OFB-I</t>
+		<t>TDES-OFBI</t>
 		<t>TDES-CTR</t>
 		<t>TDES-KW</t>
 	    </list></t>
@@ -467,7 +467,7 @@
 		<c/><c/><c/><c/>
 
 		<c>testType</c>
-		<c>The test category type (AFT or MCT)</c>
+		<c>The test category type (AFT, MCT or counter)</c>
 		<c>value</c>
 		<c>No</c>
 		<c/><c/><c/><c/>
@@ -477,6 +477,14 @@
 		<c>array</c>
 		<c>No</c>
 	    </texttable>
+
+<t>The testType field definitions are:</t>
+
+        <t><list style="testtype">
+		<t>AFT - Algorithm Functional Test</t>
+		<t>MCT - Monte Carlo Test</t>
+		<t>counter - Counter mode test</t>
+        </list></t>
 	</section>
 
 	<section title="Test Case JSON Schema" anchor="tvjs">
@@ -593,7 +601,7 @@
 
 	  <c>decryptFail</c>
 	  <c>Some test cases included with decrypt operations in AES-GCM, AES-CCM, AES-XPN, AES-KW, AES-KWP, and TDES-KW will have expected failures. For these cases the
-	      JSON reponse should include the decryptFail keyword, see <xref target="app-test-results-ex"/> </c>
+	      JSON reponse should include the decryptFail keyword, see <xref target="app-vs-ex"/> </c>
           <c>boolean true</c>
 	  <c/><c/><c/>
 
@@ -729,42 +737,488 @@
     </references>
 
     <section anchor="app-reg-ex" title="Example Capabilities JSON Object">
-      <t>The following is a example JSON object advertising support for AES-GCM.</t>
+      <t>The following is a example JSON object advertising support for all the symmetric ciphers.</t>
       <figure>
         <artwork><![CDATA[
 
-
-            {
-                "algorithm": "AES-GCM",
-                "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
-		                {"algorithm" : "DRBG", "valValue" : "123456"}],
-                "direction": [
-                    "encrypt",
-                    "decrypt"
-                ],
-                "ivGen": "internal",
-                "ivGenMode": "8.2.2",
-                "keyLen": [
-                    128,
-                    192,
-                    256
-                ],
-                "tagLen": [
-                    96,
-                    128
-                ],
-                "ivLen": [
-                    96
-                ],
-                "ptLen": [
-                    0,
-                    256
-                ],
-                "aadLen": [
-                    128,
-                    256
-                ]
-            }
+POST [
+           {
+                    "algorithm": "AES-GCM",
+                    "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
+                            {"algorithm" : "DRBG", "valValue" : "123456"}],
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "ivGen": "internal",
+                    "ivGenMode": "8.2.2",
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "tagLen": [
+                        96,
+                        128
+                    ],
+                    "ivLen": [
+                        96
+                    ],
+                    "dataLen": [
+                        0,
+                        256
+                    ],
+                    "aadLen": [
+                        128,
+                        256
+                    ]
+                },
+                {
+                    "algorithm": "AES-ECB",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        1536
+                    ]
+                },
+                {
+                    "algorithm": "AES-CBC",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        128
+                    ]
+                },
+                {
+                    "algorithm": "AES-CFB8",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        256
+                    ]
+                },
+                {
+                    "algorithm": "AES-CFB128",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        1536
+                    ]
+                },
+                {
+                    "algorithm": "AES-OFB",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        128
+                    ]
+                },
+                {
+                    "algorithm": "AES-XPN",
+                    "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"},
+                            {"algorithm" : "DRBG", "valValue" : "123456"}],
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "ivGen": "internal",
+                    "ivGenMode": "8.2.2",
+                    "saltGen": "internal",      
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "tagLen": [
+                        96,
+                       128
+                    ],
+                   "dataLen": [
+                        0,
+                        128
+                    ]
+                   "aadLen": [
+                        120,
+                        128
+                   ]
+                },
+                {
+                    "algorithm": "AES-CTR",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        128
+                    ]
+                 },
+                 {
+                    "algorithm": "AES-CCM",
+                    "prereqVals": [
+                        {
+                            "algorithm": "AES",
+                            "valValue": "same"
+                        }
+                    ],
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "tagLen": [
+                        128
+                    ],
+                    "ivLen": [
+                        56
+                    ],
+                    "dataLen": [
+                        0,
+                        256
+                    ],
+                    "aadLen": [
+                        0,
+                        65536
+                    ]
+                },
+                {
+                    "algorithm": "AES-CFB1",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        1536
+                    ]
+                },
+                {
+                    "algorithm": "AES-KW",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "kwCipher": [
+                        "cipher"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        512,
+                        192,
+                        128
+                    ]
+                },
+                {
+                    "algorithm": "AES-KWP",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "kwCipher": [
+                        "cipher"
+                    ],
+                    "keyLen": [
+                        128,
+                        192,
+                        256
+                    ],
+                    "dataLen": [
+                        8,
+                        32,
+                        96,
+                        808
+                    ]
+                },
+                {
+                    "algorithm": "AES-XTS",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyLen": [
+                        128,
+                        256
+                    ],
+                    "dataLen": [
+                        65536
+                    ],
+                    "tweakMode": [
+                        "hex"
+                    ]
+                },
+                {
+                    "algorithm": "TDES-ECB",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        512
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CBC",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64,
+                        128,
+                        192,
+                        768
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CBCI",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64,
+                        128,
+                        192,
+                        768
+                    ]
+                },
+                {
+                    "algorithm": "TDES-OFB",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64
+                    ]
+                },
+                {
+                    "algorithm": "TDES-OFBI",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CFB64",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        320
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CFB8",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64,
+                        256
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CFB1",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CFBP64",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        320
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CFBP8",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64,
+                        256
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CFBP1",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64
+                    ]
+                },
+                {
+                    "algorithm": "TDES-CTR",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "keyingOption": [
+                        1
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        64
+                    ]
+                },
+                {
+                    "algorithm": "TDES-KW",
+                    "direction": [
+                        "encrypt",
+                        "decrypt"
+                    ],
+                    "kwCipher": [
+                        "cipher"
+                    ],
+                    "keyLen": [
+                        192
+                    ],
+                    "dataLen": [
+                        512,
+                        192,
+                        128
+                    ]
+                }
+            ]
+        }
+    }
+] 
             ]]></artwork>
     </figure>
     </section>
