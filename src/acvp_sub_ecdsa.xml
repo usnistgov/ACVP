@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+
+
+
+
+
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -28,586 +33,927 @@
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
 <rfc category="info" docName="draft-ietf-acvp-subecdsa-0.3" ipr="trust200902">
-  <!-- category values: std, bcp, info, exp, and historic
+	<!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN"
      they will automatically be output with "(if approved)" -->
-
-  <!-- ***** FRONT MATTER ***** -->
-
-  <front>
-    <!-- The abbreviated title is used in the page header - it is only necessary if the
+	<!-- ***** FRONT MATTER ***** -->
+	<front>
+		<!-- The abbreviated title is used in the page header - it is only necessary if the
          full title is longer than 39 characters -->
-
-    <title abbrev="Sym Alg JSON">ACVP ECDSA2 Algorithm JSON Specification</title>
-
-    <!-- add 'role="editor"' below for the editors if appropriate -->
-
-    <!-- Another author who claims to be an editor -->
-
-    <author fullname="Barry Fussell" initials="B.F." role="editor"
-            surname="Fussell">
-      <organization>Cisco Systems, Inc.</organization>
-
-      <address>
-        <postal>
-          <street>170 West Tasman Dr.</street>
-
-          <!-- Reorder these if your country does things differently -->
-
-          <city>San Jose</city>
-
-          <region>CA</region>
-
-          <code>95134</code>
-
-          <country>USA</country>
-        </postal>
-
-        <email>bfussell@cisco.com</email>
-
-        <!-- uri and facsimile elements may also be added -->
-      </address>
-    </author>
-
-    <date month="June" year="2016" />
-
-    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+		<title abbrev="Sym Alg JSON">ACVP ECDSA Algorithm JSON Specification</title>
+		<!-- add 'role="editor"' below for the editors if appropriate -->
+		<!-- Another author who claims to be an editor -->
+		<author fullname="Barry Fussell" initials="B.F." role="editor" surname="Fussell">
+			<organization>Cisco Systems, Inc.</organization>
+			<address>
+				<postal>
+					<street>170 West Tasman Dr.</street>
+					<!-- Reorder these if your country does things differently -->
+					<city>San Jose</city>
+					<region>CA</region>
+					<code>95134</code>
+					<country>USA</country>
+				</postal>
+				<email>bfussell@cisco.com</email>
+				<!-- uri and facsimile elements may also be added -->
+			</address>
+		</author>
+		<date month="June" year="2016" />
+		<!-- If the month and year are both specified and are the current ones, xml2rfc will fill
          in the current day for you. If only the current year is specified, xml2rfc will fill
 	 in the current day and month for you. If the year is not the current one, it is
 	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
 	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
 	 specify just the year. -->
-
-    <!-- Meta-data Declarations -->
-
-    <area>General</area>
-
-    <workgroup>TBD</workgroup>
-
-    <!-- WG name at the upperleft corner of the doc,
+		<!-- Meta-data Declarations -->
+		<area>General</area>
+		<workgroup>TBD</workgroup>
+		<!-- WG name at the upperleft corner of the doc,
          IETF is fine for individual submissions.
 	 If this element is not present, the default is "Network Working Group",
          which is used by the RFC Editor as a nod to the history of the IETF. -->
-
-    <keyword>acvp</keyword>
-    <keyword>crypto</keyword>
-
-    <!-- Keywords will be incorporated into HTML output
+		<keyword>acvp</keyword>
+		<keyword>crypto</keyword>
+		<!-- Keywords will be incorporated into HTML output
          files in a meta tag but they have no effect on text or nroff
          output. If you submit your draft to the RFC Editor, the
          keywords will be used for the search engine. -->
-
-    <abstract>
-      <t>This document defines the JSON schema for using ECDSA2 algorithms with the ACVP specification.</t>
-    </abstract>
-  </front>
-
-  <middle>
-    <section title="Introduction">
-      <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically
-              verify the cryptographic implementation of a software or hardware crypto module.
-              The ACVP specification defines how a crypto module communicates with an ACVP
-              server, including crypto capabilities negotiation, session management, authentication,
-	      vector processing and more.  The ACVP specification does not define algorithm specific
-	      JSON constructs for performing the crypto validation.  A series of ACVP sub-specifications
-	      define the constructs for testing individual crypto algorithms.  Each sub-specification
-	      addresses a specific class of crypto algorithms.  This sub-specification defines the JSON
-	      constructs for testing ECDSA2 algorithms using ACVP.</t>
-
-      <section title="Requirements Language">
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-	document are to be interpreted in
-	<xref target="RFC2119">RFC 2119</xref>.</t>
-      </section>
-    </section>
-
-<section anchor="caps_reg" title="Capabilities Registration">
-    <t>ACVP requires crypto modules to register their capabilities.  This allows the crypto
-	module to advertise support for specific algorithms, notifying the ACVP server which
-	algorithms need test vectors generated for the validation process.  This section
-    describes the constructs for advertising support of ECDSA2 algorithms to the ACVP server.</t>
-
-    <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms'
-	value of the ACVP registration message.  The 'algorithms' value is an array, where each
-	array element is an individual JSON object defined in this section.  The 'algorithms'
-	value is part of the 'capability_exchange' element of the ACVP JSON registration message.
-	See the ACVP specification for details on the registration message.</t>
-
-	<section anchor="prereq_algs" title="Required Prerequisite Algorithms for ECDSA Validations">
-	    <t>Each ECDSA implementation relies on other cryptographic primitives.
-	    For example, ECDSA uses an underlying SHA algorithm. Each of these underlying algorithm primitives 
-	    must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
-	    <texttable anchor="rereqs_table" title="Required ECDSA2 Prerequisite Algorithms JSON Values">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-          <ttcol align="left">Valid Values</ttcol>
-          <ttcol align="left">Optional</ttcol>
-          <c>algorithm</c>
-          <c>a prerequisite algorithm</c>
-          <c>value</c>
-          <c>DRBG, DRBG_OPT2, SHA, SHA_OPT2, SHA_OPT3</c>
-          <c>No</c>
-          <c/><c/><c/><c/><c/>
-
-          <c>valValue</c>
-          <c>algorithm validation number</c>
-          <c>value</c>
-          <c>actual number or "same"</c>
-          <c>No</c>
-          <c/><c/><c/><c/><c/>
-
-          <c>prereqAlgVal</c>
-          <c>prerequistie algorithm validation</c>
-          <c>object with algorithm and valValue properties</c>
-          <c>see above</c>
-          <c>No</c>
-
-	  </texttable>
-	  </section>
-
-
-
-        <section anchor="ecdsa_caps_reg" title="ECDSA2 Algorithm Capabilities Registration">
-	<t>Each algorithm capability advertised is a self-contained JSON object using the following values</t>
-
-        <texttable anchor="caps_table" title="ECDSA2 Algorithm Capabilities JSON Values">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-          <ttcol align="left">Valid Values</ttcol>
-          <ttcol align="left">Optional</ttcol>
-
-          <c>algorithm</c>
-	  <c>The algorithm under test</c>
-          <c>value</c>
-          <c>ECDSA2</c>
-          <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>prereqVals</c>
-          <c>prerequistie algorithm validations</c>
-          <c>array of prereqAlgVal objects</c>
-          <c>See <xref target="prereq_algs" /></c>
-          <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-	  <c>methods</c>
-	  <c>Method and associated parameters represented as an array of the following JSON values</c>
-	  <c>array</c>
-	  <c>See the following values</c>
-	  <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-	  <c>type</c>
-	  <c>Type of operation supported</c>
-	  <c>array</c>
-	  <c>See <xref target="supported_types" /></c>
-	  <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-	  <c>curves</c>
-	  <c>EC curves supported and the support sha per curve</c>
-	  <c>array</c>
-	  <c>See <xref target="supported_curves" /></c>
-	  <c>No</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>sha</c>
-	  <c>Array of SHA values used for a specific curve</c>
-	  <c>array</c>
-	  <c>See <xref target="supported_sha"/></c>	
-          <c>Yes</c>
-	  <c/><c/><c/><c/><c/>
-
-          <c>options</c>
-	  <c>Options used for key pair generation</c>
-	  <c>array</c>
-	  <c>See <xref target="supported_options"/></c>
-	  <c>Yes</c>
-        </texttable>
-	<t>Note: Some optional values are required depending on the algorithm.  Failure to provide these values will
-	result in the ACVP server returning an error to the ACVP client during registration.</t>
-
-	</section>
-
-
-
-	<section anchor="supported_types" title="Supported ECDSA2 Functions">
-	    <t>The following ECDSA2 method types may be advertised by the ACVP compliant crypto module:</t>
-	    <t><list style="symbols">
-		<t>keyPair</t>
-		<t>PKV</t>
-		<t>sigGen</t>
-		<t>sigVer</t>
-	    </list></t>
-	</section>
-
-	<section anchor="supported_curves" title="Supported ECDSA2 Curves">
-	    <t>The following ECDSA2 curves may be advertised by the ACVP compliant crypto module:</t>
-	    <t><list style="symbols">
-		<t>P-244</t>
-		<t>P-256</t>
-		<t>P-384</t>
-		<t>P-521</t>
-		<t>K-233</t>
-		<t>K-283</t>
-		<t>K-409</t>
-		<t>K-571</t>
-		<t>B-233</t>
-		<t>B-283</t>
-		<t>B-409</t>
-		<t>B-571</t>
-	    </list></t>
-	</section>
-
-	<section anchor="supported_sha" title="Supported SHA Methods">
-	    <t>The following SHA methods may be advertised by the ACVP compliant crypto module:</t>
-	    <t><list style="symbols">
-		<t>SHA-1</t>
-		<t>SHA-224</t>
-		<t>SHA-256</t>
-		<t>SHA-384</t>
-		<t>SHA-512</t>
-		<t>SHA-512-244</t>
-		<t>SHA-512-256</t>
-	    </list></t>
-	</section>
-
-	<section anchor="supported_options" title="Supported Method Options">
-	    <t>The following options may be advertised by the ACVP compliant crypto module:</t>
-	    <t><list style="symbols">
-		<t>randomBits</t>
-		<t>testingCandidates</t>
-		<t>186-2</t>
-		<t>sigGen186-4</t>
-		<t>sigGenComponent</t>
-	    </list></t>
-	</section>
-    </section>
-
-    <section anchor="test_vectors" title="Test Vectors">
-	<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
-	    the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
-	    sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
-	    ECDSA2 function.  This section describes the JSON schema for a test vector set used with ECDSA2 algorithms.</t>
-
-	<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
-	vector set as well as individual test vectors to be processed by the ACVP client.The following table describes the JSON elements at the top level of the hierarchy.
-	</t>
-	<texttable anchor="vs_top_table" title="Vector Set JSON Object">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-
-	  <c>acvVersion</c>
-	  <c>Protocol version identifier</c>
-          <c>value</c>
-	  <c/><c/><c/>
-
-	  <c>vsId</c>
-	  <c>Unique numeric identifier for the vector set</c>
-          <c>value</c>
-	  <c/><c/><c/>
-
-          <c>algorithm</c>
-	  <c>ECDSA2</c>
-          <c>value</c>
-	  <c/><c/><c/>
-
-	  <c>testGroups</c>
-	  <c>Array of test group JSON objects, which are defined in <xref target="tgjs" /></c>
-          <c>array</c>
-	</texttable>
-
-	<section title="Test Groups JSON Schema" anchor="tgjs">
-	    <t>The testGroups element at the top level in the test vector JSON object is an array of test
-		groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
-	        in the vector set.  For instance, all test vectors that use the same key size would be grouped
-	        together.  The Test Group JSON object contains meta data that applies to all test vectors within
-	        the group. The following table describes the secure hash JSON elements of the Test Group JSON object.</t>
-
-	<t> The test group for ECDSA2 is as follows:</t>
-	<texttable anchor="vs_tg_table5" title="Vector Group JSON Object">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-	  <ttcol align="left">Optional</ttcol>
-
-
-	  <c>type</c>
-	  <c>The type of operation for the test vectors. See <xref target="supported_types" /> for possible values</c>
-          <c>value</c>
-          <c>No</c>
-	  <c/><c/><c/><c/>
-
-	  <c>curve</c>
-	  <c>The curve type used for the test vectors. See <xref target="supported_curves" /> for possible values</c>
-          <c>value</c>
-          <c>No</c>
-	  <c/><c/><c/><c/>
-
-	  <c>options</c>
-	  <c>The options for the operation. See <xref target="supported_options"/></c>
-	  <c>array</c>
-          <c>No</c>
-	  <c/><c/><c/><c/>
-
-          <c>sha</c>
-	  <c>SHA version used</c>
-	  <c>array</c>
-          <c>Yes</c>
-	  <c/><c/><c/><c/>
-
-	  <c>tests</c>
-	  <c>Array of individual test vector JSON objects, which are defined in <xref target="tvjs" /></c>
-	  <c>array</c>
-          <c>No</c>
-	</texttable>
-
-          </section>
-
-	<section title="Test Case JSON Schema" anchor="tvjs">
-	    <t>Each test group contains an array of one or more test cases.  Each test case is a JSON object
-		that represents a single test vector to be processed by the ACVP client.  The following table describes the JSON elements for each ECDSA2 test vector.</t>
-	    <texttable anchor="vs_tc_table5" title="Test Case JSON Object">
-		<ttcol align="left">JSON Value</ttcol>
-		<ttcol align="left">Description</ttcol>
-		<ttcol align="left">JSON type</ttcol>
-		<ttcol align="left">Optional</ttcol>
-
-		<c>tcId</c>
-		<c>Numeric identifier for the test case, unique across the entire vector set.</c>
-		<c>value</c>
-		<c>No</c>
-		<c/><c/><c/><c/>
-
-		<c>qx</c>
-		<c>The public key curve point x</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>qy</c>
-		<c>The public key curve point y</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>r</c>
-		<c>The signature component R</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>s</c>
-		<c>The signature component S</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>number</c>
-		<c>Number of keypair sets to be generated</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>message</c>
-		<c>The message used to generate signature or verify signature</c>
-		<c>value</c>
-		<c>Yes</c>
-
-	    </texttable>
-	</section>
-    </section>
-
-    <section anchor="vector_responses" title="Test Vector Responses">
-	<t>After the ACVP client downloads and processes a vector set, it must send the response vectors
-	back to the ACVP server.  The following table describes the JSON object that represents a vector set response.</t>
-
-	<texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-
-	  <c>acvVersion</c>
-	  <c>Protocol version identifier</c>
-          <c>value</c>
-	  <c/><c/><c/>
-
-	  <c>vsId</c>
-	  <c>Unique numeric identifier for the vector set</c>
-          <c>value</c>
-	  <c/><c/><c/>
-
-	  <c>testResults</c>
-	  <c>Array of JSON objects that represent each test vector result, as defined by the tables below</c>
-          <c>array</c>
-	</texttable>
-
-	<t>The following table describes the JSON object that represents a vector set response for ECDSA2.</t>	<texttable anchor="vr_top_table5" title="Vector Set Response JSON Object">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-	  <ttcol align="left">Optional</ttcol>
-
-
-		<c>d</c>
-		<c>The private key</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>qx</c>
-		<c>The public key curve point x</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>qy</c>
-		<c>The public key curve point y</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>r</c>
-		<c>The signature component R</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>s</c>
-		<c>The signature component S</c>
-		<c>value</c>
-		<c>Yes</c>
-		<c/><c/><c/><c/>
-
-		<c>results</c>
-		<c>The Pass or Fail result of the verify or validation</c>
-		<c>value</c>
-		<c>Yes</c>
-	</texttable>
-    </section>
-
-    <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
-
-    <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>TBD...</t>
-    </section>
-
-    <!-- Possibly a 'Contributors' section ... -->
-
-    <section anchor="IANA" title="IANA Considerations">
-      <t>This memo includes no request to IANA.</t>
-    </section>
-
-    <section anchor="Security" title="Security Considerations">
-      <t>Security considerations are addressed by the ACVP specification.</t>
-    </section>
-  </middle>
-
-  <!--  *****BACK MATTER ***** -->
-
-  <back>
-    <references title="Normative References">
-      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
-      &RFC2119;
-
-      <reference anchor="ACVP">
-        <!-- the following is the minimum to make xml2rfc happy -->
-
-        <front>
-          <title>ACVP Specification</title>
-
-          <author initials="authInitials" surname="authSurName">
-            <organization>NIST</organization>
-          </author>
-
-          <date year="2016" />
-        </front>
-      </reference>
-    </references>
-
-    <section anchor="app-reg-ex" title="Example ECDSA2 Capabilities JSON Object">
-      <t>The following is a example JSON object advertising support for ECDSA2.</t>
-      <figure>
-        <artwork><![CDATA[
-
-
+		<abstract>
+			<t>This document defines the JSON schema for using ECDSA algorithms with the ACVP specification.</t>
+		</abstract>
+	</front>
+	<middle>
+		<section title="Introduction">
+			<t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically verify the cryptographic implementation of a software or hardware crypto module. The ACVP specification defines how a crypto module communicates with an ACVP server, including crypto capabilities negotiation, session management, authentication, vector processing and more. The ACVP specification does not define algorithm specific JSON constructs for performing the crypto validation. A series of ACVP sub-specifications define the constructs for testing individual crypto algorithms. Each sub-specification addresses a specific class of crypto algorithms. This sub-specification defines the JSON constructs for testing ECDSA algorithms using ACVP.</t>
+			<section title="Requirements Language">
+				<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted in																															
+					<xref target="RFC2119">RFC 2119</xref>.																								
+				</t>
+			</section>
+		</section>
+		<section anchor="caps_reg" title="Capabilities Registration">
+			<t>ACVP requires crypto modules to register their capabilities. This allows the crypto	module to advertise support for specific algorithms, notifying the ACVP server which algorithms need test vectors generated for the validation process. This section describes the constructs for advertising support of ECDSA algorithms to the ACVP server.</t>
+			<t>The algorithm capabilities are advertised as JSON objects within the 'algorithms' value of the ACVP registration message. The 'algorithms' value is an array, where each	array element is an individual JSON object defined in this section. The 'algorithms' value is part of the 'capability_exchange' element of the ACVP JSON registration message. See the ACVP specification for details on the registration message.</t>
+			<section anchor="prereq_algs" title="Required Prerequisite Algorithms for ECDSA Validations">
+				<t>Each ECDSA implementation relies on other cryptographic primitives. For example, ECDSA uses an underlying SHA algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
+				<texttable anchor="rereqs_table" title="Required ECDSA Prerequisite Algorithms JSON Values">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<ttcol align="left">Valid Values</ttcol>
+					<ttcol align="left">Optional</ttcol>
+					<c>algorithm</c>
+					<c>a prerequisite algorithm</c>
+					<c>value</c>
+					<c>DRBG, DRBG_OPT2, SHA, SHA_OPT2, SHA_OPT3</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>valValue</c>
+					<c>algorithm validation number</c>
+					<c>value</c>
+					<c>actual number or "same"</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>prereqAlgVal</c>
+					<c>prerequistie algorithm validation</c>
+					<c>object with algorithm and valValue properties</c>
+					<c>see above</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>prereqVals</c>
+					<c>prerequistie algorithm validations</c>
+					<c>array of prereqAlgVal objects</c>
+					<c>see above</c>
+					<c>No</c>
+				</texttable>
+			</section>
+			<section anchor="ecdsa_caps_reg" title="ECDSA Algorithm Capabilities Registration">
+				<t>Each algorithm capability advertised is a self-contained JSON object using the following values</t>
+				<texttable anchor="caps_table" title="ECDSA Algorithm Capabilities JSON Values">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<ttcol align="left">Valid Values</ttcol>
+					<ttcol align="left">Optional</ttcol>
+					<c>algorithm</c>
+					<c>The algorithm under test</c>
+					<c>value</c>
+					<c>"ECDSA"</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>mode</c>
+					<c>The ECDSA mode to be validated</c>
+					<c>value</c>
+					<c>"keyGen", "keyVer", "sigGen", or "sigVer"</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>prereqVals</c>
+					<c>prerequistie algorithm validations</c>
+					<c>array of prereqAlgVal objects</c>
+					<c>See 																																				
+						<xref target="prereq_algs" />
+					</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>algSpecs</c>
+					<c>array of JSON objects, each with fields pertaining to the global ECDSA mode indicated above and identified uniquely by the combination of the ECDSA "mode" and indicated properties</c>
+					<c>Array of JSON objects</c>
+					<c>See                                                                                                 																		
+						<xref target="supported_modes" />
+					</c>
+				</texttable>
+			</section>
+			<section anchor="supported_modes" title="Supported ECDSA Modes Capabilities">
+				<t>The ECDSA mode capabilities are advertised as JSON objects within the 'algSpecs' value of the ACVP registration message - see                                                             															
+					<xref target="caps_table"/>. The 'algSpecs' value is an array, where each array element is a JSON object corresponding to a particular ECDSA mode defined in this section. The 'algSpecs'	value is part of the 'capability_exchange' element of the ACVP JSON registration message.	See the ACVP specification for details on the registration message.                                                												
+				</t>
+				<t>Each ECDSA mode's capabilities are advertised as JSON objects.</t>
+				<section anchor="mode_keyGen" title="The keyGen Mode Capabilities">
+					<t>The ECDSA keyGen mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+					<t>Each ECDSA keyGen mode capability set is advertised as a self-contained JSON object.</t>
+					<section anchor="mode_keyGenFullSet" title="keyGen Full Set of Capabilities">
+						<t>The complete list of ECDSA key generation capabilities may be advertised by the ACVP compliant crypto module:</t>
+						<texttable anchor="keyGen_table" title="ECDSA keyGen Capabilities JSON Values">
+							<ttcol align="left">JSON Value</ttcol>
+							<ttcol align="left">Description</ttcol>
+							<ttcol align="left">JSON type</ttcol>
+							<ttcol align="left">Valid Values</ttcol>
+							<ttcol align="left">Optional</ttcol>
+							<c>curve</c>
+							<c>The curve names supported for the IUT in keyGen.</c>
+							<c>array</c>
+							<c>Any non-empty subset of {"p-224", "p-256", "p-384", "p-521", "b-233", "b-283", "b-409", "b-571", "k-233", "k-283", "k-409", "k-571"}</c>
+							<c>No</c>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c>secretGenerationMode</c>
+							<c>The method used to generate the randomness incoporated in the key.</c>
+							<c>array</c>
+							<c>Any non-empty subset of {"extra bits", "testing candidates"}</c>
+							<c>No</c>
+						</texttable>
+					</section>
+				</section>
+				<section anchor="mode_keyVer" title="The keyVer Mode Capabilities">
+					<t>The ECDSA keyVer mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+					<t>Each ECDSA keyVer mode capability set is advertised as a self-contained JSON object.</t>
+					<section anchor="mode_keyVerFullSet" title="keyVer Full Set of Capabilities">
+						<t>The complete list of ECDSA key verification capabilities may be advertised by the ACVP compliant crypto module:</t>
+						<texttable anchor="keyVer_table" title="ECDSA keyVer Capabilities JSON Values">
+							<ttcol align="left">JSON Value</ttcol>
+							<ttcol align="left">Description</ttcol>
+							<ttcol align="left">JSON type</ttcol>
+							<ttcol align="left">Valid Values</ttcol>
+							<ttcol align="left">Optional</ttcol>
+							<c>curve</c>
+							<c>The curve names supported for the IUT in keyVer.</c>
+							<c>array</c>
+							<c>Any non-empty subset of {"p-192", "p-224", "p-256", "p-384", "p-521", "b-163", "b-233", "b-283", "b-409", "b-571", "k-163", "k-233", "k-283", "k-409", "k-571"}</c>
+							<c>No</c>
+						</texttable>
+					</section>
+				</section>
+				<section anchor="mode_sigGen" title="The sigGen Mode Capabilities">
+					<t>The ECDSA sigGen mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+					<t>Each ECDSA sigGen mode capability set is advertised as a self-contained JSON object.</t>
+					<section anchor="mode_sigGenFullSet" title="sigGen Full Set of Capabilities">
+						<t>The complete list of ECDSA signature generation capabilities may be advertised by the ACVP compliant crypto module:</t>
+						<texttable anchor="sigGen_table" title="ECDSA sigGen Capabilities JSON Values">
+							<ttcol align="left">JSON Value</ttcol>
+							<ttcol align="left">Description</ttcol>
+							<ttcol align="left">JSON type</ttcol>
+							<ttcol align="left">Valid Values</ttcol>
+							<ttcol align="left">Optional</ttcol>
+							<c>capabilities</c>
+							<c>An array containing capability objects defined as an array of 'curve' and an array of 'hashAlg' as listed below.</c>
+							<c>array</c>
+							<c>Any non-empty subset of capability objects</c>
+							<c>No</c>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c>curve</c>
+							<c>The curves supported with a particular set of hash algorithms.</c>
+							<c>array</c>
+							<c>Any non-empty subset of {"p-224", "p-256", "p-384", "p-521", "b-233", "b-283", "b-409", "b-571", "k-233", "k-283", "k-409", "k-571"}</c>
+							<c>No</c>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c>hashAlg</c>
+							<c>The hash functions supported when signing a message for a particular set of curves.</c>
+							<c>array</c>
+							<c>Any non-empty subset of {"SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}.</c>
+							<c>No</c>
+						</texttable>
+					</section>
+				</section>
+				<section anchor="mode_sigVer" title="The sigVer Mode Capabilities">
+					<t>The ECDSA sigVer mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+					<t>Each ECDSA sigVer mode capability set is advertised as a self-contained JSON object.</t>
+					<section anchor="mode_sigVerFullSet" title="sigVer Full Set of Capabilities">
+						<t>The complete list of ECDSA signature verification capabilities may be advertised by the ACVP compliant crypto module:</t>
+						<texttable anchor="sigVer_table" title="ECDSA sigVer Capabilities JSON Values">
+							<ttcol align="left">JSON Value</ttcol>
+							<ttcol align="left">Description</ttcol>
+							<ttcol align="left">JSON type</ttcol>
+							<ttcol align="left">Valid Values</ttcol>
+							<ttcol align="left">Optional</ttcol>
+							<c>capabilities</c>
+							<c>An array containing capability objects defined as an array of 'curve' and an array of 'hashAlg' as listed below.</c>
+							<c>array</c>
+							<c>Any non-empty subset of capability objects</c>
+							<c>No</c>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c>curve</c>
+							<c>The curves supported with a particular set of hash algorithms.</c>
+							<c>array</c>
+							<c>Any non-empty subset of {"p-192", "p-224", "p-256", "p-384", "p-521", "b-163", "b-233", "b-283", "b-409", "b-571", "k-163", "k-233", "k-283", "k-409", "k-571"}</c>
+							<c>No</c>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c/>
+							<c>hashAlg</c>
+							<c>The hash functions supported when signing a message for a particular set of curves.</c>
+							<c>array</c>
+							<c>Any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}.</c>
+							<c>No</c>
+						</texttable>
+					</section>
+				</section>
+			</section>
+			<section anchor="test_vectors" title="Test Vectors">
+				<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to the ACVP server for validation. A typical ACVP validation session would require multiple test vector sets to be downloaded and processed by the ACVP client. Each test vector set represents an individual ECDSA function. This section describes the JSON schema for a test vector set used with ECDSA algorithms.</t>
+				<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire vector set as well as individual test vectors to be processed by the ACVP client.The following table describes the JSON elements at the top level of the hierarchy.</t>
+				<texttable anchor="vs_top_table" title="Vector Set JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<c>acvVersion</c>
+					<c>Protocol version identifier</c>
+					<c>value</c>
+					<c/>
+					<c/>
+					<c/>
+					<c>vsId</c>
+					<c>Unique numeric identifier for the vector set</c>
+					<c>value</c>
+					<c/>
+					<c/>
+					<c/>
+					<c>algorithm</c>
+					<c>ECDSA</c>
+					<c>value</c>
+					<c/>
+					<c/>
+					<c/>
+					<c>mode</c>
+					<c>The ECDSA mode used for the test vectors</c>
+					<c>value</c>
+					<c/>
+					<c/>
+					<c/>
+					<c>testGroups</c>
+					<c>Array of test group JSON objects, which are defined in 																																	
+						<xref target="tgjs" />
+					</c>
+					<c>array</c>
+				</texttable>
+				<section title="Test Groups JSON Schema" anchor="tgjs">
+					<t>The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted	in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.</t>
+					<t> The test group for ECDSA is as follows:</t>
+					<texttable anchor="vs_tg_table5" title="Vector Group JSON Object">
+						<ttcol align="left">JSON Value</ttcol>
+						<ttcol align="left">Description</ttcol>
+						<ttcol align="left">JSON type</ttcol>
+						<ttcol align="left">Optional</ttcol>
+						<c>curve</c>
+						<c>The curve type used for the test vectors.</c>
+						<c>value</c>
+						<c>No</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>secretGenerationMode</c>
+						<c>The method of generating a secret used for key generation in the test vectors.</c>
+						<c>value</c>
+						<c>Yes</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>hashAlg</c>
+						<c>SHA version used</c>
+						<c>value</c>
+						<c>Yes</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>tests</c>
+						<c>Array of individual test vector JSON objects, which are defined in 																																							
+							<xref target="tvjs" />
+						</c>
+						<c>array</c>
+						<c>No</c>
+					</texttable>
+				</section>
+				<section title="Test Case JSON Schema" anchor="tvjs">
+					<t>Each test group contains an array of one or more test cases. Each test case is a JSON object	that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each ECDSA test vector.</t>
+					<texttable anchor="vs_tc_table5" title="Test Case JSON Object">
+						<ttcol align="left">JSON Value</ttcol>
+						<ttcol align="left">Description</ttcol>
+						<ttcol align="left">JSON type</ttcol>
+						<ttcol align="left">Optional</ttcol>
+						<c>tcId</c>
+						<c>Numeric identifier for the test case, unique across the entire vector set.</c>
+						<c>value</c>
+						<c>No</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>qx</c>
+						<c>The public key curve point x</c>
+						<c>value</c>
+						<c>Yes</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>qy</c>
+						<c>The public key curve point y</c>
+						<c>value</c>
+						<c>Yes</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>r</c>
+						<c>The signature component R</c>
+						<c>value</c>
+						<c>Yes</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>s</c>
+						<c>The signature component S</c>
+						<c>value</c>
+						<c>Yes</c>
+						<c/>
+						<c/>
+						<c/>
+						<c/>
+						<c>message</c>
+						<c>The message used to generate signature or verify signature</c>
+						<c>value</c>
+						<c>Yes</c>
+					</texttable>
+				</section>
+			</section>
+			<section anchor="vector_responses" title="Test Vector Responses">
+				<t>After the ACVP client downloads and processes a vector set, it must send the response vectors back to the ACVP server. The following table describes the JSON object that represents a vector set response.</t>
+				<texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<c>acvVersion</c>
+					<c>Protocol version identifier</c>
+					<c>value</c>
+					<c/>
+					<c/>
+					<c/>
+					<c>vsId</c>
+					<c>Unique numeric identifier for the vector set</c>
+					<c>value</c>
+					<c/>
+					<c/>
+					<c/>
+					<c>testResults</c>
+					<c>Array of JSON objects that represent each test vector result, as defined by the tables below</c>
+					<c>array</c>
+				</texttable>
+				<t>The following table describes the JSON object that represents a vector set response for ECDSA.</t>
+				<texttable anchor="vr_top_table5" title="Vector Set Response JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+					<ttcol align="left">Optional</ttcol>
+					<c>d</c>
+					<c>The private key</c>
+					<c>value</c>
+					<c>Yes</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>qx</c>
+					<c>The public key curve point x</c>
+					<c>value</c>
+					<c>Yes</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>qy</c>
+					<c>The public key curve point y</c>
+					<c>value</c>
+					<c>Yes</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>r</c>
+					<c>The signature component R</c>
+					<c>value</c>
+					<c>Yes</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>s</c>
+					<c>The signature component S</c>
+					<c>value</c>
+					<c>Yes</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+					<c>result</c>
+					<c>The Pass or Fail result of the verify or validation</c>
+					<c>"passed"/"failed"</c>
+					<c>Yes</c>
+				</texttable>
+			</section>
+			<!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+			<section anchor="Acknowledgements" title="Acknowledgements">
+				<t>TBD...</t>
+			</section>
+			<!-- Possibly a 'Contributors' section ... -->
+			<section anchor="IANA" title="IANA Considerations">
+				<t>This memo includes no request to IANA.</t>
+			</section>
+			<section anchor="Security" title="Security Considerations">
+				<t>Security considerations are addressed by the ACVP specification.</t>
+			</section>
+		</section>
+	</middle>
+	<!--  *****BACK MATTER ***** -->
+	<back>
+		<references title="Normative References">
+			<!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->      &RFC2119;      																					
+			<reference anchor="ACVP">
+				<!-- the following is the minimum to make xml2rfc happy -->
+				<front>
+					<title>ACVP Specification</title>
+					<author initials="authInitials" surname="authSurName">
+						<organization>NIST</organization>
+					</author>
+					<date year="2016" />
+				</front>
+			</reference>
+		</references>
+		<section anchor="app-reg-ex" title="Example ECDSA JSON Object">
+			<t>The following sections contain example JSON for the various ECDSA modes: keyGen, keyVer, sigGen, and sigVer. Note that all binary HEX representations are in big-endian format.</t>
+			<section anchor="app-reg-ex2" title="Example ECDSA KeyGen Capabilities JSON Object">
+				<t>The following is a example JSON object advertising support for ECDSA keyGen.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+{
+    "algorithm": "ECDSA",
+    "mode": "keyGen",
+    "prereqVals": [
+      {
+          "algorithm": "SHA",
+          "valValue": "123456"
+      },
+      {
+          "algorithm": "DRBG",
+          "valValue": "123456"
+      }
+    ],
+	"Curve": [
+		"p-224",
+		"p-256",
+		"p-384",
+		"p-521",
+		"b-233",
+		"b-283",
+		"b-409",
+		"b-571",
+		"k-233",
+		"k-283",
+		"k-409",
+		"k-571"
+	],
+	"SecretGenerationMode": [
+		"extra bits",
+		"testing candidates"
+	]
+}
+            ]]>
+					</artwork>
+				</figure>
+			</section>
+			<section anchor="app-reg-ex1" title="Example ECDSA KeyVer Capabilities JSON Object">
+				<t>The following is a example JSON object advertising support for ECDSA keyVer.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+{
+    "algorithm": "ECDSA",
+    "mode": "keyVer",
+    "prereqVals": [
+        {
+            "algorithm": "SHA",
+            "valValue": "123456"
+        },
+        {
+            "algorithm": "DRBG",
+            "valValue": "123456"
+        }
+    ],
+    "Curve": [
+        "p-192",
+        "p-224",
+        "p-256",
+        "p-384",
+        "p-521",
+        "b-163",
+        "b-233",
+        "b-283",
+        "b-409",
+        "b-571",
+        "k-163",
+        "k-233",
+        "k-283",
+        "k-409",
+        "k-571"
+    ]
+}
+            ]]>
+					</artwork>
+				</figure>
+			</section>
+			<section anchor="app-reg-ex3" title="Example ECDSA SigGen Capabilities JSON Object">
+				<t>The following is a example JSON object advertising support for ECDSA sigGen.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+{
+    "algorithm": "ECDSA",
+    "mode": "sigGen",
+    "prereqVals": [
+        {
+            "algorithm": "SHA",
+            "valValue": "123456"
+        },
+        {
+            "algorithm": "DRBG",
+            "valValue": "123456"
+        }
+    ],
+    "Capabilities": [
+        {
+            "Curve": [
+                "p-224",
+                "p-256",
+                "p-384",
+                "p-521",
+                "b-233",
+                "b-283",
+                "b-409",
+                "b-571",
+                "k-233",
+                "k-283",
+                "k-409",
+                "k-571"
+            ],
+            "HashAlg": [
+                "sha2-224",
+                "sha2-256",
+                "sha2-384",
+                "sha2-512",
+                "sha2-512/224",
+                "sha2-512/256"
+            ]
+        }
+    ]
+}
+            ]]>
+					</artwork>
+				</figure>
+			</section>
+			<section anchor="app-reg-ex4" title="Example ECDSA SigVer Capabilities JSON Object">
+				<t>The following is a example JSON object advertising support for ECDSA sigVer.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+{
+    "algorithm": "ECDSA",
+    "mode": "sigVer",
+    "prereqVals": [
+        {
+            "algorithm": "SHA",
+            "valValue": "123456"
+        },
+        {
+            "algorithm": "DRBG",
+            "valValue": "123456"
+        }
+    ],
+    "Capabilities": [
+        {
+            "Curve": [
+                "p-192",
+                "p-224",
+                "p-256",
+                "p-384",
+                "p-521",
+                "b-163",
+                "b-233",
+                "b-283",
+                "b-409",
+                "b-571",
+                "k-163",
+                "k-233",
+                "k-283",
+                "k-409",
+                "k-571"
+            ],
+            "HashAlg": [
+                "sha-1",
+                "sha2-224",
+                "sha2-256",
+                "sha2-384",
+                "sha2-512",
+                "sha2-512/224",
+                "sha2-512/256"
+            ]
+        }
+    ]
+}
+            ]]>
+					</artwork>
+				</figure>
+			</section>
+			<section anchor="app-vs-ex7" title="Example Test ECDSA KeyGen JSON Object">
+				<t>The following is a example JSON object for ECDSA KeyGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "ECDSA",
+        "mode": "keyGen",
+        "testGroups": [
             {
-                "algorithm": "ECDSA2",
-                "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"},
-			        {"algorithm" : "DRBG", "valValue" : "123456"}],
-                "methods": [
-			      { "type" : "SigVer",
-			        "curveInfo" : [
-			                { "curve" : "P-224", 
-				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]},
-				        { "curve" : "P-256", 
-				          "sha" : ["SHA-1", "SHA-224", "SHA-256"]}
-				       ]
-                              },
-			      { "type" : "KeyPair",
-			        "options" : ["Random Bits", "Testing Candidates"],
-			        "curveInfo" : [
-			                { "curve" : "P-224"},
-			                { "curve" : "P-256"}
-				       ]
-                              }
-			   ] 
-            }
-            ]]></artwork>
-    </figure>
-    </section>
-    <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
-      <t>The following is a example JSON object for ECDSA2 test vectors sent from the ACVP server to the crypto module.</t>
-      <figure>
-        <artwork><![CDATA[
-              [
-                { "acvVersion": "0.3" },
-                { "vsId": 1564,
-                  "algorithm": "ECDSA2",
-                  "testGroups": [
+                "curve": "p-224",
+                "secretGenerationMode": "extra bits",
+                "tests": [
                     {
-                      "type": "SigVer",
-		      "curve" : "P-256", 
-		      "sha" : "SHA-256",
-                      "tests": [
-                        {
-                          "tcId": 2170,
-			  "Msg" : "b6a3a0a5c8aecf753242d0bb1465e71b450532d29574f81b4d2a63c165ed63dce2add4aa85a849bf7e5e78cec9a2a56908d67ecfbbbac367b8305dc190298d011a42da17999841dfaf8d083f9153eb9bc91433fcf9548340040f90cd3175faa890ae81002351f7bf9c093d1585a671ed4b95315796fbe929a620553b69c79e95",
-			  "qx" : "d97f2a944063befe63a07b708629638fd658d049207982dc4b810582d21beb77",
-			  "qy" : "6528f1e1342d38f6f862aa446202bff1c55546187c2c42a1b4ebdaee506aeb7e",
-			  "r" : "f057a51efd6a889793a5e57b71aedf5545ef8ca91ffa1145cc11fe305f732de1",
-			  "s" : "c35557c560c5e035edd8ce72980f054f0467450c25a8d2f8ceea0ab2676bd92e"
-                        }
-                      ]
+                        "tcId": 1
                     }
-                  ]
-                }
-             ]
-            ]]></artwork>
-      </figure>
-    </section>
-    <section anchor="app-results-ex" title="Example Test Results JSON Object">
-      <t>The following is a example JSON object for ECDSA2 test results sent from the crypto module to the ACVP server.</t>
-      <figure>
-        <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.3" },
-                  { "vsId": 1564,
-                    "testResults": [
-                        {
-                            "tcId": 2170,
-			    "result" : "Pass"
-                        }
-                    ]
-                }
-             ]
-            ]]></artwork>
-        </figure>
-    </section>
-  </back>
+                ]
+            }
+        ]
+    }
+]
+            ]]>
+					</artwork>
+				</figure>
+				<t>The following is a example JSON object for ECDSA KeyGen test results sent from the crypto module to the ACVP server.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "testResults": [
+            {
+                "tcId": 1,
+                "qx": "7B1AA6BE712542282B8D088C233168CA4409E20264E32897C201ABA9",
+                "qy": "BCC9213347A7F988A2FF9EF14C85254B23AF0096F947CECB6C3311D2",
+                "d": "38524F26660BBA72E74EB39DEF38558EB07CB15255A09652B222CCE0"
+            }
+        ]
+    }
+]
+            ]]>
+					</artwork>
+				</figure>
+			</section>
+			<section anchor="app-vs-ex7" title="Example Test ECDSA KeyVer JSON Object">
+				<t>The following is a example JSON object for ECDSA KeyVer, test vectors sent from the ACVP server to the crypto module and the response.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "ECDSA",
+        "mode": "keyVer",
+        "testGroups": [
+            {
+                "curve": "p-192",
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "qx": "01ED77E3F1591D2EC730D0ED6D592F8DD24158D0E696408DBD",
+                        "qy": "BF31C6463EB1B6B55C8930550B88CF8D1F6432A832B40FB4"
+                    }
+                ]
+            }
+        ]
+    }
+]
+            ]]>
+					</artwork>
+				</figure>
+				<t>The following is a example JSON object for ECDSA KeyVer test results sent from the crypto module to the ACVP server.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "testResults": [
+            {
+                "tcId": 1,
+                "result": "failed"
+            }
+        ]
+    }
+]
+            ]]>
+					</artwork>
+				</figure>
+			</section>
+			<section anchor="app-vs-ex8" title="Example Test ECDSA Signature Generation JSON Object">
+				<t>The following is a example JSON object for ECDSA SigGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "ECDSA",
+        "mode": "sigGen",
+        "testGroups": [
+            {
+                "curve": "p-224",
+                "hashAlg": "sha2-224",
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "message": "AB6F57713A3BD323B4AFDCFBE202EE00A9CF5C787D19FD9094323C57FEA8B7FBE31559EC1CAC6D29C3229A58811CF2BAE2B78183DFDABD055B741EA86496454F085D17D5BCD1B82B533B533A1E5804B2DAA0ED43F8BF59FBEB16BDD4D7C065165CB9B085CECD5BCFFA794339D5A81B1949F569CAACA208B9E3E6A217A1B3A596"
+                    }
+                ]
+            }
+        ]
+    }
+]
+            ]]>
+					</artwork>
+				</figure>
+				<t>The following is a example JSON object for ECDSA SigGen test results sent from the crypto module to the ACVP server.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "testResults": [
+            {
+                "tcId": 1,
+                "qx": "3B1D9E4D986F651C3C213B2A1304693BDB8BA632CB93A3547B89EF31",
+                "qy": "E56F7B7C9E6355E573B7B3B6C0E1ECD70E4ABDF1554EAD8A68ABA1A4",
+                "r": "3E2A9588DF3D3F11B16368A30C8C34C572655BA8516AF5C914E94FF4",
+                "s": "C6E4A8C51E0A0E11C4C6D6F8F3C51A0FA440BC6FF28EBACDBB20922A"
+            }
+        ]
+    }
+]
+          ]]>
+					</artwork>
+				</figure>
+			</section>
+			<section anchor="app-vs-ex9" title="Example Test ECDSA SigVer JSON Object">
+				<t>The following is a example JSON object for ECDSA SigVer, test vectors sent from the ACVP server to the crypto module and the response.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "ECDSA",
+        "mode": "sigVer",
+        "testGroups": [
+            {
+                "curve": "p-192",
+                "hashAlg": "sha-1",
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "message": "D38A81D0C5201BA4A06A8C4760AC15DB266B17B48B13EA69775D1E896486D9D986A464D3469941F93FC65556E2CB8AB5F113E7ADCB8D50375DC76907195B6AF6C06F13EB6106EF0E19E241DB4B4831E06437E5CF7C9A499A8FC6DA36A75BDB81A2A19E14ACEFECD7E364471527E0FE37FD1162F5DD0D975E83C0DA4EDDD37261",
+                        "qx": "B08AFEAC74E42C66EBAF13807E2EB5769F5123645C0B8491",
+                        "qy": "55847857E5E48025BE9053952E0E1ECFB1D883CF9F085386",
+                        "r": "E31121E544D476DC3FA79B4DCB0A7252B6E80468BBF22843",
+                        "s": "6E3F47F2327E36AD936E0F4BE245C05F264BA9300E9E7DD9"
+                    }
+                ]
+            }
+        ]
+    }
+]
+            ]]>
+					</artwork>
+				</figure>
+				<t>The following is a example JSON object for ECDSA generation test results sent from the crypto module to the ACVP server.</t>
+				<figure>
+					<artwork>
+						<![CDATA[
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "testResults": [
+            {
+                "tcId": 1,
+                "result": "failed"
+            }
+        ]
+    }
+]
+          ]]>
+					</artwork>
+				</figure>
+			</section>
+		</section>
+	</back>
 </rfc>
