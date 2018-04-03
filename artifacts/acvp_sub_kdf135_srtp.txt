@@ -62,22 +62,20 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
-   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
      2.1.  Required Prerequisite Algorithms for KDF135 SRTP
            Validations . . . . . . . . . . . . . . . . . . . . . . .   3
      2.2.  KDF135 SRTP Algorithm Capabilities JSON Values  . . . . .   4
-     2.3.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   4
-     2.4.  Supported SP800-135 SRTP KDF Methods  . . . . . . . . . .   5
    3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
      3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
-     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .   7
+     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .   6
    4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   7
    5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
-   Appendix A.  Example SP800-135 SRTP KDF Capabilities JSON Object    9
-   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   9
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   8
+   Appendix A.  Example SP800-135 SRTP KDF Capabilities JSON Object    8
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  10
    Appendix C.  Example Test Results JSON Object . . . . . . . . . .  10
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
 
@@ -102,10 +100,12 @@ Table of Contents
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted in RFC 2119 [RFC2119].
 
+2.  Capabilities Registration
 
-
-
-
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
 
 
 
@@ -114,12 +114,6 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-2.  Capabilities Registration
-
-   ACVP requires crypto modules to register their capabilities.  This
-   allows the crypto module to advertise support for specific
-   algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
    the constructs for advertising support of SP800-135 SRTP KDF
    algorithms to the ACVP server.
 
@@ -153,13 +147,19 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |              | number       |               | or       |          |
    |              |              |               | "same"   |          |
    |              |              |               |          |          |
-   | prereqAlgVal | prerequistie | object with   | see      | Yes      |
+   | prereqAlgVal | prerequistie | object with   | see      | No       |
    |              | algorithm    | algorithm and | above    |          |
    |              | validation   | valValue      |          |          |
    |              |              | properties    |          |          |
+   |              |              |               |          |          |
+   | prereqVals   | prerequistie | array of      | see      | No       |
+   |              | algorithm    | prereqAlgVal  | above    |          |
+   |              | validations  | objects       |          |          |
    +--------------+--------------+---------------+----------+----------+
 
            Table 1: Required Prerequisite Algorithms JSON Values
+
+
 
 
 
@@ -175,49 +175,49 @@ Internet-Draft                Sym Alg JSON                     June 2016
    Each algorithm capability advertised is a self-contained JSON object
    using the following values.
 
-   +------------+--------------+--------------+-------------+----------+
-   | JSON Value | Description  | JSON type    | Valid       | Optional |
-   |            |              |              | Values      |          |
-   +------------+--------------+--------------+-------------+----------+
-   | algorithm  | The KDF to   | value        | See Section | No       |
-   |            | be validated |              | 2.3         |          |
-   |            |              |              |             |          |
-   | prereqVals | Prerequisite | array of     | See Section | No       |
-   |            | algorithm    | prereqAlgVal | 2.1         |          |
-   |            | validations  | objects      |             |          |
-   |            |              |              |             |          |
-   | methods    | Type of      | array        | See Section | No       |
-   |            | method or    |              | 2.4         |          |
-   |            | algorithm    |              |             |          |
-   |            | supported    |              |             |          |
-   |            |              |              |             |          |
-   | kdr0       | Key          | array        | all, 1-24   | No       |
-   |            | Derivation   |              |             |          |
-   |            | Rate 0       |              |             |          |
-   |            |              |              |             |          |
-   | kdr1       | Key          | array        | all, 1-24   | No       |
-   |            | Derivation   |              |             |          |
-   |            | Rate 1       |              |             |          |
-   +------------+--------------+--------------+-------------+----------+
-
-      Table 2: SP800-135 SRTP KDF Algorithm Capabilities JSON Values
-
-   Note: Some optional values are required depending on the algorithm.
-   Failure to provide these values will result in the ACVP server
-   returning an error to the ACVP client during registration.
-
-2.3.  Supported SP800-135 KDF Algorithms
-
-   The following SP800-135 KDF algorithms may be advertised by the ACVP
-   compliant crypto module:
-
-   o  IKEv1
-
-   o  IKEv2
-
-   o  TLS
-
-   o  ANSI X9.63
+   +--------------+------------+------------+----------------+---------+
+   | JSON Value   | Descriptio | JSON type  | Valid Values   | Optiona |
+   |              | n          |            |                | l       |
+   +--------------+------------+------------+----------------+---------+
+   | algorithm    | The KDF to | value      | "kdf-          | No      |
+   |              | be         |            | components"    |         |
+   |              | validated  |            |                |         |
+   |              |            |            |                |         |
+   | mode         | The KDF-   | value      | "srtp"         | No      |
+   |              | Component  |            |                |         |
+   |              | to be      |            |                |         |
+   |              | validated  |            |                |         |
+   |              |            |            |                |         |
+   | prereqVals   | Prerequisi | array of p | See Section    | No      |
+   |              | te         | rereqAlgVa | 2.1            |         |
+   |              | algorithm  | l objects  |                |         |
+   |              | validation |            |                |         |
+   |              | s          |            |                |         |
+   |              |            |            |                |         |
+   | aesKeyLength | AES Key    | array      | Any non-empty  | No      |
+   |              | sizes the  |            | subset of      |         |
+   |              | IUT        |            | {128, 192,     |         |
+   |              | supports   |            | 256}.          |         |
+   |              |            |            |                |         |
+   | supportsZero | Whether or | boolean    | true/false     | No      |
+   | Kdr          | not the    |            |                |         |
+   |              | IUT        |            |                |         |
+   |              | supports   |            |                |         |
+   |              | an empty   |            |                |         |
+   |              | KDR        |            |                |         |
+   |              |            |            |                |         |
+   | kdrExponent  | Key        | array      | integers from  | No      |
+   |              | Derivation |            | 1 to 24        |         |
+   |              | Rate as an |            | inclusive      |         |
+   |              | exponent   |            |                |         |
+   |              | of 2. So a |            |                |         |
+   |              | supported  |            |                |         |
+   |              | value of   |            |                |         |
+   |              | 3, corresp |            |                |         |
+   |              | onds to an |            |                |         |
+   |              | actual KDF |            |                |         |
+   |              | of 2^3 or  |            |                |         |
+   |              | "04" in    |            |                |         |
 
 
 
@@ -226,24 +226,19 @@ Fussell                 Expires December 3, 2016                [Page 4]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   o  SSH
+   |              | hex, as    |            |                |         |
+   |              | the third  |            |                |         |
+   |              | least sign |            |                |         |
+   |              | ificant    |            |                |         |
+   |              | bit is a   |            |                |         |
+   |              | 1.         |            |                |         |
+   +--------------+------------+------------+----------------+---------+
 
-   o  SRTP
+      Table 2: SP800-135 SRTP KDF Algorithm Capabilities JSON Values
 
-   o  SNMP
-
-   o  TPM
-
-2.4.  Supported SP800-135 SRTP KDF Methods
-
-   The following SP800-135 SRTP KDF methods may be advertised by the
-   ACVP compliant crypto module:
-
-   o  AES-128-CBC
-
-   o  AES-192-CBC
-
-   o  AES-256-CBC
+   Note: Some optional values are required depending on the algorithm.
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
 
 3.  Test Vectors
 
@@ -260,28 +255,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    test vectors to be processed by the ACVP client.The following table
    describes the JSON elements at the top level of the hierarchy.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
    +------------+---------------------------------------------+--------+
    | JSON Value | Description                                 | JSON   |
    |            |                                             | type   |
@@ -291,13 +264,23 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | vsId       | Unique numeric identifier for the vector    | value  |
    |            | set                                         |        |
    |            |                                             |        |
-   | algorithm  | SRTP                                        | value  |
+   | algorithm  | "kdf-components"                            | value  |
+   |            |                                             |        |
+   | mode       | "srtp"                                      | value  |
    |            |                                             |        |
    | testGroups | Array of test group JSON objects, which are | array  |
    |            | defined in Section 3.1                      |        |
    +------------+---------------------------------------------+--------+
 
                       Table 3: Vector Set JSON Object
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
 3.1.  Test Groups JSON Schema
 
@@ -312,21 +295,38 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    The KDF test group for SRTP is as follows:
 
-   +--------+---------------------------------------+-------+----------+
-   | JSON   | Description                           | JSON  | Optional |
-   | Value  |                                       | type  |          |
-   +--------+---------------------------------------+-------+----------+
-   | method | The method used for the test vectors. | value | No       |
-   |        | See Section 2.4 for possible values   |       |          |
-   |        |                                       |       |          |
-   | kdr    | The Key Derivation Rate used          | value | No       |
-   |        |                                       |       |          |
-   | tests  | Array of individual test vector JSON  | array | No       |
-   |        | objects, which are defined in Section |       |          |
-   |        | 3.2                                   |       |          |
-   +--------+---------------------------------------+-------+----------+
+   +--------------+---------------------------------+-------+----------+
+   | JSON Value   | Description                     | JSON  | Optional |
+   |              |                                 | type  |          |
+   +--------------+---------------------------------+-------+----------+
+   | aesKeyLength | The AES Key Length used in the  | value | No       |
+   |              | test group.                     |       |          |
+   |              |                                 |       |          |
+   | kdr          | The Key Derivation Rate used    | value | No       |
+   |              |                                 |       |          |
+   | tests        | Array of individual test vector | array | No       |
+   |              | JSON objects, which are defined |       |          |
+   |              | in Section 3.2                  |       |          |
+   +--------------+---------------------------------+-------+----------+
 
                      Table 4: Vector Group JSON Object
+
+3.2.  Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each SP800-135 SRTP KDF test vector.
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -338,13 +338,6 @@ Fussell                 Expires December 3, 2016                [Page 6]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-3.2.  Test Case JSON Schema
-
-   Each test group contains an array of one or more test cases.  Each
-   test case is a JSON object that represents a single test vector to be
-   processed by the ACVP client.  The following table describes the JSON
-   elements for each SP800-135 SRTP KDF test vector.
-
    +------------+-----------------------------------+-------+----------+
    | JSON Value | Description                       | JSON  | Optional |
    |            |                                   | type  |          |
@@ -353,15 +346,13 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |            | case, unique across the entire    |       |          |
    |            | vector set.                       |       |          |
    |            |                                   |       |          |
-   | kMaster    | Master key value                  | value | No       |
+   | masterKey  | Master key value                  | value | No       |
    |            |                                   |       |          |
-   | mSalt      | Master salt value                 | value | No       |
+   | masterSalt | Master salt value                 | value | No       |
    |            |                                   |       |          |
-   | kdr        | Key derivation rate value         | value | No       |
+   | index      | Index value for SCTP              | value | No       |
    |            |                                   |       |          |
-   | indexSCTP  | Index value for SCTP              | value | No       |
-   |            |                                   |       |          |
-   | indexSRTCP | Index value for SRTCP             | value | No       |
+   | srtcpIndex | Index value for SRTCP             | value | No       |
    +------------+-----------------------------------+-------+----------+
 
                       Table 5: Test Case JSON Object
@@ -372,27 +363,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    send the response vectors back to the ACVP server.  The following
    table describes the JSON object that represents a vector set
    response.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 7]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -413,20 +383,31 @@ Internet-Draft                Sym Alg JSON                     June 2016
    The following table describes the JSON object that represents a
    vector set response for SRTP.
 
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
            +------------+--------------------------+-----------+
            | JSON Value | Description              | JSON type |
            +------------+--------------------------+-----------+
-           | srtpKE     | SRTP encryption key      | value     |
+           | srtpKe     | SRTP encryption key      | value     |
            |            |                          |           |
-           | srtpKA     | SRTP authentication key  | value     |
+           | srtpKa     | SRTP authentication key  | value     |
            |            |                          |           |
-           | srtpKS     | SRTP salting key         | value     |
+           | srtpKs     | SRTP salting key         | value     |
            |            |                          |           |
-           | srtcpKE    | SRTCP encryption key     | value     |
+           | srtcpKe    | SRTCP encryption key     | value     |
            |            |                          |           |
-           | srtcpKA    | SRTCP authentication key | value     |
+           | srtcpKa    | SRTCP authentication key | value     |
            |            |                          |           |
-           | srtcpKS    | SRTCP salting key        | value     |
+           | srtcpKs    | SRTCP salting key        | value     |
            +------------+--------------------------+-----------+
 
                  Table 7: Vector Set Response JSON Object
@@ -439,17 +420,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    This memo includes no request to IANA.
 
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 8]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
 7.  Security Considerations
 
    Security considerations are addressed by the ACVP specification.
@@ -461,7 +431,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
+              <https://www.rfc-editor.org/info/rfc2119>.
 
 Appendix A.  Example SP800-135 SRTP KDF Capabilities JSON Object
 
@@ -470,28 +440,58 @@ Appendix A.  Example SP800-135 SRTP KDF Capabilities JSON Object
 
 
 
-            {
-                "algorithm": "SRTP",
-                "prereqVals" : [{"algorithm" : "AES", "valValue" : "123456"}],
-                "methods" : ["AES-128-CBC", "AES-192-CBC", "AES-256-CBC" ],
-                "kdr" : [ "all"]
-            }
-
-Appendix B.  Example Test Vectors JSON Object
-
-   The following is a example JSON object for SP800-135 SRTP KDF test
-   vectors sent from the ACVP server to the crypto module.
 
 
 
 
 
+Fussell                 Expires December 3, 2016                [Page 8]
+
+Internet-Draft                Sym Alg JSON                     June 2016
 
 
-
-
-
-
+   {
+       "algorithm": "kdf-components",
+       "mode": "srtp",
+       "prereqVals": [
+           {
+               "algorithm": "AES",
+               "valValue": "123456"
+           }
+       ],
+       "AesKeyLength": [
+           128,
+           192,
+           256
+       ],
+       "SupportsZeroKdr": true,
+       "KdrExponent": [
+           1,
+           2,
+           3,
+           4,
+           5,
+           6,
+           7,
+           8,
+           9,
+           10,
+           11,
+           12,
+           13,
+           14,
+           15,
+           16,
+           17,
+           18,
+           19,
+           20,
+           21,
+           22,
+           23,
+           24
+       ]
+   }
 
 
 
@@ -506,51 +506,51 @@ Fussell                 Expires December 3, 2016                [Page 9]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-              [
-                { "acvVersion": "0.3" },
-                { "vsId": 1564,
-                  "algorithm": "SRTP",
-                  "testGroups": [
-                    {
-                      "method": "AES-128-CBC",
-                      "kdr" : "all",
-                      "tests": [
-                        {
-                          "tcId": 2170,
-                          "kMaster" : "3a18bc2b15738e054f87014c9096da98",
-                          "mSalt" : "85b9fa33b28a76b844fd453c3af7",
-                          "kdr" : "000000000000",
-                          "indexSCTP" : "92373bee6572",
-                          "indexSRTCP" : "1dfb5e64"
+Appendix B.  Example Test Vectors JSON Object
 
-                        }
-                      ]
+   The following is a example JSON object for SP800-135 SRTP KDF test
+   vectors sent from the ACVP server to the crypto module.
+
+
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "SRTP",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "kdr": "00",
+                "aesKeyLength": 128,
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "masterKey": "AD16913E52D9C2A6D8E1D3CB90E4FDAD",
+                        "masterSalt": "2AB06C2BCC07C7AF364F3BE6EAEC",
+                        "index": "B18C1C4ED637",
+                        "srtcpIndex": "20FB9BB3"
                     }
-                  ]
-                }
-             ]
+                ]
+            }
+        ]
+    }
+]
+
 
 Appendix C.  Example Test Results JSON Object
 
    The following is a example JSON object for SP800-135 SRTP KDF test
    results sent from the crypto module to the ACVP server.
 
-              [
-                  { "acvVersion": "0.3" },
-                  { "vsId": 1564,
-                    "testResults": [
-                        {
-                            "tcId": 2170,
-                            "srtpKE" : "82e463c444f177ff459829c59e4c31e7",
-                            "srtpKA" : "986bfe23803a98ad28abcc09466f758770244f34",
-                            "srtpKS" : "1338f50d9ba6511c9a5c6360ad6e",
-                            "srtcpKE" : "4e0c1fdf228b3564b6d2061bcf49d3ff",
-                            "srtcpKA" : "0fd8416b54975965fd12ac4a84428dceea41281c",
-                            "srtcpKS" : "88357f3f7c2c556b1f9a8ccbdbbf"
-                        }
-                    ]
-                }
-             ]
+
+
+
+
+
+
+
 
 
 
@@ -562,6 +562,27 @@ Fussell                 Expires December 3, 2016               [Page 10]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+  [
+      {
+          "acvVersion": "0.4"
+      },
+      {
+          "vsId": 1564,
+          "testResults": [
+              {
+                  "tcId": 1,
+                  "srtpKe": "94AD7DB37D198F049375BD461E90D9E5",
+                  "srtpKa": "51E18978366B7EFF4E3EE57DCBC50636AAF19F39",
+                  "srtpKs": "7157797656C383BD69192B036C0A",
+                  "srtcpKe": "5707D07782D6FE0030635106A487D97C",
+                  "srtcpKa": "097ECF3E2965DF071180F5F126C2D54A548B902F",
+                  "srtcpKs": "72DF8546DDB209875A5209786E4B"
+              }
+          ]
+      }
+  ]
+
+
 Author's Address
 
    Barry Fussell (editor)
@@ -571,27 +592,6 @@ Author's Address
    USA
 
    Email: bfussell@cisco.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
