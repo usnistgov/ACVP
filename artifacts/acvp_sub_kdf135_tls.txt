@@ -62,14 +62,12 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
-   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
      2.1.  Required Prerequisite Algorithms for KDF135 TLS
            Validations . . . . . . . . . . . . . . . . . . . . . . .   3
      2.2.  KDF135 TLS Algorithm Capabilities JSON Values . . . . . .   4
-     2.3.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   4
-     2.4.  Supported SP800-135 TLS KDF Methods . . . . . . . . . . .   5
    3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
      3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .   6
    4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   7
    5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
@@ -78,8 +76,8 @@ Table of Contents
    8.  Normative References  . . . . . . . . . . . . . . . . . . . .   8
    Appendix A.  Example SP800-135 TLS KDF Capabilities JSON Object .   8
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   9
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   9
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
 
 1.  Introduction
 
@@ -102,10 +100,12 @@ Table of Contents
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted in RFC 2119 [RFC2119].
 
+2.  Capabilities Registration
 
-
-
-
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
 
 
 
@@ -114,12 +114,6 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-2.  Capabilities Registration
-
-   ACVP requires crypto modules to register their capabilities.  This
-   allows the crypto module to advertise support for specific
-   algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
    the constructs for advertising support of SP800-135 TLS KDF
    algorithms to the ACVP server.
 
@@ -153,13 +147,19 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |              | number       |               | or       |          |
    |              |              |               | "same"   |          |
    |              |              |               |          |          |
-   | prereqAlgVal | prerequistie | object with   | see      | Yes      |
+   | prereqAlgVal | prerequistie | object with   | see      | No       |
    |              | algorithm    | algorithm and | above    |          |
    |              | validation   | valValue      |          |          |
    |              |              | properties    |          |          |
+   |              |              |               |          |          |
+   | prereqVals   | prerequistie | array of      | see      | No       |
+   |              | algorithm    | prereqAlgVal  | above    |          |
+   |              | validations  | objects       |          |          |
    +--------------+--------------+---------------+----------+----------+
 
            Table 1: Required Prerequisite Algorithms JSON Values
+
+
 
 
 
@@ -175,26 +175,42 @@ Internet-Draft                Sym Alg JSON                     June 2016
    Each algorithm capability advertised is a self-contained JSON object
    using the following values.
 
-   +------------+--------------+--------------+-------------+----------+
-   | JSON Value | Description  | JSON type    | Valid       | Optional |
-   |            |              |              | Values      |          |
-   +------------+--------------+--------------+-------------+----------+
-   | algorithm  | The KDF to   | value        | See Section | No       |
-   |            | be validated |              | 2.3         |          |
-   |            |              |              |             |          |
-   | prereqVals | Prerequisite | array of     | See Section | No       |
-   |            | algorithm    | prereqAlgVal | 2.1         |          |
-   |            | validations  | objects      |             |          |
-   |            |              |              |             |          |
-   | methods    | Type of      | array        | See Section | No       |
-   |            | method or    |              | 2.4         |          |
-   |            | algorithm    |              |             |          |
-   |            | supported    |              |             |          |
-   |            |              |              |             |          |
-   | sha        | SHA          | array        | SHA-256,    | Yes      |
-   |            | functions    |              | SHA-384,    |          |
-   |            | supported    |              | SHA-512     |          |
-   +------------+--------------+--------------+-------------+----------+
+   +----------+-------------+-------------+-----------------+----------+
+   | JSON     | Description | JSON type   | Valid Values    | Optional |
+   | Value    |             |             |                 |          |
+   +----------+-------------+-------------+-----------------+----------+
+   | algorith | The KDF to  | value       | "kdf-           | No       |
+   | m        | be          |             | components"     |          |
+   |          | validated   |             |                 |          |
+   |          |             |             |                 |          |
+   | mode     | The KDF-    | value       | "tls"           | No       |
+   |          | Component   |             |                 |          |
+   |          | to be       |             |                 |          |
+   |          | validated   |             |                 |          |
+   |          |             |             |                 |          |
+   | prereqVa | Prerequisit | array of pr | See Section 2.1 | No       |
+   | ls       | e algorithm | ereqAlgVal  |                 |          |
+   |          | validations | objects     |                 |          |
+   |          |             |             |                 |          |
+   | tlsVersi | The version | array       | "v1.0/1.1", and | No       |
+   | on       | of TLS      |             | "v1.2"          |          |
+   |          | supported.  |             |                 |          |
+   |          |             |             |                 |          |
+   | hashAlg  | SHA         | array       | SHA-256,        | Yes      |
+   |          | functions   |             | SHA-384,        |          |
+   |          | supported   |             | SHA-512         |          |
+   |          | if TLS      |             |                 |          |
+   |          | Version     |             |                 |          |
+   |          | "v1.2" is   |             |                 |          |
+   |          | included in |             |                 |          |
+   |          | the registr |             |                 |          |
+   |          | ation. Note |             |                 |          |
+   |          | this field  |             |                 |          |
+   |          | is only     |             |                 |          |
+   |          | required    |             |                 |          |
+   |          | when "v1.2" |             |                 |          |
+   |          | is present. |             |                 |          |
+   +----------+-------------+-------------+-----------------+----------+
 
        Table 2: SP800-135 TLS KDF Algorithm Capabilities JSON Values
 
@@ -202,22 +218,6 @@ Internet-Draft                Sym Alg JSON                     June 2016
    Failure to provide these values will result in the ACVP server
    returning an error to the ACVP client during registration.
 
-2.3.  Supported SP800-135 KDF Algorithms
-
-   The following SP800-135 KDF algorithms may be advertised by the ACVP
-   compliant crypto module:
-
-   o  IKEv1
-
-   o  IKEv2
-
-   o  TLS
-
-   o  ANSI X9.63
-
-   o  SSH
-
-   o  SRTP
 
 
 
@@ -225,19 +225,6 @@ Fussell                 Expires December 3, 2016                [Page 4]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
-
-   o  SNMP
-
-   o  TPM
-
-2.4.  Supported SP800-135 TLS KDF Methods
-
-   The following SP800-135 TLS KDF methods may be advertised by the ACVP
-   compliant crypto module:
-
-   o  TLS 1.0/1.1
-
-   o  TLS 1.2
 
 3.  Test Vectors
 
@@ -263,24 +250,15 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | vsId       | Unique numeric identifier for the vector    | value  |
    |            | set                                         |        |
    |            |                                             |        |
-   | algorithm  | TLS                                         | value  |
+   | algorithm  | "kdf-components"                            | value  |
+   |            |                                             |        |
+   | mode       | "tls"                                       | value  |
    |            |                                             |        |
    | testGroups | Array of test group JSON objects, which are | array  |
    |            | defined in Section 3.1                      |        |
    +------------+---------------------------------------------+--------+
 
                       Table 3: Vector Set JSON Object
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
 3.1.  Test Groups JSON Schema
 
@@ -295,24 +273,35 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    The KDF test group for TLS is as follows:
 
-   +---------+--------------------------------------+-------+----------+
-   | JSON    | Description                          | JSON  | Optional |
-   | Value   |                                      | type  |          |
-   +---------+--------------------------------------+-------+----------+
-   | methods | The method used for the test         | value | No       |
-   |         | vectors.  See Section 2.4 for        |       |          |
-   |         | possible values                      |       |          |
-   |         |                                      |       |          |
-   | sha     | SHA version used                     | value | Yes      |
-   |         |                                      |       |          |
-   | pmLen   | Pre-master secret length in bits     | value | No       |
-   |         |                                      |       |          |
-   | kbLen   | Key block length in bits             | value | No       |
-   |         |                                      |       |          |
-   | tests   | Array of individual test vector JSON | array | No       |
-   |         | objects, which are defined in        |       |          |
-   |         | Section 3.2                          |       |          |
-   +---------+--------------------------------------+-------+----------+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 5]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+   +-----------------------+------------------------+-------+----------+
+   | JSON Value            | Description            | JSON  | Optional |
+   |                       |                        | type  |          |
+   +-----------------------+------------------------+-------+----------+
+   | tlsVersion            | The version of TLS     | value | No       |
+   |                       | used in the test group |       |          |
+   |                       |                        |       |          |
+   | hashAlg               | SHA version used       | value | Yes      |
+   |                       |                        |       |          |
+   | preMasterSecretLength | Pre-master secret      | value | No       |
+   |                       | length in bits         |       |          |
+   |                       |                        |       |          |
+   | keyBlockLength        | Key block length in    | value | No       |
+   |                       | bits                   |       |          |
+   |                       |                        |       |          |
+   | tests                 | Array of individual    | array | No       |
+   |                       | test vector JSON       |       |          |
+   |                       | objects, which are     |       |          |
+   |                       | defined in Section 3.2 |       |          |
+   +-----------------------+------------------------+-------+----------+
 
                      Table 4: Vector Group JSON Object
 
@@ -333,29 +322,40 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 Fussell                 Expires December 3, 2016                [Page 6]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +----------+-------------------------------------+-------+----------+
-   | JSON     | Description                         | JSON  | Optional |
-   | Value    |                                     | type  |          |
-   +----------+-------------------------------------+-------+----------+
-   | tcId     | Numeric identifier for the test     | value | No       |
-   |          | case, unique across the entire      |       |          |
-   |          | vector set.                         |       |          |
-   |          |                                     |       |          |
-   | pmSecret | Pre-master secret value             | value | No       |
-   |          |                                     |       |          |
-   | shRND    | Server Hello random value           | value | No       |
-   |          |                                     |       |          |
-   | chRND    | Client Hello random value           | value | No       |
-   |          |                                     |       |          |
-   | sRND     | Server random value                 | value | No       |
-   |          |                                     |       |          |
-   | cRND     | Client random value                 | value | No       |
-   +----------+-------------------------------------+-------+----------+
+   +-------------------+----------------------------+-------+----------+
+   | JSON Value        | Description                | JSON  | Optional |
+   |                   |                            | type  |          |
+   +-------------------+----------------------------+-------+----------+
+   | tcId              | Numeric identifier for the | value | No       |
+   |                   | test case, unique across   |       |          |
+   |                   | the entire vector set.     |       |          |
+   |                   |                            |       |          |
+   | preMasterSecret   | Pre-master secret value    | value | No       |
+   |                   |                            |       |          |
+   | serverHelloRandom | Server Hello random value  | value | No       |
+   |                   |                            |       |          |
+   | clientHelloRandom | Client Hello random value  | value | No       |
+   |                   |                            |       |          |
+   | serverRandom      | Server random value        | value | No       |
+   |                   |                            |       |          |
+   | clientRandom      | Client random value        | value | No       |
+   +-------------------+----------------------------+-------+----------+
 
                       Table 5: Test Case JSON Object
 
@@ -371,8 +371,10 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |             |                                             | type  |
    +-------------+---------------------------------------------+-------+
    | acvVersion  | Protocol version identifier                 | value |
+   |             |                                             |       |
    | vsId        | Unique numeric identifier for the vector    | value |
    |             | set                                         |       |
+   |             |                                             |       |
    | testResults | Array of JSON objects that represent each   | array |
    |             | test vector result, as defined by the       |       |
    |             | tables below                                |       |
@@ -387,20 +389,18 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-
-
 Fussell                 Expires December 3, 2016                [Page 7]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-    +------------+---------------------------------------+-----------+
-    | JSON Value | Description                           | JSON type |
-    +------------+---------------------------------------+-----------+
-    | mSecret    | Master secret value                   | value     |
-    |            |                                       |           |
-    | kBlock     | Key block value of the expansion step | value     |
-    +------------+---------------------------------------+-----------+
+   +--------------+---------------------------------------+-----------+
+   | JSON Value   | Description                           | JSON type |
+   +--------------+---------------------------------------+-----------+
+   | masterSecret | Master secret value                   | value     |
+   |              |                                       |           |
+   | keyBlock     | Key block value of the expansion step | value     |
+   +--------------+---------------------------------------+-----------+
 
                  Table 7: Vector Set Response JSON Object
 
@@ -423,7 +423,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
+              <https://www.rfc-editor.org/info/rfc2119>.
 
 Appendix A.  Example SP800-135 TLS KDF Capabilities JSON Object
 
@@ -432,13 +432,13 @@ Appendix A.  Example SP800-135 TLS KDF Capabilities JSON Object
 
 
 
-            {
-                "algorithm": "TLS",
-                "prereqVals" : [{"algorithm" : "HMAC", "valValue" : "123456"},
-                                {"algorithm" : "SHA", "valValue" : "123456"}],
-                "methods" : ["TLS1.0/1.1", "TLS1.2"],
-                "sha" : [ "SHA-256", "SHA-384", "SHA-512"]
-            }
+
+
+
+
+
+
+
 
 
 
@@ -450,53 +450,53 @@ Fussell                 Expires December 3, 2016                [Page 8]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
+   {
+       "algorithm": "kdf-components",
+       "mode": "tls",
+       "prereqVals": [
+           {
+               "algorithm": "HMAC",
+               "valValue": "123456"
+           },
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           }
+       ],
+       "TlsVersion": [
+           "v1.0/1.1",
+           "v1.2"
+       ],
+       "HashAlg": [
+           "sha2-256",
+           "sha2-384",
+           "sha2-512"
+       ]
+   }
+
+
 Appendix B.  Example Test Vectors JSON Object
 
    The following is a example JSON object for SP800-135 TLS KDF test
    vectors sent from the ACVP server to the crypto module.
 
-              [
-                { "acvVersion": "0.3" },
-                { "vsId": 1564,
-                  "algorithm": "TLS",
-                  "testGroups": [
-                    {
-                      "method": "TLS1.2",
-                      "sha" : "SHA-256",
-                      "pmLen" : 384,
-                      "kbLen" : 1024,
-                      "tests": [
-                        {
-                          "tcId": 2170,
-                          "pmSecret" : "1b4aecf96fc9029d4ce8c8539b6c97f25bcdf3510471f9607083dd2a6d25a0750bdfb2d87cb0ecc3046025c65d8d1a49",
-                          "shRND" : "45afd73d8cb73450898e1ed87ace19d14c5b10274771b331213181290b71fc2d",
-                          "chRND" : "75ee876ab02ea8fb3cb43426c7f28648946ae091281d66d35ff0e749d0547a6d",
-                          "sRND" : "d352f20cb79b7e8fea6274850a15963a852728609e29a1e7c54257031a91721a",
-                          "cRND" : "f667e99811fb1c226110ac606e7e06b11964956f22164d4b5d4e1304c2659436"
-                        }
-                      ]
-                    }
-                  ]
-                }
-             ]
 
-Appendix C.  Example Test Results JSON Object
 
-   The following is a example JSON object for SP800-135 TLS KDF test
-   results sent from the crypto module to the ACVP server.
 
-              [
-                  { "acvVersion": "0.3" },
-                  { "vsId": 1564,
-                    "testResults": [
-                        {
-                            "tcId": 2170,
-                            "mSecret" : "e9359c60c2b290b3666f3d1658e21c49fa2653f5b45b06815bfc45a9d01766e09d292bf7139f5621c4990a7360559c67",
-                            "kBlock" : "296f63ac740aa1f2953e86c9ae2073bc5d01d257fc20ec28c48c5f72d105a8ee408aeb56698f361a498b9be645de3ed4df6c6acb921517a3a962d3856f6a2cf749c13fbc2e2fb2d7b247e5adff311a348604213f2b137c49aac41cd657a0c2f50c6af92e48aa31e43fda97f2a60c4d4b1a4cf7a6ba49f4ecf4f96d9acb28c48"
-                        }
-                    ]
-                }
-             ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -504,6 +504,79 @@ Appendix C.  Example Test Results JSON Object
 Fussell                 Expires December 3, 2016                [Page 9]
 
 Internet-Draft                Sym Alg JSON                     June 2016
+
+
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "kdf-components",
+        "mode": "tls",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "tlsVersion": "v1.0/1.1",
+                "hashAlg": "SHA-1",
+                "preMasterSecretLength": 384,
+                "keyBlockLength": 832,
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "clientHelloRandom": "00D5EDFC0A7D8B0913DEB191B592B7AE03503F48E876D702CD7A467E823A416B",
+                        "serverHelloRandom": "14D06FC8F2792762BA9E5894147583C65D3BF0DA8D9FAE4CC46A443A675AF274",
+                        "clientRandom": "DDFB77CB1304A0541C6CC07779441F5018385111E368CE4D69C8E8E455737601",
+                        "serverRandom": "D59EB4E444005709409C572BA8A160EE10A8BAEFC5C70BBBDD79E57D648B8ADD",
+                        "preMasterSecret": "2F0D26CC2487169D83D95064A17BC70AE8C775A8C5228227A21184211B0EE26442520D7C9DA07578F8046A6A9D791351"
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for SP800-135 TLS KDF test
+   results sent from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016               [Page 10]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "testResults": [
+            {
+                "tcId": 1,
+                "masterSecret": "38E544579C06B3F515E1CE556E8F63D72694BAD1CC27F0896EFF2C0BC0BA82B958CB2B008191656DD76FCDD0A30A1375",
+                "keyBlock": "9F39392B46ABF3D852F4F31BE188909738749CAAF93A4AB6F1EBE645EAACE04B2F1792EFD16946D63674CEB0D75F44210502108ACDF4B2A6630E1706480807EC068FE16127430FF8B9C87EDE119BC91A9890D2761131169E1FB7DAC72282BB32B772BEC716C2D549"
+            }
+        ]
+    }
+]
 
 
 Author's Address
@@ -540,21 +613,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016               [Page 10]
+Fussell                 Expires December 3, 2016               [Page 11]
