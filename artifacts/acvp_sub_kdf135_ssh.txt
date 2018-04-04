@@ -62,24 +62,22 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
-   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
+   2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   2
      2.1.  Required Prerequisite Algorithms for KDF135 SSH
            Validations . . . . . . . . . . . . . . . . . . . . . . .   3
      2.2.  KDF135 SSH Algorithm Capabilities JSON Values . . . . . .   4
-     2.3.  Supported SP800-135 KDF Algorithms  . . . . . . . . . . .   4
-     2.4.  Supported SP800-135 SSH KDF Methods . . . . . . . . . . .   5
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   5
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   6
-     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .   7
-   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   8
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   9
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
-   Appendix A.  Example SP800-135 SSH KDF Capabilities JSON Object .   9
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .   5
+     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .   6
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .   6
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   8
+   Appendix A.  Example SP800-135 SSH KDF Capabilities JSON Object .   8
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .   9
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  10
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .   9
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
 
 1.  Introduction
 
@@ -102,10 +100,12 @@ Table of Contents
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted in RFC 2119 [RFC2119].
 
+2.  Capabilities Registration
 
-
-
-
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
 
 
 
@@ -114,12 +114,6 @@ Fussell                 Expires December 3, 2016                [Page 2]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-2.  Capabilities Registration
-
-   ACVP requires crypto modules to register their capabilities.  This
-   allows the crypto module to advertise support for specific
-   algorithms, notifying the ACVP server which algorithms need test
-   vectors generated for the validation process.  This section describes
    the constructs for advertising support of SP800-135 SSH KDF
    algorithms to the ACVP server.
 
@@ -144,22 +138,28 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | JSON Value   | Description  | JSON type     | Valid    | Optional |
    |              |              |               | Values   |          |
    +--------------+--------------+---------------+----------+----------+
-   | algorithm    | a            | value         | SHA      | No       |
-   |              | prerequisite |               |          |          |
-   |              | algorithm    |               |          |          |
+   | algorithm    | a            | value         | SHA,     | No       |
+   |              | prerequisite |               | AES,     |          |
+   |              | algorithm    |               | TDES     |          |
    |              |              |               |          |          |
    | valValue     | algorithm    | value         | actual   | No       |
    |              | validation   |               | number   |          |
    |              | number       |               | or       |          |
    |              |              |               | "same"   |          |
    |              |              |               |          |          |
-   | prereqAlgVal | prerequistie | object with   | see      | Yes      |
+   | prereqAlgVal | prerequistie | object with   | see      | No       |
    |              | algorithm    | algorithm and | above    |          |
    |              | validation   | valValue      |          |          |
    |              |              | properties    |          |          |
+   |              |              |               |          |          |
+   | prereqVals   | prerequistie | array of      | see      | No       |
+   |              | algorithm    | prereqAlgVal  | above    |          |
+   |              | validations  | objects       |          |          |
    +--------------+--------------+---------------+----------+----------+
 
            Table 1: Required Prerequisite Algorithms JSON Values
+
+
 
 
 
@@ -175,75 +175,38 @@ Internet-Draft                Sym Alg JSON                     June 2016
    Each algorithm capability advertised is a self-contained JSON object
    using the following values.
 
-   +------------+--------------+--------------+-------------+----------+
-   | JSON Value | Description  | JSON type    | Valid       | Optional |
-   |            |              |              | Values      |          |
-   +------------+--------------+--------------+-------------+----------+
-   | algorithm  | The KDF to   | value        | See Section | No       |
-   |            | be validated |              | 2.3         |          |
-   |            |              |              |             |          |
-   | prereqVals | Prerequisite | array of     | See Section | No       |
-   |            | algorithm    | prereqAlgVal | 2.1         |          |
-   |            | validations  | objects      |             |          |
-   |            |              |              |             |          |
-   | methods    | Type of      | array        | See Section | No       |
-   |            | method or    |              | 2.4         |          |
-   |            | algorithm    |              |             |          |
-   |            | supported    |              |             |          |
-   |            |              |              |             |          |
-   | sha        | SHA          | array        | SHA-1,      | No       |
-   |            | functions    |              | SHA-224,    |          |
-   |            | supported    |              | SHA-256,    |          |
-   |            |              |              | SHA-384,    |          |
-   |            |              |              | SHA-512     |          |
-   +------------+--------------+--------------+-------------+----------+
+   +----------+-------------+-------------+-----------------+----------+
+   | JSON     | Description | JSON type   | Valid Values    | Optional |
+   | Value    |             |             |                 |          |
+   +----------+-------------+-------------+-----------------+----------+
+   | algorith | The KDF to  | value       | "kdf-           | No       |
+   | m        | be          |             | components"     |          |
+   |          | validated   |             |                 |          |
+   |          |             |             |                 |          |
+   | mode     | The KDF-    | value       | "ssh"           | No       |
+   |          | Component   |             |                 |          |
+   |          | to be       |             |                 |          |
+   |          | validated   |             |                 |          |
+   |          |             |             |                 |          |
+   | prereqVa | Prerequisit | array of pr | See Section 2.1 | No       |
+   | ls       | e algorithm | ereqAlgVal  |                 |          |
+   |          | validations | objects     |                 |          |
+   |          |             |             |                 |          |
+   | cipher   | Block       | array       | tdes, aes-128,  | No       |
+   |          | ciphers     |             | aes-192,        |          |
+   |          | supported   |             | aes-256         |          |
+   |          |             |             |                 |          |
+   | hashAlg  | SHA         | array       | SHA-1, SHA-224, | No       |
+   |          | functions   |             | SHA-256,        |          |
+   |          | supported   |             | SHA-384,        |          |
+   |          |             |             | SHA-512         |          |
+   +----------+-------------+-------------+-----------------+----------+
 
        Table 2: SP800-135 SSH KDF Algorithm Capabilities JSON Values
 
    Note: Some optional values are required depending on the algorithm.
    Failure to provide these values will result in the ACVP server
    returning an error to the ACVP client during registration.
-
-2.3.  Supported SP800-135 KDF Algorithms
-
-   The following SP800-135 KDF algorithms may be advertised by the ACVP
-   compliant crypto module:
-
-   o  IKEv1
-
-   o  IKEv2
-
-   o  TLS
-
-   o  ANSI X9.63
-
-   o  SSH
-
-
-
-Fussell                 Expires December 3, 2016                [Page 4]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
-
-   o  SRTP
-
-   o  SNMP
-
-   o  TPM
-
-2.4.  Supported SP800-135 SSH KDF Methods
-
-   The following SP800-135 SSH KDF methods may be advertised by the ACVP
-   compliant crypto module:
-
-   o  TDES CBC
-
-   o  AES-128-CBC
-
-   o  AES-192-CBC
-
-   o  AES-256-CBC
 
 3.  Test Vectors
 
@@ -255,32 +218,18 @@ Internet-Draft                Sym Alg JSON                     June 2016
    such as SNMP, SSH, etc.  This section describes the JSON schema for a
    test vector set used with SP800-135 SSH KDF algorithms.
 
+
+
+
+Fussell                 Expires December 3, 2016                [Page 4]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
    The test vector set JSON schema is a multi-level hierarchy that
    contains meta data for the entire vector set as well as individual
    test vectors to be processed by the ACVP client.The following table
    describes the JSON elements at the top level of the hierarchy.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 5]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
    +------------+---------------------------------------------+--------+
    | JSON Value | Description                                 | JSON   |
@@ -291,7 +240,9 @@ Internet-Draft                Sym Alg JSON                     June 2016
    | vsId       | Unique numeric identifier for the vector    | value  |
    |            | set                                         |        |
    |            |                                             |        |
-   | algorithm  | SSH                                         | value  |
+   | algorithm  | "kdf-components"                            | value  |
+   |            |                                             |        |
+   | mode       | "ssh"                                       | value  |
    |            |                                             |        |
    | testGroups | Array of test group JSON objects, which are | array  |
    |            | defined in Section 3.1                      |        |
@@ -326,37 +277,24 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
 
 
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 6]
+Fussell                 Expires December 3, 2016                [Page 5]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +----------+-------------------------------------+-------+----------+
-   | JSON     | Description                         | JSON  | Optional |
-   | Value    |                                     | type  |          |
-   +----------+-------------------------------------+-------+----------+
-   | sha      | The SHA type used for the test      | value | No       |
-   |          | vectors                             |       |          |
-   |          |                                     |       |          |
-   | shSecLen | The shared secret length used in    | value | No       |
-   |          | bits                                |       |          |
-   |          |                                     |       |          |
-   | ivLen    | The IV length used in bits          | value | No       |
-   |          |                                     |       |          |
-   | keyLen   | The encryption key length used in   | value | No       |
-   |          | bits                                |       |          |
-   |          |                                     |       |          |
-   | tests    | Array of individual test vector     | array | No       |
-   |          | JSON objects, which are defined in  |       |          |
-   |          | Section 3.2                         |       |          |
-   +----------+-------------------------------------+-------+----------+
+   +---------+--------------------------------------+-------+----------+
+   | JSON    | Description                          | JSON  | Optional |
+   | Value   |                                      | type  |          |
+   +---------+--------------------------------------+-------+----------+
+   | hashAlg | The SHA type used for the test       | value | No       |
+   |         | vectors                              |       |          |
+   |         |                                      |       |          |
+   | cipher  | The encryption method used           | value | No       |
+   |         |                                      |       |          |
+   | tests   | Array of individual test vector JSON | array | No       |
+   |         | objects, which are defined in        |       |          |
+   |         | Section 3.2                          |       |          |
+   +---------+--------------------------------------+-------+----------+
 
                      Table 4: Vector Group JSON Object
 
@@ -379,20 +317,10 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |           |                                    |       |          |
    | h         | Hash value                         | value | No       |
    |           |                                    |       |          |
-   | sessionID | Session ID value                   | value | No       |
+   | sessionId | Session ID value                   | value | No       |
    +-----------+------------------------------------+-------+----------+
 
                       Table 5: Test Case JSON Object
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016                [Page 7]
-
-Internet-Draft                Sym Alg JSON                     June 2016
-
 
 4.  Test Vector Responses
 
@@ -400,6 +328,15 @@ Internet-Draft                Sym Alg JSON                     June 2016
    send the response vectors back to the ACVP server.  The following
    table describes the JSON object that represents a vector set
    response.
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 6]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -420,23 +357,86 @@ Internet-Draft                Sym Alg JSON                     June 2016
    The following table describes the JSON object that represents a
    vector set response for SSH.
 
-       +------------+----------------------------------+-----------+
-       | JSON Value | Description                      | JSON type |
-       +------------+----------------------------------+-----------+
-       | csInitIV   | Client to server initial IV      | value     |
-       |            |                                  |           |
-       | scInitIV   | Server to client initial IV      | value     |
-       |            |                                  |           |
-       | csEKey     | Client to server encryption key  | value     |
-       |            |                                  |           |
-       | scEKey     | Server to client eencryption key | value     |
-       |            |                                  |           |
-       | csIKey     | Client to server integrity key   | value     |
-       |            |                                  |           |
-       | scIKey     | Server to client integrity key   | value     |
-       +------------+----------------------------------+-----------+
+   +---------------------+---------------------------------+-----------+
+   | JSON Value          | Description                     | JSON type |
+   +---------------------+---------------------------------+-----------+
+   | initialIvClient     | Client to server initial IV     | value     |
+   |                     |                                 |           |
+   | initialIvServer     | Server to client initial IV     | value     |
+   |                     |                                 |           |
+   | encryptionKeyClient | Client to server encryption key | value     |
+   |                     |                                 |           |
+   | encryptionKeyServer | Server to client eencryption    | value     |
+   |                     | key                             |           |
+   |                     |                                 |           |
+   | integrityKeyClient  | Client to server integrity key  | value     |
+   |                     |                                 |           |
+   | integrityKeyServer  | Server to client integrity key  | value     |
+   +---------------------+---------------------------------+-----------+
 
                  Table 7: Vector Set Response JSON Object
+
+5.  Acknowledgements
+
+   TBD...
+
+6.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+
+
+
+
+
+Fussell                 Expires December 3, 2016                [Page 7]
+
+Internet-Draft                Sym Alg JSON                     June 2016
+
+
+7.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+8.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+Appendix A.  Example SP800-135 SSH KDF Capabilities JSON Object
+
+   The following is a example JSON object advertising support for SHA-
+   256.
+
+
+   {
+       "algorithm": "kdf-components",
+       "mode": "ssh",
+       "prereqVals": [
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           }
+       ],
+       "HashAlg": [
+           "sha-1",
+           "sha2-224",
+           "sha2-256",
+           "sha2-384",
+           "sha2-512"
+       ],
+       "Cipher": [
+           "tdes",
+           "aes-128",
+           "aes-192",
+           "aes-256"
+       ]
+   }
+
 
 
 
@@ -450,45 +450,45 @@ Fussell                 Expires December 3, 2016                [Page 8]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-5.  Acknowledgements
-
-   TBD...
-
-6.  IANA Considerations
-
-   This memo includes no request to IANA.
-
-7.  Security Considerations
-
-   Security considerations are addressed by the ACVP specification.
-
-8.  Normative References
-
-   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
-
-Appendix A.  Example SP800-135 SSH KDF Capabilities JSON Object
-
-   The following is a example JSON object advertising support for SHA-
-   256.
-
-
-
-            {
-                "algorithm": "SSH",
-                "prereqVals" : [{"algorithm" : "SHA", "valValue" : "123456"}],
-                "methods" : ["TDES-CBC", "AES-128-CBC"],
-                "sha" : [ "SHA-1", "SHA-256", "SHA-384", "SHA-512"]
-            }
-
 Appendix B.  Example Test Vectors JSON Object
 
    The following is a example JSON object for SP800-135 SSH KDF test
    vectors sent from the ACVP server to the crypto module.
+
+
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "kdf-components",
+        "mode": "ssh",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "cipher": "tdes",
+                "hashAlg": "SHA-1",
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "k": "00000100074F0CA30BDF604789CFE2466241960B643361FC515317427E4B7A5DF6CC3C5CE93EE5DAAF641797628494156021A620708A7A6E78522CED29BC072276C3CB1DE5436709610796DFA1DA4E7D4041FE866EF021C1E9219F504747E24644B871B102D4575FA71411914C648F18A273340C034CDAE875CEF13CA20F1E7398E34431F3F1F1744D02D249D9968FDB5E425F65BA7A2988E965A2F349A5617A5EEA27DC40EE5B02D9EF862CD5C44D17C13BE103897C5DC0BF841F4EF3CA64D42EA70D27AE51164045E8E2183BE90D08B496BEAD7990216B11D52E572EA1EBBB07C116E3CC01AE7FE85B93ABE76F96EDDC4EF0DF866B96458ADA285CD1FF9BD993CA88D1",
+                        "h": "44A4FFE335663340FE1EA25BA61394AE311C69ED",
+                        "sessionId": "76B6014593634CC835DB3F9AFCAE436D7AA2DBA4"
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+
+Appendix C.  Example Test Results JSON Object
+
+   The following is a example JSON object for SP800-135 SSH KDF test
+   results sent from the crypto module to the ACVP server.
+
+
 
 
 
@@ -506,60 +506,25 @@ Fussell                 Expires December 3, 2016                [Page 9]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-              [
-                { "acvVersion": "0.3" },
-                { "vsId": 1564,
-                  "algorithm": "SSH",
-                  "testGroups": [
-                    {
-                      "sha" : "SHA-1",
-                      "shSecLen" : 2048,
-                      "ivLen" : 64,
-                      "keyLen" : 192,
-                      "tests": [
-                        {
-                          "tcId": 2170,
-                          "k" : "0000010100ea2c1b7b4e16c6ed18263ffbc4d0dd34012863fb030c9ff21a1cb8400314d62d816fc793e377da60811274caac952d255efae6923325a9dbb2b771d4cc2b5aa9c51977af7682a159bc1e15800b798e7074f46125976d4271626fd1ad193b2e6099ebc7a04d95663cd5a43d2f3bb24e9fe2d3b9cda1e865416d3b5274ff81d2281182dde4d8c76e96c3d2f631e20f08378affd0bc2212756f3519e3e0af960da7c0036b8a8d8af7baab53c918fde8ccee400d7edf92d14fc2434eee478ebb1d5793daf4cdce9c06f0d4c9740a0ebebcefddd54764de05d01478ea84b6c057d19843b0cffd5a39799231e8f55428975851f8f385897302b31bc06d4a5ff38b6125",
-                          "h" : "378fa86f7c632fc9d4b488e02179bc74d369f73e",
-                          "sessionID" : "378fa86f7c632fc9d4b488e02179bc74d369f73e"
-                        }
-                      ]
-                    }
-                  ]
-                }
-             ]
-
-Appendix C.  Example Test Results JSON Object
-
-   The following is a example JSON object for SP800-135 SSH KDF test
-   results sent from the crypto module to the ACVP server.
-
-              [
-                  { "acvVersion": "0.3" },
-                  { "vsId": 1564,
-                    "testResults": [
-                        {
-                            "tcId": 2170,
-                            "csInitIV" : "4a2a242f4781d159",
-                            "scInitIV" : "9ebb82819240842c",
-                            "csEKey" : "048be2543a185d7c3b612b94713db353898507af4756c160",
-                            "scEKey" : "8670a887e357315e2e45286c4fb7bb27a7f9e9e1cfbd35b3",
-                            "csIKey" : "acfec0ea7f441854ccc3589d31c954bc01f0d231",
-                            "scIKey" : "0e00e033874b8b9cefb1fbeb191c75a69d927ed8"
-                        }
-                    ]
-                }
-             ]
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016               [Page 10]
-
-Internet-Draft                Sym Alg JSON                     June 2016
+[
+    {
+        "acvVersion": "0.4"
+    },
+    {
+        "vsId": 1564,
+        "testResults": [
+            {
+                "tcId": 1,
+                "initialIvClient": "D58275F599E68471",
+                "encryptionKeyClient": "D1B16D92ED9AB429546C53A3798998794E323188F094264B",
+                "integrityKeyClient": "E7F57D7BFFFB588164FAD8E8721478D275789B37",
+                "initialIvServer": "3F48A283BF85F147",
+                "encryptionKeyServer": "289241764AB45E7E70F90C779F24533B9D33CD6401962F57",
+                "integrityKeyServer": "9EE185ACDFE19221B796F2A698C82454B5E2A8C0"
+            }
+        ]
+    }
+]
 
 
 Author's Address
@@ -592,25 +557,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell                 Expires December 3, 2016               [Page 11]
+Fussell                 Expires December 3, 2016               [Page 10]
