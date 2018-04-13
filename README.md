@@ -73,6 +73,14 @@ If you want to contribute, please follow the simple rules below and send us pull
 
 If you would like to talk to our developers, you may want to send email to our mailing list algotest@list.nist.gov. You may also report bugs or request new tests.
 
+
+# Related projects
+- [Automated Cryptographic Validation Testing](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing)
+- [Cisco libacvp](https://github.com/cisco/libacvp)
+- [Google Project Wycheproof](https://github.com/google/wycheproof)
+- [HACL*, a formally verified cryptographic library written in F*](https://github.com/mitls/hacl-star)
+- [Automated Module Validation Protocol](https://github.com/usnistgov/AMVP)
+
 # Licensing terms
 
 This data was developed by employees of the National Institute of Standards and Technology (NIST), an agency of the Federal Government, in collaboration with 
@@ -99,10 +107,3 @@ NIST's creation of the data.
   - Citation format:
 
     - Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date). 
-
-
-# Related projects
-- [Automated Cryptographic Validation Testing](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing)
-- [Cisco libacvp](https://github.com/cisco/libacvp)
-- [Google Project Wycheproof](https://github.com/google/wycheproof)
-- [Automated Module Validation Protocol](https://github.com/usnistgov/AMVP)
