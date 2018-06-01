@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC3339 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml">
 ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <!-- used by XSLT processors -->
@@ -13,7 +14,7 @@
 <!-- control the table of contents (ToC) -->
 <?rfc toc="yes"?>
 <!-- generate a ToC -->
-<?rfc tocdepth="4"?>
+<?rfc tocdepth="3"?>
 <!-- the number of levels of subsections in ToC. default: 3 -->
 <!-- control references -->
 <?rfc symrefs="yes"?>
@@ -307,9 +308,9 @@
       </section>
 
       <section title="HTTP URI Resources">
-        <t>In the table below, any part of a resource path enclosed in brackets are replaced by an
-          instance of what is described in the brackets. For example &lt;testSessionId&gt; could be
-          replaced with 1.</t>
+        <t>In the table below, any part of a resource path enclosed in curly braces, { or }, are
+          replaced by an instance of what is described in the brackets. For example {testSessionId}
+          could be replaced with 1.</t>
         <texttable anchor="uri_table" title="Resources and their available operations">
           <preamble>
             <spanx style="emph">An empty cell for a resource and HTTP Method combination denotes
@@ -327,49 +328,57 @@
           <c/>
           <c/>
 
-          <c>/vendors/&lt;vendorId&gt;</c>
+          <c>/vendors/{vendorId}</c>
           <c><xref target="vendor_get">Retrieve Information for a specific vendor</xref></c>
           <c/>
           <c><xref target="vendor_put">Update a vendor</xref></c>
           <c><xref target="vendor_delete">Delete a vendor</xref></c>
 
           <c>/testSessions</c>
-          <c><xref target="testSessions_get">Returns a list of Test Sessions for the current user</xref> (Optional)</c>
+          <c><xref target="testSessions_get">Returns a list of Test Sessions for the current
+              user</xref> (Optional)</c>
           <c><xref target="testSessions_post">Create a new Test Session</xref></c>
           <c/>
           <c/>
 
-          <c>/testSessions/&lt;testSessionId&gt;</c>
-          <c><xref target="testSession_get">Returns information about the specific Test Session</xref> (Optional)</c>
+          <c>/testSessions/{testSessionId}</c>
+          <c><xref target="testSession_get">Returns information about the specific Test
+              Session</xref> (Optional)</c>
           <c/>
-          <c><xref target="testSession_put">Submit the Test Session for validation.</xref></c>
+          <c><xref target="testSession_put">Submit the Test Session for
+              validation.</xref><cref>should this be a POST instead?</cref></c>
           <c><xref target="testSession_delete">Cancel testing for a specific Test Session</xref></c>
 
-          <c>/testSessions/&lt;testSessionId&gt;/results</c>
-          <c><xref target="testSession_results_get">Request Validation Results for a Test Session</xref></c>
-          <c/>
-          <c/>
-          <c/>
-          
-          <c>/testSessions/&lt;testSessionId&gt;/vectorSets</c>
-          <c><xref target="vectorSets_get">Returns a list of Vector Sets for the specific Test Session</xref></c>
+          <c>/testSessions/{testSessionId}/results</c>
+          <c><xref target="testSession_results_get">Request Validation Results for a Test
+              Session</xref></c>
           <c/>
           <c/>
           <c/>
 
-          <c>/testSessions/&lt;testSessionId&gt;/vectorSets/&lt;vectorSetId&gt;</c>
+          <c>/testSessions/{testSessionId}/vectorSets</c>
+          <c><xref target="vectorSets_get">Returns a list of Vector Sets for the specific Test
+              Session</xref></c>
+          <c/>
+          <c/>
+          <c/>
+
+          <c>/testSessions/{testSessionId}/vectorSets/{vectorSetId}</c>
           <c><xref target="vectorSet_get">Vector Set download request</xref></c>
           <c/>
           <c/>
           <c><xref target="vectorSet_delete">Cancel testing for a specific Vector Set</xref></c>
 
-          <c>/testSessions/&lt;testSessionId&gt;/vectorSets/&lt;vectorSetId&gt;/results</c>
-          <c><xref target="vectorSet_results_get">Request Validation Results for a Vector Set</xref></c>
-          <c><xref target="vectorSet_results_post">Initial Submission of Vector Set Test Results</xref><cref>POST and PUT seem redundant</cref></c>
-          <c><xref target="vectorSet_results_put">Update Vector Set Test Results Submission</xref></c>
+          <c>/testSessions/{testSessionId}/vectorSets/{vectorSetId}/results</c>
+          <c><xref target="vectorSet_results_get">Request Validation Results for a Vector
+            Set</xref></c>
+          <c><xref target="vectorSet_results_post">Initial Submission of Vector Set Test
+              Results</xref><cref>POST and PUT seem redundant</cref></c>
+          <c><xref target="vectorSet_results_put">Update Vector Set Test Results
+            Submission</xref></c>
           <c/>
 
-          <c>/testSessions/&lt;testSessionId&gt;/vectorSets/&lt;vectorSetId&gt;/expected</c>
+          <c>/testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected</c>
           <c><xref target="vectorSet_expected_get">Expected Test Results</xref> (Optional)</c>
           <c/>
           <c/>
@@ -378,9 +387,8 @@
 
         <t> The resource path is appended to the path prefix to form the URI used with an HTTP
           Method to perform the desired ACVP operation. For example to create a new test session
-          using the "/testSessions" resource is "/acvp/v1/testSessions" (assuming an empty
-          context). To create a new Test Session, the ACVP client would use the following HTTP
-          request-line: </t>
+          using the "/testSessions" resource is "/acvp/v1/testSessions" (assuming an empty context).
+          To create a new Test Session, the ACVP client would use the following HTTP request-line: </t>
         <t>POST /acvp/v1/testSessions HTTP/1.1</t>
 
         <t>Likewise, to request a specific vector set from the server the ACVP client would use the
@@ -523,26 +531,28 @@ each message.
       </section>
 
       <section anchor="vendors" title="Vendor Resources">
-        <t>The available properties for vendor resources are:
-          <list>
-            <t><spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for this resource</t>
+        <t>The available properties for vendor resources are: <list>
+            <t><spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier
+              for this resource</t>
             <t><spanx style="strong">name</spanx> - <spanx style="verb">string</spanx></t>
+            <t><spanx style="strong">parentUrl</spanx> - a parent vendor identifier, allows for
+              multiple divisions or business units to share a parent company identifier</t>
             <t><spanx style="strong">website</spanx> - <spanx style="verb">string</spanx></t>
-            <t><spanx style="strong">emails</spanx> - array of <spanx style="verb">string</spanx>s</t>
-            <t><spanx style="strong">contacts</spanx> - an array of contact objects,
-              <list>
+            <t><spanx style="strong">emails</spanx> - array of
+              <spanx style="verb">string</spanx>s</t>
+            <t><spanx style="strong">contacts</spanx> - an array of contact objects, <list>
                 <t><spanx style="strong">name</spanx> - <spanx style="verb">string</spanx></t>
-                <t><spanx style="strong">emails</spanx> - array of <spanx style="verb">string</spanx>s</t>
-                <t><spanx style="strong">phoneNumbers</spanx> - array of phone objects,
-                  <list>
+                <t><spanx style="strong">emails</spanx> - array of
+                  <spanx style="verb">string</spanx>s</t>
+                <t><spanx style="strong">phoneNumbers</spanx> - array of phone objects, <list>
                     <t><spanx style="strong">number</spanx> - <spanx style="verb">string</spanx></t>
-                    <t><spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>, one of (fax, voice)</t>
+                    <t><spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>, one
+                      of (fax, voice)</t>
                   </list>
                 </t>
               </list>
             </t>
-            <t><spanx style="strong">address</spanx> - an address object,
-              <list>
+            <t><spanx style="strong">address</spanx> - an address object, <list>
                 <t><spanx style="strong">street</spanx> - <spanx style="verb">string</spanx></t>
                 <t><spanx style="strong">locality</spanx> - <spanx style="verb">string</spanx></t>
                 <t><spanx style="strong">region</spanx> - <spanx style="verb">string</spanx></t>
@@ -613,6 +623,8 @@ each message.
           <t><spanx style="strong">POST /vendors</spanx></t>
           <t>Request the creation of a new Vendor.</t>
           <section title="Request">
+            <t><spanx style="verb">name</spanx> is required and all other properties are optional.
+              <spanx style="verb">url</spanx> is not allowed.</t>
             <figure align="center">
               <artwork align="left"><![CDATA[
 [
@@ -644,7 +656,7 @@ each message.
     }
 ]
            ]]></artwork>
-            </figure>            
+            </figure>
           </section>
           <section title="Response">
             <figure align="center">
@@ -654,34 +666,356 @@ each message.
     {"url": "/acvp/v1/vendors/2"}
 ]
          ]]></artwork>
-          </figure>
+            </figure>
+          </section>
         </section>
-      </section>
         <section anchor="vendor_get" title="Vendor Information">
+          <t><spanx style="strong">GET /vendors/{vendorId}</spanx></t>
+          <t>Retrieve Information for a specific vendor</t>
+          <section title="Response">
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {
+        "url": "/acvp/v1/vendors/2",
+        "name": "Acme, LLC",
+        "website": "www.acme.acme",
+        "emails" : [ "inquiry@acme.acme" ],
+        "contacts": [{
+            "name": "Jane Smith",
+            "emails": ["jane.smith@acme.acme"],
+            "phoneNumbers" : [
+                {
+                    "name": "555-555-0001",
+                    "type" : "fax"
+                }, {
+                    "name": "555-555-0002",
+                    "type" : "voice"
+                }
+            ],
+            "address" : {
+                "street" : "123 Main Street",
+                "locality" : "Any Town",
+                "region" : "AnyState",
+                "country" : "USA",
+                "postalCode" : "123456"
+            }
+        }]
+    }
+]
+           ]]></artwork>
+            </figure>
+          </section>
         </section>
         <section anchor="vendor_put" title="Update an existing Vendor">
+          <t><spanx style="strong">PUT /vendors/{vendorId}</spanx></t>
+          <t>Update a vendor</t>
+          <t>The <spanx style="verb">url</spanx> property is not updateable.</t>
+          <section title="Request">
+            <t>Can be any subset of the updateable properties. If a property is not included its
+              value is not changed. A <spanx style="verb">null</spanx> value for a property
+              indicates the value should be removed.</t>
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {
+        "name": "Acme, LLC",
+        "website": "www.acme.acme",
+        "emails" : [ "inquiry@acme.acme" ],
+        "contacts": [{
+            "name": "Jane Smith",
+            "emails": ["jane.smith@acme.acme"],
+            "phoneNumbers" : [
+                {
+                    "name": "555-555-0001",
+                    "type" : "fax"
+                }, {
+                    "name": "555-555-0002",
+                    "type" : "voice"
+                }
+            ],
+            "address" : {
+                "street" : "123 Main Street",
+                "locality" : "Any Town",
+                "region" : "AnyState",
+                "country" : "USA",
+                "postalCode" : "123456"
+            }
+        }]
+    }
+]
+           ]]></artwork>
+            </figure>
+          </section>
         </section>
         <section anchor="vendor_delete" title="Remove a Vendor">
+          <t><spanx style="strong">DELETE /vendors/{vendorId}</spanx></t>
+          <t>Delete a specific vendor.</t>
+          <t>The server is not required to remove the resource but MUST return an error if the
+            resource will not be removed.</t>
         </section>
       </section>
 
       <section anchor="testSessions" title="Test Sessions">
+        <t>The available properties for test session resources are: <list>
+            <t><spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier
+              for this resource</t>
+            <t><spanx style="strong">acvpVersion</spanx> - <spanx style="verb">string</spanx>,
+              version of ACV protocol used to created the test session.</t>
+            <t><spanx style="strong">createdOn</spanx> - <xref target="dateType">date</xref></t>
+            <t><spanx style="strong">expiresOn</spanx> - <xref target="dateType">date</xref></t>
+            <t><spanx style="strong">encryptAtRest</spanx> - <spanx style="verb">boolean</spanx></t>
+            <t><spanx style="strong">vectorSetsUrl</spanx>
+              <cref>should this instead be an array or should there be two different
+                properties?</cref> - <spanx style="verb">string</spanx></t>
+            <t><spanx style="strong">publishable</spanx><cref>need a better name</cref> -
+              <spanx style="verb">boolean</spanx>, indicates whether this test session may be
+              submitted for validation </t>
+            <t><spanx style="strong">passed</spanx><cref>need a better name</cref> -
+              <spanx style="verb">boolean</spanx>, indicates whether all of the vector set tests
+              have passed </t>
+            <t><spanx style="strong">isSample</spanx> - <spanx style="verb">boolean</spanx>, if true
+                <xref target="vectorSet_expected_get">
+                /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected</xref> will return
+              expected result values.</t>
+            <t><spanx style="strong">production</spanx> - <spanx style="verb">boolean</spanx>,
+              indicates that the test session excludes tests that require intermediate values; this
+              may cause the test session to have a <spanx style="verb">publishable</spanx> value of
+              <spanx style="verb">false</spanx>.</t>
+          </list>
+        </t>
         <section anchor="testSessions_get" title="Test Session Listing (Current User)">
-          <t>Returns a list of vendors</t>
+          <t><spanx style="strong">GET /testSessions</spanx></t>
+          <t>Returns a list of Test Sessions for the current user.</t>
+          <t>This is an optional operation.</t>
+          <section title="Response">
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {"testSessions": [{
+        "url": "/acvp/v1/testSessions/2",
+        "acvpVersion": "0.5",
+        "createdOn": "2018-05-31T12:03:43Z",
+        "expiresOn": "2018-06-30T12:03:43Z",
+        "encryptAtRest": false,
+        "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+        "publishable": false,
+        "passed": true,
+        "production" : false,
+        "isSample": true
+    }]}
+]
+           ]]></artwork>
+            </figure>
+          </section>
         </section>
         <section anchor="testSessions_post" title="Create a New Test Session">
+          <t><spanx style="strong">POST /testSessions</spanx></t>
+          <t>Create a new Test Session.</t>
+          <section title="Request">
+            <t><spanx style="verb">algorithms</spanx> is an array of algorithm objects. Each
+              algorithm object has the following available properties: <list>
+                <t><spanx style="strong">algorithm</spanx> - <spanx style="verb">string</spanx>,
+                  required</t>
+              </list> Additional properties for each algorithm are based on the algorithm definition
+              available in each sub-specification. </t>
+            <t>If not provided <spanx style="verb">isSample</spanx>,
+              <spanx style="verb">production</spanx> and <spanx style="verb">encryptAtRest</spanx>
+              default to <spanx style="verb">false</spanx>.</t>
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {
+    "isSample" : "true",
+    "algorithms": [{
+        "algorithm": "AES-GCM",
+        "direction": [
+            "encrypt",
+            "decrypt"
+        ],
+        "ivGen": "internal",
+        "ivGenMode": "8.2.1",
+        "keyLen": [
+            128,
+            256
+        ],
+        "tagLen": [96],
+        "ivLen": [96],
+        "dataLength": [
+            0,
+            128,
+            136
+        ],
+        "aadLen": [
+            128,
+            136
+        ]
+    }]}
+]
+           ]]></artwork>
+            </figure>
+          </section>
+          <section title="Response">
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {
+        "url": "/acvp/v1/testSessions/2",
+        "acvpVersion": "0.5",
+        "createdOn": "2018-05-31T12:03:43Z",
+        "expiresOn": "2018-06-30T12:03:43Z",
+        "encryptAtRest": false,
+        "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+        "publishable": false,
+        "passed": true,
+        "production": false,
+        "isSample": true
+    }
+]
+           ]]></artwork>
+            </figure>
+          </section>
         </section>
         <section anchor="testSession_get" title="Test Session Information">
-          <t>Returns a list of vendors</t>
+          <t><spanx style="strong">GET /testSessions/{testSessionId}</spanx></t>
+          <t>Returns information about the specific Test Session</t>
+          <section title="Response">
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {
+        "url": "/acvp/v1/testSessions/2",
+        "acvpVersion": "0.5",
+        "createdOn": "2018-05-31T12:03:43Z",
+        "expiresOn": "2018-06-30T12:03:43Z",
+        "encryptAtRest": false,
+        "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+        "publishable": false,
+        "passed": true,
+        "production": false,
+        "isSample": true
+    }
+]
+           ]]></artwork>
+            </figure>
+          </section>
         </section>
         <section anchor="testSession_put" title="Submit For Validation">
+          <t><spanx style="strong">PUT /testSessions/{testSessionId}</spanx></t>
+          <t>Submit the Test Session for validation.</t>
+          <t>Associates all of the testing information with the test session. The test session MUST
+            be have both <spanx style="verb">publishable</spanx> and
+            <spanx style="verb">passed</spanx> set to <spanx style="verb">true</spanx>.</t>
+          <section title="Request">
+            <t>Available properties: <list>
+                <t><spanx style="strong">moduleUrl</spanx> - <spanx style="verb">string</spanx></t>
+                <t><spanx style="strong">oeUrl</spanx> - <spanx style="verb">string</spanx></t>
+                <t>
+                  <spanx style="strong">signature</spanx> - a signature object, <cref>no idea what
+                    should go inside the signature block really. sigature algorithm, text signed,
+                    certificate used?</cref>
+                  <list>
+                    <t><spanx style="strong">algorithm</spanx> -
+                      <spanx style="verb">string</spanx></t>
+                    <t><spanx style="strong">certificate</spanx> -
+                      <spanx style="verb">string</spanx></t>
+                    <t><spanx style="strong">digitalSignature</spanx> -
+                      <spanx style="verb">string</spanx></t>
+                  </list>
+                </t>
+                <t>
+                  <spanx style="strong">algorithmPrerequisites</spanx> - array of algorithm
+                  prerequiste objects, optional, for any algorithm that has a prerequisite that was
+                  not included in testing, the prerequisite MUST be provided by adding an element to
+                  this array
+                  <list>
+                    <t><spanx style="strong">algorithm</spanx> - <spanx style="verb">string</spanx>,
+                      name of the algorithm</t>
+                    <t><spanx style="strong">mode</spanx> - <spanx style="verb">string</spanx>,
+                      mode of the algorithm, optional, not all algorithms have a mode</t>
+                    <t><spanx style="strong">prerequisites</spanx> - <cref>this needs some additional work</cref>
+                      <spanx style="verb">string</spanx>, array of prerequiste objects <list>
+                        <t><spanx style="strong">algorithm</spanx> -
+                          <spanx style="verb">string</spanx>, required</t>
+                        <t><spanx style="strong">validationId</spanx> -
+                          <spanx style="verb">string</spanx>, required</t>
+                      </list>
+                    </t>
+                  </list>
+                </t>
+              </list>
+            </t>
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {
+        "moduleUrl": "/acvp/v1/modules/20",
+        "oeUrl": "/acvp/v1/oes/60",
+        "algorithmPrerequisites": [{
+            "algorithm": "AES-GCM",
+            "prerequisites": [
+                {
+                    "algorithm": "AES",
+                    "validationId": "123456"
+                },
+                {
+                    "algorithm": "DRBG",
+                    "validationId": "123456"
+                }
+            ]
+        }],
+        "signature": {
+            "algorithm": "SHA256RSA",
+            "certificate": "{base64encodedcertificate}",
+            "digitalSignature": "{base64encodedsignature}"
+        }
+    }
+]
+           ]]></artwork>
+            </figure>
+          </section>
         </section>
         <section anchor="testSession_delete" title="Cancel Test Session">
+          <t><spanx style="strong">DELETE /testSessions/{testSessionId}</spanx></t>
+          <t>Delete a test session.</t>
+          <t>Marks a test session as being cancelled and may be deleted by the server. Further
+            operations with the test session resource may return 404 HTTP Status.</t>
         </section>
         <section anchor="testSession_results_get" title="Request Validation Results">
+          <t><spanx style="strong">GET /testSessions/{testSessionId}/results</spanx></t>
+          <t>Request Validation Results for a Test Session</t>
+          <section title="Response">
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": "0.5"},
+    {
+        "passed": false,
+        "results": [
+            {
+                "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/1",
+                "status": "incomplete"
+            },
+            {
+                "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/2",
+                "status": "passed"
+            }
+        ]
+    }
+]
+           ]]></artwork>
+            </figure>
+          </section>
         </section>
       </section>
-      
+
       <section anchor="vectorSet" title="Vector Sets">
         <section anchor="vectorSets_get" title="Vectors Set Listing">
           <t>Returns a list of vendors</t>
@@ -690,20 +1024,18 @@ each message.
           <t>Returns a list of vendors</t>
         </section>
         <section anchor="vectorSet_delete" title="Cancel Testing of a Vector Set">
-          <t>May be cases where a particular vector set may not be cancelled and the entire Test Session will need to be cancelled instead.</t>
+          <t>May be cases where a particular vector set may not be cancelled and the entire Test
+            Session will need to be cancelled instead.</t>
         </section>
         <section anchor="vectorSet_results_get" title="Request Validation Results">
           <t>Returns a list of vendors</t>
         </section>
-        <section anchor="vectorSet_results_post" title="Submit Results">
-        </section>
-        <section anchor="vectorSet_results_put" title="Update Results Submission">
-        </section>
-        <section anchor="vectorSet_expected_get" title="Retrieve Expected Results">
-        </section>
- 
+        <section anchor="vectorSet_results_post" title="Submit Results"> </section>
+        <section anchor="vectorSet_results_put" title="Update Results Submission"> </section>
+        <section anchor="vectorSet_expected_get" title="Retrieve Expected Results"> </section>
+
       </section>
-      
+
       <section anchor="reg_capex" title="Product Registration with Capabilities">
         <t>POST the registration to the server consisting of the ACVP version, Operating Environment
           (OE), vector encoding, capabilities and any extensions. In addition there are a few
@@ -1120,20 +1452,20 @@ Content-Length: <length of results>
           the DUT). The resending of vector set responses must occur prior to expiry. </t>
       </section>
     </section>
-    
+
     <section title="Paging Parameters" anchor="paging">
-      <t>Some<cref>should we instead add a property to indicate that paging was enabled to allow implementations to decide?</cref> resources require paging in order to avoid returning large amounts of data. To faciliate
-        paging the following Query parameters should be allowed on resources where paging is
-        necessary.
-        <list>
+      <t>Some<cref>should we instead add a property to indicate that paging was enabled to allow
+          implementations to decide?</cref> resources require paging in order to avoid returning
+        large amounts of data. To faciliate paging the following Query parameters should be allowed
+        on resources where paging is necessary. <list>
           <t><spanx style="verb">limit</spanx> - the number of entries to return</t>
           <t><spanx style="verb">offset</spanx> - the offset into the list of entries</t>
         </list>
       </t>
-      <t>The response will indicate the offset and the total count using <spanx style="verb">offset</spanx> and
-        <spanx style="verb">total</spanx> properties.</t>
+      <t>The response will indicate the offset and the total count using
+        <spanx style="verb">offset</spanx> and <spanx style="verb">total</spanx> properties.</t>
     </section>
-    
+
 
     <section title="Error Codes">
       <t>Errors will follow HTTP[S] numbering scheme. In addition errors as well as 200 messages may
@@ -1144,6 +1476,12 @@ Content-Length: <length of results>
 
 
     <section title="Custom Specification Objects">
+      <section title="Date" anchor="dateType">
+        <t>A date type is a time <spanx style="verb">string</spanx> formatted according to the rules
+          of <xref target="RFC3339">RFC 3339</xref>; all date/times must use UTC time denoted by 'Z'
+          suffix with no local timezone adjustment. Example is
+          <spanx style="verb">2018-06-01T20:10:33Z</spanx></t>
+      </section>
       <section title="BitString">
         <t> Bitstrings are used to communicate a string of bits between the ACVP server and IUT. </t>
         <section title="Endianness">
@@ -1304,7 +1642,9 @@ Content-Length: <length of results>
 
     <references title="Normative References">
       <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
-      &RFC2119; </references>
+      &RFC2119;
+      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml"?-->
+      &RFC3339; </references>
 
     <section anchor="app-reg-ex" title="JSON Formatting Guidelines">
       <t>All JSON keywords shall use lower camelCase format with no underscores or hyphens and use
