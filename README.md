@@ -47,15 +47,11 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 
 # Accessing the demo server
 
-**=====================NOTICE=====================**
+## Configuring and using One-Time-Passwords (OTP)
 
-Please be aware that starting in the week of March 12th [the two-factor authentication and associated workflows](https://drive.google.com/open?id=1Ug8EGtbEwRZTyhHBn1rz5ZBOHcypF6A_) has been turned-on. The specification for the second factor authentication has been updated significantly since the first draft was posted for comments - please be sure to read the current version posted [here](https://drive.google.com/open?id=1Ug8EGtbEwRZTyhHBn1rz5ZBOHcypF6A_). By default two-factor authentication and the login workflow is required but there is a brief transition period available for those who wish to take advantage of it where it can be made optional.
+Please be aware that starting in the week of March 12th the second-factor authentication based on OTP and associated workflows have been turned-on - see section "Second-Factor Authentication and Authorization Schema for Accessing and Working with the NIST Automated Cryptographic Validation Services" posted [here](https://github.com/usnistgov/ACVP/wiki). 
 
-From a practical standpoint not requiring two-factor authentication means that the additional login workflow step will not be required and access to the /validation/acvp/register endpoint will not require an authorization token, although authentication/authorization will still be provided through the TLS certificate. Subsequent interactions for the test session will require the JWT access token returned by the registration but this is no change from now. While not required, the login workflow step will still be available to allow for testing and to make sure that all will work once the two-factor authentication is required.
-
-Please send a note to acvts-demo@nist.gov with your request to make two-factor authentication optional and we will follow-up with you.
-
-**=====================NOTICE=====================**
+## Obtaining TLS credentials
 
 The protocol spec and development information are available here. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump start your work.
 
