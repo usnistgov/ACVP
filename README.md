@@ -63,7 +63,7 @@ You are accessing a U.S. Government information system, which includes: 1) this 
 
 ## Configuring and using One-Time-Passwords (OTP)
 
-Please be aware that starting in the week of March 12th the second-factor authentication based on OTP and associated workflows have been turned-on - see section "Second-Factor Authentication and Authorization Schema for Accessing and Working with the NIST Automated Cryptographic Validation Services" posted [here](https://github.com/usnistgov/ACVP/wiki). 
+Please be aware that starting in the week of March 12th, 2018, the second-factor authentication based on OTP and associated workflows have been turned-on - see details [here](https://github.com/usnistgov/ACVP/wiki#second-factor-authentication-and-authorization-schema-for-accessing-and-working-with-the-nist-automated-cryptographic-validation-services). 
 
 # Contribution guidelines:
 
