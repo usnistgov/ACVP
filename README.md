@@ -47,10 +47,8 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 
 # Accessing the demo server
 
-## Configuring and using One-Time-Passwords (OTP)
-
-Please be aware that starting in the week of March 12th the second-factor authentication based on OTP and associated workflows have been turned-on - see section "Second-Factor Authentication and Authorization Schema for Accessing and Working with the NIST Automated Cryptographic Validation Services" posted [here](https://github.com/usnistgov/ACVP/wiki). 
-
+To access the demo server one needs a TLS credential **and** a one-time password (OTP). To set expectations, since this is a demo system, it will be in a state of flux and any all data on the system is considered temporary and may be reset to accommodate development of the Automated Cryptographic Validation Protocol (ACVP) service. We will try to keep the demo service relatively stable, but we plan to update it as we continue to add new algorithms and capabilities.
+ 
 ## Obtaining TLS credentials
 
 The protocol spec and development information are available here. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump start your work.
@@ -63,7 +61,9 @@ You are expected to protect the key pair from unauthorized use and to notify NIS
 You are accessing a U.S. Government information system, which includes: 1) this computer, 2) this computer network, 3) all computers connected to this network, and 4) all devices and storage media attached to this network or to a computer on this network. You understand and consent to the following: you may access this information system for authorized use only; you have no reasonable expectation of privacy regarding any communication of data transiting or stored on this information system; at any time and for any lawful Government purpose, the Government may monitor, intercept, and search and seize any communication or data transiting or stored on this information system; and any communications or data transiting or stored on this information system may be disclosed or used for any lawful Government purpose.
 ***WARNING***WARNING***WARNING”
 
-To set expectations, since this is a demo system, it will be in a state of flux and any all data on the system is considered temporary and may be reset to accommodate development of the Automated Cryptographic Validation Protocol (ACVP) service. We will try to keep the demo service relatively stable, but we plan to update it as we continue to add new algorithms and capabilities.
+## Configuring and using One-Time-Passwords (OTP)
+
+Please be aware that starting in the week of March 12th the second-factor authentication based on OTP and associated workflows have been turned-on - see section "Second-Factor Authentication and Authorization Schema for Accessing and Working with the NIST Automated Cryptographic Validation Services" posted [here](https://github.com/usnistgov/ACVP/wiki). 
 
 # Contribution guidelines:
 
