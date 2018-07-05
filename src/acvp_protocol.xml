@@ -461,8 +461,10 @@
     </section>
 
     <section title="Authentication">
-      <t>It is recommended that an authentication scheme be used. Depending on the target
-        environment and usage objectives, that can be as weak as basic HTTP authentication or as
+      <t>It is recommended that an authentication scheme be used. Typically, a JSON Web Token (JWT) is created by the server
+       upon successful client authentication and returned to the client to use as an authorization mechanism for accessing
+       the server resources - see <xref target="jwtToken">JWT specification</xref>  below for more information.  Depending on the target
+        environment and usage objectives, the authentication can be as weak as basic HTTP authentication or as
         strong as TLS mutual certificate authentication. Definition of an authentication scheme will
         not be discussed here, but should be agreed upon between the client and server owning
         entities including the servers owned by the validation authorities. For the purposes of the
@@ -556,6 +558,120 @@
             Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ
            ]]></artwork>
         </figure>
+        
+        <texttable anchor="authorizationFlow_table" title="Workflow authorization flows">
+          <preamble>
+            <spanx style="emph">All exchanges below are over HTTP."</spanx>
+          </preamble>
+          <ttcol align="left" width="10%">Client</ttcol>
+          <ttcol align="left" width="60%"/>
+          <ttcol align="left" width="10%">Server</ttcol>
+          <ttcol align="left" width="20%">Notes</ttcol>
+          <c/>
+          <c>POST to /login or similar with appropriate credentials</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>--------------------------------&gt;</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>receive the access token</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>&lt;-  -  -  -  -  -  -  -  -  -  - </c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>POST to /register with access token in header</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>-------------------------------&gt;</c>
+          <c/>
+          <c>the token from login is used</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>receive the session info and a session access token</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>&lt;-  -  -  -  -  -  -  -  -  -  - </c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+                    <c/>
+          <c>GET /vectors?vsID=&lt;ID&gt; with session access token in header</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>-------------------------------&gt;</c>
+          <c/>
+          <c>the token from registration is used to retrieve vector sets, submit answers etc.</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+                   <c/>
+          <c>receive vectors</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>&lt;-  -  -  -  -  -  -  -  -  -  - </c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>POST to /vectors?vsID=&lt;ID&gt; with session access token in header and answers in body</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>-------------------------------&gt;</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+          <c>GET /results?vsID=&lt;ID&gt; with session access token in body</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>-------------------------------&gt;</c>
+          <c/>
+          <c/>
+           <c/>
+          <c/>
+          <c/>
+          <c/>
+                             <c/>
+          <c>receive results</c>
+          <c/>
+          <c/>
+          <c/>
+          <c>&lt;-  -  -  -  -  -  -  -  -  -  - </c>
+          <c/>
+          <c/>
+          </texttable>
       </section>
 
       <section anchor="vendors" title="Vendor Resources">
@@ -916,8 +1032,7 @@
               for this resource</t>
             <t><spanx style="strong">name</spanx> - <spanx style="verb">string</spanx></t>
             <t><spanx style="strong">dependencyUrls</spanx> - an array of
-              <spanx style="verb">string</spanx>s which identify the <xref target="dependencies"
-                >dependencies</xref> which comprise this OE.</t>
+              <spanx style="verb">string</spanx>s which identify the <xref target="dependencies">dependencies</xref> which comprise this OE.</t>
           </list>
         </t>
         <section anchor="oes_get" title="List Operational Environments">
@@ -1029,8 +1144,7 @@
               for this resource</t>
             <t><spanx style="strong">type</spanx> - <spanx style="verb">string</spanx></t>
             <t><spanx style="verb">{varies}</spanx> depending on the value of
-              <spanx style="verb">type</spanx> as defined by the response of <xref
-                target="dependencies_properties_get"/></t>
+              <spanx style="verb">type</spanx> as defined by the response of <xref target="dependencies_properties_get"/></t>
           </list>
         </t>
         <section anchor="dependencies_get" title="List Dependencies">
@@ -1752,16 +1866,14 @@
             in the implementation). The resending of vector set responses must occur prior to
             expiry.</t>
           <section title="Request">
-            <t>The request content is identical to the request content described in <xref
-                target="vectorSet_results_post"/>.</t>
+            <t>The request content is identical to the request content described in <xref target="vectorSet_results_post"/>.</t>
           </section>
         </section>
         <section anchor="vectorSet_expected_get" title="Retrieve Expected Results">
           <t><spanx style="strong">GET /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected</spanx></t>
           <t>Expected Test Results.</t>
           <section title="Response">
-            <t>The response is identical to the request content described in <xref
-                target="vectorSet_results_post"/>.</t>
+            <t>The response is identical to the request content described in <xref target="vectorSet_results_post"/>.</t>
           </section>
         </section>
       </section>
