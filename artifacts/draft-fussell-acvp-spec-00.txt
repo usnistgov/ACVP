@@ -1,0 +1,2912 @@
+
+
+
+
+Internet Engineering Task Force                          B. Fussell, Ed.
+Internet-Draft                                             Cisco Systems
+Intended status: Informational                          A. Vassilev, Ed.
+Expires: February 7, 2019                                       H. Booth
+                          National Institute of Standards and Technology
+                                                          August 6, 2018
+
+
+              Automated Cryptographic Validation Protocol
+                       draft-fussell-acvp-spec-00
+
+Abstract
+
+   This document defines the Automated Cryptographic Validation
+   Protocol(ACVP).
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on February 7, 2019.
+
+Copyright Notice
+
+   Copyright (c) 2018 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (https://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 1]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   4
+   2.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     2.1.  Audience  . . . . . . . . . . . . . . . . . . . . . . . .   5
+     2.2.  Goals . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+     2.3.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   6
+   3.  Architecture  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     3.1.  Server/Client Architecture  . . . . . . . . . . . . . . .   6
+     3.2.  Server/Proxy Architecture . . . . . . . . . . . . . . . .   7
+   4.  ACV Protocsubol . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.1.  HTTP URI Hierarchy  . . . . . . . . . . . . . . . . . . .   8
+     4.2.  HTTP URI Resources  . . . . . . . . . . . . . . . . . . .   8
+   5.  Security  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
+   6.  Authentication  . . . . . . . . . . . . . . . . . . . . . . .  12
+   7.  Traceability  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   8.  Encoding  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  Versioning  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. Messaging . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+     10.1.  Product Registration/Capabilities Exchange . . . . . . .  13
+     10.2.  Test Exchange  . . . . . . . . . . . . . . . . . . . . .  13
+   11. Message Formats . . . . . . . . . . . . . . . . . . . . . . .  13
+     11.1.  JSON Web Token (JWT) . . . . . . . . . . . . . . . . . .  13
+       11.1.1.  Authorization flows with JWT . . . . . . . . . . . .  14
+       11.1.2.  JWT Expiration/Renewal . . . . . . . . . . . . . . .  16
+     11.2.  Vendor Resources . . . . . . . . . . . . . . . . . . . .  16
+       11.2.1.  Vendor Listing . . . . . . . . . . . . . . . . . . .  17
+       11.2.2.  Create a New Vendor  . . . . . . . . . . . . . . . .  18
+       11.2.3.  Vendor Information . . . . . . . . . . . . . . . . .  19
+       11.2.4.  Update an existing Vendor  . . . . . . . . . . . . .  20
+       11.2.5.  Remove a Vendor  . . . . . . . . . . . . . . . . . .  21
+     11.3.  Modules  . . . . . . . . . . . . . . . . . . . . . . . .  21
+       11.3.1.  List Modules . . . . . . . . . . . . . . . . . . . .  22
+       11.3.2.  Register a new Module  . . . . . . . . . . . . . . .  22
+       11.3.3.  Retrieve information for a Module  . . . . . . . . .  23
+       11.3.4.  Update a Module  . . . . . . . . . . . . . . . . . .  23
+       11.3.5.  Delete a Module  . . . . . . . . . . . . . . . . . .  24
+     11.4.  Operational Environments (OEs) . . . . . . . . . . . . .  24
+       11.4.1.  List Operational Environments  . . . . . . . . . . .  24
+       11.4.2.  Create a new Operational Environment . . . . . . . .  25
+       11.4.3.  Retrieve information for an Operational Environment   25
+       11.4.4.  Update an Operational Environment  . . . . . . . . .  26
+       11.4.5.  Delete an Operational Environment  . . . . . . . . .  26
+     11.5.  Dependencies . . . . . . . . . . . . . . . . . . . . . .  26
+       11.5.1.  List Dependencies  . . . . . . . . . . . . . . . . .  27
+       11.5.2.  Register a new Dependency  . . . . . . . . . . . . .  27
+       11.5.3.  List Dependency Properties . . . . . . . . . . . . .  28
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 2]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+       11.5.4.  Retrieve information for a Dependency  . . . . . . .  30
+       11.5.5.  Update a Dependency  . . . . . . . . . . . . . . . .  30
+       11.5.6.  Delete a Dependency  . . . . . . . . . . . . . . . .  30
+     11.6.  Algorithms . . . . . . . . . . . . . . . . . . . . . . .  30
+       11.6.1.  Algorithms Listing . . . . . . . . . . . . . . . . .  31
+       11.6.2.  Algorithm Information  . . . . . . . . . . . . . . .  31
+     11.7.  Test Sessions  . . . . . . . . . . . . . . . . . . . . .  31
+       11.7.1.  Test Session Listing (Current User)  . . . . . . . .  32
+       11.7.2.  Create a New Test Session  . . . . . . . . . . . . .  33
+       11.7.3.  Test Session Information . . . . . . . . . . . . . .  35
+       11.7.4.  Submit For Validation  . . . . . . . . . . . . . . .  35
+       11.7.5.  Cancel Test Session  . . . . . . . . . . . . . . . .  37
+       11.7.6.  Request Validation Results . . . . . . . . . . . . .  37
+     11.8.  Vector Sets  . . . . . . . . . . . . . . . . . . . . . .  38
+       11.8.1.  Vectors Set Listing  . . . . . . . . . . . . . . . .  38
+       11.8.2.  Vector Set Download  . . . . . . . . . . . . . . . .  39
+       11.8.3.  Cancel Testing of a Vector Set . . . . . . . . . . .  41
+       11.8.4.  Request Validation Results . . . . . . . . . . . . .  41
+       11.8.5.  Submit Results . . . . . . . . . . . . . . . . . . .  43
+       11.8.6.  Update Results Submission  . . . . . . . . . . . . .  44
+       11.8.7.  Retrieve Expected Results  . . . . . . . . . . . . .  45
+   12. Vector Set Expiration . . . . . . . . . . . . . . . . . . . .  45
+   13. Paging Parameters . . . . . . . . . . . . . . . . . . . . . .  46
+   14. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  47
+   15. Algorithm Test Extensions . . . . . . . . . . . . . . . . . .  47
+   16. Custom Specification Objects  . . . . . . . . . . . . . . . .  47
+     16.1.  Date . . . . . . . . . . . . . . . . . . . . . . . . . .  47
+     16.2.  BitString  . . . . . . . . . . . . . . . . . . . . . . .  47
+       16.2.1.  Endianness . . . . . . . . . . . . . . . . . . . . .  47
+       16.2.2.  Hex to Bitstring Parsing . . . . . . . . . . . . . .  47
+     16.3.  Range  . . . . . . . . . . . . . . . . . . . . . . . . .  48
+       16.3.1.  Range JSON examples  . . . . . . . . . . . . . . . .  48
+     16.4.  Domain . . . . . . . . . . . . . . . . . . . . . . . . .  49
+       16.4.1.  Domain JSON examples . . . . . . . . . . . . . . . .  49
+       16.4.2.  Additional Domain Information  . . . . . . . . . . .  49
+   17. Other Considerations  . . . . . . . . . . . . . . . . . . . .  50
+   18. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  50
+   19. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  50
+   20. Normative References  . . . . . . . . . . . . . . . . . . . .  50
+   Appendix A.  JSON Formatting Guidelines . . . . . . . . . . . . .  50
+   Appendix B.  JSON Encoded Error Messages  . . . . . . . . . . . .  51
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  51
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 3]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+1.  Introduction
+
+   ACVP enables communication between a cryptographic module that is
+   embedded inside of a device or otherwise running on a platform
+   accessible via computer network, and an external testing system,
+   using standard network communication interfaces and protocols.  This
+   communication protocol can also be used to validate the correctness
+   of the implementations of the algorithms in the cryptographic module
+   with a validation authority.  This document describes how ACVP is
+   structured with respect to the client-server model, the messaging
+   protocol, optional features and flows.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119 [RFC2119].
+
+2.  Overview
+
+   ACVP has the following goals:
+
+   o  To work in situations where the testing system is remote from the
+      cryptographic module, e.g. running as a process on a separate
+      device.
+
+   o  To enable automated testing that can take place with a minimum of
+      human interaction.
+
+   o  To enable the testing system to discover the capabilities of the
+      module being tested; that is, the particular algorithms and
+      parameters that the module supports.
+
+   o  To provide extensibility that can be used to introduce tests for
+      new algorithms, and new tests for existing algorithms.
+
+   o  To be compatible with emerging automated validation systems
+      wherever possible, especially the FIPS-140 Cryptographic Algorithm
+      Validation Program.
+
+   o  To provide a standard communication method so that vendors can
+      utilize the same testing service for FIPS-140, 3rd party crypto
+      verification and product FCS readiness testing.
+
+   ACVP defines how to communicate a request (to execute a cryptographic
+   operation) to a cryptographic module, and how to communicate the
+   corresponding response (containing the output of that operation) back
+   to a testing system.  It defines a transport (based on HTTP or
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 4]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   HTTPS), an encoding and message format (which is negotiated), and a
+   set of message exchanges.  Each vector test set corresponds to a
+   single message exchange driven from the client associated with the
+   module under test.  ACVP does not define the cryptographic
+   algorithms, nor does it detail the precise conditions for a response
+   to be acceptable.  Instead, it references existing specifications for
+   those algorithms, and defines a mapping between the data on the wire
+   and the algorithm testing specification.  ACVP does not define
+   detailed conformance criteria, such as those in FIPS-140.  Instead,
+   it aims to be independent of particular conformance criteria, so that
+   it can be used in multiple domains with different (even potentially
+   conflicting) conformance criteria.  ACVP does not define an interface
+   that can be used to manage or control a cryptographic module.
+
+2.1.  Audience
+
+   This document is written to address multiple audiences:
+
+   o  Crypto module developers who require validation testing
+
+   o  Crypto validation organizations who will perform validation
+      testing
+
+   o  Crypto module customers that desire validation testing results or
+      verifiable artifacts of testing
+
+2.2.  Goals
+
+   The goals for this document are to provide a messaging protocol that
+   can be used with existing authentication and communication protocols
+   to provide a way to test crypto modules.  The following functions are
+   outside the scope of this document:
+
+   o  The API to the cryptographic module
+
+   o  How the tests are generated
+
+   o  How the results/artifacts are stored or managed
+
+   o  Authentication used
+
+   o  Scalability
+
+   o  Management interface
+
+   With that in mind there are several expectations when building a
+   server used as a validation authority.  A validation authority shall
+   use HTTPS, TLS 1.2 or greater and mutual authentication.  Therefore a
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 5]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   client that expects to be used with a validation authority shall have
+   the same requirements.  A server, proxy or client developed for the
+   purposes of internal organizational testing only may chose not to
+   include some of those features.
+
+2.3.  Terminology
+
+   TBD
+
+3.  Architecture
+
+                        Server/Client Architecture
+
+
+                              +----------------------------------------+
+                              |                    +-----------------+ |
+   +----------+               | Entropy ---------->| DRBG----Encrypt | |
+   | ACV      |               |                    |         Auth    | |
+   | Server   |<=============>| +--------+         |                 | |
+   +----------+               | | ACV    |<------->| PKI-----Key Est | |
+                              | | Client |    ^    |         Sign    | |
+                              | +--------+    |    |                 | |
+                              |            Crypto  | Crypto Module   | |
+                              |            Module  +-----------------+ |
+                              |              API                       |
+                              |                                        |
+                              |        Device Under Test (DUT)         |
+                              +----------------------------------------+
+
+
+
+                                 Figure 1
+
+3.1.  Server/Client Architecture
+
+   A server client model is used where the roles are defined as:
+
+   o  ACV Client - resides in, or accessible from, the device under test
+      and communicates with the ACV server using Java Script Object
+      Notation (JSON) as well as the crypto module using product
+      specific methods.
+
+   o  ACV Server - Sends JSON formatted messaging and test data to the
+      ACV client and processes test responses.
+
+   o  ACV Proxy - Resides between the ACV server and ACV client to proxy
+      the connection for the client.  This is particularly useful when
+      the client does not support TLS, key management or have signature
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 6]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+      capabilities and they are required by the server.  An example
+      architecture is provided in Figure 2.
+
+   o  Device Under Test - contains the ACV client and the crypto module
+      under test which can include various algorithms and functions that
+      encrypt/decrypt, generate keys, signatures, perform varifications
+      and DRBG functions.
+
+   o  Crpyographic Module API - This is the interface to the crypto
+      module from the ACV Client.  This interface is environment
+      specific and will vary depending on the API available on the
+      crypto module.
+
+3.2.  Server/Proxy Architecture
+
+                         Server/Proxy Architecture
+
+
+
+                 +-----------------------------------------------------+
+                 |                         +-------------------------+ |
+ +----------+    |     +----------+        |                         | |
+ | ACV      |    |     | ACV      |        |                         | |
+ | Server   |<========>| Proxy    |<======>| +--------+   +--------+ | |
+ +----------+    |     +----------+        | | ACV    |<->| Crypto | | |
+                 |                         | | Client |   | Module | | |
+                 |                         | +--------+   +--------+ | |
+                 |                         |                         | |
+                 |                         |      DUT                | |
+                 |                         +-------------------------+ |
+                 | Vendor/Customer Premise                             |
+                 +-----------------------------------------------------+
+
+
+                                 Figure 2
+
+4.  ACV Protocsubol
+
+   The ACV protocol will utilize existing mechanisms for transport
+   coordinated with JSON formatted messaging.
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 7]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+                             Protocol Layering
+
+   +-----------------------------------------------+
+   | JSON Formatted ACVP request/response messages |
+   +-----------------------------------------------+
+   | HTTP[S] message transfer and signaling        |
+   +-----------------------------------------------+
+   | TLS for transport security(recommended)       |
+   +-----------------------------------------------+
+   | TCP for transport                             |
+   |_______________________________________________|
+
+
+
+                                 Figure 3
+
+4.1.  HTTP URI Hierarchy
+
+
+            +-------------+------------------+-------------------------+
+               server          path prefix          resource
+            +-------------+------------------+-------------------------+
+    https://acvts.nist.gov/validation/acvp/v1/testSession/1/vectorSet/1
+            +-------------+----------+----+--+-------------------------+
+                             context  API   |
+                                         version
+
+
+
+                                 Figure 4
+
+   Note that deployments utilizing ACV Proxy server may use a different
+   protocol, e.g., HTTP, custom server, context and port number to
+   interact with the DUT.
+
+4.2.  HTTP URI Resources
+
+   In the table below, any part of a resource path enclosed in curly
+   braces, { or }, are replaced by an instance of what is described in
+   the brackets.  For example {testSessionId} could be replaced with 1.
+
+     _An empty cell for a resource and HTTP Method combination denotes
+    that the server returns an HTTP Status 405 code "Method not allowed
+                                 (405)"._
+
+   +--------------+------------+------------+------------+-------------+
+   | Resource     | GET (read) | POST       | PUT        | DELETE      |
+   |              |            | (create)   | (update)   |             |
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 8]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   +--------------+------------+------------+------------+-------------+
+   | /vendors     | Returns a  | Register a |            |             |
+   |              | list of    | new vendor |            |             |
+   |              | vendors    | (Section   |            |             |
+   |              | (Section   | 11.2.2)    |            |             |
+   |              | 11.2.1)    |            |            |             |
+   | /vendors/{ve | Retrieve I |            | Update a   | Delete a    |
+   | ndorId}      | nformation |            | vendor     | vendor      |
+   |              | for a      |            | (Section   | (Section    |
+   |              | specific   |            | 11.2.4)    | 11.2.5)     |
+   |              | vendor     |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.2.3)    |            |            |             |
+   | /oes         | Return a   | Create a   |            |             |
+   |              | List of    | new OE     |            |             |
+   |              | OEs        | (Section   |            |             |
+   |              | (Section   | 11.4.2)    |            |             |
+   |              | 11.4.1)    |            |            |             |
+   | /oes/{oeId}  | Retrieve I |            | Update an  | Delete an   |
+   |              | nformation |            | OE         | OE (Section |
+   |              | for a OE   |            | (Section   | 11.4.5)     |
+   |              | (Section   |            | 11.4.4)    |             |
+   |              | 11.4.3)    |            |            |             |
+   | /modules     | Return a   | Register a |            |             |
+   |              | List of    | new Module |            |             |
+   |              | Modules    | (Section   |            |             |
+   |              | (Section   | 11.3.2)    |            |             |
+   |              | 11.3.1)    |            |            |             |
+   | /modules/{mo | Retrieve I |            | Update a   | Delete a    |
+   | duleId}      | nformation |            | module     | module      |
+   |              | for a      |            | (Section   | (Section    |
+   |              | specific   |            | 11.3.4)    | 11.3.5)     |
+   |              | module     |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.3.3)    |            |            |             |
+   | /dependencie | Returns a  | Create a   |            |             |
+   | s            | list of de | new        |            |             |
+   |              | pendencies | dependency |            |             |
+   |              | (Section   | (Section   |            |             |
+   |              | 11.5.1)    | 11.5.2)    |            |             |
+   | /dependencie | Returns a  |            |            |             |
+   | s/properties | list of    |            |            |             |
+   |              | properties |            |            |             |
+   |              | for depend |            |            |             |
+   |              | encies     |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.5.3)    |            |            |             |
+   | /dependencie | Retrieve I |            | Update a   | Delete a    |
+
+
+
+Fussell, et al.         Expires February 7, 2019                [Page 9]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   | s/{dependenc | nformation |            | dependency | dependency  |
+   | yId}         | for a      |            | (Section   | (Section    |
+   |              | specific   |            | 11.5.5)    | 11.5.6)     |
+   |              | dependency |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.5.4)    |            |            |             |
+   | /algorithms  | Return a   |            |            |             |
+   |              | List of    |            |            |             |
+   |              | Available  |            |            |             |
+   |              | Algorithms |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.6.1)    |            |            |             |
+   | /algorithms/ | Retrieve I |            |            |             |
+   | {algorithmId | nformation |            |            |             |
+   | }            | about an   |            |            |             |
+   |              | Algorithm  |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.6.2)    |            |            |             |
+   | /testSession | Returns a  | Create a   |            |             |
+   | s            | list of    | new Test   |            |             |
+   |              | Test       | Session    |            |             |
+   |              | Sessions   | (Section   |            |             |
+   |              | for the    | 11.7.2)    |            |             |
+   |              | current    |            |            |             |
+   |              | user       |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.7.1)    |            |            |             |
+   |              | (Optional) |            |            |             |
+   | /testSession | Returns in |            | Certify    | Cancel      |
+   | s/{testSessi | formation  |            | the Test   | testing for |
+   | onId}        | about the  |            | Session    | a specific  |
+   |              | specific   |            | for valida | Test        |
+   |              | Test       |            | tion.      | Session     |
+   |              | Session    |            | (Section   | (Section    |
+   |              | (Section   |            | 11.7.4)    | 11.7.5)     |
+   |              | 11.7.3)    |            |            |             |
+   |              | (Optional) |            |            |             |
+   | /testSession | Request    |            |            |             |
+   | s/{testSessi | Validation |            |            |             |
+   | onId}/result | Results    |            |            |             |
+   | s            | for a Test |            |            |             |
+   |              | Session    |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.7.6)    |            |            |             |
+   | /testSession | Returns a  |            |            |             |
+   | s/{testSessi | list of    |            |            |             |
+   | onId}/vector | Vector     |            |            |             |
+   | Sets         | Sets for   |            |            |             |
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 10]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   |              | the        |            |            |             |
+   |              | specific   |            |            |             |
+   |              | Test       |            |            |             |
+   |              | Session    |            |            |             |
+   |              | (Section   |            |            |             |
+   |              | 11.8.1)    |            |            |             |
+   | /testSession | Vector Set |            |            | Cancel      |
+   | s/{testSessi | download   |            |            | testing for |
+   | onId}/vector | request    |            |            | a specific  |
+   | Sets/{vector | (Section   |            |            | Vector Set  |
+   | SetId}       | 11.8.2)    |            |            | (Section    |
+   |              |            |            |            | 11.8.3)     |
+   | /testSession | Request    | Initial    | Update     |             |
+   | s/{testSessi | Validation | Submission | Vector Set |             |
+   | onId}/vector | Results    | of Vector  | Test       |             |
+   | Sets/{vector | for a      | Set Test   | Results    |             |
+   | SetId}/resul | Vector Set | Results    | Submission |             |
+   | ts           | (Section   | (Section   | (Section   |             |
+   |              | 11.8.4)    | 11.8.5)    | 11.8.6)    |             |
+   | /testSession | Expected   |            |            |             |
+   | s/{testSessi | Test       |            |            |             |
+   | onId}/vector | Results    |            |            |             |
+   | Sets/{vector | (Section   |            |            |             |
+   | SetId}/expec | 11.8.7)    |            |            |             |
+   | ted          | (Optional) |            |            |             |
+   +--------------+------------+------------+------------+-------------+
+
+             Table 1: Resources and their available operations
+
+   The resource path is appended to the path prefix to form the URI used
+   with an HTTP Method to perform the desired ACVP operation.  For
+   example to create a new test session using the "/testSessions"
+   resource is "/acvp/v1/testSessions" (assuming an empty context).  To
+   create a new Test Session, the ACVP client would use the following
+   HTTP request-line:
+
+   POST /acvp/v1/testSessions HTTP/1.1
+
+   Likewise, to request a specific vector set from the server the ACVP
+   client would use the following request-line:
+
+   GET /acvp/v1/testSessions/1/vectorSets/1 HTTP/1.1
+
+5.  Security
+
+   It is recommended that HTTPS and TLS 1.2 or greater be used in order
+   to enforce a secure communication method.  Not all environments will
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 11]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   have TLS so HTTP with some level of authentication may be the only
+   option.
+
+6.  Authentication
+
+   It is recommended that an authentication scheme be used.  Typically,
+   a JSON Web Token (JWT) is created by the server upon successful
+   client authentication and returned to the client to use as an
+   authorization mechanism for accessing the server resources - see JWT
+   specification (Section 11.1) below for more information.  Depending
+   on the target environment and usage objectives, the authentication
+   can be as weak as basic HTTP authentication or as strong as TLS
+   mutual certificate authentication.  Definition of an authentication
+   scheme will not be discussed here, but should be agreed upon between
+   the client and server owning entities including the servers owned by
+   the validation authorities.  For the purposes of the message flow
+   examples, no authentication will be used.
+
+7.  Traceability
+
+   TBD
+
+8.  Encoding
+
+   The encoding used for the request/response messaging will be JSON.
+   The data will be identified by: Content-type: application/json In
+   order to allow environment specific extensions to a particular
+   version of the ACV protocol, a top-level JSON keyword, extensions
+   will be used to extend the OE description and/or the capabilities.
+   Extensions may be ignored by the ACV server.  Vector and vector
+   response data will be JSON encoded.
+
+9.  Versioning
+
+   The version of the ACVP protocol will be carried with each message
+   and will contain a simple major.minor format.  Major version changes
+   will not be backward compatible, however additions and enhancements
+   that do not disrupt compatibility will be indicated with a minor
+   version change.  A server may accept a down-level version from the
+   client if it can process at a lower level.  If not, it will reject
+   the session.  All subsequent messages will carry the negotiated
+   version value.
+
+10.  Messaging
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 12]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+10.1.  Product Registration/Capabilities Exchange
+
+   The product registration message will include many of the normal
+   cryptographic algorithm identification line items that are found when
+   filling out a testing form.  This pre-test message will carry the
+   Company name, primary contact (OE information) as well as a detailed
+   list of the supported cryptographic algorithms to be tested during a
+   session.  The server will return the vector test list to the client.
+   It will consist of a list of vector set IDs (vsId) each of which
+   represent a set of test vectors which can be used to request the test
+   vectors at a later time.
+
+10.2.  Test Exchange
+
+   The test exchange consists of the ACV client requesting a particular
+   set of vectors selected from the vector test list.  The server
+   responds with the test vectors.  Once the client has run the vectors
+   the response data will be returned to the server for processing.  The
+   client will repeat this process until all of the tests in the session
+   test list have been processed.  The client may request results from
+   the server at any time, however if test sets have not been completed
+   the overall status will be incomplete.
+
+11.  Message Formats
+
+   As described in Section 4.1 servers may require a contextual path in
+   the URI prior to the API and version path parts used to reference a
+   resource and clients/proxies must be able to support contextual
+   paths.
+
+11.1.  JSON Web Token (JWT)
+
+   JSON Web Token is described in RFC 7519 [RFC7519] and is used as an
+   authorization mechanism for gaining access to different resources.
+
+   An example JWT:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 13]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+{
+"alg" : "none"
+}
+   {
+      "iss" : "nist.gov",
+      "exp" : 1426420800,
+      "company" : "MyCompany",
+      "jti" : 0987654321,
+      "pkey" : "cc74f56acdba635079383a03941d68db55c7b3c2fcd0f9716c9b62d56d3f8f546e9ec0244203b6ab4a82c08a46b1dbc243c6434861e31ab51065f41dbce00482498d4474d1ed3b09dc727af6b9c788fdb5da283c5a98cf8ac9e473f34644c6bbfc146e28f8158f725ce25bcb73e0a2c05378739d101df15a0c1297a1a2e3abc7912e24caba5465e78f694ad0d3cf48f2f01c4580d774d592684756efbdf0cc7648470dd78a3b38973b18946e71c8feaf2f28b93a2ff36b1cc31236e5845145899e8a0438aeb1073bc0d23d5c7898845d5227867a38234739595d55a44e41a39feff8eb447757fc6b246d92f02fe43b46e46c7403a5966f40ba4e01ca64e955c5"
+   }
+   {
+   Empty octet string (since alg is none).
+   }
+
+   The JWT can be secured if desired using the header encryption "alg"
+   value defined to HS256(HMAC-SHA256) or one of the other secure
+   values.  Key agreement would follow RFC7518.
+
+   The first four claims are required, however "pkey" is an optional
+   private claim used to pass the key used for encrypting the database
+   at the server.  Enabling this option is discussed further in
+   Section 11.7.2
+
+11.1.1.  Authorization flows with JWT
+
+   JSON Web Token is described in RFC 7519 [RFC7519] and is used as an
+   authorization mechanism for gaining access to different resources.
+
+   In order to access any resource which requires authorization a client
+   must supply the JWT as an "Authorization" header value as a "Bearer"
+   token.  An example header value is:
+
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ
+
+     Workflow authorization flows.  All exchanges shown are over HTTP.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 14]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+            +--------+---------------------------------+------+--------+
+            | Client |                                 |Server|  Notes |
+            +--------+---------------------------------+------+--------+
+            |        |POST to /login or similar with   |      |        |
+            |        |appropriate credentials          |      |        |
+            |        |-------------------------------->|      |        |
+            |        |                                 |      |        |
+            |        |receive the access token         |      |        |
+            |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
+            |        |                                 |      |        |
+            |        |POST to /register with           |      |token   |
+            |        |access token in header           |      |from    |
+            |        |-------------------------------->|      |login   |
+            |        |                                 |      |        |
+            |        |receive the session info and     |      |        |
+            |        |a session access token           |      |        |
+            |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
+            |        |                                 |      |        |
+            |        |GET /vectors?vsID=<ID> with      |      |use     |
+            |        |session access token in header   |      |token   |
+            |        |-------------------------------->|      |from    |
+            |        |                                 |      |regist- |
+            |        |                                 |      |ration  |
+            |        |                                 |      |to      |
+            |        |                                 |      |retrieve|
+            |        |                                 |      |vector  |
+            |        |                                 |      |sets,   |
+            |        |                                 |      |submit  |
+            |        |                                 |      |answers |
+            |        |                                 |      |etc.    |
+            |        |                                 |      |        |
+            |        |receive vectors                  |      |        |
+            |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
+            |        |                                 |      |        |
+            |        |POST to /vectors?vsID=<ID> with  |      |        |
+            |        |session access token in header   |      |        |
+            |        |and answers in body              |      |        |
+            |        |-------------------------------->|      |        |
+            |        |                                 |      |        |
+            |        |GET /results?vsID=<ID>           |      |        |
+            |        |with session access token in body|      |        |
+            |        |-------------------------------->|      |        |
+            |        |                                 |      |        |
+            |        |receive results                  |      |        |
+            |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
+
+                                 Figure 5
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 15]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.1.2.  JWT Expiration/Renewal
+
+   The JWT access tokens received from either the /login or the
+   /register server endpoint should be set to expire after a pre-defined
+   period, The specific length of the expiration period is out of scope
+   for this specification.  However, the expiration period length
+   impacts both the security and protocol overhead.  Longer expiration
+   periods reduce the overhead but increase the window for attacks.
+   Attempting to access a service with an expired JWT shall result in a
+   "401 Unauthorized" HTTP status code.  A client may renew an expired
+   JWT access token using the mechanism shown in Figure 6 below.
+
+    JWT access token renewal flows.  All exchanges shown are over HTTP.
+
+            +--------+---------------------------------+------+--------+
+            | Client |                                 |Server|  Notes |
+            +--------+---------------------------------+------+--------+
+            |        |POST to /login or similar with   |      |        |
+            |        |appropriate credentials          |      |        |
+            |        |and expired JWT access token     |      |        |
+            |        |-------------------------------->|      |session |
+            |        |                                 |      |or      |
+            |        |                                 |      |login   |
+            |        |                                 |      |JWT     |
+            |        |receive the renewed access token |      |        |
+            |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
+
+                                 Figure 6
+
+11.2.  Vendor Resources
+
+   The available properties for vendor resources are:
+
+      *url* - "string", identifier for this resource
+
+      *name* - "string"
+
+      *parentUrl* - a parent vendor identifier, allows for multiple
+      divisions or business units to share a parent company identifier
+
+      *website* - "string"
+
+      *emails* - array of "string"s
+
+      *contacts* - an array of contact objects,
+
+         *name* - "string"
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 16]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+         *emails* - array of "string"s
+
+         *phoneNumbers* - array of phone objects,
+
+            *number* - "string"
+
+            *type* - "string", one of (fax, voice)
+
+      *address* - an address object,
+
+         *street* - "string"
+
+         *locality* - "string"
+
+         *region* - "string"
+
+         *country* - "string"
+
+         *postalCode* - "string"
+
+11.2.1.  Vendor Listing
+
+   *GET /vendors*
+
+   Returns a listing of vendors.
+
+11.2.1.1.  Parameters
+
+      Paging Parameters (Section 13)
+
+11.2.1.2.  Response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 17]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {"vendors": [
+           {
+               "url": "/acvp/v1/vendors/1",
+               "name": "Cisco",
+               "website": "www.cisco.com",
+               "contacts": [{
+                   "name": "John Doe",
+                   "email": "johndoe@cisco.com"
+               }]
+           },
+           {
+               "url": "/acvp/v1/vendors/2",
+               "name": "Acme, LLC",
+               "website": "www.acme.acme",
+               "emails" : [ "inquiry@acme.acme" ],
+               "contacts": [{
+                   "name": "Jane Smith",
+                   "emails": ["jane.smith@acme.acme"],
+                   "phoneNumbers" : [
+                       {
+                           "name": "555-555-0001",
+                           "type" : "fax"
+                       }, {
+                           "name": "555-555-0002",
+                           "type" : "voice"
+                       }
+                   ],
+                   "address" : {
+                       "street" : "123 Main Street",
+                       "locality" : "Any Town",
+                       "region" : "AnyState",
+                       "country" : "USA",
+                       "postalCode" : "123456"
+                   }
+               }]
+           }
+       ]}
+   ]
+
+11.2.2.  Create a New Vendor
+
+   *POST /vendors*
+
+   Request the creation of a new Vendor.
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 18]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.2.2.1.  Request
+
+   "name" is required and all other properties are optional.  "url" is
+   not allowed.
+
+   [
+       {"acvVersion": "0.5"},
+       {
+         "name": "Acme, LLC",
+         "website": "www.acme.acme",
+         "emails" : [ "inquiry@acme.acme" ],
+         "contacts": [{
+             "name": "Jane Smith",
+             "emails": ["jane.smith@acme.acme"],
+             "phoneNumbers" : [
+                 {
+                     "name": "555-555-0001",
+                     "type" : "fax"
+                 }, {
+                     "name": "555-555-0002",
+                     "type" : "voice"
+                 }
+             ],
+             "address" : {
+                 "street" : "123 Main Street",
+                 "locality" : "Any Town",
+                 "region" : "AnyState",
+                 "country" : "USA",
+                 "postalCode" : "123456"
+             }
+         }]
+       }
+   ]
+
+11.2.2.2.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {"url": "/acvp/v1/vendors/2"}
+   ]
+
+11.2.3.  Vendor Information
+
+   *GET /vendors/{vendorId}*
+
+   Retrieve Information for a specific vendor
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 19]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.2.3.1.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "url": "/acvp/v1/vendors/2",
+           "name": "Acme, LLC",
+           "website": "www.acme.acme",
+           "emails" : [ "inquiry@acme.acme" ],
+           "contacts": [{
+               "name": "Jane Smith",
+               "emails": ["jane.smith@acme.acme"],
+               "phoneNumbers" : [
+                   {
+                       "name": "555-555-0001",
+                       "type" : "fax"
+                   }, {
+                       "name": "555-555-0002",
+                       "type" : "voice"
+                   }
+               ],
+               "address" : {
+                   "street" : "123 Main Street",
+                   "locality" : "Any Town",
+                   "region" : "AnyState",
+                   "country" : "USA",
+                   "postalCode" : "123456"
+               }
+           }]
+       }
+   ]
+
+11.2.4.  Update an existing Vendor
+
+   *PUT /vendors/{vendorId}*
+
+   Update a vendor
+
+   The "url" property is not updateable.
+
+11.2.4.1.  Request
+
+   Can be any subset of the updateable properties.  If a property is not
+   included its value is not changed.  A "null" value for a property
+   indicates the value should be removed.
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 20]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "name": "Acme, LLC",
+           "website": "www.acme.acme",
+           "emails" : [ "inquiry@acme.acme" ],
+           "contacts": [{
+               "name": "Jane Smith",
+               "emails": ["jane.smith@acme.acme"],
+               "phoneNumbers" : [
+                   {
+                       "name": "555-555-0001",
+                       "type" : "fax"
+                   }, {
+                       "name": "555-555-0002",
+                       "type" : "voice"
+                   }
+               ],
+               "address" : {
+                   "street" : "123 Main Street",
+                   "locality" : "Any Town",
+                   "region" : "AnyState",
+                   "country" : "USA",
+                   "postalCode" : "123456"
+               }
+           }]
+       }
+   ]
+
+11.2.5.  Remove a Vendor
+
+   *DELETE /vendors/{vendorId}*
+
+   Delete a specific vendor.
+
+   The server is not required to remove the resource but MUST return an
+   error if the resource will not be removed.
+
+11.3.  Modules
+
+   The available properties for module resources are:
+
+      *url* - "string", identifier for this resource
+
+      *name* - "string"
+
+      *version* - "string"
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 21]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+      *type* - "string", valid values are:
+
+         "software" - software-based modules
+
+         "hardware" - hardware-based modules
+
+      *vendorUrl* - "string", identifier for a vendor resource
+      (Section 11.2)
+
+      *implementationDescription* - "string", a description of the
+      implementation
+
+11.3.1.  List Modules
+
+   *GET /modules*
+
+   Returns a List of available modules.
+
+11.3.1.1.  Response
+
+[
+    {"acvVersion": "0.5"},
+    {"modules": [
+        {
+            "url": "/acvp/v1/modules/1",
+            "name": "ACME ACV Test Module",
+            "version": "1.0",
+            "type": "Software",
+            "vendorUrl": "/acvp/v1/vendors/2",
+            "implementationDescription" : "ACME test module."
+        },
+        {
+            "url": "/acvp/v1/modules/2",
+            "name": "ACME ACV Test Module",
+            "version": "2.0",
+            "type": "Software",
+            "vendorUrl": "/acvp/v1/vendors/2",
+            "implementationDescription" : "ACME test module with more features."
+        }
+    ]}
+]
+
+11.3.2.  Register a new Module
+
+   *POST /modules*
+
+   Register a new module.
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 22]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.3.2.1.  Request
+
+[
+    {"acvVersion": "0.5"},
+    {
+        "name": "ACME ACV Test Module",
+        "version": "3.0",
+        "type": "Software",
+        "vendorUrl": "/acvp/v1/vendors/2",
+        "implementationDescription" : "ACME test module with more bells and whistles."
+    }
+]
+
+11.3.2.2.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {"url": "/acvp/v1/modules/5"}
+   ]
+
+11.3.3.  Retrieve information for a Module
+
+   *GET /modules/{moduleId}*
+
+   Returns information about a specific module.
+
+11.3.3.1.  Response
+
+[
+    {"acvVersion": "0.5"},
+    {
+        "url": "/acvp/v1/modules/2",
+        "name": "ACME ACV Test Module",
+        "version": "2.0",
+        "type": "Software",
+        "vendorUrl": "/acvp/v1/vendors/2",
+        "implementationDescription": "ACME test module with more features."
+    }
+]
+
+11.3.4.  Update a Module
+
+   *PUT /modules/{moduleId}*
+
+   Update an existing module.
+
+   It may not be possible to update all properties of a module once the
+   module has been associated with a test session.
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 23]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.3.4.1.  Request
+
+[
+    {"acvVersion": "0.5"},
+    {
+        "implementationDescription" : "ACME test module with more bells and whistles."
+    }
+]
+
+11.3.5.  Delete a Module
+
+   *DELETE /modules/{moduleId}*
+
+   Delete a module or mark as no longer in use.  (Optional)
+
+11.4.  Operational Environments (OEs)
+
+   The available properties for operational environment resources are:
+
+      *url* - "string", identifier for this resource
+
+      *name* - "string"
+
+      *dependencyUrls* - an array of "string"s which identify the
+      dependencies (Section 11.5) which comprise this OE.
+
+11.4.1.  List Operational Environments
+
+   *GET /oes*
+
+   Returns a List of available operational environments.
+
+11.4.1.1.  Response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 24]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+[
+    {"acvVersion": "0.5"},
+    {"oes": [
+        {
+            "url": "/acvp/v1/oes/1",
+            "name": "Windows 10 on Intel Xeon 5100 Series Processor",
+            "dependencyUrls": [ "/acvp/v1/dependencies/1", "/acvp/v1/dependencies/2"]
+        },
+        {
+            "url": "/acvp/v1/oes/2",
+            "name": "Windows 10 on AMD 6272 Opteron Processor",
+            "dependencyUrls": [ "/acvp/v1/dependencies/1", "/acvp/v1/dependencies/3"]
+        }
+    ]}
+]
+
+11.4.2.  Create a new Operational Environment
+
+   *POST /oes*
+
+   Create a new operational environment.
+
+11.4.2.1.  Request
+
+[
+    {"acvVersion": "0.5"},
+    {
+        "name": "Ubuntu Linux 3.1 on AMD 6272 Opteron Processor with Acme package installed",
+        "dependencyUrls": [
+            "/acvp/v1/dependencies/4",
+            "/acvp/v1/dependencies/5",
+            "/acvp/v1/dependencies/7"
+        ]
+    }
+]
+
+11.4.2.2.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {"url": "/acvp/v1/oes/20"}
+   ]
+
+11.4.3.  Retrieve information for an Operational Environment
+
+   *GET /oes/{oeId}*
+
+   Returns information about a specific operational environment.
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 25]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.4.3.1.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "url": "/acvp/v1/oes/1",
+           "name": "Windows 10 on Intel Xeon 5100 Series Processor",
+           "dependencyUrls": [
+               "/acvp/v1/dependencies/1",
+               "/acvp/v1/dependencies/2"
+           ]
+       }
+   ]
+
+11.4.4.  Update an Operational Environment
+
+   *PUT /oes/{oeId}*
+
+   Update an existing operational environment.
+
+   It may not be possible to update all (or any) properties of an
+   operational environment resource once the resource has been
+   associated with a test session.
+
+11.4.4.1.  Request
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "name": "Windows 10 on Intel Xeon 5100 Series Processor",
+       }
+   ]
+
+11.4.5.  Delete an Operational Environment
+
+   *DELETE /oes/{oeId}*
+
+   Delete an operational environment or mark as no longer in use.
+   (Optional)
+
+11.5.  Dependencies
+
+   The available properties for dependency resources are:
+
+      *url* - "string", identifier for this resource
+
+      *type* - "string"
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 26]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+      "{varies}" depending on the value of "type" as defined by the
+      response of Section 11.5.3
+
+11.5.1.  List Dependencies
+
+   *GET /dependencies*
+
+   Returns a List of available dependencies.
+
+11.5.1.1.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {"dependencies": [
+           {
+               "type": "software",
+               "name": "Linux 3.1",
+               "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
+           },
+           {
+               "type": "processor",
+               "manufacturer": "Intel",
+               "family": "ARK",
+               "name": "Xeon",
+               "series": "5100",
+               "features": ["rdrand"]
+           }
+       ]}
+   ]
+
+11.5.2.  Register a new Dependency
+
+   *POST /dependencies*
+
+   Register a new dependency.
+
+11.5.2.1.  Request
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "type": "software",
+           "name": "Linux 3.1",
+           "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
+       }
+   ]
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 27]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.5.2.2.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {"url": "/acvp/v1/dependencies/7"}
+   ]
+
+11.5.3.  List Dependency Properties
+
+   *GET /dependencies/properties*
+
+   Returns the list of available dependency properties.
+
+   An array of property objects is returned with the following
+   properties:
+
+      *name* - "string"
+
+      *dataType* - "string"
+
+      *validTypes* - an array of "string"s where each element
+      corresponds to a dependency type value that this property may be
+      used with.
+
+      *description* - "string"
+
+11.5.3.1.  Response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 28]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+[
+    {"acvVersion": "0.5"},
+    {"properties": [
+        {
+            "name": "name",
+            "dataType": "string",
+            "validTypes": [
+                "software",
+                "processor"
+            ],
+            "description": "The name of the dependency."
+        },
+        {
+            "name": "swid",
+            "dataType": "string",
+            "validTypes": ["software"],
+            "description": "A Software identification (SWID) tag as described in ISO/IEC 19770-2:2015. NIST IR 8060, https://csrc.nist.gov/publications/detail/nistir/8060/final, provides guidance on creating and maintaining SWID tags."
+        },
+        {
+            "name": "cpe",
+            "dataType": "string",
+            "validTypes": [
+                "software",
+                "processor"
+            ],
+            "description": "A Common Platform Enumeration (CPE) formatted name according to Version 2.3 of the CPE Naming Specification found in NISTIR 7695, https://csrc.nist.gov/publications/detail/nistir/7695/final."
+        },
+        {
+            "name": "manufacturer",
+            "dataType": "string",
+            "validTypes": ["processor"],
+            "description": "The name of the manufacturer of the processor dependency."
+        },
+        {
+            "name": "family",
+            "dataType": "string",
+            "validTypes": ["processor"],
+            "description": "The name of the family of the processor."
+        },
+        {
+            "name": "series",
+            "dataType": "string",
+            "validTypes": ["processor"],
+            "description": "The name of the series of the processor."
+        }
+    ]}
+]
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 29]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.5.4.  Retrieve information for a Dependency
+
+   *GET /dependencies/{dependencyId}*
+
+   Returns information about a specific dependency.
+
+11.5.4.1.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "type": "software",
+           "name": "Linux 3.1",
+           "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
+       }
+   ]
+
+11.5.5.  Update a Dependency
+
+   *PUT /dependencies/{dependencyId}*
+
+   Update an existing dependency.
+
+   It may not be possible to update all (or any) properties of a
+   dependency resource once the resource has been associated with an
+   operational environment.
+
+11.5.5.1.  Request
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "name": "Linux 3.1.0",
+       }
+   ]
+
+11.5.6.  Delete a Dependency
+
+   *DELETE /dependencies/{dependencyId}*
+
+   Delete a dependency or mark as no longer in use.  (Optional)
+
+11.6.  Algorithms
+
+   The Algorithm resources are informational only.
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 30]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.6.1.  Algorithms Listing
+
+   *GET /algorithms*
+
+   Returns a list of available Algorithms on the server.
+
+   This is an optional operation.
+
+11.6.1.1.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {"algorithms": [
+           {
+               "url": "/acvp/v1/algorithms/2",
+               "name": "AES",
+               "mode": "GCM",
+               "versions": [
+                   "0.4",
+                   "0.5"
+               ]
+           },
+           {
+               "url": "/acvp/v1/algorithms/3",
+               "name": "AES",
+               "mode": "ECB",
+               "versions": [
+                   "0.5"
+               ]
+           }
+       ]}
+   ]
+
+11.6.2.  Algorithm Information
+
+   *GET /algorithms/{algorithmId}*
+
+   Retrieve Information for about a specific algorithm.
+
+11.6.2.1.  Response
+
+   Response may vary from server depending on internal representation.
+
+11.7.  Test Sessions
+
+   The available properties for test session resources are:
+
+      *url* - "string", identifier for this resource
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 31]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+      *acvpVersion* - "string", version of ACV protocol used to created
+      the test session.
+
+      *createdOn* - date (Section 16.1)
+
+      *expiresOn* - date (Section 16.1)
+
+      *encryptAtRest* - "boolean"
+
+      *vectorSetsUrl* - "string"
+
+      *publishable* - "boolean", indicates whether this test session may
+      be submitted for validation
+
+      *passed* - "boolean", indicates whether all of the vector set
+      tests have passed
+
+      *isSample* - "boolean", if true
+      /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected
+      (Section 11.8.7) will return expected result values.
+
+      *production* - "boolean", indicates that the test session excludes
+      tests that require intermediate values; this may cause the test
+      session to have a "publishable" value of "false".
+
+11.7.1.  Test Session Listing (Current User)
+
+   *GET /testSessions*
+
+   Returns a list of Test Sessions for the current user.
+
+   This is an optional operation.
+
+11.7.1.1.  Response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 32]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {"testSessions": [{
+           "url": "/acvp/v1/testSessions/2",
+           "acvpVersion": "0.5",
+           "createdOn": "2018-05-31T12:03:43Z",
+           "expiresOn": "2018-06-30T12:03:43Z",
+           "encryptAtRest": false,
+           "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+           "publishable": false,
+           "passed": true,
+           "production" : false,
+           "isSample": true
+       }]}
+   ]
+
+11.7.2.  Create a New Test Session
+
+   *POST /testSessions*
+
+   Create a new Test Session.
+
+11.7.2.1.  Request
+
+   "algorithms" is an array of algorithm objects.  Each algorithm object
+   has the following available properties:
+
+      *algorithm* - "string", required
+
+   Additional properties for each algorithm are based on the algorithm
+   definition available in each sub-specification.
+
+   If not provided "isSample", "production" and "encryptAtRest" default
+   to "false".
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 33]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {
+       "isSample" : "true",
+       "algorithms": [{
+           "algorithm": "AES-GCM",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "ivGen": "internal",
+           "ivGenMode": "8.2.1",
+           "keyLen": [
+               128,
+               256
+           ],
+           "tagLen": [96],
+           "ivLen": [96],
+           "dataLength": [
+               0,
+               128,
+               136
+           ],
+           "aadLen": [
+               128,
+               136
+           ]
+       }]}
+   ]
+
+11.7.2.2.  Response
+
+   "accessToken" is a JWT Token [RFC7519] which MUST be supplied as
+   described in Section 11.1 in order to access the Test Session.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 34]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+[
+    {"acvVersion": "0.5"},
+    {
+        "url": "/acvp/v1/testSessions/2",
+        "acvpVersion": "0.5",
+        "createdOn": "2018-05-31T12:03:43Z",
+        "expiresOn": "2018-06-30T12:03:43Z",
+        "encryptAtRest": false,
+        "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+        "publishable": false,
+        "passed": true,
+        "production": false,
+        "isSample": true,
+        "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ"
+    }
+]
+
+11.7.3.  Test Session Information
+
+   *GET /testSessions/{testSessionId}*
+
+   Returns information about the specific Test Session
+
+11.7.3.1.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "url": "/acvp/v1/testSessions/2",
+           "acvpVersion": "0.5",
+           "createdOn": "2018-05-31T12:03:43Z",
+           "expiresOn": "2018-06-30T12:03:43Z",
+           "encryptAtRest": false,
+           "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+           "publishable": false,
+           "passed": true,
+           "production": false,
+           "isSample": true
+       }
+   ]
+
+11.7.4.  Submit For Validation
+
+   *PUT /testSessions/{testSessionId}*
+
+   Certify the Test Session for validation.
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 35]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   Associates all of the testing information with the test session.  The
+   test session MUST be have both "publishable" and "passed" set to
+   "true".
+
+11.7.4.1.  Request
+
+   Available properties:
+
+      *moduleUrl* - "string"
+
+      *oeUrl* - "string"
+
+      *signature* - a signature object,
+
+         *algorithm* - "string"
+
+         *certificate* - "string"
+
+         *digitalSignature* - "string"
+
+      *algorithmPrerequisites* - array of algorithm prerequiste objects,
+      optional, for any algorithm that has a prerequisite that was not
+      included in testing, the prerequisite MUST be provided by adding
+      an element to this array
+
+         *algorithm* - "string", name of the algorithm
+
+         *mode* - "string", mode of the algorithm, optional, not all
+         algorithms have a mode
+
+         *prerequisites* - "string", array of prerequiste objects
+
+            *algorithm* - "string", required
+
+            *validationId* - "string", required
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 36]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "moduleUrl": "/acvp/v1/modules/20",
+           "oeUrl": "/acvp/v1/oes/60",
+           "algorithmPrerequisites": [{
+               "algorithm": "AES-GCM",
+               "prerequisites": [
+                   {
+                       "algorithm": "AES",
+                       "validationId": "123456"
+                   },
+                   {
+                       "algorithm": "DRBG",
+                       "validationId": "123456"
+                   }
+               ]
+           }],
+           "signature": {
+               "algorithm": "SHA256RSA",
+               "certificate": "{base64encodedcertificate}",
+               "digitalSignature": "{base64encodedsignature}"
+           }
+       }
+   ]
+
+11.7.5.  Cancel Test Session
+
+   *DELETE /testSessions/{testSessionId}*
+
+   Delete a test session.
+
+   Marks a test session as being cancelled and may be deleted by the
+   server.  Further operations with the test session resource may return
+   404 HTTP Status.
+
+11.7.6.  Request Validation Results
+
+   *GET /testSessions/{testSessionId}/results*
+
+   Request Validation Results for a Test Session
+
+11.7.6.1.  Response
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 37]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+ [
+     {"acvVersion": "0.5"},
+     {
+         "passed": false,
+         "results": [
+             {
+                 "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/1",
+                 "status": "incomplete"
+             },
+             {
+                 "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/2",
+                 "status": "passed"
+             }
+         ]
+     }
+ ]
+
+11.8.  Vector Sets
+
+   The available properties for vector set resources are:
+
+      *url* - "string", identifier for this resource
+
+      *vsId* - "number"
+
+      *algorithm* - "string"
+
+      *mode* - "string"
+
+      *testGroups* - array of test group objects,
+
+         "{varies}" - based on the values of "algorithm" and "mode"
+         there are zero or more test group properties.
+
+         *tests* - array of test objects,
+
+            *tcId* - "number"
+
+            "{varies}" - based on the values of "algorithm" and "mode"
+            there are zero or more test properties.
+
+11.8.1.  Vectors Set Listing
+
+   *GET /testSessions/{testSessionId}/vectorSets*
+
+   Returns a list of Vector Sets for the specific Test Session.
+
+   The property returned is:
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 38]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+      *vectorSetUrls* - array of "string"s
+
+11.8.1.1.  Response
+
+   [
+       {"acvVersion": "0.5"},
+       {"vectorSetUrls": [
+           "/acvp/v1/testSessions/2/vectorSets/1",
+           "/acvp/v1/testSessions/2/vectorSets/2"
+       ]}
+   ]
+
+11.8.2.  Vector Set Download
+
+   *GET /testSessions/{testSessionId}/vectorSets/{vectorSetId}*
+
+   Vector Set download request.
+
+   The server will respond with the vector set associated with the vsId
+   for the client to process.  The test group content contained in the
+   response will vary depending on the specific sub-specification of the
+   algorithm and testType being tested.
+
+11.8.2.1.  Response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 39]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "vsId": 11,
+           "algorithm": "AES-CBC",
+           "testGroups": [
+               {
+                   "direction": "encrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "iv": "00000000000000000000000000000000",
+                           "key": "00000000000000000000000000000000",
+                           "pt": "F34481EC3CC627BACD5DC3FB08F273E6"
+                       },
+                       {
+                           "tcId": 2,
+                           "iv": "00000000000000000000000000000000",
+                           "key": "00000000000000000000000000000000",
+                           "pt": "9798C4640BAD75C7C3227DB910174E72"
+                       }
+                       ... additional tests ...
+                   ]
+               },
+               ... additional test groups ...
+               {
+                   "direction": "encrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                       "tcId": 2139,
+                       "iv": "036B918F3DAB01649FC9EA13675D714A",
+                       "key": "CC3CCB78B161504A9D5698FA75E88D49",
+                       "pt": "9CA6930792FA735C160011EC1C1B5118"
+                   }]
+               }
+               ... additional test groups ...
+           ]
+       }
+   ]
+
+   If the server did not have enough time to generate the vector set for
+   a given test session, the server may reply:
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 40]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+     { "acvVersion": "0.5" },
+     { "vsId": 1437,
+       "retry" : 10
+     }
+   ]
+
+   Where:
+
+      *retry* - represents the number of seconds for the client to wait
+      before retrying the request.
+
+   The server may set the "retry" value based on the current server load
+   and expected processing time to generate the vector set.
+
+11.8.3.  Cancel Testing of a Vector Set
+
+   *DELETE /testSessions/{testSessionId}/vectorSets/{vectorSetId}*
+
+   Cancel testing for a specific Vector Set.
+
+   There may be cases where a particular vector set may not be cancelled
+   and the entire Test Session will need to be cancelled instead.
+
+11.8.4.  Request Validation Results
+
+   *GET /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results*
+
+   Request Validation Results for a Vector Set.
+
+11.8.4.1.  Response
+
+   The client will send this request to learn the validation results for
+   an individual vector set.  Properties are:
+
+      *vsId* - "number"
+
+      *disposition* - "string", the overall result for the vector set
+      with:
+
+         "fail" - indicates at least one test case has failed.
+
+         "unreceived" - indicates the server has not received responses
+         from the client for all the test cases.
+
+         "incomplete" - indicates not all tests have been processed by
+         the server, however none have failed thus far.
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 41]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+         "expired" - indicates not all the test case responses were
+         received from the client prior to expiry.
+
+         "passed" - indicates all test cases have been processed by the
+         server and have passed.
+
+      *tests* - array of test result objects,
+
+         *tcId* - "number"
+
+         *result* - "string", the result for a test case with:
+
+            "fail" - indicates the test case has failed.
+
+            "unreceived" - indicates the server has not received a
+            response from the client for the test case.
+
+            "incomplete" - indicates the server has not processed the
+            test case.
+
+            "expired" - indicates the client did not send the test case
+            response to the server prior to expiry.
+
+            "passed" - indicates the test case passed.
+
+         *reason* - "number", provides additional detail in case of a
+         "failed" "result" value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 42]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {"results": {
+           "vsId": 1437,
+           "disposition": "incomplete",
+           "tests": [
+               {
+                   "tcId": 12340,
+                   "result": "passed",
+                   "reason": ""
+               },
+               {
+                   "tcId": 12341,
+                   "result": "incomplete",
+                   "reason": ""
+               },
+               {
+                   "tcId": 12342,
+                   "result": "failed",
+                   "reason": "Authentication tag mismatch"
+               }
+           ]
+       }}
+   ]
+
+11.8.5.  Submit Results
+
+   *POST /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results*
+
+   Initial Submission of Vector Set Test Results.
+
+11.8.5.1.  Request
+
+   The client will send this request to submit the test results for an
+   individual vector set.  Similar to the vector set download the format
+   will vary depending on the specific sub-specification of the
+   algorithm and testType being tested.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 43]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "vsId": 1437,
+           "testResults": [
+               {
+                   "tcId": 12340,
+                   "iv": "01020304C077A707E56C22AC",
+                   "ct": "",
+                   "tag": "53B15E85E377F8B5B6BFC2DE915FD622"
+               },
+               {
+                   "tcId": 12341,
+                   "iv": "01020304D666587803BCBAD7",
+                   "ct": "",
+                   "tag": "E7B1F2D77D82C6EB3C9CEFF16C376D9C"
+               }, ...
+           ]
+       }
+   ]
+
+11.8.5.2.  Response
+
+   No content response.  Standard HTTP status codes will indicate
+   success or failure of the submission, but do not indicated the
+   disposition of the tests.
+
+11.8.6.  Update Results Submission
+
+   *PUT /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results*
+
+   Update Vector Set Test Results Submission.
+
+   When one or more test cases fails, the client will need to correct
+   the issue in the crypto module and send the responses again.  The
+   resending of responses for failed test cases will occur for an entire
+   vector set.  Therefore, even if only a single test case in the vector
+   set failed, the client will need to download, process, and upload
+   responses to the server for the entire vector set (presumably after
+   the problem has been corrected in the implementation).  The resending
+   of vector set responses must occur prior to expiry.
+
+11.8.6.1.  Request
+
+   The request content is identical to the request content described in
+   Section 11.8.5.
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 44]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+11.8.7.  Retrieve Expected Results
+
+   *GET /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected*
+
+   Expected Test Results.
+
+11.8.7.1.  Response
+
+   The response is identical to the request content described in
+   Section 11.8.5.
+
+12.  Vector Set Expiration
+
+   Vector sets can expire.  For example, in terms of a validation
+   authority use, the vector sets are one-time use only.  Old vector
+   sets can never be reused to obtain a new validation certificate for
+   an algorithm implementation or to update an existing certificate.
+   Expiration is a server specific definition which depends on database
+   costs, need for artifacts, etc.  If the vector set has expired, the
+   server will reply with an expired response when the client attempts
+   to download the vector set:
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "vsId": <vs-id>,
+           "status": "expired"
+       }
+   ]
+
+   The ACVP protocol requires server implementations to generate test
+   values and retain the data while the ACVP client processes and
+   returns the results.  Some crypto modules implementing the client-
+   side ACVP protocol may not return results immediately.  The ACVP
+   protocol design implies the server must retain the test values to
+   verify the client test responses at some time in the future.
+   However, some test vector sets are fairly large, which could place
+   significant storage requirements on ACVP server implementations.  To
+   alleviate long term storage requirements, ACVP allows for an
+   expiration timestamp to be set when a test vector set is generated by
+   the server.
+
+   The vector set expiration timestamp must be included by the server in
+   the vector set when the client downloads the vector set.  The server
+   may change the expiration timestamp of a previously issued vector set
+   to extend its lifetime subject to server policy.  The expiration
+   timestamp must be in the 'expiry' JSON value, which is included in
+   the JSON encoded vector set.  The expiry JSON value will be a string
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 45]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   value of the UTC timestamp using form "YYYY-MM-DD HH:MM:SS".  The
+   following figure shows a partial JSON encoded vector set that
+   contains the expiry value.
+
+   [
+       {"acvVersion": "0.5"},
+       {
+           "vsId": 1437,
+           "expiry": "2018-12-31 23:59:59",
+           "algorithm": "AES-GCM",
+           "testGroups": [{
+               "direction": "encrypt",
+               "keyLen": 128,
+               "ivLen": 96,
+               "ptLen": 0,
+               "aadLen": 128,
+               "tagLen": 128,
+               "tests": [{
+                   "tcId": 12340,
+                   "key": "1529BAC6229586F057FAA59353851686",
+                   "pt": "",
+                   "aad": "4B11160620475D8EE440C3795CF62D26"
+               },
+                           .
+                           .
+                           .
+                           <remainder of vector set omitted from figure>
+                           .
+                           .
+                           .
+               ]
+           }]
+       }
+   ]
+
+13.  Paging Parameters
+
+   Some resources require paging in order to avoid returning large
+   amounts of data.  To faciliate paging the following Query parameters
+   should be allowed on resources where paging is necessary.
+
+      "limit" - the number of entries to return
+
+      "offset" - the offset into the list of entries
+
+   The response will indicate the offset and the total count using
+   "offset" and "total" properties.
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 46]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+14.  Error Codes
+
+   Errors will follow HTTP[S] numbering scheme.  In addition errors as
+   well as 200 messages may carry JSON encoded information that
+   describes in detail the error and any associated troubleshooting
+   information.  A non-exhaustive list of JSON encoded error messages
+   are in Appendix B.
+
+15.  Algorithm Test Extensions
+
+   ACVP is an extensible protocol that supports testing of a large
+   number of cryptographic algorithms from several different classes.
+   See [ext] for datails.
+
+16.  Custom Specification Objects
+
+16.1.  Date
+
+   A date type is a time "string" formatted according to the rules of
+   RFC 3339 [RFC3339]; all date/times must use UTC time denoted by 'Z'
+   suffix with no local timezone adjustment.  Example is
+   "2018-06-01T20:10:33Z"
+
+16.2.  BitString
+
+   Bitstrings are used to communicate a string of bits between the ACVP
+   server and IUT.
+
+16.2.1.  Endianness
+
+   BitStrings should be considered in big endian order, unless otherwise
+   specified by the algorithm.
+
+   The hex string "FA" (assuming all bits are considered) should
+   represent the bits 11111010 (in MSb) or the value 250.
+
+16.2.2.  Hex to Bitstring Parsing
+
+   "valueLen" will be used as the example, but it can apply to any bit
+   length registration/vector set/etc parameters.
+
+   When a "value" is provided along with a "valueLen", the "valueLen"
+   MUST be considered when parsing the hex string represented in
+   "value", EXCEPT in empty bitstring cases, which MUST be represented
+   as an empty string "".  Parsing Hex strings into Bit strings is
+   especially important for algorithms such as the SHA variations that
+   may only include a portion of bits from the provided hex string.
+   When only a portion of bits from a Hex string are considered, bits
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 47]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   for use in the bitstring should be taken from the most significant
+   bits, meaning the lesser significant bits are the bits that are
+   dropped.
+
+16.2.2.1.  Hex string parsing examples
+
+   o  valueLen: 8, value: "FA", should be parsed as the bits 11111010,
+      or the value 250.
+
+   o  valueLen: 7, value: "FA", should be parsed as the bits 1111101, or
+      the value 125.
+
+   o  valueLen: 5, value: "FA", should be parsed as the bits 11111, or
+      the value 31.
+
+   o  valueLen: 3, value: "FA", should be parsed as the bits 111, or the
+      value 7.
+
+   o  valueLen: 0, value: "", MUST be interpreted as an empty bit
+      string.
+
+16.3.  Range
+
+   The Range object can be used to convey a range of values.  It
+   contains its own set of properties made up of "min", "max", and
+   "increment".
+
+16.3.1.  Range JSON examples
+
+   A range object specifying a minimum of 0, a maximum of 8, with an
+   increment of 1.  This range object includes the values 1, 2, 3, 4, 5,
+   6, 7, and 8.
+
+
+   {"myRange": {
+       "min": 1,
+       "max": 8,
+       "increment": 1
+   }}
+
+
+   A range object specifying a minimum of 0, a maximum of 8, with an
+   increment of 2.  This range object includes the values 0, 2, 4, 6,
+   and 8.
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 48]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   {"myRange": {
+       "min": 0,
+       "max": 8,
+       "increment": 2
+   }}
+
+
+16.4.  Domain
+
+   The Domain object can be used to specify a set of values similar to
+   Range, albeit with more control.  A domain can be made up of an array
+   of objects, where those objects can be literal values, and/or Range
+   objects.
+
+16.4.1.  Domain JSON examples
+
+   Several sample domain objects that state 0, 8, 16, 32, 96, 128, 192,
+   and 256 are valid values.
+
+
+   {"myDomain": [
+       {
+           "min": 0,
+           "max": 16,
+           "increment": 8
+       },
+       32,
+       96,
+       {
+           "min": 128,
+           "max": 256,
+           "increment": 64
+       }
+   ]}
+
+
+
+   {"myDomain": [ 0, 8, 16,  32, 96,  128, 192, 256 ]}
+
+
+16.4.2.  Additional Domain Information
+
+   Because the Domain is an array of objects consisting of (potentially)
+   both literals and ranges, algorithms that use an array of integers
+   can be used interchangably with the Domain object.
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 49]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+17.  Other Considerations
+
+   When an ACVP client is attached to a cryptographic module that is in
+   use, access to ACVP MUST be controlled so that only an administrator
+   or other authorized user can send and receive ACVP messages.  This is
+   because an attacker that has access to ACVP can potentially use it to
+   probe for weaknesses in the cryptographic module.
+
+18.  Acknowledgements
+
+   Original ACVP created by David McGrew, Bill Hudson and Anthony Grieco
+   of Cisco Systems.
+
+19.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+20.  Normative References
+
+   [ext]      Vassilev, A., "ACVP Algorithm Test Extensions
+              Specification", February 2018,
+              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
+              draft-vassilev-acvp-ext-00.txt>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+              <https://www.rfc-editor.org/info/rfc3339>.
+
+   [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+              <https://www.rfc-editor.org/info/rfc7519>.
+
+Appendix A.  JSON Formatting Guidelines
+
+   All JSON keywords shall use lower camelCase format with no
+   underscores or hyphens and use the following characters only a-z,
+   A-Z, 0-9.  Keywords shall abbreviate common words and phrases
+   wherever possible for brevity.
+
+   For example: password length - pwLen plain text length - ptLen
+
+   Keywords should be chosen such that they are informative and brief,
+   for example:
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 50]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   [ { "acvVersion": "0.5" }, { "results" : { "disposition" :
+   "incomplete" } } ]
+
+   Metadata assigned to the keyword may use any format which best
+   reflects the information being represented including hyphens,
+   underscores alternating case, numbers, etc.  However, brevity should
+   be a major consideration, for example:
+
+   "algorithms" : [ { "algorithm" : "AES-GCM", "mode" : "modes", "ivGen"
+   : "internal", "ivGenMode" : "8.2.1" } All metadata representing
+   strings or big numbers shall use double quotes at both ends.  Big
+   numbers require conversion from strings to whatever format is used by
+   the DUT.  Numerical values of integer size or with decimal points may
+   use quotations if those values are generally used as a string, for
+   example the acvVersion would generally be used in displaying
+   information not in any mathematical operations.  Something like
+   keyLen or ptLen values would be better used without quotes to avoid
+   having to convert the string to an integer for use in the code.
+
+Appendix B.  JSON Encoded Error Messages
+
+   TBD
+
+Authors' Addresses
+
+   Barry Fussell (editor)
+   Cisco Systems
+   170 West Tasman Dr.
+   San Jose, CA  95134
+   USA
+
+   Email: bfussell@cisco.com
+
+
+   Apostol Vassilev (editor)
+   National Institute of Standards and Technology
+   100 Bureau Dr.
+   Gaithersburg, MD  20899
+   USA
+
+   Email: apostol.vassilev@nist.gov
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 51]
+
+Internet-Draft              Abbreviated Title                August 2018
+
+
+   Harold Booth
+   National Institute of Standards and Technology
+   100 Bureau Dr.
+   Gaithersburg, MD  20899
+   USA
+
+   Email: harold.booth@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.         Expires February 7, 2019               [Page 52]
