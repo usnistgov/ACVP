@@ -69,7 +69,7 @@
       </address>
     </author>
 
-    <date month="July" year="2018"/>
+    <date month="August" year="2018"/>
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
          in the current day for you. If only the current year is specified, xml2rfc will fill
@@ -477,12 +477,20 @@
 	        the group.  The following table describes the DRBG JSON elements of the Test Group JSON object.</t>
         <t>ACVP allows default bit lengths for the inputs to specific algorithms, typically communicated as numerical value zero (0). If an implementation does not support one of the defaults,
 the bit lengths the supported values shall be specified explicitly. </t>
+
         <texttable anchor="vs_tg_table" title="Test Group JSON Object">
           <ttcol align="left">JSON Value</ttcol>
           <ttcol align="left">Description</ttcol>
           <ttcol align="left">JSON type</ttcol>
           <ttcol align="left">Optional</ttcol>
-
+          <c>tgId</c>
+          <c>Numeric identifier for the test group, unique across the entire vector set.</c>
+          <c>value</c>
+          <c>No</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
           <c>mode</c>
           <c>the mode of the DRBG, see            <xref target="supported_algs"/>
           </c>
@@ -719,11 +727,33 @@ the bit lengths the supported values shall be specified explicitly. </t>
         <c/>
         <c/>
         <c/>
-        <c>testResults</c>
-        <c>Array of JSON objects that represent each test vector result, which uses the same
-	      JSON schema as defined in          <xref target="tvjs"/>
+        <c>testGroups</c>
+        <c>Array of JSON objects that represent each test vector group. See          <xref target="vr_group_table"/>
         </c>
         <c>array</c>
+      </texttable>
+
+      <t>The testGroups section is used to organize the ACVP client response in a similar manner 
+      to how it receives vectors.  Several algorithms SHALL require the client to send back group 
+      level properties in their response.  This structure helps accommodate that.</t>
+
+      <texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
+        <ttcol align="left">JSON Value</ttcol>
+        <ttcol align="left">Description</ttcol>
+        <ttcol align="left">JSON type</ttcol>
+
+        <c>tgId</c>
+        <c>The test group Id</c>
+        <c>value</c>
+        <c/>
+        <c/>
+        <c/>
+        <c>tests</c>
+        <c>The tests associated to the group specified in tgId</c>
+        <c>value</c>
+        <c/>
+        <c/>
+        <c/>
       </texttable>
 
       <t>Each test group contains an array of one or more test cases.  Each test case is a JSON object
@@ -1102,12 +1132,13 @@ the bit lengths the supported values shall be specified explicitly. </t>
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.4" },
+                { "acvVersion": "0.5" },
                 { "vectorSetId": 1133,
                   "algorithm": "ctrDRBG",
                   "mode": "3KeyTDEA",
                   "testGroups": [
                     {
+                      "tgId": 1,
                       "derFunc": true,
                       "predResistance": true,
                       "reSeed": true,
@@ -1157,12 +1188,13 @@ the bit lengths the supported values shall be specified explicitly. </t>
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.4" },
+                { "acvVersion": "0.5" },
                 { "vectorSetId": 1146,
                   "algorithm": "hmacDRBG",
                   "mode": "AES-256",
                   "testGroups": [
                     {
+                      "tgId": 1,
                       "predResistance": true,
                       "reSeed": false,
                       "entropyInputLen": 256,
@@ -1210,12 +1242,13 @@ the bit lengths the supported values shall be specified explicitly. </t>
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.4" },
+                { "acvVersion": "0.5" },
                 { "vectorSetId": 1156,
                   "algorithm": "hashDRBG",
                   "mode": "SHA2-256",
                   "testGroups": [
                     {
+                      "tgId": 1,
                       "predResistance": true,
                       "reSeed": false,
                       "entropyInputLen": 256,
@@ -1263,12 +1296,13 @@ the bit lengths the supported values shall be specified explicitly. </t>
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.4" },
+                { "acvVersion": "0.5" },
                 { "vectorSetId": 1157,
                   "algorithm": "hashDRBG",
                   "mode": "SHA2-256",
                   "testGroups": [
                     {
+                      "tgId": 1,
                       "predResistance": false,
                       "reSeed": true,
                       "entropyInputLen": 256,
@@ -1322,12 +1356,13 @@ the bit lengths the supported values shall be specified explicitly. </t>
       <figure>
         <artwork><![CDATA[
               [
-                { "acvVersion": "0.4" },
+                { "acvVersion": "0.5" },
                 { "vectorSetId": 1167,
                   "algorithm": "hashDRBG",
                   "mode": "SHA2-256",
                   "testGroups": [
                     {
+                      "tgId": 1,
                       "predResistance": false,
                       "reSeed": false,
                       "entropyInputLen": 256,
@@ -1376,101 +1411,122 @@ the bit lengths the supported values shall be specified explicitly. </t>
       <t>The following is a example JSON object for ctrDRBG with 3KeyTDEA test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.4" },
-                  { "vectorSetId": 1133,
-                    "testResults": [
-                        {
-                            "tcId": 1815,
-                            "returnedBits ": "4565e85447af7134775816588f1b0faf8b402a951db17753d01809d14724449d"
-                        },
-                        {
-                            "tcId": 1816,
-                            "returnedBits": "b67acc3b2231ec54344d5be2ee8fcac72e83651b8cf2ac2bc361171b882f0965"
-                        }
-                    ]
+          [{
+              "acvVersion": "0.5"
+            },
+            {
+              "vectorSetId": 1133,
+              "testGroups": [{
+                  "tgId": 1,
+                  "tests": [{
+                      "tcId": 1815,
+                      "returnedBits ": "4565e85447af7134775816588f1b0faf8b402a951db17753d01809d14724449d"
+                    },
+                    {
+                      "tcId": 1816,
+                      "returnedBits": "b67acc3b2231ec54344d5be2ee8fcac72e83651b8cf2ac2bc361171b882f0965"
+                    }
+                  ]
                 }
-             ]
+              ]
+            }
+          ]
             ]]>        </artwork>
       </figure>
       <t>The following is a example JSON object for HMAC_DRBG test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.4" },
-                  { "vectorSetId":  1146,
-                    "testResults": [
-                        {
-                            "tcId": 2111,
-                            "returnedBits": "e42130fd1d920a2bcd177c0de0d5834c9b05a6ecdf3bc46e3733869f762dc2e7d97357934d8061db033670c3739369924b321216c30b3e45d9bc8c0bad61d8fdc03dffd70725e793ebfe98bc15358764402f4e2c71be4acfad898649b51c5d2625374a61be2b59833d2dfcc593eddcffbac79016b22a992ae6f5f82bae194e06"
-                        },
-                       {
-                            "tcId": 2112,
-                            "returnedBits": "495b2a0de6b5fc4545fdd5fec93362d1203b1dfef3528f7d852fb89ba1c45059bd52cb7a80176dd71c26108912be6f3c33d95d5cee92349ba6bf16db42c4c828729a9b4a5f53e60655df55f0e58753ad2785d53fc44fe98a5e214e8172554bd53047f38a67f8a5af11111e33dcc5e705824a78d661839994f3529cec5a83a9f0"
-                       }
-                    ]
-                }
-             ]
+          [{
+              "acvVersion": "0.5"
+            },
+            {
+              "vectorSetId": 1146,
+              "testGroups": [{
+                "tgId": 1,
+                "tests": [{
+                    "tcId": 2111,
+                    "returnedBits": "e42130fd1d920a2bcd177c0de0d5834c9b05a6ecdf3bc46e3733869f762dc2e7d97357934d8061db033670c3739369924b321216c30b3e45d9bc8c0bad61d8fdc03dffd70725e793ebfe98bc15358764402f4e2c71be4acfad898649b51c5d2625374a61be2b59833d2dfcc593eddcffbac79016b22a992ae6f5f82bae194e06"
+                  },
+                  {
+                    "tcId": 2112,
+                    "returnedBits": "495b2a0de6b5fc4545fdd5fec93362d1203b1dfef3528f7d852fb89ba1c45059bd52cb7a80176dd71c26108912be6f3c33d95d5cee92349ba6bf16db42c4c828729a9b4a5f53e60655df55f0e58753ad2785d53fc44fe98a5e214e8172554bd53047f38a67f8a5af11111e33dcc5e705824a78d661839994f3529cec5a83a9f0"
+                  }
+                ]
+              }]
+            }
+          ]
             ]]>        </artwork>
       </figure>
       <t>The following is a example JSON object for hashDRBG test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.4" },
-                  { "vectorSetId": 1156,
-                    "testResults": [
-                        {
-                            "tcId": 2151,
-                            "returnedBits ": "1af967534c670271e26c9b991ec975b78c84623853cd531368f5b2e81f015f97ffbb8cd4533d4354ed432fbdf8025f04786745fd006e173f34e6f01e136bd9b4db2b96919dfa12e8deecf7b7c72b1d329afa99c29e844b27ee34d468a4b20b5739c00ad405943aeb5084285468765190112c5e44756770479552f2f2913ed362"
-                        },
-                       {
-                            "tcId": 2152,
-                            "returnedBits": "8a74a8c31ea4e6e62f8a77b45da8ec9d8b75e6813f15327c5beb8cb4b56b15e85f95ace34826f8da9048be7c800b33d6c4d3c6558b3e2e0ccfe867a2c6107dc7bacf513017c1a5bcb65ce16ed49aefe764ea7a13d36ceb7f9c443a0cb81f55abcc0c7b2d7d97858ee0b237a72364e826dd6b25df84914f2b354e03fd7fea758e"
-                       }
-                    ]
-                }
-             ]
+          [{
+              "acvVersion": "0.5"
+            },
+            {
+              "vectorSetId": 1156,
+              "testGroups": [{
+                "tgId": 1,
+                "tests": [{
+                    "tcId": 2151,
+                    "returnedBits ": "1af967534c670271e26c9b991ec975b78c84623853cd531368f5b2e81f015f97ffbb8cd4533d4354ed432fbdf8025f04786745fd006e173f34e6f01e136bd9b4db2b96919dfa12e8deecf7b7c72b1d329afa99c29e844b27ee34d468a4b20b5739c00ad405943aeb5084285468765190112c5e44756770479552f2f2913ed362"
+                  },
+                  {
+                    "tcId": 2152,
+                    "returnedBits": "8a74a8c31ea4e6e62f8a77b45da8ec9d8b75e6813f15327c5beb8cb4b56b15e85f95ace34826f8da9048be7c800b33d6c4d3c6558b3e2e0ccfe867a2c6107dc7bacf513017c1a5bcb65ce16ed49aefe764ea7a13d36ceb7f9c443a0cb81f55abcc0c7b2d7d97858ee0b237a72364e826dd6b25df84914f2b354e03fd7fea758e"
+                  }
+                ]
+              }]
+            }
+          ]
             ]]>        </artwork>
       </figure>
       <t>The following is a example JSON object for hashDRBG test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.4" },
-                  { "vectorSetId": 1157,
-                    "testResults": [
-                        {
-                            "tcId": 3151,
-                            "returnedBits ": "0eadc82746890ee0b6c20b10016e2fd037073d952ed075d1ad4c53f6971ee6405ec40f6fd090c639a800ab9092f537913608787fbc77efd0465a84688da189f14c0d2adba5953f07ea463f4a772bb1f52a3c589cd89231acf0ff06269611f7a908eb171143d5a78d0fb7dca8326d235f3f4f3f25a0a69f0a596d6dbac1eb0cdc"
-                        },
-                       {
-                            "tcId": 3152,
-                            "returnedBits": "6452be2ee730d7245b28efa7a0dcd50299aaa126c5aa6dc8be3ae1c75ff54c412b1776a4beba8cb7c7bf9e2ec8c7fe2de5f51c4d740e20f5d9bbef3b743c81b958e05880ad9bbc8794be156e6d4b2f6a826787ce1fb479e449a27aa99831eba6c0fc990eabff928fafa703619f85060090548e2a23911a1e5adec5ac15a29798"
-                       }
-                    ]
-                }
-             ]
+          [{
+              "acvVersion": "0.5"
+            },
+            {
+              "vectorSetId": 1157,
+              "testGroups": [{
+                "tgId": 1,
+                "tests": [{
+                    "tcId": 3151,
+                    "returnedBits ": "0eadc82746890ee0b6c20b10016e2fd037073d952ed075d1ad4c53f6971ee6405ec40f6fd090c639a800ab9092f537913608787fbc77efd0465a84688da189f14c0d2adba5953f07ea463f4a772bb1f52a3c589cd89231acf0ff06269611f7a908eb171143d5a78d0fb7dca8326d235f3f4f3f25a0a69f0a596d6dbac1eb0cdc"
+                  },
+                  {
+                    "tcId": 3152,
+                    "returnedBits": "6452be2ee730d7245b28efa7a0dcd50299aaa126c5aa6dc8be3ae1c75ff54c412b1776a4beba8cb7c7bf9e2ec8c7fe2de5f51c4d740e20f5d9bbef3b743c81b958e05880ad9bbc8794be156e6d4b2f6a826787ce1fb479e449a27aa99831eba6c0fc990eabff928fafa703619f85060090548e2a23911a1e5adec5ac15a29798"
+                  }
+                ]
+              }]
+            }
+          ]
             ]]>        </artwork>
       </figure>
       <t>The following is a example JSON object for hashDRBG test results sent from the crypto module to the ACVP server.</t>
       <figure>
         <artwork><![CDATA[
-              [
-                  { "acvVersion": "0.4" },
-                  { "vectorSetId": 1167,
-                    "testResults": [
-                        {
-                            "tcId": 4151,
-                            "returnedBits ": "5dbfd26651bc71597e8f5b06c650bbf2c8117c0735bd903027628b7d7e0658abb818ad63f67d5d9f38f3bc976a0d3c89764122acf3b6a704cd9af0c3ebbde3cd90e4787a4b90267752e5585188f572b2a7f7dfa424cf05f5a2bf49540b90a887af4b352ddf226ee62809f329652faba219c27b430172feb58b875d2611324f9e"
-                        },
-                       {
-                            "tcId": 4152,
-                            "returnedBits": "ff3cce0b5585172b1f93b22a00d9757f60f15f773b33a93b40f01a5e00328dcc78e8827897ec141132104dfb670b0d8ce7a60ab66e89aa5322ea3a497a6861dc0457ab86b1c28c290cef05fd52a78641172f5ef5a1511d31c8eeb9373cb0098c24e12abe3f907a1633f21defdfd2b232dedca7035de0bda31585d0b0321a9009"
-                       }
-                    ]
+        [{
+            "acvVersion": "0.5"
+          },
+          {
+            "vectorSetId": 1167,
+            "testGroups": [{
+              "tgId": 1,
+              "tests": [{
+                  "tcId": 4151,
+                  "returnedBits ": "5dbfd26651bc71597e8f5b06c650bbf2c8117c0735bd903027628b7d7e0658abb818ad63f67d5d9f38f3bc976a0d3c89764122acf3b6a704cd9af0c3ebbde3cd90e4787a4b90267752e5585188f572b2a7f7dfa424cf05f5a2bf49540b90a887af4b352ddf226ee62809f329652faba219c27b430172feb58b875d2611324f9e"
+                },
+                {
+                  "tcId": 4152,
+                  "returnedBits": "ff3cce0b5585172b1f93b22a00d9757f60f15f773b33a93b40f01a5e00328dcc78e8827897ec141132104dfb670b0d8ce7a60ab66e89aa5322ea3a497a6861dc0457ab86b1c28c290cef05fd52a78641172f5ef5a1511d31c8eeb9373cb0098c24e12abe3f907a1633f21defdfd2b232dedca7035de0bda31585d0b0321a9009"
                 }
-             ]
+              ]
+            }]
+          }
+        ]
             ]]>        </artwork>
       </figure>
     </section>
