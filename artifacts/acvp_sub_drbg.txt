@@ -62,23 +62,24 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
-     1.2.  Default values  . . . . . . . . . . . . . . . . . . . . .   2
+     1.2.  Default values  . . . . . . . . . . . . . . . . . . . . .   3
    2.  Capabilities Registration . . . . . . . . . . . . . . . . . .   3
      2.1.  Supported DRBG Algorithms . . . . . . . . . . . . . . . .   3
-     2.2.  Required Prerequisite Algorithms for DRBG Validations . .   4
-     2.3.  Supported DRBG Algorithm Capabilities . . . . . . . . . .   4
-   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   9
-     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  10
-     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  12
-   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  14
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
-   Appendix A.  Example DRBG Capabilities JSON Object  . . . . . . .  15
-   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  21
-   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  27
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  30
+       2.1.1.  Supported values per DRBG option  . . . . . . . . . .   4
+     2.2.  Required Prerequisite Algorithms for DRBG Validations . .   5
+     2.3.  Supported DRBG Algorithm Capabilities . . . . . . . . . .   6
+   3.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  11
+     3.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  12
+     3.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  14
+   4.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  16
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  17
+   Appendix A.  Example DRBG Capabilities JSON Object  . . . . . . .  17
+   Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  23
+   Appendix C.  Example Test Results JSON Object . . . . . . . . . .  29
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  32
 
 1.  Introduction
 
@@ -101,11 +102,10 @@ Table of Contents
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted in RFC 2119 [RFC2119].
 
-1.2.  Default values
 
-   ACVP has default values for many of the input parameters for testing
-   the DRBG algorithms.For example, the Entropy Input, Nonce,
-   Personalization String, and Addtional Input parameters have default
+
+
+
 
 
 
@@ -114,8 +114,13 @@ Vassilev                Expires February 17, 2019               [Page 2]
 Internet-Draft                DRBG Alg JSON                  August 2018
 
 
+1.2.  Default values
+
+   ACVP has default values for many of the input parameters for testing
+   the DRBG algorithms.For example, the Entropy Input, Nonce,
+   Personalization String, and Addtional Input parameters have default
    values.  The specific details and restrictions on each of these input
-   lengths is specified in Section 2 , Table 4 and the notes following
+   lengths is specified in Section 2 , Table 5 and the notes following
    it.  To indicate a preference for using a default value for any of
    these parameters, the value zero (0) should be set.  If the
    implementation does not support one of these defaults, the
@@ -134,6 +139,36 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
    The following DRBG algorithms and modes may be advertised by the ACVP
    compliant crypto module:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vassilev                Expires February 17, 2019               [Page 3]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
 
                 +----------------------+-----------------+
                 | JSON algorithm value | JSON mode value |
@@ -162,16 +197,74 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
           Table 1: Supported DRBG Algorithm and Modes JSON Values
 
+   Note 1: The ctrDRBG algorithm in TDES mode shall only be used with
+   the three-key option of the Triple-DES algorithm.
+
+2.1.1.  Supported values per DRBG option
+
+   DRBG minimum/maximum values for several options such as minimum
+   entropy and nonce, vary depending on the DRBG capabilities
+   registered.  The following table depicts those values
+
+   +------+--------+-------+-------+------+------+--------+------+-----+
+   | DRBG | Mode   | Deriv | Secur | Min  | Max  | Max Pe | Max  | Min |
+   | Algo |        | ation | ity S | Entr | Entr | rsoStr | Addl | Non |
+   | rith |        | Funct | treng | opy  | opy  | ing    | Stri | ce  |
+   | m    |        | ion   | th    |      |      |        | ng   |     |
+   +------+--------+-------+-------+------+------+--------+------+-----+
+   | Coun | AES128 | TRUE  | 128   | 128  | 2^35 | 2^35   | 2^35 | 64  |
+   | ter  |        |       |       |      |      |        |      |     |
+   | Coun | AES192 | TRUE  | 192   | 192  | 2^35 | 2^35   | 2^35 | 96  |
+   | ter  |        |       |       |      |      |        |      |     |
+   | Coun | AES256 | TRUE  | 256   | 256  | 2^35 | 2^35   | 2^35 | 128 |
+   | ter  |        |       |       |      |      |        |      |     |
 
 
 
-Vassilev                Expires February 17, 2019               [Page 3]
+Vassilev                Expires February 17, 2019               [Page 4]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
 
-   Note 1: The ctrDRBG algorithm in TDES mode shall only be used with
-   the three-key option of the Triple-DES algorithm.
+   | Coun | TDES   | TRUE  | 112   | 112  | 2^35 | 2^35   | 2^35 | 56  |
+   | ter  |        |       |       |      |      |        |      |     |
+   | Coun | AES128 | FALSE | 128   | 256  | 256  | 256    | 256  | 0   |
+   | ter  |        |       |       |      |      |        |      |     |
+   | Coun | AES192 | FALSE | 192   | 320  | 320  | 320    | 320  | 0   |
+   | ter  |        |       |       |      |      |        |      |     |
+   | Coun | AES256 | FALSE | 256   | 384  | 384  | 384    | 384  | 0   |
+   | ter  |        |       |       |      |      |        |      |     |
+   | Coun | TDES   | FALSE | 112   | 232  | 232  | 232    | 232  | 0   |
+   | ter  |        |       |       |      |      |        |      |     |
+   | Hash | SHA1   | N/A   | 80    | 80   | 2^35 | 2^35   | 2^35 | 40  |
+   | Hash | SHA2-2 | N/A   | 112   | 112  | 2^35 | 2^35   | 2^35 | 56  |
+   |      | 24     |       |       |      |      |        |      |     |
+   | Hash | SHA2-2 | N/A   | 128   | 128  | 2^35 | 2^35   | 2^35 | 64  |
+   |      | 56     |       |       |      |      |        |      |     |
+   | Hash | SHA2-3 | N/A   | 192   | 192  | 2^35 | 2^35   | 2^35 | 96  |
+   |      | 84     |       |       |      |      |        |      |     |
+   | Hash | SHA2-5 | N/A   | 256   | 256  | 2^35 | 2^35   | 2^35 | 128 |
+   |      | 12     |       |       |      |      |        |      |     |
+   | Hash | SHA2-5 | N/A   | 112   | 112  | 2^35 | 2^35   | 2^35 | 56  |
+   |      | 12/224 |       |       |      |      |        |      |     |
+   | Hash | SHA2-5 | N/A   | 128   | 128  | 2^35 | 2^35   | 2^35 | 64  |
+   |      | 12/256 |       |       |      |      |        |      |     |
+   | Hmac | SHA1   | N/A   | 128   | 128  | 2^35 | 2^35   | 2^35 | 64  |
+   | Hmac | SHA2-2 | N/A   | 192   | 192  | 2^35 | 2^35   | 2^35 | 96  |
+   |      | 24     |       |       |      |      |        |      |     |
+   | Hmac | SHA2-2 | N/A   | 256   | 256  | 2^35 | 2^35   | 2^35 | 128 |
+   |      | 56     |       |       |      |      |        |      |     |
+   | Hmac | SHA2-3 | N/A   | 256   | 256  | 2^35 | 2^35   | 2^35 | 128 |
+   |      | 84     |       |       |      |      |        |      |     |
+   | Hmac | SHA2-5 | N/A   | 256   | 256  | 2^35 | 2^35   | 2^35 | 128 |
+   |      | 12     |       |       |      |      |        |      |     |
+   | Hmac | SHA2-5 | N/A   | 192   | 192  | 2^35 | 2^35   | 2^35 | 96  |
+   |      | 12/224 |       |       |      |      |        |      |     |
+   | Hmac | SHA2-5 | N/A   | 256   | 256  | 2^35 | 2^35   | 2^35 | 128 |
+   |      | 12/256 |       |       |      |      |        |      |     |
+   +------+--------+-------+-------+------+------+--------+------+-----+
+
+              Table 2: Supported values per DRBG option table
 
 2.2.  Required Prerequisite Algorithms for DRBG Validations
 
@@ -181,6 +274,13 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    primitives must be validated, either separately or as part of the
    same submission.  ACVP provides a mechanism for specifying the
    required prerequisites:
+
+
+
+Vassilev                Expires February 17, 2019               [Page 5]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
 
    +--------------+--------------+--------------+-----------+----------+
    | JSON Value   | Description  | JSON type    | Valid     | Optional |
@@ -207,7 +307,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |              | validations  | objects      |           |          |
    +--------------+--------------+--------------+-----------+----------+
 
-        Table 2: Required DRBG Prerequisite Algorithms JSON Values
+        Table 3: Required DRBG Prerequisite Algorithms JSON Values
 
 2.3.  Supported DRBG Algorithm Capabilities
 
@@ -218,14 +318,6 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    value is part of the 'capability_exchange' element of the ACVP JSON
    registration message.  See the ACVP specification for details on the
    registration message.  Each DRBG mode capability advertised is a
-
-
-
-Vassilev                Expires February 17, 2019               [Page 4]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
-
    self-contained JSON object.  The following JSON values are used for
    DRBG mode capabilities:
 
@@ -238,6 +330,14 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                | mode to   |        |                 |           |
    |                | be        |        |                 |           |
    |                | validated |        |                 |           |
+
+
+
+Vassilev                Expires February 17, 2019               [Page 6]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
+
    |                |           |        |                 |           |
    | derFuncEnabled | derivatio | boolea | true/false      | Yes, appl |
    |                | n         | n      |                 | icable to |
@@ -246,7 +346,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                | see the   |        |                 |           |
    |                | notes     |        |                 |           |
    |                | below     |        |                 |           |
-   |                | Table 4   |        |                 |           |
+   |                | Table 5   |        |                 |           |
    |                | for more  |        |                 |           |
    |                | informati |        |                 |           |
    |                | on.       |        |                 |           |
@@ -259,12 +359,12 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                | entropy   |        | the mechanism/o |           |
    |                | input.    |        | ption, max -    |           |
    |                | See       |        | larger values   |           |
-   |                | Table 4   |        | are optional,   |           |
+   |                | Table 5   |        | are optional,   |           |
    |                | notes     |        | step -          |           |
    |                | below.    |        | increment.      |           |
    |                |           |        |                 |           |
    | nonceLen       | See       | Domain | min - at least  | No        |
-   |                | Table 4   |        | one half of the |           |
+   |                | Table 5   |        | one half of the |           |
    |                | notes     |        | maximum         |           |
    |                | below.    |        | security        |           |
    |                |           |        | strength        |           |
@@ -274,26 +374,26 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                |           |        | longer nonces   |           |
    |                |           |        | are permitted,  |           |
    |                |           |        | step -          |           |
-
-
-
-Vassilev                Expires February 17, 2019               [Page 5]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
-
    |                |           |        | increment. Set  |           |
    |                |           |        | to zero (0) if  |           |
    |                |           |        | not supported.  |           |
    |                |           |        |                 |           |
    | persoStringLen | See       | Domain | min - the       | No        |
-   |                | Table 4   |        | maximum         |           |
+   |                | Table 5   |        | maximum         |           |
    |                | notes     |        | security        |           |
    |                | below.    |        | strength        |           |
    |                |           |        | supported by    |           |
    |                |           |        | the mechanism/o |           |
    |                |           |        | ption; max -    |           |
    |                |           |        | largest         |           |
+
+
+
+Vassilev                Expires February 17, 2019               [Page 7]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
+
    |                |           |        | supported       |           |
    |                |           |        | length, step -  |           |
    |                |           |        | increment to    |           |
@@ -305,7 +405,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                |           |        | supported.      |           |
    |                |           |        |                 |           |
    | additionalInpu | See       | Domain | min - the       | No        |
-   | tLen           | Table 4   |        | maximum         |           |
+   | tLen           | Table 5   |        | maximum         |           |
    |                | notes     |        | security        |           |
    |                | below.    |        | strength        |           |
    |                |           |        | supported by    |           |
@@ -323,20 +423,12 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                |           |        | supported.      |           |
    |                |           |        |                 |           |
    | returnedBitsLe | See       | value  |                 | No        |
-   | n              | Table 4   |        |                 |           |
+   | n              | Table 5   |        |                 |           |
    |                | notes     |        |                 |           |
    |                | below.    |        |                 |           |
    +----------------+-----------+--------+-----------------+-----------+
 
-                Table 3: DRBG Mode Capabilities JSON Values
-
-
-
-
-Vassilev                Expires February 17, 2019               [Page 6]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
+                Table 4: DRBG Mode Capabilities JSON Values
 
    Each DRBG algorithm capability advertised is a self-contained JSON
    object.  The following JSON values are used for DRBG algorithm
@@ -350,6 +442,14 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                  | algorithm   |            | Table 1   |         |
    |                  | to be       |            |           |         |
    |                  | validated.  |            |           |         |
+
+
+
+Vassilev                Expires February 17, 2019               [Page 8]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
+
    |                  |             |            |           |         |
    | prereqVals       | The prerequ | array of p | array     | No      |
    |                  | isite       | rereqAlgVa |           |         |
@@ -365,7 +465,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                  | prediction  | distinct   | [false]   |         |
    |                  | resistance. | values     |           |         |
    |                  | See         |            |           |         |
-   |                  | Table 4     |            |           |         |
+   |                  | Table 5     |            |           |         |
    |                  | notes       |            |           |         |
    |                  | below.      |            |           |         |
    |                  |             |            |           |         |
@@ -381,19 +481,11 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                  | given DRBG  |            |           |         |
    |                  | mechanism.  |            |           |         |
    |                  | See         |            |           |         |
-   |                  | Table 4     |            |           |         |
+   |                  | Table 5     |            |           |         |
    |                  | notes       |            |           |         |
    |                  | below.      |            |           |         |
    |                  |             |            |           |         |
    | capabilities     | An array of | array      |           | No      |
-
-
-
-Vassilev                Expires February 17, 2019               [Page 7]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
-
    |                  | objects     |            |           |         |
    |                  | describing  |            |           |         |
    |                  | the capabil |            |           |         |
@@ -401,12 +493,20 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                  | mode of the |            |           |         |
    |                  | algorithm.  |            |           |         |
    |                  | See         |            |           |         |
-   |                  | Table 3 for |            |           |         |
+   |                  | Table 4 for |            |           |         |
    |                  | more inform |            |           |         |
    |                  | ation.      |            |           |         |
    +------------------+-------------+------------+-----------+---------+
 
-             Table 4: DRBG Algorithm Capabilities JSON Values
+
+
+
+Vassilev                Expires February 17, 2019               [Page 9]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
+
+             Table 5: DRBG Algorithm Capabilities JSON Values
 
    Note 2: If an implementation utilizes a nonce in the construction of
    a seed during instantiation, the length of the nonce shall be at
@@ -441,15 +541,6 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    nonce; the nonce values, if supplied, will be ignored for this case.
    The default nonce bit length is one-half the maximum security
    strength supported by the mechanism/option.  See Tables 2 and 3 in
-
-
-
-
-Vassilev                Expires February 17, 2019               [Page 8]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
-
    [SP800-90A] for help on choosing appropriate parameter values for the
    tested DRBG implementation.
 
@@ -463,6 +554,14 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    all range parameters (min, max, step) to 0 (zero).  If the
    implementation can work with and without persoString, set the min to
    zero (0), set the max to at least the maximum supported strength and
+
+
+
+Vassilev                Expires February 17, 2019              [Page 10]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
+
    set the step equal to at least the maximum supported strength to
    avoid testing lengths less than that.  See Tables 2 and 3 in
    [SP800-90A] for help on choosing appropriate parameter values for the
@@ -486,26 +585,6 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    test vectors to be processed by the ACVP client.  The following table
    describes the JSON elements at the top level of the hierarchy.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Vassilev                Expires February 17, 2019               [Page 9]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
-
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
    |             |                                             | type  |
@@ -527,7 +606,17 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |             | defined in          Section 3.1             |       |
    +-------------+---------------------------------------------+-------+
 
-                      Table 5: Vector Set JSON Object
+                      Table 6: Vector Set JSON Object
+
+
+
+
+
+
+Vassilev                Expires February 17, 2019              [Page 11]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
 
 3.1.  Test Groups JSON Schema
 
@@ -554,14 +643,6 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                   | entire vector set.    |            |          |
    |                   |                       |            |          |
    | mode              | the mode of the DRBG, | value      | No       |
-
-
-
-Vassilev                Expires February 17, 2019              [Page 10]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
-
    |                   | see                   |            |          |
    |                   | Section 2.1           |            |          |
    |                   |                       |            |          |
@@ -580,21 +661,29 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                   | 0 (zero) if not       |            |          |
    |                   | used/supported. See   |            |          |
    |                   | also notes after      |            |          |
-   |                   | Table 4 above.        |            |          |
+   |                   | Table 5 above.        |            |          |
    |                   |                       |            |          |
    | persoStringLen    | personalization       | value      | No       |
    |                   | string length; set to |            |          |
    |                   | 0 (zero) if not       |            |          |
+
+
+
+Vassilev                Expires February 17, 2019              [Page 12]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
+
    |                   | used/supported. See   |            |          |
    |                   | also notes after      |            |          |
-   |                   | Table 4 above.        |            |          |
+   |                   | Table 5 above.        |            |          |
    |                   |                       |            |          |
    | additonalInputLen | additional input      | value      | No       |
    |                   | length; set to 0      |            |          |
    |                   | (zero) if not         |            |          |
    |                   | used/supported. See   |            |          |
    |                   | also notes after      |            |          |
-   |                   | Table 4 above.        |            |          |
+   |                   | Table 5 above.        |            |          |
    |                   |                       |            |          |
    | returnedBitsLen   | returned bits length  | value      | No       |
    |                   |                       |            |          |
@@ -605,22 +694,41 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                   | Section 3.2           |            |          |
    +-------------------+-----------------------+------------+----------+
 
-                      Table 6: Test Group JSON Object
+                      Table 7: Test Group JSON Object
 
    Note 11: According to SP 800-90A [SP800-90A] , a DRBG implementation
    has two separate controls for determining the correct test procedure
    for handling addtional entropy and other data in providing prediction
-
-
-
-Vassilev                Expires February 17, 2019              [Page 11]
-
-Internet-Draft                DRBG Alg JSON                  August 2018
-
-
    resistance assurances.  Depending on the capabilities advertised by
    the predResistanceEnabled and reseedImplemented flags ACVP generates
    test data according to the following test scenarios:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vassilev                Expires February 17, 2019              [Page 13]
+
+Internet-Draft                DRBG Alg JSON                  August 2018
+
 
    +---------------------------------------+---------------------------+
    | Prediction Resistance Assurance       | Test Procedure            |
@@ -649,7 +757,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |                                       | Uninstantiate             |
    +---------------------------------------+---------------------------+
 
-   Table 7: Test Procedures for Supported Prediction Resistance Options
+   Table 8: Test Procedures for Supported Prediction Resistance Options
 
 3.2.  Test Case JSON Schema
 
@@ -669,7 +777,11 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 12]
+
+
+
+
+Vassilev                Expires February 17, 2019              [Page 14]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -692,15 +804,15 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    | otherInput   | array of additonal              | array | No       |
    |              | input/entropy input value pairs |       |          |
    |              | for testing. See                |       |          |
-   |              | Table 9                         |       |          |
+   |              | Table 10                        |       |          |
    +--------------+---------------------------------+-------+----------+
 
-                    Table 8: DRBG Test Case JSON Object
+                    Table 9: DRBG Test Case JSON Object
 
    Each test group contains an array of one or more tests.  Each test
    object contains an otherInput object, which is an array of objects,
    each with the intendedUse property indicating if the particular test
-   data is to be used for reSeed or generate - see Table 7 .  Each test
+   data is to be used for reSeed or generate - see Table 8 .  Each test
    vector is a JSON object that represents a single test case to be
    processed by the ACVP client.  The following table describes the JSON
    elements for each DRBG predcition resistance test vector.
@@ -720,12 +832,12 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    | intendedUse     | "reSeed", "generate"         | value | No       |
    +-----------------+------------------------------+-------+----------+
 
-           Table 9: Prediction Resistance Test Case JSON Object
+           Table 10: Prediction Resistance Test Case JSON Object
 
 
 
 
-Vassilev                Expires February 17, 2019              [Page 13]
+Vassilev                Expires February 17, 2019              [Page 15]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -747,10 +859,10 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |             | set                                         |       |
    |             |                                             |       |
    | testGroups  | Array of JSON objects that represent each   | array |
-   |             | test vector group. See          Table 11    |       |
+   |             | test vector group. See          Table 12    |       |
    +-------------+---------------------------------------------+-------+
 
-                 Table 10: Vector Set Response JSON Object
+                 Table 11: Vector Set Response JSON Object
 
    The testGroups section is used to organize the ACVP client response
    in a similar manner to how it receives vectors.  Several algorithms
@@ -768,7 +880,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |           |                                            |          |
    +-----------+--------------------------------------------+----------+
 
-              Table 11: Vector Set Group Response JSON Object
+              Table 12: Vector Set Group Response JSON Object
 
    Each test group contains an array of one or more test cases.  Each
    test case is a JSON object that represents a single test vector to be
@@ -781,7 +893,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 14]
+Vassilev                Expires February 17, 2019              [Page 16]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -798,7 +910,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
    |              | output                          |       |          |
    +--------------+---------------------------------+-------+----------+
 
-               Table 12: DRBG Test Case Results JSON Object
+               Table 13: DRBG Test Case Results JSON Object
 
 5.  Acknowledgements
 
@@ -837,7 +949,7 @@ Appendix A.  Example DRBG Capabilities JSON Object
 
 
 
-Vassilev                Expires February 17, 2019              [Page 15]
+Vassilev                Expires February 17, 2019              [Page 17]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -893,7 +1005,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 16]
+Vassilev                Expires February 17, 2019              [Page 18]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -949,7 +1061,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 17]
+Vassilev                Expires February 17, 2019              [Page 19]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1005,7 +1117,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 18]
+Vassilev                Expires February 17, 2019              [Page 20]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1061,7 +1173,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 19]
+Vassilev                Expires February 17, 2019              [Page 21]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1117,7 +1229,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 20]
+Vassilev                Expires February 17, 2019              [Page 22]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1173,7 +1285,7 @@ Appendix B.  Example Test Vectors JSON Object
 
 
 
-Vassilev                Expires February 17, 2019              [Page 21]
+Vassilev                Expires February 17, 2019              [Page 23]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1229,7 +1341,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 22]
+Vassilev                Expires February 17, 2019              [Page 24]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1285,7 +1397,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 23]
+Vassilev                Expires February 17, 2019              [Page 25]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1341,7 +1453,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 24]
+Vassilev                Expires February 17, 2019              [Page 26]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1397,7 +1509,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 25]
+Vassilev                Expires February 17, 2019              [Page 27]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1453,7 +1565,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 26]
+Vassilev                Expires February 17, 2019              [Page 28]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1509,7 +1621,7 @@ Appendix C.  Example Test Results JSON Object
 
 
 
-Vassilev                Expires February 17, 2019              [Page 27]
+Vassilev                Expires February 17, 2019              [Page 29]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1565,7 +1677,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 28]
+Vassilev                Expires February 17, 2019              [Page 30]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1621,7 +1733,7 @@ Internet-Draft                DRBG Alg JSON                  August 2018
 
 
 
-Vassilev                Expires February 17, 2019              [Page 29]
+Vassilev                Expires February 17, 2019              [Page 31]
 
 Internet-Draft                DRBG Alg JSON                  August 2018
 
@@ -1677,4 +1789,4 @@ Author's Address
 
 
 
-Vassilev                Expires February 17, 2019              [Page 30]
+Vassilev                Expires February 17, 2019              [Page 32]
