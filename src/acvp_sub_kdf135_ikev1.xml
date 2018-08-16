@@ -27,7 +27,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-acvp-subkdf135-ikev1-0.3" ipr="trust200902">
+<rfc category="info" docName="draft-ietf-acvp-subkdf135-ikev1-0.5" ipr="trust200902">
     <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN"
@@ -54,7 +54,7 @@
                 <!-- uri and facsimile elements may also be added -->
             </address>
         </author>
-        <date month="June" year="2016" />
+        <date month="August" year="2018" />
         <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
          in the current day for you. If only the current year is specified, xml2rfc will fill
 	 in the current day and month for you. If the year is not the current one, it is
@@ -299,6 +299,16 @@
                     <ttcol align="left">Description</ttcol>
                     <ttcol align="left">JSON type</ttcol>
                     <ttcol align="left">Optional</ttcol>
+                    
+                    <c>tgId</c>
+					<c>Numeric identifier for the test group, unique across the entire vector set.</c>
+					<c>value</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+                    
                     <c>authenticationMethod</c>
                     <c>The method used for the test vectors.  See                         
                         <xref target="supported_modes" />
@@ -426,27 +436,68 @@
                 <ttcol align="left">JSON Value</ttcol>
                 <ttcol align="left">Description</ttcol>
                 <ttcol align="left">JSON type</ttcol>
+                
                 <c>acvVersion</c>
                 <c>Protocol version identifier</c>
                 <c>value</c>
                 <c/>
                 <c/>
                 <c/>
+
                 <c>vsId</c>
                 <c>Unique numeric identifier for the vector set</c>
                 <c>value</c>
                 <c/>
                 <c/>
                 <c/>
-                <c>testResults</c>
-                <c>Array of JSON objects that represent each test vector result, as defined by the tables below</c>
-                <c>array</c>
+
+                <c>testGroups</c>
+				<c>Array of JSON objects that represent each test vector group. See					<xref target="vr_group_table"/>
+				</c>
+				<c>array</c>
+				<c/>
+				<c/>
+				<c/>
             </texttable>
+
+            <t>The testGroups section is used to organize the ACVP client response in a similar manner 
+      to how it receives vectors.  Several algorithms SHALL require the client to send back group 
+      level properties in their response.  This structure helps accommodate that.</t>
+
+			<texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
+				<ttcol align="left">JSON Value</ttcol>
+				<ttcol align="left">Description</ttcol>
+				<ttcol align="left">JSON type</ttcol>
+
+				<c>tgId</c>
+				<c>The test group Id</c>
+				<c>value</c>
+				<c/>
+				<c/>
+				<c/>
+				<c>tests</c>
+				<c>The tests associated to the group specified in tgId</c>
+				<c>value</c>
+				<c/>
+				<c/>
+				<c/>
+			</texttable>
+
             <t>The following table describes the JSON object that represents a vector set response for IKEv1.</t>
             <texttable anchor="vr_top_table1" title="Vector Set Response JSON Object">
                 <ttcol align="left">JSON Value</ttcol>
                 <ttcol align="left">Description</ttcol>
                 <ttcol align="left">JSON type</ttcol>
+                
+                <c>tcId</c>
+				<c>Numeric identifier for the test case, unique across the entire vector set.</c>
+				<c>value</c>
+				<c>No</c>
+				<c/>
+				<c/>
+				<c/>
+				<c/>
+
                 <c>sKeyId</c>
                 <c>Results of the extraction step</c>
                 <c>value</c>
@@ -627,69 +678,64 @@
             <figure>
                 <artwork>
                     <![CDATA[
-[
-    {
-        "acvVersion": "0.4"
-    },
-    {
-        "vsId": 1564,
-        "algorithm": "IKEv1",
-        "testGroups": [
-            {
-                "authenticationMethod": "dsa",
-                "hashAlg": "SHA-1",
-                "nInitLength": 64,
-                "nRespLength": 64,
-                "dhLength": 3794,
-                "tests": [
-                    {
-                        "tcId": 1,
-                        "nInit": "D7965167F186B5C1",
-                        "nResp": "F3B1CD728B9BE97D",
-                        "ckyInit": "D93E766AC69F5B3C",
-                        "ckyResp": "E6552343EF4C3676",
-                        "gxy": "648A4DF592307C667D9EE9F286EFF27B7C3A3E1313C2CBEE595FCF24877A4CCFF64A847E1FA20990A7152A6A93C55DC8903FD992D39B84E8C86D579B81237BA7C9BDB824F8427B558D11EE98EBD45BF13B9007C2E2564DAE6F7C805AF7D6A295AE167EEFB65958D7C2FBE9210A346588884F7263B929BE086D6E7E511A7E51B632F8CD115D2400ADF3C0ECA09EFADCEDCDDA99494CD54EBB67DBD3F6C74C98EF9C87DC272233A36198FF3907A525E4416545DDF32DEE3E0F1FEF450045D96D2CC89186833C4233AB8DC7378B24AEAAACDC59D074B96141630B1869159F3168D08A1DB60F9280DB35BA5714AF51492789052431AEE9F74A7EA15943D7B7EDC2E27688D44C37AFD10E08BA6BC3E022BC4F302103A1D39F599EA9EDFF63CEE3F0265AF4920DD857AA48C6054E4395F42C60FD12FBA7D41D970896ECA3E1F89713973DC1F7CC43B961EB8917FFAAE8304B0D8FB7FAE27B2DE812C115873A03336085F07673E0C1FC18F8357695FC70981E1DE6A715191D03CDB1A2F9889C7157221ED43003064E71B4A4D11826489F8ACC89F23891255234B6337C8212B66129D01BBF35473D21D056B7CC674D93374A33B570298641B2E1541B6D2516A4E9810C1EEB1D92D3007CB3787A0406A64FE3185366FC37AD48BB7951C84780"
-                    }
-                ]
-            },
-            {
-                "authenticationMethod": "psk",
-                "hashAlg": "SHA-1",
-                "nInitLength": 227,
-                "nRespLength": 64,
-                "dhLength": 224,
-                "preSharedKeyLength": 8,
-                "tests": [
-                    {
-                        "tcId": 1501,
-                        "nInit": "42C0DE5D47C2CF363EBFE6847D4B55D8F8EC1F58867B51070EC0E0BB00",
-                        "nResp": "3192D20E80961883",
-                        "ckyInit": "0745FD92564BE166",
-                        "ckyResp": "2C59CB8F0199A372",
-                        "gxy": "4F7837D07B1E9EB353BDB8C7DCB947CAE24049C382458BC8EE5EB46E",
-                        "preSharedKey": "6C"
-                    }
-                ]
-            },
-            {
-                "authenticationMethod": "pke",
-                "hashAlg": "SHA-1",
-                "nInitLength": 784,
-                "nRespLength": 64,
-                "dhLength": 224,
-                "tests": [
-                    {
-                        "tcId": 3001,
-                        "nInit": "1FD16DF313FAE5942265310E8D0061478DC77B62D76FB65DA278AB8A2C3503B0809DC54921B42BC2334785B38AA65E48D1FE077111071FE41B8EA73FBC18DCA819BCB4EB48334694388D6AF654D1EC4AB868A309DD1C6C35890E7C6749644F9D3ED9",
-                        "nResp": "9C47D2D26D608781",
-                        "ckyInit": "46D07016FC2D03E5",
-                        "ckyResp": "7E7110C5E8D92764",
-                        "gxy": "CCAFB314240C68040AA7641975BA591ADA5650E4EFAE65B1A597129D"
-                    }
-                ]
-            }
-        ]
-    }
+[{
+		"acvVersion": "0.5"
+	},
+	{
+		"vsId": 1564,
+		"algorithm": "IKEv1",
+		"testGroups": [{
+				"tgId": 1,
+				"authenticationMethod": "dsa",
+				"hashAlg": "SHA-1",
+				"nInitLength": 64,
+				"nRespLength": 64,
+				"dhLength": 3794,
+				"tests": [{
+					"tcId": 1,
+					"nInit": "D7965167F186B5C1",
+					"nResp": "F3B1CD728B9BE97D",
+					"ckyInit": "D93E766AC69F5B3C",
+					"ckyResp": "E6552343EF4C3676",
+					"gxy": "648A4DF592307C667D9EE9F286EFF27B7C3A3E1313C2CBEE595FCF24877A4CCFF64A847E1FA20990A7152A6A93C55DC8903FD992D39B84E8C86D579B81237BA7C9BDB824F8427B558D11EE98EBD45BF13B9007C2E2564DAE6F7C805AF7D6A295AE167EEFB65958D7C2FBE9210A346588884F7263B929BE086D6E7E511A7E51B632F8CD115D2400ADF3C0ECA09EFADCEDCDDA99494CD54EBB67DBD3F6C74C98EF9C87DC272233A36198FF3907A525E4416545DDF32DEE3E0F1FEF450045D96D2CC89186833C4233AB8DC7378B24AEAAACDC59D074B96141630B1869159F3168D08A1DB60F9280DB35BA5714AF51492789052431AEE9F74A7EA15943D7B7EDC2E27688D44C37AFD10E08BA6BC3E022BC4F302103A1D39F599EA9EDFF63CEE3F0265AF4920DD857AA48C6054E4395F42C60FD12FBA7D41D970896ECA3E1F89713973DC1F7CC43B961EB8917FFAAE8304B0D8FB7FAE27B2DE812C115873A03336085F07673E0C1FC18F8357695FC70981E1DE6A715191D03CDB1A2F9889C7157221ED43003064E71B4A4D11826489F8ACC89F23891255234B6337C8212B66129D01BBF35473D21D056B7CC674D93374A33B570298641B2E1541B6D2516A4E9810C1EEB1D92D3007CB3787A0406A64FE3185366FC37AD48BB7951C84780"
+				}]
+			},
+			{
+				"tgId": 2,
+				"authenticationMethod": "psk",
+				"hashAlg": "SHA-1",
+				"nInitLength": 227,
+				"nRespLength": 64,
+				"dhLength": 224,
+				"preSharedKeyLength": 8,
+				"tests": [{
+					"tcId": 1501,
+					"nInit": "42C0DE5D47C2CF363EBFE6847D4B55D8F8EC1F58867B51070EC0E0BB00",
+					"nResp": "3192D20E80961883",
+					"ckyInit": "0745FD92564BE166",
+					"ckyResp": "2C59CB8F0199A372",
+					"gxy": "4F7837D07B1E9EB353BDB8C7DCB947CAE24049C382458BC8EE5EB46E",
+					"preSharedKey": "6C"
+				}]
+			},
+			{
+				"tgId": 3,
+				"authenticationMethod": "pke",
+				"hashAlg": "SHA-1",
+				"nInitLength": 784,
+				"nRespLength": 64,
+				"dhLength": 224,
+				"tests": [{
+					"tcId": 3001,
+					"nInit": "1FD16DF313FAE5942265310E8D0061478DC77B62D76FB65DA278AB8A2C3503B0809DC54921B42BC2334785B38AA65E48D1FE077111071FE41B8EA73FBC18DCA819BCB4EB48334694388D6AF654D1EC4AB868A309DD1C6C35890E7C6749644F9D3ED9",
+					"nResp": "9C47D2D26D608781",
+					"ckyInit": "46D07016FC2D03E5",
+					"ckyResp": "7E7110C5E8D92764",
+					"gxy": "CCAFB314240C68040AA7641975BA591ADA5650E4EFAE65B1A597129D"
+				}]
+			}
+		]
+	}
 ]
             ]]>
                 </artwork>
@@ -700,36 +746,43 @@
             <figure>
                 <artwork>
                     <![CDATA[
-[
-    {
-        "acvVersion": "0.4"
-    },
-    {
-        "vsId": 1564,
-        "testResults": [
-            {
-                "tcId": 1,
-                "sKeyId": "F4818718FC105FACF05F5C77ED7648531FA3CBD9",
-                "sKeyIdD": "2416325BA038A28B8263060A8C33B0DAB0C369BD",
-                "sKeyIdA": "514EEBEF3A8135ADB8FF3514ED1F6E524BBBEBB9",
-                "sKeyIdE": "6AC021B419C196EA83E9052DCC0DF87B0F19BDD6"
-            },
-            {
-                "tcId": 1501,
-                "sKeyId": "01EACF38DE6D5FC8BBF36D7D8EB8075DF0B462BF",
-                "sKeyIdD": "8AD25FBE26F21C0E3ADA9ECA02999BB666E1A4E4",
-                "sKeyIdA": "F8820DC28C0ABCF87DF32630A69AE51394291495",
-                "sKeyIdE": "B9E283B6DA93A875A43BDD28FCD0CAE7B452C1B9"
-            },
-            {
-                "tcId": 3001,
-                "sKeyId": "3DB972E5BECC0382FBE8A8E373F6560541D78394",
-                "sKeyIdD": "0A962B834E0FF947ADD64596C6291B8614D2C7C0",
-                "sKeyIdA": "A82E520D6DA16DEF41B0C75A5B92F5FD31A5EFBA",
-                "sKeyIdE": "65A1254642B871147BB4D1EABCD6286F3CF131E6"
-            }
-        ]
-    }
+[{
+		"acvVersion": "0.5"
+	},
+	{
+		"vsId": 1564,
+		"testGroups": [{
+				"tgId": 1,
+				"tests": [{
+					"tcId": 1,
+					"sKeyId": "F4818718FC105FACF05F5C77ED7648531FA3CBD9",
+					"sKeyIdD": "2416325BA038A28B8263060A8C33B0DAB0C369BD",
+					"sKeyIdA": "514EEBEF3A8135ADB8FF3514ED1F6E524BBBEBB9",
+					"sKeyIdE": "6AC021B419C196EA83E9052DCC0DF87B0F19BDD6"
+				}]
+			},
+			{
+				"tgId": 2,
+				"tests": [{
+					"tcId": 1501,
+					"sKeyId": "01EACF38DE6D5FC8BBF36D7D8EB8075DF0B462BF",
+					"sKeyIdD": "8AD25FBE26F21C0E3ADA9ECA02999BB666E1A4E4",
+					"sKeyIdA": "F8820DC28C0ABCF87DF32630A69AE51394291495",
+					"sKeyIdE": "B9E283B6DA93A875A43BDD28FCD0CAE7B452C1B9"
+				}]
+			},
+			{
+				"tgId": 3,
+				"tests": [{
+					"tcId": 3001,
+					"sKeyId": "3DB972E5BECC0382FBE8A8E373F6560541D78394",
+					"sKeyIdD": "0A962B834E0FF947ADD64596C6291B8614D2C7C0",
+					"sKeyIdA": "A82E520D6DA16DEF41B0C75A5B92F5FD31A5EFBA",
+					"sKeyIdE": "65A1254642B871147BB4D1EABCD6286F3CF131E6"
+				}]
+			}
+		]
+	}
 ]
             ]]>
                 </artwork>
