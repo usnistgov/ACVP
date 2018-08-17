@@ -371,101 +371,11 @@
 	      </section>
 
     </section>
-
-    <section anchor="algo_tests" title="Algorithm Tests">
-<t>The ACVP server performs a set of tests on the block ciphers in order to assess the correctness and robustness of the 
-implementation. A typical ACVP validation session would require multiple tests to be performed for every supported 
-      cryptographic algorithm, such as AES-ECB, AES-CBC, AES-CTR, AES-GCM, TDES-CBC, TDES-CTR, etc.  This section
-  describes the design of the tests used to validate implementations of block cipher algorithms.</t>
-<t>There are two types of tests for block ciphers: functional tests and Monte Carlo tests.</t>
-
-<section anchor="functional_test" title="Functional block cipher tests">
-  <t>The functional tests of the block cipher are designed to verify that the logical components of the cipher (GFSbox, KeySbox, etc.)
-  are operating correctly. This test includes the verification that the implementation is designed to process multi-block messages, 
-  which may require chaining of information from one block to the next.  </t>
-  </section>
-
-<section anchor="MC_test" title="Monte Carlo tests for block ciphers">
-  <t>The Monte Carlo tests are designed to provide much better test coverage of the implementation compared to the coverage resulting
-  from testing with the controlled inputs of the functional tests in Section <xref target="functional_test"/>. The goal of this test is to detect
-  potential flaws in the implementation related to allocation of resources, addressing variables, error handling and generally improper behavior in
-  response to random inputs.  Each MCT processes 100 pseudorandom
-   tests.</t>
-  <t>The MCT start with an initial condition (plain/cipher text, key, and
-   optional IV) and perform a series of chained calculation.  For modes
-   that use an IV, the IV is used in the beginning of each pseudorandom
-   text.  There are separate rounds of MCT for encryption and
-   decryption.  Because some block cipher modes rely on an IV and
-   perform calculations differently from other modes, there are specific
-   definitions of MCT for many of the block cipher modes.</t>
-
-  <section anchor="AES-ECB-MCT" title="AES Monte Carlo Test - ECB mode">
-  <t>The initial condition for the test is the tuple (KEY, PT) set to some
-   values. </t>
-  <t>The algorithm is shown in <xref target="xml_figureMCTECB"/>. </t>
-       <figure align="center" anchor="xml_figureMCTECB">
-        <preamble>AES-ECB Monte Carlo Test</preamble>
-
-        <artwork align="left"><![CDATA[
-
-   Key[0] = KEY
-   PT[0] = PT
-   For i = 0 to 99
-             Output Key[i]
-             Output PT[0]
-             For j = 0 to 999
-                  CT[j] = AES(Key[i], PT[j])
-                  PT[j+1] = CT[j]
-             Output CT[j]
-             If ( keylen = 128 )
-                  Key[i+1] = Key[i] xor CT[j]
-             If ( keylen = 192 )
-                  Key[i+1] = Key[i] xor (last 64-bits of CT[j-1] || CT[j])
-             If ( keylen = 256 )
-                  Key[i+1] = Key[i] xor (CT[j-1] || CT[j])
-             PT[0] = CT[j]
-
-           ]]></artwork>
-
-      </figure>
-  <t>Note: The pseudocode for decryption can be obtained by replacing all
-   PT's with CT's and all CT's with PT's.</t>
-  </section>
-  <section anchor="AES-CBC-MCT" title="AES Monte Carlo Test - CBC mode">
-  </section>  
-  <section anchor="AES-OFB-MCT" title="AES Monte Carlo Test - OFB mode">
-  </section>
-  <section anchor="AES-CFB1-MCT" title="AES Monte Carlo Test - CFB1 mode">
-  </section>
-  <section anchor="AES-CFB8-MCT" title="AES Monte Carlo Test - CFB8 mode">
-  </section>
-  <section anchor="AES-CFB128-MCT" title="AES Monte Carlo Test - CFB128 mode">
-  </section>
-  <section anchor="TDES-TECB-MCT" title="TDES Monte Carlo Test - TECB mode">
-  </section>
-  <section anchor="TDES-TCBC-MCT" title="TDES Monte Carlo Test - TCBC mode">
-  </section>
-  <section anchor="TDES-TCBC-I-MCT" title="TDES Monte Carlo Test - TCBC-I mode">
-  </section>
-  <section anchor="TDES-TCFB-MCT" title="TDES Monte Carlo Test - TCFB mode">
-  </section>
-  <section anchor="TDES-TCFB-P-MCT" title="TDES Monte Carlo Test - CFB-P mode">
-  </section>
-  <section anchor="TDES-TOFB-MCT" title="TDES Monte Carlo Test - TOFB mode">
-  </section>
-  <section anchor="TDES-TOFB-I-MCT" title="TDES Monte Carlo Test - TOFB-I mode">
-  </section>  
-
-
-
-    </section>  
-</section>
-
     <section anchor="test_vectors" title="Test Vectors">
       <t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
 	    the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
 	    sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
-	    crypto algorithm, such as AES-ECB, AES-CBC, AES-CTR, AES-GCM, DES-CBC, DES-CTR, etc.  This section
+	    crypto algorithm, such as AES-ECB, AES-CBC, AES-CTR, AES-GCM, TDES-CBC, TDES-CTR, etc.  This section
 	describes the JSON schema for a test vector set used with block cipher algorithms.</t>
 
       <t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
@@ -527,7 +437,7 @@ implementation. A typical ACVP validation session would require multiple tests t
     <c/><c/><c/><c/>
 
     <c>saltGen</c>
-    <c>Salt generation method (Required AES-XPN)</c>
+    <c>Salt generation method (Required for AES-XPN)</c>
     <c>value</c>
     <c>Yes</c>
     <c/><c/><c/><c/>
@@ -563,7 +473,7 @@ implementation. A typical ACVP validation session would require multiple tests t
     <c/><c/><c/><c/>
 
     <c>testType</c>
-    <c>The test category type (AFT, MCT or counter)</c>
+    <c>The test category type (AFT, MCT or counter). See <xref target="testtypes"/> for more information about what these tests do, and how to implement them.</c>
     <c>value</c>
     <c>No</c>
     <c/><c/><c/><c/>
@@ -573,21 +483,6 @@ implementation. A typical ACVP validation session would require multiple tests t
     <c>array</c>
     <c>No</c>
         </texttable>
-
-<t>The testType field definitions are:</t>
-
-        <t><list style="testtype">
-	    <t>AFT - Algorithm Functional Test. These tests can be processed by the client using a normal 'encrypt' or 'decrypt' operation. 
-        AFTs cause the implentation under test to exercise normal operations whether single block, multiple blocks, or (where applicable) 
-        partial blocks. In some cases random data is used, in others, static, predetermined tests are provided.</t>
-	    <t>MCT - Monte Carlo Test. These tests exercise the implentation under test under strenuous circumstances. The implementation
-        under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect
-        potential memory leaks over time. Not every algorithm and mode combination has an MCT.</t>
-	    <t>Counter - Counter Mode Test. Counter tests are specifically for counter modes and require an implementation under test to
-        exercise their counter mechanism. The server will send a long message to the client for encryption or decryption and back-compute
-        the counters used by the implementation under test. These counters are then verified for uniqueness and an increasing (or decreasing)
-        nature.</t>
-        </list></t>
 	</section>
 
       <section title="Test Case JSON Schema" anchor="tvjs">
@@ -685,7 +580,7 @@ implementation. A typical ACVP validation session would require multiple tests t
 
     <section anchor="vector_responses" title="Test Vector Responses">
       <t>After the ACVP client downloads and processes a vector set, it must send the response vectors
-	back to the ACVP server.  The following table describes the JSON object that represents a vector set response.</t>
+	back to the ACVP server. The following table describes the JSON object that represents a vector set response.</t>
 
       <texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
           <ttcol align="left">JSON Value</ttcol>
@@ -715,15 +610,177 @@ implementation. A typical ACVP validation session would require multiple tests t
 	    <c/><c/><c/>
 
 	      <c>resultsArray</c>
-	        <c>Array of JSON objects that represent each iteration of a Monte Carlo Test.  Each iteration will contain the key(s), pt, ct and iv(except for ECB mode)</c>
+	        <c>Array of JSON objects that represent each iteration of a Monte Carlo Test. Each iteration will contain the key(s), pt, ct and iv (except for ECB mode)</c>
           <c>array</c>
 	  </texttable>
     </section>
+    <section anchor="testtypes" title="Test Types and Test Coverage">
+    <t>The ACVP server performs a set of tests on the block ciphers in order to assess the correctness and robustness of the 
+implementation. A typical ACVP validation session would require multiple tests to be performed for every supported 
+      cryptographic algorithm, such as AES-ECB, AES-CBC, AES-CTR, AES-GCM, TDES-CBC, TDES-CTR, etc.  This section
+  describes the design of the tests used to validate implementations of block cipher algorithms.
+  There are three types of tests for block ciphers: functional tests, Monte Carlo tests and counter tests. Each has a specific value to be used in the
+  testType field.
+    The testType field definitions are:
+
+        <list style="testtype">
+	    <t>"AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'encrypt' or 'decrypt' operation. 
+        AFTs cause the implentation under test to exercise normal operations whether single block, multiple blocks, or (where applicable) 
+        partial blocks. In some cases random data is used, in others, static, predetermined tests are provided. The functional tests of the 
+        block cipher are designed to verify that the logical components of the cipher (GFSbox, KeySbox, block chaining etc.) are operating correctly.</t>
+	    <t>"MCT" - Monte Carlo Test. These tests exercise the implentation under test under strenuous circumstances. The implementation
+        under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect
+        potential memory leaks over time, and problems in allocation of resources, addressing variables, error handling and generally improper behavior in
+        response to random inputs. Each MCT processes 100 pseudorandom tests. Not every algorithm and mode combination has an MCT. 
+        See <xref target="MC_test"/> for implementation details.</t>
+	    <t>"Counter" - Counter Mode Test. Counter tests are specifically for counter modes (AES-MCT and TDES-MCT) and require an implementation under test to
+        exercise their counter mechanism. The server will send a long message to the client for encryption or decryption and back-compute
+        the counters used by the implementation under test. These counters are then verified for uniqueness and an increasing (or decreasing)
+        nature. The client processes these tests as normal AFTs. The different mode is highlighted here to signify the difference on the server side for
+        processing.</t>
+        </list></t>
+
+<section anchor="MC_test" title="Monte Carlo tests for block ciphers">
+  <t>The MCT start with an initial condition (plain/cipher text, key, and optional, or maybe multiple IVs) and perform a series of chained calculation. For modes
+   that use an IV, the IV is used in the beginning of each pseudorandom process. There are separate rounds of MCT for encryption and decryption. Because some 
+   block cipher modes rely on an IV and perform calculations differently from other modes, there are specific definitions of MCT for many of the block cipher modes.</t>
+
+  <t>Note: For all the following, the pseudocode for decryption can be obtained by replacing all
+   PT's with CT's and all CT's with PT's. As well, replace the encrypt operation with the corresponding decrypt operation.</t>
+
+  <section anchor="AES-ECB-MCT" title="AES Monte Carlo Test - ECB mode">
+  <t>The initial condition for the test is the tuple (KEY, PT) set to some
+   values. </t>
+  <t>The algorithm is shown in <xref target="xml_figureMCTECB"/>.</t>
+       <figure align="center" anchor="xml_figureMCTECB">
+        <preamble>AES-ECB Monte Carlo Test</preamble>
+        <artwork align="left">
+<![CDATA[
+Key[0] = KEY
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output PT[0]
+    For j = 0 to 999
+        CT[j] = AES_ECB_ENCRYPT(Key[i], PT[j])
+        PT[j+1] = CT[j]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    PT[0] = CT[j]
+]]>
+    </artwork>
+      </figure>
+  </section>
+  <section anchor="AES-CBC-MCT" title="AES Monte Carlo Test - CBC mode">
+    <t>The initial condition for the test is the tuple (KEY, IV, PT) set to some
+   values. </t>
+  <t>The algorithm is shown in <xref target="xml_figureMCTCBC"/>.</t>
+       <figure align="center" anchor="xml_figureMCTCBC">
+        <preamble>AES-CBC Monte Carlo Test</preamble>
+        <artwork align="left">
+<![CDATA[
+Key[0] = KEY
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CBC_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = IV[i]
+        Else
+            CT[j] = AES_CBC_ENCRYPT(Key[i], PT[j])
+            PT[j+1] = CT[j-1]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    IV[i+1] = CT[j]
+    PT[0] = CT[j-1]
+]]>
+    </artwork>
+      </figure>
+  </section>  
+  <section anchor="AES-OFB-MCT" title="AES Monte Carlo Test - OFB mode">
+      <t>The initial condition for the test is the tuple (KEY, IV, PT) set to some
+   values. </t>
+  <t>The algorithm is shown in <xref target="xml_figureMCTOFB"/>. </t>
+       <figure align="center" anchor="xml_figureMCTOFB">
+        <preamble>AES-OFB Monte Carlo Test</preamble>
+        <artwork align="left">
+<![CDATA[
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_OFB_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = IV[i]
+        Else
+            CT[j] = AES_OFB_ENCRYPT(Key[i], PT[j])
+            PT[j+1] = CT[j-1]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    IV[i+1] = CT[j]
+    PT[0] = CT[j-1]
+]]>
+    </artwork>
+      </figure>
+  </section>
+  <section anchor="AES-CFB1-MCT" title="AES Monte Carlo Test - CFB1 mode">
+  </section>
+  <section anchor="AES-CFB8-MCT" title="AES Monte Carlo Test - CFB8 mode">
+  </section>
+  <section anchor="AES-CFB128-MCT" title="AES Monte Carlo Test - CFB128 mode">
+  </section>
+  <section anchor="AES_KEY_SHUFFLE" title="AES Monte Carlo Key Shuffle">
+  <t>Most AES MCTs use a shared key shuffle routine. The algorithm is shown in <xref target="xml_figureAESKEY"/>.
+  The initial condition for the routine is a tuple (KEY, CT) set to some values. This pseudocode is specifically for 
+  encryption. For decryption, swap all instances of CT with PT.</t>
+         <figure align="center" anchor="xml_figureAESKEY">
+        <preamble>AES Encrypt Key Shuffle Routine</preamble>
+        <artwork align="left">
+<![CDATA[
+If ( keylen = 128 )
+    Key[i+1] = Key[i] xor CT[j]
+If ( keylen = 192 )
+    Key[i+1] = Key[i] xor (last 64-bits of CT[j-1] || CT[j])
+If ( keylen = 256 )
+    Key[i+1] = Key[i] xor (CT[j-1] || CT[j])
+]]>
+    </artwork>
+      </figure>
+  </section>
+
+  <section anchor="TDES-ECB-MCT" title="TDES Monte Carlo Test - ECB mode">
+  </section>
+  <section anchor="TDES-CBC-MCT" title="TDES Monte Carlo Test - CBC mode">
+  </section>
+  <section anchor="TDES-CBC-I-MCT" title="TDES Monte Carlo Test - CBC-I mode">
+  </section>
+  <section anchor="TDES-CFB-MCT" title="TDES Monte Carlo Test - CFB mode">
+  </section>
+  <section anchor="TDES-CFB-P-MCT" title="TDES Monte Carlo Test - CFB-P mode">
+  </section>
+  <section anchor="TDES-OFB-MCT" title="TDES Monte Carlo Test - OFB mode">
+  </section>
+  <section anchor="TDES-OFB-I-MCT" title="TDES Monte Carlo Test - OFB-I mode">
+  </section>  
+    </section>  
+
+    <section anchor="test_coverage" title="Test Coverage">
+    <t>Requirement stuff here</t>
+    </section>
+</section>
 
     <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
 
     <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>The authotors thank John Foley for putting together an early draft of this specification.</t>
+      <t>The authors thank John Foley for putting together an early draft of this specification.</t>
     </section>
 
     <!-- Possibly a 'Contributors' section ... -->
