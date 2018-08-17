@@ -625,7 +625,7 @@ implementation. A typical ACVP validation session would require multiple tests t
 
         <list style="testtype">
 	    <t>"AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'encrypt' or 'decrypt' operation. 
-        AFTs cause the implentation under test to exercise normal operations whether single block, multiple blocks, or (where applicable) 
+        AFTs cause the implentation under test to exercise normal operations on a single block, multiple blocks, or (where applicable) 
         partial blocks. In some cases random data is used, in others, static, predetermined tests are provided. The functional tests of the 
         block cipher are designed to verify that the logical components of the cipher (GFSbox, KeySbox, block chaining etc.) are operating correctly.</t>
 	    <t>"MCT" - Monte Carlo Test. These tests exercise the implentation under test under strenuous circumstances. The implementation
@@ -635,7 +635,7 @@ implementation. A typical ACVP validation session would require multiple tests t
         See <xref target="MC_test"/> for implementation details.</t>
 	    <t>"Counter" - Counter Mode Test. Counter tests are specifically for counter modes (AES-MCT and TDES-MCT) and require an implementation under test to
         exercise their counter mechanism. The server will send a long message to the client for encryption or decryption and back-compute
-        the counters used by the implementation under test. These counters are then verified for uniqueness and an increasing (or decreasing)
+        the IVs used by the implementation under test. These IVs are then verified for uniqueness and an increasing (or decreasing)
         nature. The client processes these tests as normal AFTs. The different mode is highlighted here to signify the difference on the server side for
         processing.</t>
         </list></t>
@@ -732,10 +732,110 @@ For i = 0 to 99
       </figure>
   </section>
   <section anchor="AES-CFB1-MCT" title="AES Monte Carlo Test - CFB1 mode">
+        <t>The initial condition for the test is the tuple (KEY, IV, PT) set to some
+   values. </t>
+  <t>The algorithm is shown in <xref target="xml_figureMCTCFB1"/>. </t>
+       <figure align="center" anchor="xml_figureMCTCFB1">
+        <preamble>AES-CFB1 Monte Carlo Test</preamble>
+        <artwork align="left">
+<![CDATA[
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CFB1_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = BitJ(IV[i])
+        Else
+            CT[j] = AES_CFB1_ENCRYPT(Key[i], PT[j])
+            If ( j<128 )
+                PT[j+1] = BitJ(IV[i])
+            Else
+                PT[j+1] = CT[j-128]
+    Output CT[j]
+    If ( keylen = 128 )
+        Key[i+1] = Key[i] xor (CT[j-127] || CT[j-126] || ... || CT[j])
+    If ( keylen = 192 )
+        Key[i+1] = Key[i] xor (CT[j-191] || CT[j-190] || ... || CT[j])
+    If ( keylen = 256 )
+        Key[i+1] = Key[i] xor (CT[j-255] || CT[j-254] || ... || CT[j])
+    IV[i+1] = (CT[j-127] || CT[j-126] || ... || CT[j])
+    PT[0] = CT[j-128]
+]]>
+    </artwork>
+      </figure>
   </section>
   <section anchor="AES-CFB8-MCT" title="AES Monte Carlo Test - CFB8 mode">
+          <t>The initial condition for the test is the tuple (KEY, IV, PT) set to some
+   values. </t>
+  <t>The algorithm is shown in <xref target="xml_figureMCTCFB8"/>. </t>
+       <figure align="center" anchor="xml_figureMCTCFB8">
+        <preamble>AES-CFB8 Monte Carlo Test</preamble>
+        <artwork align="left">
+<![CDATA[
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CFB8_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = ByteJ(IV[i])
+        Else
+            CT[j] = AES_CFB8_ENCRYPT(Key[i], PT[j])
+            If ( j<16 )
+                PT[j+1] = ByteJ(IV[i])
+            Else
+                PT[j+1] = CT[j-16]
+    Output CT[j]
+    If ( keylen = 128 )
+        Key[i+1] = Key[i] xor (CT[j-15] || CT[j-14] || ... || CT[j])
+    If ( keylen = 192 )
+        Key[i+1] = Key[i] xor (CT[j-23] || CT[j-22] || ... || CT[j])
+    If ( keylen = 256 )
+        Key[i+1] = Key[i] xor (CT[j-31] || CT[j-30] || ... || CT[j])
+    IV[i+1] = (CT[j-15] || CT[j-14] || ... || CT[j])
+    PT[0] = CT[j-16]
+]]>
+    </artwork>
+      </figure>
   </section>
   <section anchor="AES-CFB128-MCT" title="AES Monte Carlo Test - CFB128 mode">
+            <t>The initial condition for the test is the tuple (KEY, IV, PT) set to some
+   values. </t>
+  <t>The algorithm is shown in <xref target="xml_figureMCTCFB128"/>. </t>
+       <figure align="center" anchor="xml_figureMCTCFB128">
+        <preamble>AES-CFB128 Monte Carlo Test</preamble>
+        <artwork align="left">
+<![CDATA[
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CFB128_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = IV[i]
+        Else
+            CT[j] = AES_CFB128_ENCRYPT(Key[i], PT[j])
+            PT[j+1] = CT[j-1]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    IV[i+1] = CT[j]
+    PT[0] = CT[j-1]
+]]>
+    </artwork>
+      </figure>
   </section>
   <section anchor="AES_KEY_SHUFFLE" title="AES Monte Carlo Key Shuffle">
   <t>Most AES MCTs use a shared key shuffle routine. The algorithm is shown in <xref target="xml_figureAESKEY"/>.
@@ -773,7 +873,42 @@ If ( keylen = 256 )
     </section>  
 
     <section anchor="test_coverage" title="Test Coverage">
-    <t>Requirement stuff here</t>
+        <t>The tests described in this document have the intention of ensuring an implementation is conformant to <xref target="FIPS-197"/> 
+        and <xref target="SP800-38A"/>.</t>
+        <section anchor="aes-coverage" title="AES Requirements Covered">
+            <t>In <xref target="SP800-38A"/>, both Section 5 and Section 6 which describe general modes of operation
+            for block ciphers are tested. In <xref target="FIPS-197"/>, Section 4 outlines the AES engine and necessary functions to perform simple
+            encrypt an decrypt operations. All AES tests perform such operations and thus rely heavily on this section. Section 5 specifically outlines
+            the algorithm for AES and thus all AES tests rely heavily on this section as well.</t>
+        </section>
+        <section anchor="aes-not-coverage" title="AES Requirements Not Covered">
+            <t>Some requirements in the outlined specifications are not easily tested. Often they are not ideal for black-box testing such as the ACVP.
+            In <xref target="SP800-38A"/>, Appendix A outlines padding for when the data being encrypted does not evenly fill the blocks. In these tests,
+            all data, unless otherwise specified, is assumed to be a multiple of the block length. All exceptions to those cases are when stream ciphers 
+            specifically are being tested. In Section 5.3, IV generation which is required for all modes of AES and TDES outside of ECB, is not tested.
+            Appendix D outlines how errors are to be handled. As some symmetric ciphers aren't authenticated, ACVP does not include tests that change
+            random bits in payload, IV, key or results, as these results can be successfully encrypted/decrypted, but errors aren't necessarily detectable.
+            
+            In <xref target="FIPS-197"/> Section 5.3 defines the inverse cipher for AES. This is not tested in the CBC, CFB (all), OFB or CTR modes.</t>
+        </section>
+        <section anchor="tdes-coverage" title="TDES Requirements Covered">
+
+        </section>
+        <section anchor="tdes-not-coverage" title="TDES Requirements Not Covered">
+
+        </section>
+        <section anchor="aead-coverage" title="AEAD Requirements Covered">
+
+        </section>
+        <section anchor="aead-not-coverage" title="AEAD Requirements Not Covered">
+
+        </section>
+        <section anchor="kw-coverage" title="KeyWrap Requirements Covered">
+        
+        </section>
+        <section anchor="kw-not-coverage" title="KeyWrap Requirements Not Covered">
+
+        </section>
     </section>
 </section>
 
@@ -807,16 +942,36 @@ If ( keylen = 256 )
         <front>
           <title>ACVP Specification</title>
 
-          <author initials="authInitials" surname="authSurName">
-            <organization>NIST</organization>
+          <author initials="BF" surname="Barry Fussell">
+            <organization>Cisco</organization>
           </author>
 
-          <date year="2016"/>
+          <date year="2018"/>
         </front>
       </reference>
     </references>
 
     <references title="Informative References">
+      <reference anchor="SP800-38A">
+        <front>
+          <title>Recommendation for Block Cipher Modes of Operation: Methods and Techniques</title>
+          <author initials="MD" surname="Morris Dworkin">
+            <organization>NIST</organization>
+          </author>
+          <date year="2001"/>
+        </front>
+      </reference>
+
+      <reference anchor="FIPS-197">
+        <front>
+          <title>Specification for the Advanced Encryption Standard (AES)</title>
+          <author>
+            <organization>NIST</organization>
+          </author>
+          <date year="2001"/>
+        </front>
+      </reference>
+
       <reference anchor="AESAVS">
         <!-- the following is the minimum to make xml2rfc happy -->
 
