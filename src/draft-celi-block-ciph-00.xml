@@ -503,6 +503,15 @@
 		  <ttcol align="left">Description</ttcol>
 		  <ttcol align="left">JSON type</ttcol>
 		  <ttcol align="left">Optional</ttcol>
+            <c>tgId</c>
+            <c>Numeric identifier for the test group, unique across the entire vector set.</c>
+            <c>value</c>
+            <c>No</c>
+            <c/>
+            <c/>
+            <c/>
+            <c/>
+
 		    <c>direction</c>
 		      <c>The IUT processing direction: encrypt or decrypt</c>
     <c>value</c>
@@ -682,22 +691,78 @@
           <c>value</c>
 	    <c/><c/><c/>
 
-	      <c>testResults</c>
-	        <c>Array of JSON objects that represent each test vector result, which uses the same
-		        JSON schema as defined in <xref target="tvjs"/> </c>
-          <c>array</c>
-	    <c/><c/><c/>
-
-	      <c>decryptFail</c>
-	        <c>Some test cases included with decrypt operations in AES-GCM, AES-CCM, AES-XPN, AES-KW, AES-KWP, and TDES-KW will have expected failures. For these cases the
-		        JSON reponse should include the decryptFail keyword, see <xref target="app-vs-ex"/> </c>
-          <c>boolean true</c>
-	    <c/><c/><c/>
-
-	      <c>resultsArray</c>
-	        <c>Array of JSON objects that represent each iteration of a Monte Carlo Test. Each iteration will contain the key(s), pt, ct and iv (except for ECB mode)</c>
-          <c>array</c>
+	      <c>testGroups</c>
+        <c>Array of JSON objects that represent each test vector group. See          <xref target="vr_group_table"/>
+        </c>
+        <c>array</c>
+        <c/><c/><c/>
 	  </texttable>
+
+        <t>The testGroups section is used to organize the ACVP client response in a similar manner 
+      to how it receives vectors.  Several algorithms SHALL require the client to send back group 
+      level properties in their response.  This structure helps accommodate that.</t>
+
+      <texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
+        <ttcol align="left">JSON Value</ttcol>
+        <ttcol align="left">Description</ttcol>
+        <ttcol align="left">JSON type</ttcol>
+
+        <c>tgId</c>
+        <c>The test group Id</c>
+        <c>value</c>
+        <c/>
+        <c/>
+        <c/>
+        <c>tests</c>
+        <c>The tests associated to the group specified in tgId</c>
+        <c>value</c>
+        <c/>
+        <c/>
+        <c/>
+      </texttable>
+
+      <t>Each test group contains an array of one or more test cases.  Each test case is a JSON object
+		that represents a single test vector to be processed by the ACVP client.  The following table describes
+	    the JSON elements for each test vector.</t>
+      <texttable anchor="vs_tr_table" title="Test Case Results JSON Object">
+        <ttcol align="left">JSON Value</ttcol>
+        <ttcol align="left">Description</ttcol>
+        <ttcol align="left">JSON type</ttcol>
+        <ttcol align="left">Optional</ttcol>
+
+        <c>tcId</c>
+        <c>Numeric identifier for the test case, unique across the entire vector set.</c>
+        <c>value</c>
+        <c>No</c>
+        <c/><c/><c/><c/>
+
+        <c>pt</c>
+        <c>The IUT's pt response to a decrypt test</c>
+        <c>value</c>
+        <c>Yes</c>
+        <c/><c/><c/><c/>
+
+        <c>ct</c>
+        <c>The IUT's ct response to an encrypt test</c>
+        <c>value</c>
+        <c>Yes</c>
+        <c/><c/><c/><c/>
+
+        <c>testPassed</c>
+        <c>Some test cases included with decrypt operations in AES-GCM, AES-CCM, AES-XPN, AES-KW, AES-KWP, and TDES-KW will have expected failures. For these cases the
+        JSON reponse should include the decryptFail keyword, see <xref target="app-vs-ex"/> </c>
+        <c>boolean</c>
+        <c>Yes</c>
+        <c/><c/><c/><c/>
+
+        <c>resultsArray</c>
+        <c>Array of JSON objects that represent each iteration of a Monte Carlo Test. Each iteration will contain the key(s), pt, ct and iv (except for ECB mode)</c>
+        <c>array</c>
+        <c>Yes</c>
+        <c/><c/><c/><c/>
+
+      </texttable>
+
     </section>
     <section anchor="testtypes" title="Test Types and Test Coverage">
     <t>The ACVP server performs a set of tests on the block ciphers in order to assess the correctness and robustness of the 
@@ -1660,7 +1725,7 @@ POST [
 				},
 				{
 					"tcId": 903,
-					"decryptFail": true
+					"testPassed": false
 				}
 			]
 		}
@@ -1700,7 +1765,7 @@ POST [
 				},
 				{
 					"tcId": 903,
-					"decryptFail": true
+					"testPassed": false
 				}
 			]
 		}
@@ -1787,7 +1852,7 @@ POST [
     			"tgId": 2,
     			"tests": [{
     					"tcId": 181,
-    					"decryptFail": true
+    					"testPassed": false
     				},
     				{
     					"tcId": 182,
@@ -3028,7 +3093,7 @@ TBD
 				},
 				{
 					"tcId": 301,
-					"decryptFail": true
+					"testPassed": false
 				}
 			]
 		}
@@ -3280,7 +3345,7 @@ TBD
 				},
 				{
 					"tcId": 2172,
-					"decryptFail": true
+					"testPassed": false
 				}
 			]
 		}]
