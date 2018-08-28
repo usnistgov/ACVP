@@ -27,7 +27,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-acvp-subkdf135-snmp-0.3" ipr="trust200902">
+<rfc category="info" docName="draft-ietf-acvp-subkdf135-snmp-0.5" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN"
@@ -54,7 +54,7 @@
         <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-    <date month="June" year="2016" />
+    <date month="August" year="2018" />
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
          in the current day for you. If only the current year is specified, xml2rfc will fill
 	 in the current day and month for you. If the year is not the current one, it is
@@ -240,6 +240,16 @@
           <ttcol align="left">Description</ttcol>
           <ttcol align="left">JSON type</ttcol>
           <ttcol align="left">Optional</ttcol>
+          
+          <c>tgId</c>
+					<c>Numeric identifier for the test group, unique across the entire vector set.</c>
+					<c>value</c>
+					<c>No</c>
+					<c/>
+					<c/>
+					<c/>
+					<c/>
+          
           <c>engineId</c>
           <c>engine ID as hexadecimal string</c>
           <c>value</c>
@@ -248,6 +258,7 @@
           <c/>
           <c/>
           <c/>
+
           <c>passwordLength</c>
           <c>Length of password</c>
           <c>value</c>
@@ -256,12 +267,18 @@
           <c/>
           <c/>
           <c/>
+
           <c>tests</c>
           <c>Array of individual test vector JSON objects, which are defined in 
             <xref target="tvjs" />
           </c>
           <c>array</c>
           <c>No</c>
+          <c/>
+          <c/>
+          <c/>
+          <c/>
+
         </texttable>
       </section>
       <section title="Test Case JSON Schema" anchor="tvjs">
@@ -292,30 +309,76 @@
         <ttcol align="left">JSON Value</ttcol>
         <ttcol align="left">Description</ttcol>
         <ttcol align="left">JSON type</ttcol>
+        
         <c>acvVersion</c>
         <c>Protocol version identifier</c>
         <c>value</c>
         <c/>
         <c/>
         <c/>
+
         <c>vsId</c>
         <c>Unique numeric identifier for the vector set</c>
         <c>value</c>
         <c/>
         <c/>
         <c/>
-        <c>testResults</c>
-        <c>Array of JSON objects that represent each test vector result, as defined by the tables below</c>
-        <c>array</c>
+
+        <c>testGroups</c>
+				<c>Array of JSON objects that represent each test vector group. See					<xref target="vr_group_table"/>
+				</c>
+				<c>array</c>
+				<c/>
+				<c/>
+				<c/>
+
       </texttable>
+
+      <t>The testGroups section is used to organize the ACVP client response in a similar manner 
+      to how it receives vectors.  Several algorithms SHALL require the client to send back group 
+      level properties in their response.  This structure helps accommodate that.</t>
+
+			<texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
+				<ttcol align="left">JSON Value</ttcol>
+				<ttcol align="left">Description</ttcol>
+				<ttcol align="left">JSON type</ttcol>
+
+				<c>tgId</c>
+				<c>The test group Id</c>
+				<c>value</c>
+				<c/>
+				<c/>
+				<c/>
+
+				<c>tests</c>
+				<c>The tests associated to the group specified in tgId</c>
+				<c>value</c>
+				<c/>
+				<c/>
+				<c/>
+
+			</texttable>
+
       <t>The following table describes the JSON object that represents a vector set response for SNMP.</t>
       <texttable anchor="vr_top_table6" title="Vector Set Response JSON Object">
         <ttcol align="left">JSON Value</ttcol>
         <ttcol align="left">Description</ttcol>
         <ttcol align="left">JSON type</ttcol>
+
+        <c>tcId</c>
+				<c>Numeric identifier for the test case, unique across the entire vector set.</c>
+				<c>value</c>
+				<c/>
+				<c/>
+				<c/>
+
         <c>sharedKey</c>
         <c>Shared key value</c>
         <c>value (hex)</c>
+        <c/>
+        <c/>
+        <c/>
+
       </texttable>
     </section>
     <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
@@ -382,27 +445,23 @@
       <figure>
         <artwork>
           <![CDATA[
-[
-    {
-        "acvVersion": "0.4"
-    },
-    {
-        "vsId": 1564,
-        "algorithm": "kdf-components",
-        "mode": "snmp",
-        "testGroups": [
-            {
-                "engineId": "12345678912345678900",
-                "passwordLength": 64,
-                "tests": [
-                    {
-                        "tcId": 1,
-                        "password": "HkrWlnWjflyJTgvYFhvCQpsZLWDfcmdaZrBwSMRbsiKlKxldmeEohaWrSrkoJRhT"
-                    }
-                ]
-            }
-        ]
-    }
+[{
+		"acvVersion": <acvp-version>
+	},
+	{
+		"vsId": 1564,
+		"algorithm": "kdf-components",
+		"mode": "snmp",
+		"testGroups": [{
+			"tgId": 1,
+			"engineId": "12345678912345678900",
+			"passwordLength": 64,
+			"tests": [{
+				"tcId": 1,
+				"password": "HkrWlnWjflyJTgvYFhvCQpsZLWDfcmdaZrBwSMRbsiKlKxldmeEohaWrSrkoJRhT"
+			}]
+		}]
+	}
 ]
             ]]>
         </artwork>
@@ -413,19 +472,19 @@
       <figure>
         <artwork>
           <![CDATA[
-[
-    {
-        "acvVersion": "0.4"
-    },
-    {
-        "vsId": 1564,
-        "testResults": [
-            {
-                "tcId": 1,
-                "sharedKey": "DC775617098106487650FA45E9E1CCDF1CF6EB32"
-            }
-        ]
-    }
+[{
+		"acvVersion": <acvp-version>
+	},
+	{
+		"vsId": 1564,
+		"testGroups": [{
+			"tgId": 1,
+			"tests": [{
+				"tcId": 1,
+				"sharedKey": "DC775617098106487650FA45E9E1CCDF1CF6EB32"
+			}]
+		}]
+	}
 ]
             ]]>
         </artwork>
