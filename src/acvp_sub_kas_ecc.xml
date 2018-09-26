@@ -309,25 +309,23 @@
                     ACVP client during registration.</t>
             </section>
 
-            <section anchor="supported_functions" title="Supported KAS FFC Functions">
-				<t>The following function types may be advertised by the ACVP compliant crypto
-					module:</t>
-				<t>
-					<list style="symbols">
-						<t>dpGen - IUT can perform domain parameter generation (FFC only)</t>
-						<t>dpVal - IUT can perform domain parameter validation (FFC only)</t>
-						<t>keyPairGen - IUT can perform keypair generation.</t>
-						<t>fullVal - IUT can perform full public key validation
-							(<xref target="SP800-56a" />
-							section 5.6.2.3.1 / 5.6.2.3.3)</t>
-						<t>partialVal - IUT can perform partial public key validation
-							(<xref target="SP800-56a" />
-							section 5.6.2.3.2 / 5.6.2.3.4)</t>
-						<t>keyRegen - IUT can regenerate keys given a specific seed and domain
-							parameter (pqg for FFC, curve for ECC)</t>
-					</list>
-				</t>
-			</section>
+            <section anchor="supported_functions" title="Supported KAS ECC Functions">
+                <t>The following function types may be advertised by the ACVP compliant crypto
+                    module:</t>
+                <t>
+                    <list style="symbols">
+                        <t>dpGen - IUT can perform domain parameter generation (FFC only)</t>
+                        <t>dpVal - IUT can perform domain parameter validation (FFC only)</t>
+                        <t>keyPairGen - IUT can perform keypair generation.</t>
+                        <t>fullVal - IUT can perform full public key validation (<xref
+                                target="SP800-56a"/> section 5.6.2.3.1 / 5.6.2.3.3)</t>
+                        <t>partialVal - IUT can perform partial public key validation (<xref
+                                target="SP800-56a"/> section 5.6.2.3.2 / 5.6.2.3.4)</t>
+                        <t>keyRegen - IUT can regenerate keys given a specific seed and domain
+                            parameter (pqg for FFC, curve for ECC)</t>
+                    </list>
+                </t>
+            </section>
 
             <section anchor="schemes" title="KAS ECC Schemes">
 
@@ -924,6 +922,124 @@
                 </texttable>
             </section>
 
+            <section anchor="app-reg-ex" title="Example KAS ECC Capabilities JSON Object">
+                <t>The following is a example JSON object advertising support for KAS ECC.</t>
+                <figure>
+                    <artwork><![CDATA[
+
+{
+	"algorithm": "KAS-ECC",
+	"prereqVals": [{
+			"algorithm": "ECDSA",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "DRBG",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "SHA",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "CCM",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "CMAC",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "HMAC",
+			"valValue": "123456"
+		}
+	],
+	"function": ["keyPairGen", "dpGen"],
+	"scheme": {
+		"ephemeralUnified": {
+			"kasRole": ["initiator", "responder"],
+			"kdfNoKc": {
+				"kdfOption": {
+					"concatenation": "uPartyInfo||vPartyInfo",
+					"ASN1": "uPartyInfo||vPartyInfo"
+				},
+				"parameterSet": {
+					"ec": {
+						"curve": "K-283",
+						"hashAlg": ["SHA2-224", "SHA2-256"],
+						"macOption": {
+							"AES-CCM": {
+								"keyLen": [128],
+								"nonceLen": 56,
+								"macLen": 64
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+            ]]>                </artwork>
+                </figure>
+            </section>
+
+            <section anchor="app-reg-component-ex"
+                title="Example KAS ECC Component Capabilities JSON Object">
+                <t>The following is a example JSON object advertising support for KAS ECC
+                    Component.</t>
+                <figure>
+                    <artwork><![CDATA[
+
+{
+	"algorithm": "KAS-ECC",
+	"mode": "Component",
+	"prereqVals": [{
+			"algorithm": "ECDSA",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "DRBG",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "SHA",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "CCM",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "CMAC",
+			"valValue": "123456"
+		},
+		{
+			"algorithm": "HMAC",
+			"valValue": "123456"
+		}
+	],
+	"function": ["keyPairGen", "dpGen"],
+	"scheme": {
+		"ephemeralUnified": {
+			"kasRole": ["initiator", "responder"],
+			"noKdfNoKc": {
+				"parameterSet": {
+					"eb": {
+						"curve": "P-224",
+						"hashAlg": ["SHA2-224", "SHA2-256"]
+					}
+				}
+			}
+		}
+	}
+}
+
+            ]]>                </artwork>
+                </figure>
+            </section>
+
         </section>
 
         <section anchor="test_vectors" title="Test Vectors">
@@ -1478,514 +1594,12 @@
                     <c>Yes</c>
                 </texttable>
             </section>
-        </section>
 
-        <section anchor="vector_responses" title="Test Vector Responses">
-            <t>After the ACVP client downloads and processes a vector set, it must send the response
-                vectors back to the ACVP server. The following table describes the JSON object that
-                represents a vector set response.</t>
-
-            <texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
-                <ttcol align="left">JSON Value</ttcol>
-                <ttcol align="left">Description</ttcol>
-                <ttcol align="left">JSON type</ttcol>
-
-                <c>acvVersion</c>
-                <c>Protocol version identifier</c>
-                <c>value</c>
-                <c/>
-                <c/>
-                <c/>
-
-                <c>vsId</c>
-                <c>Unique numeric identifier for the vector set</c>
-                <c>value</c>
-                <c/>
-                <c/>
-                <c/>
-
-                <c>testGroups</c>
-                <c>Array of JSON objects that represent each test vector group. See <xref
-                        target="vr_group_table"/>
-                </c>
-                <c>array</c>
-            </texttable>
-
-            <t>The testGroups section is used to organize the ACVP client response in a similar
-                manner to how it receives vectors. Several algorithms SHALL require the client to
-                send back group level properties in their response. This structure helps accommodate
-                that.</t>
-
-            <texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
-                <ttcol align="left">JSON Value</ttcol>
-                <ttcol align="left">Description</ttcol>
-                <ttcol align="left">JSON type</ttcol>
-
-                <c>tgId</c>
-                <c>The test group Id</c>
-                <c>value</c>
-                <c/>
-                <c/>
-                <c/>
-                <c>tests</c>
-                <c>The tests associated to the group specified in tgId</c>
-                <c>value</c>
-                <c/>
-                <c/>
-                <c/>
-            </texttable>
-
-            <t>Note. the following bullet lists outline which JSON keywords must be provided for the
-                respective KAS ECC test types in the shared secret generation test vector
-                response.</t>
-
-            <t>ECC CDH component testing:</t>
-
-            <t>
-                <list style="symbols">
-                    <t>publicIutX</t>
-                    <t>publicIutY</t>
-                    <t>z</t>
-                </list>
-            </t>
-
-            <t>ephemeralUnified:</t>
-
-            <t>
-                <list style="symbols">
-                    <t>ephemeralPublicIutX</t>
-                    <t>ephemeralPublicIutY</t>
-                    <t>hashZIut</t>
-                </list>
-            </t>
-
-            <t>fullMqv: TBD</t>
-
-            <t>fullUnified: TBD</t>
-
-            <t>onePassDh</t>
-
-            <t>
-                <list style="symbols">
-                    <t>ephemeralPublicIutX</t>
-                    <t>ephemeralPublicIutY</t>
-                    <t>hashZIut</t>
-                </list>
-            </t>
-
-            <t>onePassMqv: TBD</t>
-
-            <t>onePassUnified: TBD</t>
-
-            <t>staticUnified</t>
-
-            <t>
-                <list style="symbols">
-                    <t>staticPublicIutX</t>
-                    <t>staticPublicIutY</t>
-                    <t>hashZIut</t>
-                </list>
-            </t>
-
-        </section>
-
-        <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
-
-        <section anchor="eccComp" title="ECC CDH Component Test">
-            <t>The ECC CDH Component Test</t>
-
-            <section anchor="eccCompCap" title="ECC CDH Component Capabilities JSON Values">
-                <t>Each algorithm capability advertised is a self-contained JSON object using the
-                    following values.</t>
-                <texttable anchor="eccComp_caps_table"
-                    title="KAS ECC Component Capabilities JSON Values">
-                    <ttcol align="left">JSON Value</ttcol>
-                    <ttcol align="left">Description</ttcol>
-                    <ttcol align="left">JSON type</ttcol>
-                    <ttcol align="left">Valid Values</ttcol>
-                    <ttcol align="left">Optional</ttcol>
-
-                    <c>algorithm</c>
-                    <c>The algorithm under test</c>
-                    <c>value</c>
-                    <c>KAS-ECC</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>mode</c>
-                    <c>The algorithm mode</c>
-                    <c>value</c>
-                    <c>CDH-Component</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>prereqVals</c>
-                    <c>Prerequisite algorithm validations</c>
-                    <c>array of prereqAlgVal objects</c>
-                    <c>See <xref target="prereq_algs"/>
-                    </c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>curve</c>
-                    <c>Array of supported curves</c>
-                    <c>array</c>
-                    <c>See <xref target="supported_curves"/>
-                    </c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                </texttable>
-            </section>
-
-            <section anchor="eccCompVectors" title="ECC CDH Component TestVectors JSON Values">
-
-                <texttable anchor="eccComp_vector_table"
-                    title="KAS ECC CDH Component TestVectors JSON Values">
-                    <ttcol align="left">JSON Value</ttcol>
-                    <ttcol align="left">Description</ttcol>
-                    <ttcol align="left">JSON type</ttcol>
-                    <ttcol align="left">Valid Values</ttcol>
-                    <ttcol align="left">Optional</ttcol>
-
-                    <c>algorithm</c>
-                    <c>The algorithm under test</c>
-                    <c>value</c>
-                    <c>KAS-ECC</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>mode</c>
-                    <c>The algorithm mode under test</c>
-                    <c>value</c>
-                    <c>CDH-Component</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>testGroups</c>
-                    <c>Array of individual test group JSON objects, which are defined in <xref
-                            target="eccCompTestGroup"/>
-                    </c>
-                    <c>Array</c>
-                    <c>Array of test group information</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                </texttable>
-            </section>
-
-            <section anchor="eccCompTestGroup" title="ECC CDH Component TestGroup JSON Values">
-
-                <texttable anchor="eccComp_testGroup_table"
-                    title="KAS ECC CDH Component TestGroup JSON Values">
-                    <ttcol align="left">JSON Value</ttcol>
-                    <ttcol align="left">Description</ttcol>
-                    <ttcol align="left">JSON type</ttcol>
-                    <ttcol align="left">Valid Values</ttcol>
-                    <ttcol align="left">Optional</ttcol>
-
-                    <c>testType</c>
-                    <c>The test type expected within the group. AFT is the only valid value for ECC
-                        Component.</c>
-                    <c>value</c>
-                    <c>AFT</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>curve</c>
-                    <c>The curve used in the test group</c>
-                    <c>value</c>
-                    <c>P-224, P-256, P-384, P-521, K-233, K-283, K-409, K-571, B-233, B-283, B-409,
-                        B-571</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>tests</c>
-                    <c>Array of individual test vector JSON objects, which are defined in <xref
-                            target="eccCompTestCase"/>
-                    </c>
-                    <c>array</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                </texttable>
-            </section>
-
-            <section anchor="eccCompTestCase" title="ECC CDH Component TestCase JSON Values">
-
-                <texttable anchor="eccComp_testCase_table"
-                    title="KAS ECC CDH Component TestCase JSON Values">
-                    <ttcol align="left">JSON Value</ttcol>
-                    <ttcol align="left">Description</ttcol>
-                    <ttcol align="left">Valid Values</ttcol>
-                    <ttcol align="left">Optional</ttcol>
-
-                    <c>tcId</c>
-                    <c>Numeric identifier for the test case, unique across the entire vector
-                        set.</c>
-                    <c>value</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>publicServerX</c>
-                    <c>The X coordinate of the server's public key</c>
-                    <c>value</c>
-                    <c>Yes</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>publicServerY</c>
-                    <c>The Y coordinate of the server's public key</c>
-                    <c>value</c>
-                    <c>Yes</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>publicIutX</c>
-                    <c>The X coordinate of the iut's public key</c>
-                    <c>value</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>publicIutY</c>
-                    <c>The Y coordinate of the iut's public key</c>
-                    <c>value</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                    <c>z</c>
-                    <c>The shared secret Z</c>
-                    <c>value</c>
-                    <c>No</c>
-                    <c/>
-                    <c/>
-                    <c/>
-                    <c/>
-
-                </texttable>
-            </section>
-
-        </section>
-
-        <section anchor="Acknowledgements" title="Acknowledgements">
-            <t>TBD...</t>
-        </section>
-
-        <!-- Possibly a 'Contributors' section ... -->
-
-        <section anchor="IANA" title="IANA Considerations">
-            <t>This memo includes no request to IANA.</t>
-        </section>
-
-        <section anchor="Security" title="Security Considerations">
-            <t>Security considerations are addressed by the ACVP specification.</t>
-        </section>
-    </middle>
-
-    <!--  *****BACK MATTER ***** -->
-
-    <back>
-        <references title="Normative References">
-            <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.Rfc.2119.xml"?-->
-            &RFC2119; <reference anchor="ACVP">
-                <!-- the following is the minimum to make xml2rfc happy -->
-
-                <front>
-                    <title>ACVP Specification</title>
-
-                    <author initials="authInitials" surname="authSurName">
-                        <organization>NIST</organization>
-                    </author>
-
-                    <date year="2016"/>
-                </front>
-            </reference>
-            <reference anchor="SP800-56a" target="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar3.pdf">
-				<front>
-					<title>Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography</title>
-					<author>
-						<organization>NIST</organization>
-					</author>
-					<date month="April" year="2018" />
-				</front>
-			</reference>
-        </references>
-
-        <section anchor="app-reg-ex" title="Example KAS ECC Capabilities JSON Object">
-            <t>The following is a example JSON object advertising support for KAS ECC.</t>
-            <figure>
-                <artwork><![CDATA[
-
-{
-	"algorithm": "KAS-ECC",
-	"prereqVals": [{
-			"algorithm": "ECDSA",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "DRBG",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "SHA",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "CCM",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "CMAC",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "HMAC",
-			"valValue": "123456"
-		}
-	],
-	"function": ["keyPairGen", "dpGen"],
-	"scheme": {
-		"ephemeralUnified": {
-			"kasRole": ["initiator", "responder"],
-			"kdfNoKc": {
-				"kdfOption": {
-					"concatenation": "uPartyInfo||vPartyInfo",
-					"ASN1": "uPartyInfo||vPartyInfo"
-				},
-				"parameterSet": {
-					"ec": {
-						"curve": "K-283",
-						"hashAlg": ["SHA2-224", "SHA2-256"],
-						"macOption": {
-							"AES-CCM": {
-								"keyLen": [128],
-								"nonceLen": 56,
-								"macLen": 64
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-            ]]>                </artwork>
-            </figure>
-        </section>
-
-        <section anchor="app-reg-component-ex"
-            title="Example KAS ECC Component Capabilities JSON Object">
-            <t>The following is a example JSON object advertising support for KAS ECC Component.</t>
-            <figure>
-                <artwork><![CDATA[
-
-{
-	"algorithm": "KAS-ECC",
-	"mode": "Component",
-	"prereqVals": [{
-			"algorithm": "ECDSA",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "DRBG",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "SHA",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "CCM",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "CMAC",
-			"valValue": "123456"
-		},
-		{
-			"algorithm": "HMAC",
-			"valValue": "123456"
-		}
-	],
-	"function": ["keyPairGen", "dpGen"],
-	"scheme": {
-		"ephemeralUnified": {
-			"kasRole": ["initiator", "responder"],
-			"noKdfNoKc": {
-				"parameterSet": {
-					"eb": {
-						"curve": "P-224",
-						"hashAlg": ["SHA2-224", "SHA2-256"]
-					}
-				}
-			}
-		}
-	}
-}
-
-            ]]>                </artwork>
-            </figure>
-        </section>
-
-        <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
-            <t>The following is a example JSON object for KAS ECC test vectors sent from the ACVP
-                server to the crypto module.</t>
-            <figure>
-                <artwork><![CDATA[
+            <section anchor="app-vs-ex" title="Example Test Vectors JSON Object">
+                <t>The following is a example JSON object for KAS ECC test vectors sent from the
+                    ACVP server to the crypto module.</t>
+                <figure>
+                    <artwork><![CDATA[
 [{
 		"acvVersion": <acvp-version>
 	},
@@ -2103,14 +1717,14 @@
 	}
 ]
             ]]>                </artwork>
-            </figure>
-        </section>
+                </figure>
+            </section>
 
-        <section anchor="app-vs-component-ex" title="Example Test Vectors Component JSON Object">
-            <t>The following is a example JSON object for KAS ECC Component test vectors sent from
-                the ACVP server to the crypto module.</t>
-            <figure>
-                <artwork><![CDATA[
+            <section anchor="app-vs-component-ex" title="Example Test Vectors Component JSON Object">
+                <t>The following is a example JSON object for KAS ECC Component test vectors sent
+                    from the ACVP server to the crypto module.</t>
+                <figure>
+                    <artwork><![CDATA[
 [{
 		"acvVersion": <acvp-version>
 	},
@@ -2189,14 +1803,114 @@
 	}
 ]
             ]]>                </artwork>
-            </figure>
+                </figure>
+            </section>
+
+
         </section>
 
-        <section anchor="app-results-ex" title="Example Test Results JSON Object">
-            <t>The following is a example JSON object for KAS ECC test results sent from the crypto
-                module to the ACVP server.</t>
-            <figure>
-                <artwork><![CDATA[
+        <section anchor="vector_responses" title="Test Vector Responses">
+            <t>After the ACVP client downloads and processes a vector set, it must send the response
+                vectors back to the ACVP server. The following table describes the JSON object that
+                represents a vector set response.</t>
+
+            <texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
+                <ttcol align="left">JSON Value</ttcol>
+                <ttcol align="left">Description</ttcol>
+                <ttcol align="left">JSON type</ttcol>
+
+                <c>acvVersion</c>
+                <c>Protocol version identifier</c>
+                <c>value</c>
+                <c/>
+                <c/>
+                <c/>
+
+                <c>vsId</c>
+                <c>Unique numeric identifier for the vector set</c>
+                <c>value</c>
+                <c/>
+                <c/>
+                <c/>
+
+                <c>testGroups</c>
+                <c>Array of JSON objects that represent each test vector group. See <xref
+                        target="vr_group_table"/>
+                </c>
+                <c>array</c>
+            </texttable>
+
+            <t>The testGroups section is used to organize the ACVP client response in a similar
+                manner to how it receives vectors. Several algorithms SHALL require the client to
+                send back group level properties in their response. This structure helps accommodate
+                that.</t>
+
+            <texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
+                <ttcol align="left">JSON Value</ttcol>
+                <ttcol align="left">Description</ttcol>
+                <ttcol align="left">JSON type</ttcol>
+
+                <c>tgId</c>
+                <c>The test group Id</c>
+                <c>value</c>
+                <c/>
+                <c/>
+                <c/>
+                <c>tests</c>
+                <c>The tests associated to the group specified in tgId</c>
+                <c>value</c>
+                <c/>
+                <c/>
+                <c/>
+            </texttable>
+
+            <t>Note. the following bullet lists outline which JSON keywords must be provided for the
+                respective KAS ECC test types in the shared secret generation test vector
+                response.</t>
+
+            <t>ephemeralUnified:</t>
+
+            <t>
+                <list style="symbols">
+                    <t>ephemeralPublicIutX</t>
+                    <t>ephemeralPublicIutY</t>
+                    <t>hashZIut</t>
+                </list>
+            </t>
+
+            <t>fullMqv: TBD</t>
+
+            <t>fullUnified: TBD</t>
+
+            <t>onePassDh</t>
+
+            <t>
+                <list style="symbols">
+                    <t>ephemeralPublicIutX</t>
+                    <t>ephemeralPublicIutY</t>
+                    <t>hashZIut</t>
+                </list>
+            </t>
+
+            <t>onePassMqv: TBD</t>
+
+            <t>onePassUnified: TBD</t>
+
+            <t>staticUnified</t>
+
+            <t>
+                <list style="symbols">
+                    <t>staticPublicIutX</t>
+                    <t>staticPublicIutY</t>
+                    <t>hashZIut</t>
+                </list>
+            </t>
+
+            <section anchor="app-results-ex" title="Example Test Results JSON Object">
+                <t>The following is a example JSON object for KAS ECC test results sent from the
+                    crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork><![CDATA[
 [{
 		"acvVersion": <acvp-version>
 	},
@@ -2249,15 +1963,15 @@
 	}
 ]
             ]]>                </artwork>
-            </figure>
-        </section>
+                </figure>
+            </section>
 
-        <section anchor="app-results-component-ex"
-            title="Example Test Results Component JSON Object">
-            <t>The following is a example JSON object for KAS ECC Component test results sent from
-                the crypto module to the ACVP server.</t>
-            <figure>
-                <artwork><![CDATA[
+            <section anchor="app-results-component-ex"
+                title="Example Test Results Component JSON Object">
+                <t>The following is a example JSON object for KAS ECC Component test results sent
+                    from the crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork><![CDATA[
 [{
 		"acvVersion": <acvp-version>
 	},
@@ -2299,15 +2013,81 @@
 	}
 ]
             ]]>                </artwork>
-            </figure>
+                </figure>
+            </section>
+
         </section>
 
-        <section anchor="app-eccComponent-reg-ex"
-            title="Example KAS ECC CDH-Component Capabilities JSON Object">
-            <t>The following is a example JSON object advertising support for KAS ECC
-                CDH-Component.</t>
-            <figure>
-                <artwork><![CDATA[
+        <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+
+        <section anchor="eccComp" title="ECC CDH Component Test">
+            <t>The ECC CDH Component Test</t>
+
+            <section anchor="eccCompCap" title="ECC CDH Component Capabilities JSON Values">
+                <t>Each algorithm capability advertised is a self-contained JSON object using the
+                    following values.</t>
+                <texttable anchor="eccComp_caps_table"
+                    title="KAS ECC Component Capabilities JSON Values">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Valid Values</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+
+                    <c>algorithm</c>
+                    <c>The algorithm under test</c>
+                    <c>value</c>
+                    <c>KAS-ECC</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>mode</c>
+                    <c>The algorithm mode</c>
+                    <c>value</c>
+                    <c>CDH-Component</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>prereqVals</c>
+                    <c>Prerequisite algorithm validations</c>
+                    <c>array of prereqAlgVal objects</c>
+                    <c>See <xref target="prereq_algs"/>
+                    </c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>curve</c>
+                    <c>Array of supported curves</c>
+                    <c>array</c>
+                    <c>See <xref target="supported_curves"/>
+                    </c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                </texttable>
+
+                <section anchor="app-eccComponent-reg-ex"
+                    title="Example KAS ECC CDH-Component Capabilities JSON Object">
+                    <t>The following is a example JSON object advertising support for KAS ECC
+                        CDH-Component.</t>
+                    <figure>
+                        <artwork><![CDATA[
 
 {
 	"algorithm": "KAS-ECC",
@@ -2320,16 +2100,181 @@
 	"curve": ["p-192", "k-163", "b-163"]
 }
 
-            ]]>                </artwork>
-            </figure>
-        </section>
+            ]]>                
+            </artwork>
+                    </figure>
+                </section>
+            </section>
 
-        <section anchor="app-eccComponent-vs-ex"
-            title="Example KAS ECC CDH-Component Test Vectors JSON Object">
-            <t>The following is a example JSON object for KAS ECC CDH-Component test vectors sent
-                from the ACVP server to the crypto module.</t>
-            <figure>
-                <artwork><![CDATA[
+            <section anchor="eccCompVectors" title="ECC CDH Component TestVectors JSON Values">
+
+                <texttable anchor="eccComp_vector_table"
+                    title="KAS ECC CDH Component TestVectors JSON Values">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Valid Values</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+
+                    <c>algorithm</c>
+                    <c>The algorithm under test</c>
+                    <c>value</c>
+                    <c>KAS-ECC</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>mode</c>
+                    <c>The algorithm mode under test</c>
+                    <c>value</c>
+                    <c>CDH-Component</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>testGroups</c>
+                    <c>Array of individual test group JSON objects, which are defined in <xref
+                            target="eccCompTestGroup"/>
+                    </c>
+                    <c>Array</c>
+                    <c>Array of test group information</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                </texttable>
+
+                <section anchor="eccCompTestGroup" title="ECC CDH Component TestGroup JSON Values">
+
+                    <texttable anchor="eccComp_testGroup_table"
+                        title="KAS ECC CDH Component TestGroup JSON Values">
+                        <ttcol align="left">JSON Value</ttcol>
+                        <ttcol align="left">Description</ttcol>
+                        <ttcol align="left">JSON type</ttcol>
+                        <ttcol align="left">Valid Values</ttcol>
+                        <ttcol align="left">Optional</ttcol>
+
+                        <c>testType</c>
+                        <c>The test type expected within the group. AFT is the only valid value for
+                            ECC Component.</c>
+                        <c>value</c>
+                        <c>AFT</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                        <c>curve</c>
+                        <c>The curve used in the test group</c>
+                        <c>value</c>
+                        <c>P-224, P-256, P-384, P-521, K-233, K-283, K-409, K-571, B-233, B-283,
+                            B-409, B-571</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                        <c>tests</c>
+                        <c>Array of individual test vector JSON objects, which are defined in <xref
+                                target="eccCompTestCase"/>
+                        </c>
+                        <c>array</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                    </texttable>
+                </section>
+
+                <section anchor="eccCompTestCase" title="ECC CDH Component TestCase JSON Values">
+
+                    <texttable anchor="eccComp_testCase_table"
+                        title="KAS ECC CDH Component TestCase JSON Values">
+                        <ttcol align="left">JSON Value</ttcol>
+                        <ttcol align="left">Description</ttcol>
+                        <ttcol align="left">Valid Values</ttcol>
+                        <ttcol align="left">Optional</ttcol>
+
+                        <c>tcId</c>
+                        <c>Numeric identifier for the test case, unique across the entire vector
+                            set.</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                        <c>publicServerX</c>
+                        <c>The X coordinate of the server's public key</c>
+                        <c>value</c>
+                        <c>Yes</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                        <c>publicServerY</c>
+                        <c>The Y coordinate of the server's public key</c>
+                        <c>value</c>
+                        <c>Yes</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                        <c>publicIutX</c>
+                        <c>The X coordinate of the iut's public key</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                        <c>publicIutY</c>
+                        <c>The Y coordinate of the iut's public key</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                        <c>z</c>
+                        <c>The shared secret Z</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+
+                    </texttable>
+                </section>
+
+                <section anchor="app-eccComponent-vs-ex"
+                    title="Example KAS ECC CDH-Component Test Vectors JSON Object">
+                    <t>The following is a example JSON object for KAS ECC CDH-Component test vectors
+                        sent from the ACVP server to the crypto module.</t>
+                    <figure>
+                        <artwork><![CDATA[
 [{
 		"acvVersion": <acvp-version>
 	},
@@ -2371,15 +2316,126 @@
 	}
 ]
             ]]>                </artwork>
-            </figure>
-        </section>
+                    </figure>
+                </section>
 
-        <section anchor="app-eccComponent-results-ex"
-            title="Example KAS ECC Component Test Results JSON Object">
-            <t>The following is a example JSON object for KAS ECC Component test results sent from
-                the crypto module to the ACVP server.</t>
-            <figure>
-                <artwork><![CDATA[
+
+            </section>
+
+            <section anchor="cdh_vector_responses" title="KAS CDH-Component Test Vector Responses">
+                <t>After the ACVP client downloads and processes a vector set, it must send the
+                    response vectors back to the ACVP server. The following table describes the JSON
+                    object that represents a vector set response.</t>
+
+                <texttable anchor="vr_cdh_top_table"
+                    title="CDH Component Vector Set Response JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+
+                    <c>acvVersion</c>
+                    <c>Protocol version identifier</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>vsId</c>
+                    <c>Unique numeric identifier for the vector set</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>testGroups</c>
+                    <c>Array of JSON objects that represent each test vector group. See <xref
+                            target="vr_cdh_group_table"/>
+                    </c>
+                    <c>array</c>
+                </texttable>
+
+                <t>The testGroups section is used to organize the ACVP client response in a similar
+                    manner to how it receives vectors. Several algorithms SHALL require the client
+                    to send back group level properties in their response. This structure helps
+                    accommodate that.</t>
+
+                <texttable anchor="vr_cdh_group_table"
+                    title="CDH Component Vector Set Group Response JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+
+                    <c>tgId</c>
+                    <c>The test group Id</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>tests</c>
+                    <c>The tests associated to the group specified in tgId</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                </texttable>
+
+                <t>Each test group contains an array of one or more test cases. Each test case is a
+                    JSON object that represents a single test vector to be processed by the ACVP
+                    client. The following table describes the JSON elements for each DRBG test
+                    vector.</t>
+                <texttable anchor="vs_tr_table" title="CDH Component Test Case Results JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+
+                    <c>tcId</c>
+                    <c>Numeric identifier for the test case, unique across the entire vector
+                        set.</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>publicIutX</c>
+                    <c>x value of the IUT public key </c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>publicIutY</c>
+                    <c>x value of the IUT public key </c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                    <c>z</c>
+                    <c>Computed shared secret Z</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+
+                </texttable>
+
+            </section>
+
+            <section anchor="app-eccComponent-results-ex"
+                title="Example KAS ECC CDH Component Test Results JSON Object">
+                <t>The following is a example JSON object for KAS ECC CDH Component test results
+                    sent from the crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork><![CDATA[
 [{
 		"acvVersion": <acvp-version>
 	},
@@ -2416,8 +2472,56 @@
 	}
 ]
             ]]>                </artwork>
-            </figure>
+                </figure>
+            </section>
+
         </section>
+
+        <section anchor="Acknowledgements" title="Acknowledgements">
+            <t>TBD...</t>
+        </section>
+
+        <!-- Possibly a 'Contributors' section ... -->
+
+        <section anchor="IANA" title="IANA Considerations">
+            <t>This memo includes no request to IANA.</t>
+        </section>
+
+        <section anchor="Security" title="Security Considerations">
+            <t>Security considerations are addressed by the ACVP specification.</t>
+        </section>
+    </middle>
+
+    <!--  *****BACK MATTER ***** -->
+
+    <back>
+        <references title="Normative References">
+            <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.Rfc.2119.xml"?-->
+            &RFC2119; <reference anchor="ACVP">
+                <!-- the following is the minimum to make xml2rfc happy -->
+
+                <front>
+                    <title>ACVP Specification</title>
+
+                    <author initials="authInitials" surname="authSurName">
+                        <organization>NIST</organization>
+                    </author>
+
+                    <date year="2016"/>
+                </front>
+            </reference>
+            <reference anchor="SP800-56a"
+                target="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar3.pdf">
+                <front>
+                    <title>Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete
+                        Logarithm Cryptography</title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="April" year="2018"/>
+                </front>
+            </reference>
+        </references>
 
     </back>
 </rfc>
