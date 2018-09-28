@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC8126 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.8126.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-vassilev-acvp-iana-00" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the
+         full title is longer than 39 characters -->
+
+    <title abbrev="ACVP-IANA">ACVP IANA Registry</title>
+
+    <!-- add 'role="editor"' below for the editors if appropriate -->
+
+    <!-- Another author who claims to be an editor -->
+
+    <author fullname="Apostol Vassilev" initials="A.V." role="editor" surname="Vassilev">
+      <organization>NIST</organization>
+
+      <address>
+        <postal>
+          <street>100 Bureau Dr.</street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>Gaithersburg</city>
+
+          <region>MD</region>
+
+          <code>20899</code>
+
+          <country>USA</country>
+        </postal>
+
+        <email>apostol.vassilev@nist.gov</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+
+    <date month="July" year="2018"/>
+
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+         in the current day for you. If only the current year is specified, xml2rfc will fill
+	 in the current day and month for you. If the year is not the current one, it is
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+	 specify just the year. -->
+
+    <!-- Meta-data Declarations -->
+
+    <area>General</area>
+
+    <workgroup>TBD</workgroup>
+
+    <!-- WG name at the upperleft corner of the doc,
+         IETF is fine for individual submissions.
+	 If this element is not present, the default is "Network Working Group",
+         which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+    <keyword>acvp</keyword>
+    <keyword>cryptography</keyword>
+    <keyword>validation testing</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+      <t>This document defines the IANA registry for supported cryptographic algorithm test specifications in the Automated Cryptographic Validation Protocol (ACVP) <xref target="acvp"/>. This document also shows how to extend the capabilities of ACVP with testing for new cryptographic algorithms.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>The Automated Cryptographic Validation Protocol (ACVP) <xref target="acvp"/>   defines a mechanism to automatically
+              validate the cryptographic algorithm implementations of software or hardware cryptographic modules.
+              The ACVP specification defines how a cryptographic module communicates with a validation authority
+              server, including cryptographic capabilities negotiation, session management, authentication,
+	      test vector processing and more.  The ACVP specification does not define algorithm-specific
+	      JSON constructs for performing the cryptographic validation.  A series of ACVP-related sub-specifications
+	      define the constructs for testing individual cryptographic algorithms, see for example <xref target="sub-symmetric"/>.  Each such sub-specification
+	      addresses a specific algorithm or a class of cryptographic algorithms. This document defines the IANA registry for the supported algorithm test specifications that work with ACVP. The registry defined here provides the binding between the protocol and the supported algorithm test extensions.</t> 
+
+<t>This document also outlines the procedure
+	      for adding support for testing a new cryptographic algorithm, including hints for how to develop the testing methodology and the corresponding JSON constructs for performing the validation with ACVP. </t>
+	      </section>
+	      
+	      <section anchor="taxonomy" title="Registry hierarchy">
+	      <t>The IANA registry for ACVP is based on the high-level taxonomy of supported algorithm classes shown below.</t>
+
+<texttable anchor="table_ex" title="Algorithm class taxonomy">
+    <ttcol align='left'>Algorithm class</ttcol>
+    <ttcol align='center'>Code</ttcol>
+    <c>Symmetric block ciphers</c>
+    <c>0x01</c>
+    <c>Digital signature</c>
+    <c>0x02</c>
+    <c>Hash</c>
+    <c>0x03</c>
+    <c>XOF</c>
+    <c>0x04</c>
+    <c>MAC</c>
+    <c>0x05</c>
+    <c>DRBG</c>
+    <c>0x06</c>
+    <c>KAS</c>
+    <c>0x07</c>
+    <c>KDF</c>
+    <c>0x08</c>
+    <postamble></postamble>
+</texttable>
+
+<section anchor="types" title="Algorithm types">
+<t>Each algorithm class may contain two or more different types of algorithms, each type with some characteristic feature distinguishing it from the other algorithm types in the same class. </t>
+<section anchor="blockCipherTypes" title="Block cipher types">
+
+<t>The types of different symmetric block ciphers are shown in <xref target="table_BlockCipherTypes"/> below.</t>
+<texttable anchor="table_BlockCipherTypes" title="Block Cipher Types">
+    <ttcol align='left'>Type</ttcol>
+    <ttcol align='center'>Name</ttcol>
+    <ttcol align='center'>Code</ttcol>
+    <ttcol align='center'>Rec'd&#13;for use</ttcol>
+    <c>128-bit symmetric block cipher</c>
+    <c>AES</c>
+    <c>0x01</c>
+    <c>Yes</c>
+    <c>64-bit symmetric block cipher</c>
+    <c>TDES</c>
+    <c>0x02</c>
+    <c>Yes--</c>
+    <postamble>-- several restrictions on TDES exist to ensure secure use under the growing threats of recent attacks. For specific guidance see TBD.</postamble>
+</texttable>
+</section>
+<section anchor="digitalSignatureRTypes" title="Digital signature types">
+<t>The types of different digital signature algorithms are shown in <xref target="table_DigitalSignatureTypes"/> below.</t>
+<texttable anchor="table_DigitalSignatureTypes" title="Digital Signature Types">
+    <ttcol align='left'>Type</ttcol>
+    <ttcol align='center'>Name</ttcol>
+    <ttcol align='center'>Code</ttcol>
+    <ttcol align='center'>Rec'd&#13;for&#13;use</ttcol>
+    <c>Discrete Log Cryptography (DLC)</c>
+    <c>Finite Field Cryptography (FFC)</c>
+    <c>0x01</c>
+    <c>Yes</c>
+    <c></c>
+    <c></c>
+    <c></c>
+    <c></c>
+    <c>DLC</c>
+    <c>Elliptic Curve Cryptography (ECC)</c>
+    <c>0x02</c>
+    <c>Yes</c>
+    <c></c>
+    <c></c>
+    <c></c>
+    <c></c>
+    <c>Integer Factorization Cryptography (IFC)</c>
+    <c>n/a</c>
+    <c>0x03</c>
+    <c>Yes</c>
+    <postamble></postamble>
+</texttable>
+</section>
+<section anchor="hashTypes" title="Secure hash types">
+<t>The secure hash types are shown in <xref target="table_SHSTypes"/> below.</t>
+<texttable anchor="table_SHSTypes" title="Secure Hash Types">
+    <ttcol align='left'>Type</ttcol>
+    <ttcol align='center'>Name</ttcol>
+    <ttcol align='center'>Code</ttcol>
+    <ttcol align='center'>Rec'd&#13;for&#13;use</ttcol>
+    <c>Fixed length output</c>
+    <c>SHA-1</c>
+    <c>0x01</c>
+    <c>No++</c>
+    <c></c>
+    <c>SHA-2</c>
+    <c>0x02</c>
+    <c>Yes</c>
+    <c></c>
+    <c>SHA-3</c>
+    <c>0x03</c>
+    <c>Yes</c>
+    <c/>
+    <c/>
+    <c/>
+    <c/>
+    <c>Variable length output</c>
+    <c>TupleHash</c>
+    <c>0x04</c>
+    <c>Yes</c>
+    <c></c>
+    <c>cSHAKE</c>
+    <c>0x05</c>
+    <c>Yes</c>
+    <c></c>
+    <c>KMAC</c>
+    <c>0x06</c>
+    <c>Yes</c>
+    <c></c>
+    <c>ParallelHash</c>
+    <c>0x07</c>
+    <c>Yes</c>
+    <c/>
+    <c/>
+    <c/>
+    <c/>
+    <c>Extendable output functions (XoF)</c>
+    <c>SHAKE</c>
+    <c>0x08</c>
+    <c>Yes</c>
+    <postamble>++ SHA-1 may be used in some limited cases such as to verify existing old digital signatures. See TBD for more details.</postamble>
+</texttable>
+</section>
+
+<section anchor="drbgTypes" title="Deterministic random bit generator types"> 
+<t>The deterministic random bit generator (DRBG) types are shown in <xref target="table_DRBGTypes"/> below.</t>
+<texttable anchor="table_DRBGTypes" title="DRBG Types">
+    <ttcol align='left'>Type</ttcol>
+    <ttcol align='center'>Name</ttcol>
+    <ttcol align='center'>Code</ttcol>
+    <ttcol align='center'>Rec'd&#13;for&#13;use</ttcol>
+    <c>Counter-based</c>
+    <c>n/a</c>
+    <c>0x01</c>
+    <c>Yes</c>
+    <c>Hash-based</c>
+    <c>n/a</c>
+    <c>0x02</c>
+    <c>Yes</c>
+    <c>HMAC-based</c>
+    <c>n/a</c>
+    <c>0x03</c>
+    <c>Yes</c>
+    <postamble></postamble>
+</texttable>
+</section>
+</section>
+<section anchor="algoTaxonomy" title="Algorithm registry">
+<texttable anchor="table_algorithms" title="Algorithm registry">
+    <ttcol align='left'>Supported algorithms</ttcol>
+    <ttcol align='center'>Code &#13;{class,type,id}</ttcol>
+    <ttcol align='center'>Rec'd&#13;for&#13;use</ttcol>
+    <ttcol align='center'>Reference</ttcol>
+    <c>ACVP_AES_ECB</c>
+    <c>{0x01,0x01,0x01}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_CBC</c>
+    <c>{0x01,0x01,0x02}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_OFB</c>
+    <c>{0x01,0x01,0x03}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_CFB1</c>
+    <c>{0x01,0x01,0x04}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_CFB8</c>
+    <c>{0x01,0x01,0x05}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_CFB128</c>
+    <c>{0x01,0x01,0x06}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_CTR</c>
+    <c>{0x01,0x01,0x07}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_GCM</c>
+    <c>{0x01,0x01,0x08}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_CCM</c>
+    <c>{0x01,0x01,0x09}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_XPN</c>
+    <c>{0x01,0x01,0x0A}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_CMAC</c>
+    <c>{0x01,0x01,0x0B}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_GMAC</c>
+    <c>{0x01,0x01,0x0C}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_KW</c>
+    <c>{0x01,0x01,0x0D}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_KWP</c>
+    <c>{0x01,0x01,0x0E}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_AES_XTS</c>
+    <c>{0x01,0x01,0x0F}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_TDES_ECB</c>
+    <c>{0x01,0x02,0x01}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_TDES_CBC</c>
+    <c>{0x01,0x02,0x02}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>      
+    <c>ACVP_TDES_OFB</c>
+    <c>{0x01,0x02,0x03}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>   
+    <c>ACVP_TDES_CFB1</c>
+    <c>{0x01,0x02,0x04}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>
+    <c>ACVP_TDES_CFB8</c>
+    <c>{0x01,0x02,0x05}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>   
+    <c>ACVP_TDES_CFB64</c>
+    <c>{0x01,0x02,0x06}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>   
+    <c>ACVP_TDES_CTR</c>
+    <c>{0x01,0x02,0x07}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>   
+    <c>ACVP_TDES_TKW</c>
+    <c>{0x01,0x02,0x08}</c>
+    <c>Yes</c>
+    <c><xref target="sub-symmetric"/></c>   
+<!--    
+    <c>ACVP_DSA</c>
+    <c>{0x02,0x01,0x01}</c>
+    <c>Yes</c>
+    <c><xref target="sub-dsa"/></c>   
+    <c>ACVP_ECDSA</c>
+    <c>{0x02,0x02,0x01}</c>
+    <c>Yes</c>
+    <c><xref target="sub-ecdsa"/></c>   
+    <c>ACVP_RSA</c>
+    <c>{0x02,0x03,0x01}</c>
+    <c>Yes</c>
+    <c><xref target="sub-rsa"/></c>
+-->   
+    <postamble></postamble>
+</texttable>
+<!--
+        <t><list style="numbers">
+        <t>Symmetric block ciphers and modes
+          <list style="symbols">
+          <t>AES</t>
+          <t>TDES</t>
+          <t>SkipJack</t>
+          </list>        
+        </t>
+        <t>Block Cipher Modes
+        <list style="symbols"><t>CCM</t>
+        <t>CMAC</t>
+        <t>GCM/GMAC/XPN</t>
+        <t>KeyWrap</t>
+        <t>XTS</t></list></t>
+         <t>Digital Signatures
+         <list style="symbols">
+         <t>RSA</t>
+         <t>DSA</t>
+         <t>ECDSA</t>         
+         </list>
+         </t>
+         <t>Hash
+         <list style="symbols">
+         <t>SHA-1</t>
+         <t>SHA-2</t>
+         <t>SHA-3</t>
+         </list>
+         </t>
+         <t>XOF
+         <list style="symbols">
+         <t>SHAKE</t>
+         <t>CSHAKE</t>
+         </list>
+         </t>
+         <t>MAC
+         <list style="symbols">
+         <t>HMAC</t>
+         <t>CMAC</t>
+         <t>GMAC</t>
+         <t>KMAC</t>
+         </list></t>
+         <t>DRBG
+         <list style="symbols">
+         <t>CTR</t>
+         <t>Hash</t>
+         <t>HMAC</t>
+         </list></t>
+         <t>KAS
+         <list style="symbols">
+         <t>DH</t>
+         <t>Other Schemes</t>
+         </list></t>
+         <t>Key Derivation
+         <list style="symbols">
+         <t>CTR</t>
+         <t>Pipeline</t>
+         <t>Feedback</t>
+         <t>TLS</t>
+         <t>SSH</t>
+         <t>HASH</t>
+         <t>HMAC</t>
+         <t>TwoStep</t></list></t>
+        </list></t>
+-->
+</section>
+</section>
+	      <section title="Aligning with RFC 8126">
+		<t>IANA registries require specific registry
+   policy for changing and adding to a registry - see 
+   <xref target="RFC8126"/>.  To align with this standard,  all changes to this registry are subject to "Expert Review" unless otherwise specified. </t>
+		</section>
+        <section title="Adding a new algorithm to an existing class">
+        <t>To add testing for a new algorithm first confirm that the class the new algorithm belongs to exists within the taxonomy in 
+        <xref target="taxonomy"/>. This is subject to "Specification Required" - see <xref target="RFC8126"/></t>
+       <section title="Adding a new algorithm with existing test types"> 
+        <t>If it belongs to an already-suppoted class, check if it is similar to some of the
+        already supported algorithms from that class. Typically, the algorithms in a given class share similar testing methodology. </t> 
+        
+        <t>For example, the testing of symmetric block ciphers is comprised of two test types: Algorithm Functional Tests and Monte Carlo Tests - 
+        see <xref target="sub-symmetric"/>. </t>
+        <t>Assuming that the existing test types provide sufficient test coverage for the new algorithm, one needs to add the 
+        new block cipher algorithm to the symmertic block cipher specification <xref target="sub-symmetric"/>, 
+        including the JSON schemas for the corresponding test data exchanges between the validation server and the client. 
+        See in particular Section "Adding new algorithms" in the corresponding algorithm specification.</t>
+	<t>Next, depending on the block size of the new cipher, one may need to create a new entry in <xref target="table_BlockCipherTypes"/>. Lastly, one needs to create an entry in <xref target="table_algorithms"/> with the proper algorithm class and type and a new unique identifier. Note that this action is subject to a "Specification required" policy - see <xref target="RFC8126"/> for details.</t>
+        <t>Once this is completed and the corresponding server test generation and validation for that algorithm is implemented, 
+        testing can commence. Clients implementing that algorithm may register it for testing as described in Section "Capabilities Registration" in 
+        <xref target="sub-symmetric"/>, process the test vectors generated by the validation server and return the results for validation. 
+        </t>
+        </section>
+        <section title="Adding a new test type to a new or existing algorithm">
+        <t>If the available test types for an algorithm, existing or new, in a given class do not provide good test coverage of the algorithm, 
+        one could develop a new test type and incorporate it into the corresponding test specification for the existing class. See for example Section "Adding new algorithms" in 
+        <xref target="sub-symmetric"/> for how to add a new test type. Note that this action would require modifications of <xref target="sub-symmetric"/> and is subject to a "Specification required" policy - see <xref target="RFC8126"/> for details.</t>	      
+        </section>
+        </section>
+        <section title="Adding a new algorithm to a new class">
+        <t>Cryptography is a fast evolving field. It is conceivable to think that new cryptographic algorithm classes and  algorithms will emerge in the future. It is also likely that their implementations would need to be tested for correctness similar to the existing algorithms. When such algorithms become available they may be added as extensions to ACVP. To do this, one would have to first develop a test specification for the new algorithm similar to <xref target="sub-symmetric"/>. Next, one would have to update <xref target="table_ex"/> and develop a new table of corresponding algorithm types for the new class, similar to  <xref target="table_BlockCipherTypes"/> or <xref target="table_DigitalSignatureTypes"/>. Lastly, one would have to create an entry in <xref target="table_algorithms"/> with the proper algorithm class and type and a new unique identifier. </t>  
+
+<t>This action is subject to a "Specification Required" policy - see <xref target="RFC8126"/></t>
+        </section>
+      <section title="Requirements Language">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+	document are to be interpreted in
+	<xref target="RFC2119">RFC 2119</xref>.</t>
+      </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>TBD...</t>
+    </section>
+
+    <!-- Possibly a 'Contributors' section ... -->
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This memo includes no request to IANA.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Security considerations are addressed by the ACVP specification.</t>
+    </section>
+  </middle>
+
+  <!--  *****BACK MATTER ***** -->
+
+  <back>
+    <references title="Normative References">
+      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+      &RFC2119;
+      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.8126.xml"?-->
+      &RFC8126;
+      <reference anchor="acvp" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-fussell-acvp-spec-00.txt">
+        <!-- the following is the minimum to make xml2rfc happy -->
+        <front>
+          <title>Automatic Cryptographic Validation Protocol</title>
+          <author initials="B." surname="Fussell">
+            <organization>Cisco</organization>
+          </author>
+          <author initials="A." surname="Vassilev">
+            <organization>NIST</organization>
+          </author>
+          <author initials="H." surname="Booth">
+            <organization>NIST</organization>
+          </author>
+          <date year="2018"/>
+        </front>
+      </reference>
+      <reference anchor="sub-symmetric" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-celi-block-ciph-00.txt">
+        <!-- the following is the minimum to make xml2rfc happy -->
+        <front>
+          <title>ACVP Symmetric Algorithm JSON Specification</title>
+          <author initials="C." surname="Celi">
+            <organization>NIST</organization>
+          </author>
+          <date year="2018"/>
+        </front>
+      </reference>
+<!--
+      <reference anchor="sub-dsa" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/acvp_sub_dsa.txt">
+        <front>
+          <title>ACVP DSA Algorithm JSON Specification</title>
+          <author initials="B." surname="Fussell">
+            <organization>NIST</organization>
+          </author>
+          <date year="2018"/>
+        </front>
+      </reference>
+      <reference anchor="sub-ecdsa" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/acvp_sub_ecdsa.txt">
+        <front>
+          <title>ACVP ECDSA Algorithm JSON Specification</title>
+          <author initials="B." surname="Fussell">
+            <organization>NIST</organization>
+          </author>
+          <date year="2018"/>
+        </front>
+      </reference>
+      <reference anchor="sub-rsa" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/acvp_sub_ecdsa.txt">
+        <front>
+          <title>ACVP RSA Algorithm JSON Specification</title>
+          <author initials="A." surname="Vassilev">
+            <organization>NIST</organization>
+          </author>
+          <date year="2018"/>
+        </front>
+      </reference>
+-->
+    </references>
+  </back>
+</rfc>
