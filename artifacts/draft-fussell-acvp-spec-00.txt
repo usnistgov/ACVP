@@ -5,9 +5,9 @@
 Internet Engineering Task Force                          B. Fussell, Ed.
 Internet-Draft                                             Cisco Systems
 Intended status: Informational                          A. Vassilev, Ed.
-Expires: February 7, 2019                                       H. Booth
+Expires: March 1, 2019                                          H. Booth
                           National Institute of Standards and Technology
-                                                          August 6, 2018
+                                                         August 28, 2018
 
 
               Automated Cryptographic Validation Protocol
@@ -15,8 +15,13 @@ Expires: February 7, 2019                                       H. Booth
 
 Abstract
 
-   This document defines the Automated Cryptographic Validation
-   Protocol(ACVP).
+   The ACV Protocol provides a method for communication between a
+   cryptographic module that is embedded inside of a device or otherwise
+   running on a platform accessible via computer network, and an
+   external testing system, using standard network communication
+   interfaces and protocols.  This communication protocol can also be
+   used to validate the correctness of the algorithm implementations in
+   the cryptographic module with a validation authority.
 
 Status of This Memo
 
@@ -33,7 +38,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 7, 2019.
+   This Internet-Draft will expire on March 1, 2019.
 
 Copyright Notice
 
@@ -45,150 +50,151 @@ Copyright Notice
    (https://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
    carefully, as they describe your rights and restrictions with respect
+
+
+
+Fussell, et al.           Expires March 1, 2019                 [Page 1]
+
+Internet-Draft                ACV Protocol                   August 2018
+
+
    to this document.  Code Components extracted from this document must
    include Simplified BSD License text as described in Section 4.e of
    the Trust Legal Provisions and are provided without warranty as
    described in the Simplified BSD License.
 
-
-
-
-Fussell, et al.         Expires February 7, 2019                [Page 1]
-
-Internet-Draft              Abbreviated Title                August 2018
-
-
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   4
-   2.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
-     2.1.  Audience  . . . . . . . . . . . . . . . . . . . . . . . .   5
-     2.2.  Goals . . . . . . . . . . . . . . . . . . . . . . . . . .   5
-     2.3.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   6
-   3.  Architecture  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     3.1.  Server/Client Architecture  . . . . . . . . . . . . . . .   6
-     3.2.  Server/Proxy Architecture . . . . . . . . . . . . . . . .   7
-   4.  ACV Protocsubol . . . . . . . . . . . . . . . . . . . . . . .   7
-     4.1.  HTTP URI Hierarchy  . . . . . . . . . . . . . . . . . . .   8
-     4.2.  HTTP URI Resources  . . . . . . . . . . . . . . . . . . .   8
-   5.  Security  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
-   6.  Authentication  . . . . . . . . . . . . . . . . . . . . . . .  12
-   7.  Traceability  . . . . . . . . . . . . . . . . . . . . . . . .  12
-   8.  Encoding  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
-   9.  Versioning  . . . . . . . . . . . . . . . . . . . . . . . . .  12
-   10. Messaging . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   2.  Requirements Language . . . . . . . . . . . . . . . . . . . .   4
+   3.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Audience  . . . . . . . . . . . . . . . . . . . . . . . .   5
+     3.2.  Goals . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+     3.3.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   6
+   4.  Architecture  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     4.1.  Server/Client Architecture  . . . . . . . . . . . . . . .   7
+     4.2.  Server/Proxy Architecture . . . . . . . . . . . . . . . .   7
+   5.  ACV Protocol  . . . . . . . . . . . . . . . . . . . . . . . .   8
+     5.1.  HTTP URI Hierarchy  . . . . . . . . . . . . . . . . . . .   8
+     5.2.  HTTP URI Resources  . . . . . . . . . . . . . . . . . . .   9
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+     6.1.  Authentication  . . . . . . . . . . . . . . . . . . . . .  12
+   7.  Traceability  . . . . . . . . . . . . . . . . . . . . . . . .  13
+   8.  Encoding  . . . . . . . . . . . . . . . . . . . . . . . . . .  13
+   9.  Versioning  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+   10. Messaging . . . . . . . . . . . . . . . . . . . . . . . . . .  13
      10.1.  Product Registration/Capabilities Exchange . . . . . . .  13
      10.2.  Test Exchange  . . . . . . . . . . . . . . . . . . . . .  13
-   11. Message Formats . . . . . . . . . . . . . . . . . . . . . . .  13
-     11.1.  JSON Web Token (JWT) . . . . . . . . . . . . . . . . . .  13
+   11. Message Formats . . . . . . . . . . . . . . . . . . . . . . .  14
+     11.1.  JSON Web Token (JWT) . . . . . . . . . . . . . . . . . .  14
        11.1.1.  Authorization flows with JWT . . . . . . . . . . . .  14
-       11.1.2.  JWT Expiration/Renewal . . . . . . . . . . . . . . .  16
-     11.2.  Vendor Resources . . . . . . . . . . . . . . . . . . . .  16
-       11.2.1.  Vendor Listing . . . . . . . . . . . . . . . . . . .  17
-       11.2.2.  Create a New Vendor  . . . . . . . . . . . . . . . .  18
-       11.2.3.  Vendor Information . . . . . . . . . . . . . . . . .  19
-       11.2.4.  Update an existing Vendor  . . . . . . . . . . . . .  20
-       11.2.5.  Remove a Vendor  . . . . . . . . . . . . . . . . . .  21
-     11.3.  Modules  . . . . . . . . . . . . . . . . . . . . . . . .  21
-       11.3.1.  List Modules . . . . . . . . . . . . . . . . . . . .  22
-       11.3.2.  Register a new Module  . . . . . . . . . . . . . . .  22
-       11.3.3.  Retrieve information for a Module  . . . . . . . . .  23
-       11.3.4.  Update a Module  . . . . . . . . . . . . . . . . . .  23
-       11.3.5.  Delete a Module  . . . . . . . . . . . . . . . . . .  24
-     11.4.  Operational Environments (OEs) . . . . . . . . . . . . .  24
-       11.4.1.  List Operational Environments  . . . . . . . . . . .  24
-       11.4.2.  Create a new Operational Environment . . . . . . . .  25
-       11.4.3.  Retrieve information for an Operational Environment   25
-       11.4.4.  Update an Operational Environment  . . . . . . . . .  26
-       11.4.5.  Delete an Operational Environment  . . . . . . . . .  26
-     11.5.  Dependencies . . . . . . . . . . . . . . . . . . . . . .  26
-       11.5.1.  List Dependencies  . . . . . . . . . . . . . . . . .  27
-       11.5.2.  Register a new Dependency  . . . . . . . . . . . . .  27
-       11.5.3.  List Dependency Properties . . . . . . . . . . . . .  28
+       11.1.2.  JWT Expiration/Renewal . . . . . . . . . . . . . . .  17
+     11.2.  Vendor Resources . . . . . . . . . . . . . . . . . . . .  17
+       11.2.1.  Vendor Listing . . . . . . . . . . . . . . . . . . .  18
+       11.2.2.  Create a New Vendor  . . . . . . . . . . . . . . . .  19
+       11.2.3.  Vendor Information . . . . . . . . . . . . . . . . .  20
+       11.2.4.  Update an existing Vendor  . . . . . . . . . . . . .  21
+       11.2.5.  Remove a Vendor  . . . . . . . . . . . . . . . . . .  22
+     11.3.  Modules  . . . . . . . . . . . . . . . . . . . . . . . .  22
+       11.3.1.  List Modules . . . . . . . . . . . . . . . . . . . .  23
+       11.3.2.  Register a new Module  . . . . . . . . . . . . . . .  23
+       11.3.3.  Retrieve information for a Module  . . . . . . . . .  24
+       11.3.4.  Update a Module  . . . . . . . . . . . . . . . . . .  24
+       11.3.5.  Delete a Module  . . . . . . . . . . . . . . . . . .  25
+     11.4.  Operational Environments (OEs) . . . . . . . . . . . . .  25
+       11.4.1.  List Operational Environments  . . . . . . . . . . .  25
+       11.4.2.  Create a new Operational Environment . . . . . . . .  26
+       11.4.3.  Retrieve information for an Operational Environment   26
+       11.4.4.  Update an Operational Environment  . . . . . . . . .  27
 
 
 
-Fussell, et al.         Expires February 7, 2019                [Page 2]
+Fussell, et al.           Expires March 1, 2019                 [Page 2]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
-       11.5.4.  Retrieve information for a Dependency  . . . . . . .  30
-       11.5.5.  Update a Dependency  . . . . . . . . . . . . . . . .  30
-       11.5.6.  Delete a Dependency  . . . . . . . . . . . . . . . .  30
-     11.6.  Algorithms . . . . . . . . . . . . . . . . . . . . . . .  30
-       11.6.1.  Algorithms Listing . . . . . . . . . . . . . . . . .  31
-       11.6.2.  Algorithm Information  . . . . . . . . . . . . . . .  31
-     11.7.  Test Sessions  . . . . . . . . . . . . . . . . . . . . .  31
-       11.7.1.  Test Session Listing (Current User)  . . . . . . . .  32
-       11.7.2.  Create a New Test Session  . . . . . . . . . . . . .  33
-       11.7.3.  Test Session Information . . . . . . . . . . . . . .  35
-       11.7.4.  Submit For Validation  . . . . . . . . . . . . . . .  35
-       11.7.5.  Cancel Test Session  . . . . . . . . . . . . . . . .  37
-       11.7.6.  Request Validation Results . . . . . . . . . . . . .  37
-     11.8.  Vector Sets  . . . . . . . . . . . . . . . . . . . . . .  38
-       11.8.1.  Vectors Set Listing  . . . . . . . . . . . . . . . .  38
-       11.8.2.  Vector Set Download  . . . . . . . . . . . . . . . .  39
-       11.8.3.  Cancel Testing of a Vector Set . . . . . . . . . . .  41
-       11.8.4.  Request Validation Results . . . . . . . . . . . . .  41
-       11.8.5.  Submit Results . . . . . . . . . . . . . . . . . . .  43
-       11.8.6.  Update Results Submission  . . . . . . . . . . . . .  44
-       11.8.7.  Retrieve Expected Results  . . . . . . . . . . . . .  45
-   12. Vector Set Expiration . . . . . . . . . . . . . . . . . . . .  45
-   13. Paging Parameters . . . . . . . . . . . . . . . . . . . . . .  46
-   14. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  47
-   15. Algorithm Test Extensions . . . . . . . . . . . . . . . . . .  47
-   16. Custom Specification Objects  . . . . . . . . . . . . . . . .  47
-     16.1.  Date . . . . . . . . . . . . . . . . . . . . . . . . . .  47
-     16.2.  BitString  . . . . . . . . . . . . . . . . . . . . . . .  47
-       16.2.1.  Endianness . . . . . . . . . . . . . . . . . . . . .  47
-       16.2.2.  Hex to Bitstring Parsing . . . . . . . . . . . . . .  47
-     16.3.  Range  . . . . . . . . . . . . . . . . . . . . . . . . .  48
-       16.3.1.  Range JSON examples  . . . . . . . . . . . . . . . .  48
-     16.4.  Domain . . . . . . . . . . . . . . . . . . . . . . . . .  49
-       16.4.1.  Domain JSON examples . . . . . . . . . . . . . . . .  49
-       16.4.2.  Additional Domain Information  . . . . . . . . . . .  49
-   17. Other Considerations  . . . . . . . . . . . . . . . . . . . .  50
-   18. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  50
-   19. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  50
-   20. Normative References  . . . . . . . . . . . . . . . . . . . .  50
-   Appendix A.  JSON Formatting Guidelines . . . . . . . . . . . . .  50
-   Appendix B.  JSON Encoded Error Messages  . . . . . . . . . . . .  51
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  51
+       11.4.5.  Delete an Operational Environment  . . . . . . . . .  27
+     11.5.  Dependencies . . . . . . . . . . . . . . . . . . . . . .  27
+       11.5.1.  List Dependencies  . . . . . . . . . . . . . . . . .  28
+       11.5.2.  Register a new Dependency  . . . . . . . . . . . . .  28
+       11.5.3.  List Dependency Properties . . . . . . . . . . . . .  29
+       11.5.4.  Retrieve information for a Dependency  . . . . . . .  31
+       11.5.5.  Update a Dependency  . . . . . . . . . . . . . . . .  31
+       11.5.6.  Delete a Dependency  . . . . . . . . . . . . . . . .  31
+     11.6.  Algorithms . . . . . . . . . . . . . . . . . . . . . . .  31
+       11.6.1.  Algorithms Listing . . . . . . . . . . . . . . . . .  32
+       11.6.2.  Algorithm Information  . . . . . . . . . . . . . . .  32
+     11.7.  Test Sessions  . . . . . . . . . . . . . . . . . . . . .  32
+       11.7.1.  Test Session Listing (Current User)  . . . . . . . .  33
+       11.7.2.  Create a New Test Session  . . . . . . . . . . . . .  34
+       11.7.3.  Test Session Information . . . . . . . . . . . . . .  36
+       11.7.4.  Submit For Validation  . . . . . . . . . . . . . . .  36
+       11.7.5.  Cancel Test Session  . . . . . . . . . . . . . . . .  38
+       11.7.6.  Request Validation Results . . . . . . . . . . . . .  38
+     11.8.  Vector Sets  . . . . . . . . . . . . . . . . . . . . . .  39
+       11.8.1.  Vectors Set Listing  . . . . . . . . . . . . . . . .  39
+       11.8.2.  Vector Set Download  . . . . . . . . . . . . . . . .  40
+       11.8.3.  Cancel Testing of a Vector Set . . . . . . . . . . .  42
+       11.8.4.  Request Validation Results . . . . . . . . . . . . .  42
+       11.8.5.  Submit Results . . . . . . . . . . . . . . . . . . .  44
+       11.8.6.  Update Results Submission  . . . . . . . . . . . . .  45
+       11.8.7.  Retrieve Expected Results  . . . . . . . . . . . . .  46
+   12. Vector Set Expiration . . . . . . . . . . . . . . . . . . . .  46
+   13. Paging Parameters . . . . . . . . . . . . . . . . . . . . . .  47
+   14. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  48
+   15. Algorithm Test Extensions . . . . . . . . . . . . . . . . . .  48
+   16. Custom Specification Objects  . . . . . . . . . . . . . . . .  48
+     16.1.  Date . . . . . . . . . . . . . . . . . . . . . . . . . .  48
+     16.2.  BitString  . . . . . . . . . . . . . . . . . . . . . . .  48
+       16.2.1.  Endianness . . . . . . . . . . . . . . . . . . . . .  48
+       16.2.2.  Hex to Bitstring Parsing . . . . . . . . . . . . . .  48
+     16.3.  Range  . . . . . . . . . . . . . . . . . . . . . . . . .  49
+       16.3.1.  Range JSON examples  . . . . . . . . . . . . . . . .  49
+     16.4.  Domain . . . . . . . . . . . . . . . . . . . . . . . . .  50
+       16.4.1.  Domain JSON examples . . . . . . . . . . . . . . . .  50
+       16.4.2.  Additional Domain Information  . . . . . . . . . . .  50
+   17. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  51
+   18. Other Considerations  . . . . . . . . . . . . . . . . . . . .  51
+   19. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  51
+   20. References  . . . . . . . . . . . . . . . . . . . . . . . . .  51
+     20.1.  Normative References . . . . . . . . . . . . . . . . . .  51
+     20.2.  Informative References . . . . . . . . . . . . . . . . .  51
+   Appendix A.  JSON Formatting Guidelines . . . . . . . . . . . . .  51
+   Appendix B.  JSON Encoded Error Messages  . . . . . . . . . . . .  52
 
 
 
-
-
-
-
-
-
-Fussell, et al.         Expires February 7, 2019                [Page 3]
+Fussell, et al.           Expires March 1, 2019                 [Page 3]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
+
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  52
 
 1.  Introduction
 
-   ACVP enables communication between a cryptographic module that is
-   embedded inside of a device or otherwise running on a platform
-   accessible via computer network, and an external testing system,
-   using standard network communication interfaces and protocols.  This
-   communication protocol can also be used to validate the correctness
-   of the implementations of the algorithms in the cryptographic module
-   with a validation authority.  This document describes how ACVP is
-   structured with respect to the client-server model, the messaging
-   protocol, optional features and flows.
+   The current methods used for cryptographic module testing are limited
+   by manual test vector exchange, long validation cycles and cost.
+   These problem areas impact development cycles, hinder adoption of new
+   technologies and contribute to end customer anxiety when deciding
+   whether to deploy unvalidated new crypto with CVE fixes over
+   previously deployed and validated crypto.  In order to combat these
+   issues validation authorities need a method of cryptographic testing
+   that is easily automated.  The ACV Protocol(ACVP) is designed with
+   this in mind.  This document describes how ACVP can be used to
+   address these issues and how it is structured with respect to the
+   client-server model, the messaging protocol, optional features and
+   flows.
 
-1.1.  Requirements Language
+2.  Requirements Language
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-   document are to be interpreted as described in RFC 2119 [RFC2119].
+   document are to be interpreted as described in BCP 14, RFC 2119
+   [RFC2119].
 
-2.  Overview
+3.  Overview
 
    ACVP has the following goals:
 
@@ -210,6 +216,16 @@ Internet-Draft              Abbreviated Title                August 2018
       wherever possible, especially the FIPS-140 Cryptographic Algorithm
       Validation Program.
 
+
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                 [Page 4]
+
+Internet-Draft                ACV Protocol                   August 2018
+
+
    o  To provide a standard communication method so that vendors can
       utilize the same testing service for FIPS-140, 3rd party crypto
       verification and product FCS readiness testing.
@@ -218,14 +234,6 @@ Internet-Draft              Abbreviated Title                August 2018
    operation) to a cryptographic module, and how to communicate the
    corresponding response (containing the output of that operation) back
    to a testing system.  It defines a transport (based on HTTP or
-
-
-
-Fussell, et al.         Expires February 7, 2019                [Page 4]
-
-Internet-Draft              Abbreviated Title                August 2018
-
-
    HTTPS), an encoding and message format (which is negotiated), and a
    set of message exchanges.  Each vector test set corresponds to a
    single message exchange driven from the client associated with the
@@ -240,11 +248,14 @@ Internet-Draft              Abbreviated Title                August 2018
    conflicting) conformance criteria.  ACVP does not define an interface
    that can be used to manage or control a cryptographic module.
 
-2.1.  Audience
+3.1.  Audience
 
    This document is written to address multiple audiences:
 
    o  Crypto module developers who require validation testing
+
+   o  Crypto module developers who require runtime crypto assessment
+      testing
 
    o  Crypto validation organizations who will perform validation
       testing
@@ -252,7 +263,7 @@ Internet-Draft              Abbreviated Title                August 2018
    o  Crypto module customers that desire validation testing results or
       verifiable artifacts of testing
 
-2.2.  Goals
+3.2.  Goals
 
    The goals for this document are to provide a messaging protocol that
    can be used with existing authentication and communication protocols
@@ -262,6 +273,14 @@ Internet-Draft              Abbreviated Title                August 2018
    o  The API to the cryptographic module
 
    o  How the tests are generated
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                 [Page 5]
+
+Internet-Draft                ACV Protocol                   August 2018
+
 
    o  How the results/artifacts are stored or managed
 
@@ -274,24 +293,16 @@ Internet-Draft              Abbreviated Title                August 2018
    With that in mind there are several expectations when building a
    server used as a validation authority.  A validation authority shall
    use HTTPS, TLS 1.2 or greater and mutual authentication.  Therefore a
-
-
-
-Fussell, et al.         Expires February 7, 2019                [Page 5]
-
-Internet-Draft              Abbreviated Title                August 2018
-
-
    client that expects to be used with a validation authority shall have
    the same requirements.  A server, proxy or client developed for the
    purposes of internal organizational testing only may chose not to
    include some of those features.
 
-2.3.  Terminology
+3.3.  Terminology
 
    TBD
 
-3.  Architecture
+4.  Architecture
 
                         Server/Client Architecture
 
@@ -315,7 +326,19 @@ Internet-Draft              Abbreviated Title                August 2018
 
                                  Figure 1
 
-3.1.  Server/Client Architecture
+
+
+
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                 [Page 6]
+
+Internet-Draft                ACV Protocol                   August 2018
+
+
+4.1.  Server/Client Architecture
 
    A server client model is used where the roles are defined as:
 
@@ -330,14 +353,6 @@ Internet-Draft              Abbreviated Title                August 2018
    o  ACV Proxy - Resides between the ACV server and ACV client to proxy
       the connection for the client.  This is particularly useful when
       the client does not support TLS, key management or have signature
-
-
-
-Fussell, et al.         Expires February 7, 2019                [Page 6]
-
-Internet-Draft              Abbreviated Title                August 2018
-
-
       capabilities and they are required by the server.  An example
       architecture is provided in Figure 2.
 
@@ -351,48 +366,59 @@ Internet-Draft              Abbreviated Title                August 2018
       specific and will vary depending on the API available on the
       crypto module.
 
-3.2.  Server/Proxy Architecture
+4.2.  Server/Proxy Architecture
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                 [Page 7]
+
+Internet-Draft                ACV Protocol                   August 2018
+
 
                          Server/Proxy Architecture
 
 
 
-                 +-----------------------------------------------------+
-                 |                         +-------------------------+ |
- +----------+    |     +----------+        |                         | |
- | ACV      |    |     | ACV      |        |                         | |
- | Server   |<========>| Proxy    |<======>| +--------+   +--------+ | |
- +----------+    |     +----------+        | | ACV    |<->| Crypto | | |
-                 |                         | | Client |   | Module | | |
-                 |                         | +--------+   +--------+ | |
-                 |                         |                         | |
-                 |                         |      DUT                | |
-                 |                         +-------------------------+ |
-                 | Vendor/Customer Premise                             |
-                 +-----------------------------------------------------+
+                   +--------------------------------------------------+
+                   |                      +-------------------------+ |
+   +----------+    |    +---------+       |                         | |
+   | ACV      |    |    | ACV     |       |                         | |
+   | Server   |<=======>| Proxy   |<=====>| +--------+   +--------+ | |
+   +----------+    |    +---------+       | | ACV    |<->| Crypto | | |
+                   |                      | | Client |   | Module | | |
+                   |                      | +--------+   +--------+ | |
+                   |                      |                         | |
+                   |                      |      DUT                | |
+                   |                      +-------------------------+ |
+                   | Vendor/Customer Premise                          |
+                   +--------------------------------------------------+
 
 
                                  Figure 2
 
-4.  ACV Protocsubol
+5.  ACV Protocol
 
    The ACV protocol will utilize existing mechanisms for transport
    coordinated with JSON formatted messaging.
-
-
-
-
-
-
-
-
-
-
-
-Fussell, et al.         Expires February 7, 2019                [Page 7]
-
-Internet-Draft              Abbreviated Title                August 2018
-
 
                              Protocol Layering
 
@@ -410,16 +436,27 @@ Internet-Draft              Abbreviated Title                August 2018
 
                                  Figure 3
 
-4.1.  HTTP URI Hierarchy
+5.1.  HTTP URI Hierarchy
 
 
-            +-------------+------------------+-------------------------+
+
+
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                 [Page 8]
+
+Internet-Draft                ACV Protocol                   August 2018
+
+
+            +-------------+--------------------+---------------+
                server          path prefix          resource
-            +-------------+------------------+-------------------------+
-    https://acvts.nist.gov/validation/acvp/v1/testSession/1/vectorSet/1
-            +-------------+----------+----+--+-------------------------+
-                             context  API   |
-                                         version
+            +-------------+--------------------+---------------+
+    https://acvts.nist.gov/acvp/validation/acvp/login
+            +-------------+--------------------+---------------+
+                             context  API
+
 
 
 
@@ -429,165 +466,165 @@ Internet-Draft              Abbreviated Title                August 2018
    protocol, e.g., HTTP, custom server, context and port number to
    interact with the DUT.
 
-4.2.  HTTP URI Resources
+5.2.  HTTP URI Resources
 
-   In the table below, any part of a resource path enclosed in curly
+   In the table below, any parts of a resource path enclosed in curly
    braces, { or }, are replaced by an instance of what is described in
-   the brackets.  For example {testSessionId} could be replaced with 1.
+   the braces.  For example {testSessionId} could be replaced with 1.
 
-     _An empty cell for a resource and HTTP Method combination denotes
-    that the server returns an HTTP Status 405 code "Method not allowed
-                                 (405)"._
+   An empty cell for a resource and HTTP Method combination denotes that
+      the server returns an HTTP Status 405 code _Method not allowed
+                                  (405)_.
 
-   +--------------+------------+------------+------------+-------------+
-   | Resource     | GET (read) | POST       | PUT        | DELETE      |
-   |              |            | (create)   | (update)   |             |
+   +--------------+------------+------------+-------------+------------+
+   | Resource     | GET (read) | POST       | PUT         | DELETE     |
+   |              |            | (create)   | (update)    |            |
+   +--------------+------------+------------+-------------+------------+
+   | /vendors     | Returns a  | Register a |             |            |
+   |              | list of    | new vendor |             |            |
+   |              | vendors (S | (Section 1 |             |            |
+   |              | ection 11. | 1.2.2)     |             |            |
+   |              | 2.1)       |            |             |            |
+   | /vendors/{ve | Retrieve I |            | Update a    | Delete a   |
+   | ndorId}      | nformation |            | vendor (Sec | vendor (Se |
+   |              | for a      |            | tion 11.2.4 | ction 11.2 |
+   |              | specific   |            | )           | .5)        |
+   |              | vendor (Se |            |             |            |
+   |              | ction 11.2 |            |             |            |
+   |              | .3)        |            |             |            |
+   | /oes         | Return a   | Create a   |             |            |
+   |              | List of    | new OE (Se |             |            |
+   |              | OEs (Secti | ction 11.4 |             |            |
+   |              | on 11.4.1) | .2)        |             |            |
+   | /oes/{oeId}  | Retrieve I |            | Update an   | Delete an  |
+   |              | nformation |            | OE (Section | OE (Sectio |
 
 
 
-Fussell, et al.         Expires February 7, 2019                [Page 8]
+Fussell, et al.           Expires March 1, 2019                 [Page 9]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
-   +--------------+------------+------------+------------+-------------+
-   | /vendors     | Returns a  | Register a |            |             |
-   |              | list of    | new vendor |            |             |
-   |              | vendors    | (Section   |            |             |
-   |              | (Section   | 11.2.2)    |            |             |
-   |              | 11.2.1)    |            |            |             |
-   | /vendors/{ve | Retrieve I |            | Update a   | Delete a    |
-   | ndorId}      | nformation |            | vendor     | vendor      |
-   |              | for a      |            | (Section   | (Section    |
-   |              | specific   |            | 11.2.4)    | 11.2.5)     |
-   |              | vendor     |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.2.3)    |            |            |             |
-   | /oes         | Return a   | Create a   |            |             |
-   |              | List of    | new OE     |            |             |
-   |              | OEs        | (Section   |            |             |
-   |              | (Section   | 11.4.2)    |            |             |
-   |              | 11.4.1)    |            |            |             |
-   | /oes/{oeId}  | Retrieve I |            | Update an  | Delete an   |
-   |              | nformation |            | OE         | OE (Section |
-   |              | for a OE   |            | (Section   | 11.4.5)     |
-   |              | (Section   |            | 11.4.4)    |             |
-   |              | 11.4.3)    |            |            |             |
-   | /modules     | Return a   | Register a |            |             |
-   |              | List of    | new Module |            |             |
-   |              | Modules    | (Section   |            |             |
-   |              | (Section   | 11.3.2)    |            |             |
-   |              | 11.3.1)    |            |            |             |
-   | /modules/{mo | Retrieve I |            | Update a   | Delete a    |
-   | duleId}      | nformation |            | module     | module      |
-   |              | for a      |            | (Section   | (Section    |
-   |              | specific   |            | 11.3.4)    | 11.3.5)     |
-   |              | module     |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.3.3)    |            |            |             |
-   | /dependencie | Returns a  | Create a   |            |             |
-   | s            | list of de | new        |            |             |
-   |              | pendencies | dependency |            |             |
-   |              | (Section   | (Section   |            |             |
-   |              | 11.5.1)    | 11.5.2)    |            |             |
-   | /dependencie | Returns a  |            |            |             |
-   | s/properties | list of    |            |            |             |
-   |              | properties |            |            |             |
-   |              | for depend |            |            |             |
-   |              | encies     |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.5.3)    |            |            |             |
-   | /dependencie | Retrieve I |            | Update a   | Delete a    |
+   |              | for a OE ( |            |  11.4.4)    | n 11.4.5)  |
+   |              | Section 11 |            |             |            |
+   |              | .4.3)      |            |             |            |
+   | /modules     | Return a   | Register a |             |            |
+   |              | List of    | new Module |             |            |
+   |              | Modules (S | (Section 1 |             |            |
+   |              | ection 11. | 1.3.2)     |             |            |
+   |              | 3.1)       |            |             |            |
+   | /modules/{mo | Retrieve I |            | Update a    | Delete a   |
+   | duleId}      | nformation |            | module (Sec | module (Se |
+   |              | for a      |            | tion 11.3.4 | ction 11.3 |
+   |              | specific   |            | )           | .5)        |
+   |              | module (Se |            |             |            |
+   |              | ction 11.3 |            |             |            |
+   |              | .3)        |            |             |            |
+   | /dependencie | Returns a  | Create a   |             |            |
+   | s            | list of de | new        |             |            |
+   |              | pendencies | dependency |             |            |
+   |              | (Section 1 | (Section 1 |             |            |
+   |              | 1.5.1)     | 1.5.2)     |             |            |
+   | /dependencie | Returns a  |            |             |            |
+   | s/properties | list of    |            |             |            |
+   |              | properties |            |             |            |
+   |              | for depend |            |             |            |
+   |              | encies (Se |            |             |            |
+   |              | ction 11.5 |            |             |            |
+   |              | .3)        |            |             |            |
+   | /dependencie | Retrieve I |            | Update a    | Delete a   |
+   | s/{dependenc | nformation |            | dependency  | dependency |
+   | yId}         | for a      |            | (Section 11 | (Section 1 |
+   |              | specific   |            | .5.5)       | 1.5.6)     |
+   |              | dependency |            |             |            |
+   |              | (Section 1 |            |             |            |
+   |              | 1.5.4)     |            |             |            |
+   | /algorithms  | Return a   |            |             |            |
+   |              | List of    |            |             |            |
+   |              | Available  |            |             |            |
+   |              | Algorithms |            |             |            |
+   |              | (Section 1 |            |             |            |
+   |              | 1.6.1)     |            |             |            |
+   | /algorithms/ | Retrieve I |            |             |            |
+   | {algorithmId | nformation |            |             |            |
+   | }            | about an   |            |             |            |
+   |              | Algorithm  |            |             |            |
+   |              | (Section 1 |            |             |            |
+   |              | 1.6.2)     |            |             |            |
+   | /testSession | Returns a  | Create a   |             |            |
+   | s            | list of    | new Test   |             |            |
 
 
 
-Fussell, et al.         Expires February 7, 2019                [Page 9]
+Fussell, et al.           Expires March 1, 2019                [Page 10]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
-   | s/{dependenc | nformation |            | dependency | dependency  |
-   | yId}         | for a      |            | (Section   | (Section    |
-   |              | specific   |            | 11.5.5)    | 11.5.6)     |
-   |              | dependency |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.5.4)    |            |            |             |
-   | /algorithms  | Return a   |            |            |             |
-   |              | List of    |            |            |             |
-   |              | Available  |            |            |             |
-   |              | Algorithms |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.6.1)    |            |            |             |
-   | /algorithms/ | Retrieve I |            |            |             |
-   | {algorithmId | nformation |            |            |             |
-   | }            | about an   |            |            |             |
-   |              | Algorithm  |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.6.2)    |            |            |             |
-   | /testSession | Returns a  | Create a   |            |             |
-   | s            | list of    | new Test   |            |             |
-   |              | Test       | Session    |            |             |
-   |              | Sessions   | (Section   |            |             |
-   |              | for the    | 11.7.2)    |            |             |
-   |              | current    |            |            |             |
-   |              | user       |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.7.1)    |            |            |             |
-   |              | (Optional) |            |            |             |
-   | /testSession | Returns in |            | Certify    | Cancel      |
-   | s/{testSessi | formation  |            | the Test   | testing for |
-   | onId}        | about the  |            | Session    | a specific  |
-   |              | specific   |            | for valida | Test        |
-   |              | Test       |            | tion.      | Session     |
-   |              | Session    |            | (Section   | (Section    |
-   |              | (Section   |            | 11.7.4)    | 11.7.5)     |
-   |              | 11.7.3)    |            |            |             |
-   |              | (Optional) |            |            |             |
-   | /testSession | Request    |            |            |             |
-   | s/{testSessi | Validation |            |            |             |
-   | onId}/result | Results    |            |            |             |
-   | s            | for a Test |            |            |             |
-   |              | Session    |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.7.6)    |            |            |             |
-   | /testSession | Returns a  |            |            |             |
-   | s/{testSessi | list of    |            |            |             |
-   | onId}/vector | Vector     |            |            |             |
-   | Sets         | Sets for   |            |            |             |
+   |              | Test       | Session (S |             |            |
+   |              | Sessions   | ection 11. |             |            |
+   |              | for the    | 7.2)       |             |            |
+   |              | current    |            |             |            |
+   |              | user (Sect |            |             |            |
+   |              | ion 11.7.1 |            |             |            |
+   |              | )          |            |             |            |
+   |              | (Optional) |            |             |            |
+   | /testSession | Returns in |            | Certify the | Cancel     |
+   | s/{testSessi | formation  |            | Test        | testing    |
+   | onId}        | about the  |            | Session for | for a      |
+   |              | specific   |            | validation. | specific   |
+   |              | Test       |            | (Section 11 | Test       |
+   |              | Session (S |            | .7.4)       | Session (S |
+   |              | ection 11. |            |             | ection 11. |
+   |              | 7.3)       |            |             | 7.5)       |
+   |              | (Optional) |            |             |            |
+   | /testSession | Request    |            |             |            |
+   | s/{testSessi | Validation |            |             |            |
+   | onId}/result | Results    |            |             |            |
+   | s            | for a Test |            |             |            |
+   |              | Session (S |            |             |            |
+   |              | ection 11. |            |             |            |
+   |              | 7.6)       |            |             |            |
+   | /testSession | Returns a  |            |             |            |
+   | s/{testSessi | list of    |            |             |            |
+   | onId}/vector | Vector     |            |             |            |
+   | Sets         | Sets for   |            |             |            |
+   |              | the        |            |             |            |
+   |              | specific   |            |             |            |
+   |              | Test       |            |             |            |
+   |              | Session (S |            |             |            |
+   |              | ection 11. |            |             |            |
+   |              | 8.1)       |            |             |            |
+   | /testSession | Vector Set |            |             | Cancel     |
+   | s/{testSessi | download   |            |             | testing    |
+   | onId}/vector | request (S |            |             | for a      |
+   | Sets/{vector | ection 11. |            |             | specific   |
+   | SetId}       | 8.2)       |            |             | Vector Set |
+   |              |            |            |             | (Section 1 |
+   |              |            |            |             | 1.8.3)     |
+   | /testSession | Request    | Initial    | Update      |            |
+   | s/{testSessi | Validation | Submission | Vector Set  |            |
+   | onId}/vector | Results    | of Vector  | Test        |            |
+   | Sets/{vector | for a      | Set Test   | Results     |            |
+   | SetId}/resul | Vector Set | Results (S | Submission  |            |
+   | ts           | (Section 1 | ection 11. | (Section 11 |            |
+   |              | 1.8.4)     | 8.5)       | .8.6)       |            |
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 10]
+Fussell, et al.           Expires March 1, 2019                [Page 11]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
-   |              | the        |            |            |             |
-   |              | specific   |            |            |             |
-   |              | Test       |            |            |             |
-   |              | Session    |            |            |             |
-   |              | (Section   |            |            |             |
-   |              | 11.8.1)    |            |            |             |
-   | /testSession | Vector Set |            |            | Cancel      |
-   | s/{testSessi | download   |            |            | testing for |
-   | onId}/vector | request    |            |            | a specific  |
-   | Sets/{vector | (Section   |            |            | Vector Set  |
-   | SetId}       | 11.8.2)    |            |            | (Section    |
-   |              |            |            |            | 11.8.3)     |
-   | /testSession | Request    | Initial    | Update     |             |
-   | s/{testSessi | Validation | Submission | Vector Set |             |
-   | onId}/vector | Results    | of Vector  | Test       |             |
-   | Sets/{vector | for a      | Set Test   | Results    |             |
-   | SetId}/resul | Vector Set | Results    | Submission |             |
-   | ts           | (Section   | (Section   | (Section   |             |
-   |              | 11.8.4)    | 11.8.5)    | 11.8.6)    |             |
-   | /testSession | Expected   |            |            |             |
-   | s/{testSessi | Test       |            |            |             |
-   | onId}/vector | Results    |            |            |             |
-   | Sets/{vector | (Section   |            |            |             |
-   | SetId}/expec | 11.8.7)    |            |            |             |
-   | ted          | (Optional) |            |            |             |
-   +--------------+------------+------------+------------+-------------+
+   | /testSession | Expected   |            |             |            |
+   | s/{testSessi | Test       |            |             |            |
+   | onId}/vector | Results (S |            |             |            |
+   | Sets/{vector | ection 11. |            |             |            |
+   | SetId}/expec | 8.7)       |            |             |            |
+   | ted          | (Optional) |            |             |            |
+   +--------------+------------+------------+-------------+------------+
 
              Table 1: Resources and their available operations
 
@@ -605,23 +642,14 @@ Internet-Draft              Abbreviated Title                August 2018
 
    GET /acvp/v1/testSessions/1/vectorSets/1 HTTP/1.1
 
-5.  Security
+6.  Security Considerations
 
    It is recommended that HTTPS and TLS 1.2 or greater be used in order
    to enforce a secure communication method.  Not all environments will
-
-
-
-
-Fussell, et al.         Expires February 7, 2019               [Page 11]
-
-Internet-Draft              Abbreviated Title                August 2018
-
-
    have TLS so HTTP with some level of authentication may be the only
    option.
 
-6.  Authentication
+6.1.  Authentication
 
    It is recommended that an authentication scheme be used.  Typically,
    a JSON Web Token (JWT) is created by the server upon successful
@@ -635,6 +663,16 @@ Internet-Draft              Abbreviated Title                August 2018
    the client and server owning entities including the servers owned by
    the validation authorities.  For the purposes of the message flow
    examples, no authentication will be used.
+
+
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                [Page 12]
+
+Internet-Draft                ACV Protocol                   August 2018
+
 
 7.  Traceability
 
@@ -663,17 +701,6 @@ Internet-Draft              Abbreviated Title                August 2018
 
 10.  Messaging
 
-
-
-
-
-
-
-Fussell, et al.         Expires February 7, 2019               [Page 12]
-
-Internet-Draft              Abbreviated Title                August 2018
-
-
 10.1.  Product Registration/Capabilities Exchange
 
    The product registration message will include many of the normal
@@ -694,12 +721,21 @@ Internet-Draft              Abbreviated Title                August 2018
    the response data will be returned to the server for processing.  The
    client will repeat this process until all of the tests in the session
    test list have been processed.  The client may request results from
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                [Page 13]
+
+Internet-Draft                ACV Protocol                   August 2018
+
+
    the server at any time, however if test sets have not been completed
    the overall status will be incomplete.
 
 11.  Message Formats
 
-   As described in Section 4.1 servers may require a contextual path in
+   As described in Section 5.1 servers may require a contextual path in
    the URI prior to the API and version path parts used to reference a
    resource and clients/proxies must be able to support contextual
    paths.
@@ -710,25 +746,6 @@ Internet-Draft              Abbreviated Title                August 2018
    authorization mechanism for gaining access to different resources.
 
    An example JWT:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fussell, et al.         Expires February 7, 2019               [Page 13]
-
-Internet-Draft              Abbreviated Title                August 2018
-
 
 {
 "alg" : "none"
@@ -762,6 +779,13 @@ Internet-Draft              Abbreviated Title                August 2018
    must supply the JWT as an "Authorization" header value as a "Bearer"
    token.  An example header value is:
 
+
+
+Fussell, et al.           Expires March 1, 2019                [Page 14]
+
+Internet-Draft                ACV Protocol                   August 2018
+
+
             Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ
 
      Workflow authorization flows.  All exchanges shown are over HTTP.
@@ -781,9 +805,41 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 14]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fussell, et al.           Expires March 1, 2019                [Page 15]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
             +--------+---------------------------------+------+--------+
@@ -837,9 +893,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 15]
+Fussell, et al.           Expires March 1, 2019                [Page 16]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.1.2.  JWT Expiration/Renewal
@@ -893,9 +949,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 16]
+Fussell, et al.           Expires March 1, 2019                [Page 17]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
          *emails* - array of "string"s
@@ -949,13 +1005,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 17]
+Fussell, et al.           Expires March 1, 2019                [Page 18]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"vendors": [
            {
                "url": "/acvp/v1/vendors/1",
@@ -1005,9 +1061,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 18]
+Fussell, et al.           Expires March 1, 2019                [Page 19]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.2.2.1.  Request
@@ -1016,7 +1072,7 @@ Internet-Draft              Abbreviated Title                August 2018
    not allowed.
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
          "name": "Acme, LLC",
          "website": "www.acme.acme",
@@ -1047,7 +1103,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.2.2.2.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"url": "/acvp/v1/vendors/2"}
    ]
 
@@ -1061,15 +1117,15 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 19]
+Fussell, et al.           Expires March 1, 2019                [Page 20]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.2.3.1.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "url": "/acvp/v1/vendors/2",
            "name": "Acme, LLC",
@@ -1117,13 +1173,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 20]
+Fussell, et al.           Expires March 1, 2019                [Page 21]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "name": "Acme, LLC",
            "website": "www.acme.acme",
@@ -1173,9 +1229,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 21]
+Fussell, et al.           Expires March 1, 2019                [Page 22]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
       *type* - "string", valid values are:
@@ -1199,7 +1255,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.3.1.1.  Response
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {"modules": [
         {
             "url": "/acvp/v1/modules/1",
@@ -1229,15 +1285,15 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 22]
+Fussell, et al.           Expires March 1, 2019                [Page 23]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.3.2.1.  Request
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {
         "name": "ACME ACV Test Module",
         "version": "3.0",
@@ -1250,7 +1306,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.3.2.2.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"url": "/acvp/v1/modules/5"}
    ]
 
@@ -1263,7 +1319,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.3.3.1.  Response
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {
         "url": "/acvp/v1/modules/2",
         "name": "ACME ACV Test Module",
@@ -1285,15 +1341,15 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 23]
+Fussell, et al.           Expires March 1, 2019                [Page 24]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.3.4.1.  Request
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {
         "implementationDescription" : "ACME test module with more bells and whistles."
     }
@@ -1341,13 +1397,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 24]
+Fussell, et al.           Expires March 1, 2019                [Page 25]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {"oes": [
         {
             "url": "/acvp/v1/oes/1",
@@ -1371,7 +1427,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.4.2.1.  Request
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {
         "name": "Ubuntu Linux 3.1 on AMD 6272 Opteron Processor with Acme package installed",
         "dependencyUrls": [
@@ -1385,7 +1441,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.4.2.2.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"url": "/acvp/v1/oes/20"}
    ]
 
@@ -1397,15 +1453,15 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 25]
+Fussell, et al.           Expires March 1, 2019                [Page 26]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.4.3.1.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "url": "/acvp/v1/oes/1",
            "name": "Windows 10 on Intel Xeon 5100 Series Processor",
@@ -1429,7 +1485,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.4.4.1.  Request
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "name": "Windows 10 on Intel Xeon 5100 Series Processor",
        }
@@ -1453,9 +1509,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 26]
+Fussell, et al.           Expires March 1, 2019                [Page 27]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
       "{varies}" depending on the value of "type" as defined by the
@@ -1470,7 +1526,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.5.1.1.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"dependencies": [
            {
                "type": "software",
@@ -1497,7 +1553,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.5.2.1.  Request
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "type": "software",
            "name": "Linux 3.1",
@@ -1509,15 +1565,15 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 27]
+Fussell, et al.           Expires March 1, 2019                [Page 28]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.5.2.2.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"url": "/acvp/v1/dependencies/7"}
    ]
 
@@ -1565,13 +1621,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 28]
+Fussell, et al.           Expires March 1, 2019                [Page 29]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {"properties": [
         {
             "name": "name",
@@ -1621,9 +1677,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 29]
+Fussell, et al.           Expires March 1, 2019                [Page 30]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.5.4.  Retrieve information for a Dependency
@@ -1635,7 +1691,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.5.4.1.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "type": "software",
            "name": "Linux 3.1",
@@ -1656,7 +1712,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.5.5.1.  Request
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "name": "Linux 3.1.0",
        }
@@ -1677,9 +1733,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 30]
+Fussell, et al.           Expires March 1, 2019                [Page 31]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.6.1.  Algorithms Listing
@@ -1693,15 +1749,15 @@ Internet-Draft              Abbreviated Title                August 2018
 11.6.1.1.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"algorithms": [
            {
                "url": "/acvp/v1/algorithms/2",
                "name": "AES",
                "mode": "GCM",
                "versions": [
-                   "0.4",
-                   "0.5"
+                   <acvp-version>,
+                   <acvp-version>
                ]
            },
            {
@@ -1709,7 +1765,7 @@ Internet-Draft              Abbreviated Title                August 2018
                "name": "AES",
                "mode": "ECB",
                "versions": [
-                   "0.5"
+                   <acvp-version>
                ]
            }
        ]}
@@ -1733,9 +1789,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 31]
+Fussell, et al.           Expires March 1, 2019                [Page 32]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
       *acvpVersion* - "string", version of ACV protocol used to created
@@ -1789,16 +1845,16 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 32]
+Fussell, et al.           Expires March 1, 2019                [Page 33]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"testSessions": [{
            "url": "/acvp/v1/testSessions/2",
-           "acvpVersion": "0.5",
+           "acvpVersion": <acvp-version>,
            "createdOn": "2018-05-31T12:03:43Z",
            "expiresOn": "2018-06-30T12:03:43Z",
            "encryptAtRest": false,
@@ -1845,13 +1901,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 33]
+Fussell, et al.           Expires March 1, 2019                [Page 34]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
        "isSample" : "true",
        "algorithms": [{
@@ -1901,16 +1957,16 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 34]
+Fussell, et al.           Expires March 1, 2019                [Page 35]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 [
-    {"acvVersion": "0.5"},
+    {"acvVersion": <acvp-version>},
     {
         "url": "/acvp/v1/testSessions/2",
-        "acvpVersion": "0.5",
+        "acvpVersion": <acvp-version>,
         "createdOn": "2018-05-31T12:03:43Z",
         "expiresOn": "2018-06-30T12:03:43Z",
         "encryptAtRest": false,
@@ -1932,10 +1988,10 @@ Internet-Draft              Abbreviated Title                August 2018
 11.7.3.1.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "url": "/acvp/v1/testSessions/2",
-           "acvpVersion": "0.5",
+           "acvpVersion": <acvp-version>,
            "createdOn": "2018-05-31T12:03:43Z",
            "expiresOn": "2018-06-30T12:03:43Z",
            "encryptAtRest": false,
@@ -1957,9 +2013,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 35]
+Fussell, et al.           Expires March 1, 2019                [Page 36]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    Associates all of the testing information with the test session.  The
@@ -2013,13 +2069,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 36]
+Fussell, et al.           Expires March 1, 2019                [Page 37]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "moduleUrl": "/acvp/v1/modules/20",
            "oeUrl": "/acvp/v1/oes/60",
@@ -2069,13 +2125,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 37]
+Fussell, et al.           Expires March 1, 2019                [Page 38]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
  [
-     {"acvVersion": "0.5"},
+     {"acvVersion": <acvp-version>},
      {
          "passed": false,
          "results": [
@@ -2125,9 +2181,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 38]
+Fussell, et al.           Expires March 1, 2019                [Page 39]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
       *vectorSetUrls* - array of "string"s
@@ -2135,7 +2191,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.8.1.1.  Response
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"vectorSetUrls": [
            "/acvp/v1/testSessions/2/vectorSets/1",
            "/acvp/v1/testSessions/2/vectorSets/2"
@@ -2181,13 +2237,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 39]
+Fussell, et al.           Expires March 1, 2019                [Page 40]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "vsId": 11,
            "algorithm": "AES-CBC",
@@ -2237,13 +2293,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 40]
+Fussell, et al.           Expires March 1, 2019                [Page 41]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-     { "acvVersion": "0.5" },
+     { "acvVersion": <acvp-version> },
      { "vsId": 1437,
        "retry" : 10
      }
@@ -2293,9 +2349,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 41]
+Fussell, et al.           Expires March 1, 2019                [Page 42]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
          "expired" - indicates not all the test case responses were
@@ -2349,13 +2405,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 42]
+Fussell, et al.           Expires March 1, 2019                [Page 43]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {"results": {
            "vsId": 1437,
            "disposition": "incomplete",
@@ -2405,13 +2461,13 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 43]
+Fussell, et al.           Expires March 1, 2019                [Page 44]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "vsId": 1437,
            "testResults": [
@@ -2455,15 +2511,15 @@ Internet-Draft              Abbreviated Title                August 2018
 11.8.6.1.  Request
 
    The request content is identical to the request content described in
-   Section 11.8.5.
+   Section 11.8.5 .
 
 
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 44]
+Fussell, et al.           Expires March 1, 2019                [Page 45]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 11.8.7.  Retrieve Expected Results
@@ -2475,7 +2531,7 @@ Internet-Draft              Abbreviated Title                August 2018
 11.8.7.1.  Response
 
    The response is identical to the request content described in
-   Section 11.8.5.
+   Section 11.8.5 .
 
 12.  Vector Set Expiration
 
@@ -2489,7 +2545,7 @@ Internet-Draft              Abbreviated Title                August 2018
    to download the vector set:
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "vsId": <vs-id>,
            "status": "expired"
@@ -2517,9 +2573,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 45]
+Fussell, et al.           Expires March 1, 2019                [Page 46]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    value of the UTC timestamp using form "YYYY-MM-DD HH:MM:SS".  The
@@ -2527,7 +2583,7 @@ Internet-Draft              Abbreviated Title                August 2018
    contains the expiry value.
 
    [
-       {"acvVersion": "0.5"},
+       {"acvVersion": <acvp-version>},
        {
            "vsId": 1437,
            "expiry": "2018-12-31 23:59:59",
@@ -2545,13 +2601,13 @@ Internet-Draft              Abbreviated Title                August 2018
                    "pt": "",
                    "aad": "4B11160620475D8EE440C3795CF62D26"
                },
-                           .
-                           .
-                           .
-                           <remainder of vector set omitted from figure>
-                           .
-                           .
-                           .
+               .
+               .
+               .
+               <remainder of vector set omitted from figure>
+               .
+               .
+               .
                ]
            }]
        }
@@ -2573,9 +2629,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 46]
+Fussell, et al.           Expires March 1, 2019                [Page 47]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
 14.  Error Codes
@@ -2629,9 +2685,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 47]
+Fussell, et al.           Expires March 1, 2019                [Page 48]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    for use in the bitstring should be taken from the most significant
@@ -2685,9 +2741,9 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 48]
+Fussell, et al.           Expires March 1, 2019                [Page 49]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    {"myRange": {
@@ -2741,12 +2797,16 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 49]
+Fussell, et al.           Expires March 1, 2019                [Page 50]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
-17.  Other Considerations
+17.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+18.  Other Considerations
 
    When an ACVP client is attached to a cryptographic module that is in
    use, access to ACVP MUST be controlled so that only an administrator
@@ -2754,21 +2814,14 @@ Internet-Draft              Abbreviated Title                August 2018
    because an attacker that has access to ACVP can potentially use it to
    probe for weaknesses in the cryptographic module.
 
-18.  Acknowledgements
+19.  Contributors
 
    Original ACVP created by David McGrew, Bill Hudson and Anthony Grieco
    of Cisco Systems.
 
-19.  IANA Considerations
+20.  References
 
-   This memo includes no request to IANA.
-
-20.  Normative References
-
-   [ext]      Vassilev, A., "ACVP Algorithm Test Extensions
-              Specification", February 2018,
-              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
-              draft-vassilev-acvp-ext-00.txt>.
+20.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -2783,6 +2836,13 @@ Internet-Draft              Abbreviated Title                August 2018
               (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
               <https://www.rfc-editor.org/info/rfc7519>.
 
+20.2.  Informative References
+
+   [ext]      Vassilev, A., "ACVP Algorithm Test Extensions
+              Specification", February 2018,
+              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
+              draft-vassilev-acvp-ext-00.txt>.
+
 Appendix A.  JSON Formatting Guidelines
 
    All JSON keywords shall use lower camelCase format with no
@@ -2790,19 +2850,20 @@ Appendix A.  JSON Formatting Guidelines
    A-Z, 0-9.  Keywords shall abbreviate common words and phrases
    wherever possible for brevity.
 
+
+
+
+Fussell, et al.           Expires March 1, 2019                [Page 51]
+
+Internet-Draft                ACV Protocol                   August 2018
+
+
    For example: password length - pwLen plain text length - ptLen
 
    Keywords should be chosen such that they are informative and brief,
    for example:
 
-
-
-Fussell, et al.         Expires February 7, 2019               [Page 50]
-
-Internet-Draft              Abbreviated Title                August 2018
-
-
-   [ { "acvVersion": "0.5" }, { "results" : { "disposition" :
+   [ { "acvVersion": acvp-version }, { "results" : { "disposition" :
    "incomplete" } } ]
 
    Metadata assigned to the keyword may use any format which best
@@ -2848,14 +2909,9 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-Fussell, et al.         Expires February 7, 2019               [Page 51]
+Fussell, et al.           Expires March 1, 2019                [Page 52]
 
-Internet-Draft              Abbreviated Title                August 2018
+Internet-Draft                ACV Protocol                   August 2018
 
 
    Harold Booth
@@ -2909,4 +2965,4 @@ Internet-Draft              Abbreviated Title                August 2018
 
 
 
-Fussell, et al.         Expires February 7, 2019               [Page 52]
+Fussell, et al.           Expires March 1, 2019                [Page 53]
