@@ -2,6 +2,8 @@
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC3339 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml">
+<!ENTITY RFC5246 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml">
+<!ENTITY RFC7230 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7230.xml">
 <!ENTITY RFC7519 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7519.xml">
 ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -156,16 +158,11 @@
 
   <middle>
     <section title="Introduction">
-      <t>The current methods used for cryptographic module testing are limited
-         by manual test vector exchange, long validation cycles and cost. 
-         These problem areas impact development cycles, hinder adoption of new
-         technologies and contribute to end customer anxiety when deciding whether
-         to deploy unvalidated new crypto with CVE fixes over previously deployed and
-         validated crypto. In order to combat these issues validation authorities
-         need a method of cryptographic testing that is easily automated.  The ACV Protocol(ACVP)
-         is designed with this in mind. This document describes how ACVP can be used
-         to address these issues and how it is structured with respect to the 
-         client-server model, the messaging protocol, optional features and flows.</t>
+      <t>The ACV Protocol(ACVP) introduces a method to perform cryptographic 
+         assessment and validations at a rate which meets typical industry development cycles.
+         This provides the ability to deploy validated crypto with CVE fixes much faster
+         than previous methods. This document describes how it is structured with respect
+         to the client-server model, the messaging protocol, optional features and flows.</t>
     </section>
 
     <section title="Requirements Language">
@@ -198,7 +195,7 @@
       <t>ACVP defines how to communicate a request (to execute a cryptographic operation) to a
         cryptographic module, and how to communicate the corresponding response (containing the
         output of that operation) back to a testing system. It defines a transport (based on HTTP or
-        HTTPS), an encoding and message format (which is negotiated), and a set of message
+        HTTPS  <xref target="RFC7230"></xref>), an encoding and message format (which is negotiated), and a set of message
         exchanges. Each vector test set corresponds to a single message exchange driven from the
         client associated with the module under test. ACVP does not define the cryptographic
         algorithms, nor does it detail the precise conditions for a response to be acceptable.
@@ -236,7 +233,10 @@
           </list>
         </t>
         <t>With that in mind there are several expectations when building a server used as a
-          validation authority. A validation authority shall use HTTPS, TLS 1.2 or greater and
+          validation authority. A validation authority shall use HTTPS
+          <xref target="RFC7230"></xref>, TLS 1.2
+          <xref target="RFC5246"></xref>
+          or greater and
           mutual authentication. Therefore a client that expects to be used with a validation
           authority shall have the same requirements. A server, proxy or client developed for the
           purposes of internal organizational testing only may chose not to include some of those
@@ -250,8 +250,32 @@
 
 
     <section title="Architecture">
-      <figure align="center" anchor="xml_figure1">
-        <preamble>Server/Client Architecture</preamble>
+        <t>A server/client/proxy model is used where the roles are defined as:</t>
+        <t>
+          <list style="symbols">
+            <t> ACV Client - Communicates
+              with the ACV server using Java Script Object Notation (JSON) and collects the
+              test vectors and returns the test results using product specific methods.</t>
+            <t> ACV Server - Sends JSON formatted messaging and test data to the ACV client and
+              processes test responses.</t>
+            <t> ACV Proxy - Resides between the ACV server and ACV client to proxy the connection
+              for the client. This is particularly useful when the client does not support TLS, key
+              management or have signature capabilities and they are required by the server. An
+              example architecture is provided in Figure 3.</t>
+            <t> Device Under Test - Contains the crypto module under test which
+              can include various algorithms and functions that encrypt/decrypt, generate keys,
+              signatures, perform varifications and DRBG functions. May also contain the ACVP
+              client.</t>
+            <t> Crpyographic Module API - This is the interface, manual or otherwise,
+              to the crypto module. This interface is environment specific and will 
+              vary depending on
+              the crypto module and may not be limited to real-time operation. </t>
+          </list>
+        </t>
+
+      <section title="Server/Client Architecture(realtime)">
+
+      <figure align="center" anchor="xml_figure1a">
 
         <artwork align="left"><![CDATA[
 
@@ -265,6 +289,7 @@
                            | +--------+    |    |                 | |
                            |            Crypto  | Crypto Module   | |
                            |            Module  +-----------------+ |
+                           |           Realtime                     |
                            |              API                       |
                            |                                        |
                            |        Device Under Test (DUT)         |
@@ -274,33 +299,36 @@
            ]]>        </artwork>
 
       </figure>
+      </section>
 
-      <section title="Server/Client Architecture">
-        <t>A server client model is used where the roles are defined as:</t>
-        <t>
-          <list style="symbols">
-            <t> ACV Client - resides in, or accessible from, the device under test and communicates
-              with the ACV server using Java Script Object Notation (JSON) as well as the crypto
-              module using product specific methods.</t>
-            <t> ACV Server - Sends JSON formatted messaging and test data to the ACV client and
-              processes test responses.</t>
-            <t> ACV Proxy - Resides between the ACV server and ACV client to proxy the connection
-              for the client. This is particularly useful when the client does not support TLS, key
-              management or have signature capabilities and they are required by the server. An
-              example architecture is provided in Figure 2.</t>
-            <t> Device Under Test - contains the ACV client and the crypto module under test which
-              can include various algorithms and functions that encrypt/decrypt, generate keys,
-              signatures, perform varifications and DRBG functions.</t>
-            <t> Crpyographic Module API - This is the interface to the crypto module from the ACV
-              Client. This interface is environment specific and will vary depending on the API
-              available on the crypto module.</t>
-          </list>
-        </t>
+      <section title="Server/Client Architecture(not realtime)">
+
+      <figure align="center" anchor="xml_figure1b">
+
+        <artwork align="left"><![CDATA[
+
+                     +------------+
+                     |            |             +-----------------+
++----------+         |            |  Entropy -->| DRBG----Encrypt |
+| ACV      |         |            |             |         Auth    |
+| Server   |<=======>| +--------+ |             |                 |
++----------+         | | ACV    | |             | PKI-----Key Est |
+                     | | Client | | <==========>|         Sign    |
+                     | +--------+ |       ^     |                 |
+                     |            |       |     | Crypto Module   |
+                     +------------+       |     |                 |
+                                          |     +-----------------+
+                                   Manual/Non-Realtime
+                                    Vector Exchange
+
+           ]]>        </artwork>
+
+      </figure>
+
       </section>
 
       <section title="Server/Proxy Architecture">
         <figure align="center" anchor="xml_figure2">
-          <preamble>Server/Proxy Architecture</preamble>
 
           <artwork align="left"><![CDATA[
 
@@ -363,7 +391,7 @@
           HTTP, custom server, context and port number to interact with the DUT.</t>
       </section>
 
-      <section title="HTTP URI Resources">
+      <section title="HTTP URI Resources" anchor="uriResources">
         <t>In the table below, any parts of a resource path enclosed in curly braces, { or },
           are replaced by an instance of what is described in the braces. For 
           example {testSessionId} could be replaced with 1.</t>
@@ -592,7 +620,7 @@
     <section title="Authentication">
       <t>It is recommended that an authentication scheme be used. Typically, a JSON Web Token (JWT) is created by the server
        upon successful client authentication and returned to the client to use as an authorization mechanism for accessing
-       the server resources - see        <xref target="jwtToken">JWT specification</xref>  below for more information.  Depending on the target
+       the server resources - see        <xref target="jwtToken"/> below for more information.  Depending on the target
         environment and usage objectives, the authentication can be as weak as basic HTTP authentication or as
         strong as TLS mutual certificate authentication. Definition of an authentication scheme will
         not be discussed here, but should be agreed upon between the client and server owning
@@ -626,23 +654,25 @@
     <section title="Messaging">
 
       <section title="Product Registration/Capabilities Exchange">
-        <t>The product registration message will include many of the normal cryptographic algorithm
-          identification line items that are found when filling out a testing form. This pre-test
-          message will carry the Company name, primary contact (OE information) as well as a
-          detailed list of the supported cryptographic algorithms to be tested during a session. The
-          server will return the vector test list to the client. It will consist of a list of vector
-          set IDs (vsId) each of which represent a set of test vectors which can be used to request
-          the test vectors at a later time.</t>
+        <t>The product registration will utilize the URI resources 
+        <xref target="uriResources"/> to register and provide cryptographic capabilities. 
+          This exchange will consist of several message exchanges and carry the Company name, 
+          primary contact (OE information) 
+          as well as a detailed list of the supported cryptographic algorithms and their options
+          to be tested during the testSession. </t>
 
       </section>
 
       <section title="Test Exchange">
-        <t>The test exchange consists of the ACV client requesting a particular set of vectors
-          selected from the vector test list. The server responds with the test vectors. Once the
-          client has run the vectors the response data will be returned to the server for
-          processing. The client will repeat this process until all of the tests in the session test
-          list have been processed. The client may request results from the server at any time,
-          however if test sets have not been completed the overall status will be incomplete.</t>
+        <t>The test exchange consists of the ACV client requesting a particular vectorSet
+          associated with the testSession. The server responds with the vectorSet. The client
+          has the option to process the vectorSet and return results(realtime) or request
+          more vectorSets for processing at a later time(non-realtime).
+          The client will repeat this process until all of the tests in the session test
+          list have been processed. Once a vectorSet result has been POSTed to the server
+          the client may request success/failure results from the server at any time,
+          however if vectorSets have not been completed the overall status will be incomplete.
+          A minimal message flow is described below <xref target="xml_msgFlows"/>. </t>
       </section>
     </section>
 
@@ -714,47 +744,12 @@
          |        |receive the access token         |      |        |
          |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
          |        |                                 |      |        |                                  
-         |        |POST to /register with           |      |token   |
-         |        |access token in header           |      |from    |
-         |        |-------------------------------->|      |login   |
-         |        |                                 |      |        |                                  
-         |        |receive the session info and     |      |        |
-         |        |a session access token           |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
-         |        |                                 |      |        |                            
-         |        |GET /vectors?vsID=<ID> with      |      |use     |
-         |        |session access token in header   |      |token   |
-         |        |-------------------------------->|      |from    |
-         |        |                                 |      |regist- |        
-         |        |                                 |      |ration  |
-         |        |                                 |      |to      |
-         |        |                                 |      |retrieve|
-         |        |                                 |      |vector  |
-         |        |                                 |      |sets,   |
-         |        |                                 |      |submit  |
-         |        |                                 |      |answers |
-         |        |                                 |      |etc.    |
-         |        |                                 |      |        |               
-         |        |receive vectors                  |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
-         |        |                                 |      |        |                      
-         |        |POST to /vectors?vsID=<ID> with  |      |        | 
-         |        |session access token in header   |      |        |
-         |        |and answers in body              |      |        |
-         |        |-------------------------------->|      |        |
-         |        |                                 |      |        |                      
-         |        |GET /results?vsID=<ID>           |      |        |
-         |        |with session access token in body|      |        |
-         |        |-------------------------------->|      |        |
-         |        |                                 |      |        |                      
-         |        |receive results                  |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
          ]]></artwork>
         </figure>
         </section>
         <section title="JWT Expiration/Renewal" anchor="jwtExpire">
           <t>The JWT access tokens received from either the 
-              /login or the /register server endpoint should be set to expire after a pre-defined period, 
+              /login server endpoint should be set to expire after a pre-defined period, 
               The specific length of the expiration period is  
               out of scope for this specification. However, the expiration period length impacts both the security and protocol overhead. Longer
               expiration periods reduce the overhead but increase the window for attacks. 
@@ -781,6 +776,70 @@
         ]]></artwork>
         </figure>
           </section>
+      </section>
+
+
+      <section anchor="flow" title="Message Flow">
+        <t>The minimum message flow between client and server after receiving the JWT:
+         <xref target="xml_msgFlows"/>
+            </t>
+
+          <figure align="center" anchor="xml_msgFlows">
+            <preamble>Workflow message flows. All exchanges shown are over HTTP.</preamble>
+
+          <artwork align="left"><![CDATA[
+         +--------+-----------------------------------+------+--------+
+         | Client |                                   |Server|  Notes |
+         +--------+-----------------------------------+------+--------+
+         |        |POST /vendors                      |      |        | 
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |
+         |        |vendor URL                         |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
+         |        |                                   |      |        |
+         |        |POST /modules                      |      |        |
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |
+         |        |module URL                         |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
+         |        |                                   |      |        |  
+         |        |POST /oes                          |      |        |
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |        
+         |        |oes URL                            |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  -   |      |        |
+         |        |                                   |      |        |                      
+         |        |POST dependency                    |      |        | 
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |                      
+         |        |dependency URL                     |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
+         |        |                                   |      |        |                      
+         |        |POST testSessions                  |      |        | 
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |                      
+         |        |testSessios URL                    |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
+         |        |                                   |      |        |                      
+         |        |GET                                |      |        |                      
+         |        |testSessions/1/vectorSets/1        |      |        | 
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |                      
+         |        |send test vectors for vsId 1       |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
+         |        |                                   |      |        |                      
+         |        |POST results                       |      |        |                      
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |                      
+         |        |GET                                |      |        |                      
+         |        |testSessions/1/vectorSets/1/results|      |        |                      
+         |        |---------------------------------->|      |        |
+         |        |                                   |      |        |                      
+         |        |receive results                    |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
+         ]]></artwork>
+        </figure>
+
       </section>
 
       <section anchor="vendors" title="Vendor Resources">
@@ -2339,7 +2398,7 @@
 
     <section title="Algorithm Test Extensions">
       <t>ACVP is an extensible protocol that supports testing of a large number of cryptographic 
-        algorithms from several different classes. See        <xref target="ext"/>
+        algorithms from several different classes. See        <xref target="EXT"/>
  for datails. </t>
     </section>
 
@@ -2497,25 +2556,37 @@
     filing system or remote ones accessed by http (http://domain/dir/... ).-->
 
     <references title="Normative References">
-      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
       &RFC2119;
-            <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml"?-->
       &RFC3339;
-            <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.7519.xml"?-->
-      &RFC7519; 
+      &RFC5246;
+      &RFC7230;
+      &RFC7519;
+
       </references>
     <references title="Informative References">
-      <reference anchor="ext" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-vassilev-acvp-ext-00.txt">      
+      <reference anchor="EXT" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-vassilev-acvp-ext-00.txt">      
               <!-- the following is the minimum to make xml2rfc happy -->
 
         <front>
           <title>ACVP Algorithm Test Extensions Specification</title>
 
-          <author initials="A." surname="Vassilev">
+          <author initials="N." surname="NIST">
             <organization>NIST</organization>
           </author>
           <date day="1" month="February" year="2018"/>
         </front>
+      </reference>
+
+      <reference anchor="CMVP" target="https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program">      
+              <!-- the following is the minimum to make xml2rfc happy -->
+        <front>
+          <title>Cryptographic Algorithm Validation Program</title>
+          <author initials="A." surname="Vass">
+            <organization>NIST</organization>
+          </author>
+          <date day="1" month="February" year="2018"/>
+        </front>
+
       </reference>
     </references>
 
