@@ -2502,17 +2502,88 @@
         </section>
 
         <section anchor="test_types" title="Test Types and Test Coverage">
+            <t>The ACVP server performs a set of tests on the KAS protocol in order to assess the
+                correctness and robustness of the implementation. A typical ACVP validation session
+                would require multiple tests to be performed for every supported permutation of KAS capabilities. 
+                This section describes the design of the tests used to validate implementations of KAS
+                algorithms. There are two test types for KAS testing:
+
+                <list style="testtype">
+                    <t>"AFT" - Algorithm Function Test. In the AFT test mode, the IUT is expected to act as a party in the Key Agreement with the ACVP server. 
+                    The server will generate and provide all necessary information for the IUT to perform a successful key agreement; 
+                    both the server and IUT can act as party U/V, as well as recipient/provider to key confirmation.</t>
+                    <t>"VAL" - Validation test. In the VAL test mode, The ACVP server generates a complete (from both party U and party V's perspectives) key agreement,
+                    and expects the IUT to be able to determine if that agreement is valid.  
+                    Various types of errors are introduced in varying portions of the key agreement process 
+                    (like bad DKM, bad key, bad hash, etc), that the IUT should be able to detect and report on.</t>
+                </list>
+            </t>
+
             <section anchor="test_coverage" title="Test Coverage">
+                    <t>The tests described in this document have the intention of ensuring an
+                    implementation is conformant to <xref target="SP800-56a"/>.</t>
+
                 <section anchor="requirements_covered_kas_ecc" title="KAS-ECC Requirements Covered">
+                    <t><list>
+                        <t>SP 800-56a - 4.1 Key Establishment Preparations. 
+                        The ACVP server is responsible for generating domain parameters as per the IUT's capability registration.</t>
+                        <t>SP 800-56a - 4.2 Key-Agreement Process.
+                        Both the ACVP server and IUT participate in the Key Agreement process. 
+                        The server and IUT can both take the roles of party U/V, 
+                        and as such the "performer" of steps depicted in "Figure 2: Key Agreement process" can vary.</t>
+                        <t>SP 800-56a - 5.1 Cryptographic Hash Functions. All modes of performing KAS make use of a hash function.  
+                        The hash function may be used for confirmation of a successfully generated shared secret Z (noKdfNoKc), 
+                        or as a primitive within the KDF being tested (kdfNoKc and kdfKc).</t>
+                        <t>SP 800-56a - 5.2 Message Authentication Code (MAC) Algorithm.
+                        A MAC is utilized for confirmation of success for kdfNoKc and kdfKc modes of KAS.  Note - a MAC prerequisite is required only for kdfKc, though is utilized for both kdfNoKc and kdfKc.</t>
+                        <t>SP 800-56a - 5.4 Nonce.
+                        Nonces are made use of in various KAS schemes - both the ACVP server and IUT are expected to be able to generate nonces.</t>
+                        <t>SP 800-56a - 5.6 Domain Parameters.
+                        Domain Parameter Generation is performed solely from the ACVP server, with constraints from the IUTs capabilities registration.
+                        It is expected that the same set of domain parameters will generate all keypairs (party U/V, static/ephemeral) for a single test case.</t>
+                        <t>SP 800-56a - 5.6 Key-Pair Generation.
+                        While Key-Pairs are used in each KAS scheme, the generation of said key-pairs is out of scope for KAS testing.
+                        Random tests from the VAL groups, shall inject bad keypairs that the IUT should be able detect.  
+                        These random tests are only present in groups given appropriate assurance functions see: <xref target="supported_functions"/></t>
+                        <t>SP 800-56a - 4.3 DLC-based Key-Transport Process / 5.7 DLC Primitives.
+                        Depending on the scheme used, either Diffie Hellman or MQV is used to negotiate a shared secret of z. 
+                        Testing and validation of such key exchanges is covered under their respective schemes.</t>
+                        <t>SP 800-56a - 5.8 Key-Derivation Methods for Key-Agreement Schemes.
+                        All schemes/modes save noKdfNoKc (component) make use of a KDF.  KDF construction utilizes <xref target="oiPatternConstruction" /> for its pattern.</t>
+                        <t>SP 800-56a - 5.9 Key Confirmation.
+                        Most KAS schemes allow for a Key Confirmation process, the ACVP server and IUT can be Providers or Recipients of said confirmation.
+                        Additionally, key confirmation can be performed on one or both parties (depending on scheme).</t>
+                        <t>SP 800-56a - 6 Key Agreement Schemes.
+                        All schemes specified in referenced document are supported for validation with the ACVP server.</t>
+                    </list></t>
                 </section>
 
                 <section anchor="requirements_not_covered_kas_ecc" title="KAS-ECC Requirements Not Covered">
-                </section>
-
-                <section anchor="requirements_covered_kas_ecc_cdh_component" title="KAS-ECC CDH Component Requirements Covered">
-                </section>
-
-                <section anchor="requirements_not_covered_kas_ecc_cdh_component" title="KAS-ECC CDH Component Requirements Not Covered">
+                    <t><list>
+                        <t>SP 800-56a - 4.1 Key Establishment Preparations. 
+                        The ACVP server does not make a distinction between IUT generated keys via a trusted third party and the IUT itself.</t>
+                        <t>SP 800-56a - 5.3 Random Number Generation.
+                        It is expected the IUT performs all random number generation with a validated random number generator. 
+                        A DRBG is expected as a prerequisite to KAS, but is out of the scope of testing assurances.
+                        </t>
+                        <t>SP 800-56a - 5.4 Nonce.
+                        Nonce generation is utilized for several schemes. The various methods of generating a nonce described in section 5.5 are expected to be used, 
+                        however their generation is out of scope of KAS testing assurances</t>
+                        <t>SP 800-56a - 5.5.2 Assurances of Domain-Parameter Validity.
+                        The ACVP server generates all domain parameters, IUT validation of such parameters is out of scope for KAS testing.</t>
+                        <t>SP 800-56a - 5.5.3 Domain Parameter Management.
+                        Domain Parameter Management is out of scope for KAS testing.</t>
+                        <t>SP 800-56a - 5.6 Key-Pair Generation.
+                        While Key-Pairs are used in each KAS scheme, the generation, assurances, and management of said key-pairs is out of scope for KAS testing.</t>
+                        <t>SP 800-56a - 5.8 Key-Derivation Methods for Key-Agreement Schemes.
+                        Two-step Key-Derivation (Extraction-then-Expansion) is not utilized in KAS testing.</t>
+                        <t>SP 800-56a - 5.9 Key Confirmation.
+                        KMAC is referenced in 800-56a as being a valid MAC function; it however is not (currently) supported in KAS testing.</t>
+                        <t>SP 800-56a - 5.7 Rationale for Selecting a Specific Scheme.
+                        It is expected that the IUT registers all schemes it supports in its capabilities registration. Selecting specific schemes from a KAS testing perspective is out of scope.</t>
+                        <t>SP 800-56a - 8 Key Recovery.
+                        Key Recovery is not in scope of KAS testing.</t>
+                    </list></t>
                 </section>
             </section>
         </section>
