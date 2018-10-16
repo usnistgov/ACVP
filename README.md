@@ -55,16 +55,18 @@ To access 0.5 use the following prefix for resources listed below:
 
  https://demo.acvts.nist.gov/acvp/acvp/v1
 
-/login (POST)
-/algorithms (GET)    
-/algorithms/{algorithmId} (GET)    
-/testSessions    (GET|POST)    
-/testSessions/{testSessionId}    (GET)
-/testSessions/{testSessionId}/results (GET)        
-/testSessions/{testSessionId}/vectorSets (GET)            
-/testSessions/{testSessionId}/vectorSets/{vectorSetId} (GET)
-/testSessions/{testSessionId}/vectorSets/{vectorSetId}/results    (GET|POST)
-/testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected (GET)
+- /login (POST)
+- /algorithms (GET)    
+- /algorithms/{algorithmId} (GET)    
+- /testSessions    (GET|POST)    
+- /testSessions/{testSessionId}    (GET)
+- /testSessions/{testSessionId}/results (GET)        
+- /testSessions/{testSessionId}/vectorSets (GET)            
+- /testSessions/{testSessionId}/vectorSets/{vectorSetId} (GET)
+- /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results    (GET|POST)
+- /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected (GET)
+
+10/16/2018 NOTE: AES-CBC is the only algorithm fully tested for 0.5, other algorithms may work but they are still undergoing internal testing for conformance with the ACVP specification.
 
 # Accessing the demo server
 
