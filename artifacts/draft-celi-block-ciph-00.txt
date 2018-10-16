@@ -4,7 +4,7 @@
 
 TBD                                                         C. Celi, Ed.
 Internet-Draft            National Institute of Standards and Technology
-Intended status: Informational                            August 1, 2018
+Intended status: Informational                               August 2018
 Expires: February 2, 2019
 
 
@@ -148,20 +148,20 @@ Internet-Draft                Sym Alg JSON                   August 2018
 2.  Capabilities Registration
 
    This section describes the constructs for advertising support of
-   block cipher algorithms to the ACVP server.  ACVP requires
+   block cipher algorithms to the ACVP server.  ACVP REQURIES
    cryptographic modules to register their capabilities in a
    registration.  This allows the cryptographic module to advertise
    support for specific algorithms, notifying the ACVP server which
    algorithms need test vectors generated for the validation process.
 
-   The block cipher algorithm capabilities are advertised as JSON
+   The block cipher algorithm capabilities MUST be advertised as JSON
    objects within the 'algorithms' value of the ACVP registration
-   message.  The 'algorithms' value is an array, where each array
+   message.  The 'algorithms' value MUST be an array, where each array
    element is an individual JSON object defined in this section.  The
-   'algorithms' value is part of the 'capability_exchange' element of
-   the ACVP JSON registration message.  See the ACVP specification for
-   details on the registration message.  Each block cipher algorithm
-   capability advertised is a self-contained JSON object.
+   'algorithms' value MUST be part of the 'capability_exchange' element
+   of the ACVP JSON registration message.  See the ACVP Protocol
+   Specification Section XXX for details on the registration message.
+
 
 
 
@@ -170,10 +170,13 @@ Celi                    Expires February 2, 2019                [Page 3]
 Internet-Draft                Sym Alg JSON                   August 2018
 
 
+   Each block cipher algorithm capability advertised SHALL be a self-
+   contained JSON object.
+
 2.1.  Supported Block Cipher Algorithms
 
-   The following block cipher algorithms may be advertised by the ACVP
-   compliant crypto module:
+   The following block cipher algorithms MAY be advertised by the ACVP
+   compliant cryptographic module:
 
    o  AES-ECB
 
@@ -215,9 +218,6 @@ Internet-Draft                Sym Alg JSON                   August 2018
 
    o  TDES-CFBP1
 
-   o  TDES-CFBP8
-
-   o  TDES-CFBP64
 
 
 
@@ -225,6 +225,10 @@ Celi                    Expires February 2, 2019                [Page 4]
 
 Internet-Draft                Sym Alg JSON                   August 2018
 
+
+   o  TDES-CFBP8
+
+   o  TDES-CFBP64
 
    o  TDES-OFB
 
@@ -237,20 +241,21 @@ Internet-Draft                Sym Alg JSON                   August 2018
 2.2.  Required Prerequisite Algorithms for Block Cipher Validations
 
    Some block cipher algorithm implementations rely on other
-   cryptographic primitives.  For example, CCM uses an underlying AES-
-   ECB algorithm.  Each of these underlying algorithm primitives must be
-   validated, either separately or as part of the same submission.  ACVP
-   provides a mechanism for specifying the required prerequisites:
+   cryptographic primitives.  For example, AES-CCM uses an underlying
+   AES-ECB algorithm.  Each of these underlying algorithm primitives
+   MUST be validated, either separately or as part of the same
+   submission.  ACVP provides a mechanism for specifying the required
+   prerequisites:
 
    +--------------+-----------------+--------+-------------------------+
-   | JSON Value   | Description     | JSON   | Valid Values            |
+   | JSON Value   | Description     | JSON   | Example Values          |
    |              |                 | type   |                         |
    +--------------+-----------------+--------+-------------------------+
-   | algorithm    | a prerequisite  | value  | AES, DRBG, TDES         |
+   | algorithm    | a prerequisite  | string | AES, DRBG, TDES         |
    |              | algorithm       |        |                         |
-   | valValue     | algorithm       | value  | actual number or "same" |
-   |              | validation      |        |                         |
-   |              | number          |        |                         |
+   | valValue     | algorithm       | string | actual number or "same" |
+   |              | validation      |        | to refer to the same    |
+   |              | number          |        | submission              |
    | prereqAlgVal | prerequisite    | object | exactly one algorithm   |
    |              | algorithm       |        | property and one        |
    |              | validation      |        | valValue property       |
@@ -261,7 +266,7 @@ Internet-Draft                Sym Alg JSON                   August 2018
 2.3.  Block Cipher Algorithm Capabilities JSON Values
 
    Each algorithm capability advertised is a self-contained JSON object
-   using the following values:
+   and SHALL use the following values when appropriate:
 
    +--------------------+-------------------------------+--------------+
    | JSON Value         | Description                   | JSON type    |
@@ -269,11 +274,6 @@ Internet-Draft                Sym Alg JSON                   August 2018
    | algorithm          | The block cipher algorithm    | string       |
    |                    | and mode to be validated.     |              |
    | prereqVals         | Prerequisite algorithm        | array of     |
-   |                    | validations                   | prereqAlgVal |
-   |                    |                               | objects      |
-   |                    |                               | described in |
-   |                    |                               | Table 1      |
-   | direction          | The IUT processing direction  | array of     |
 
 
 
@@ -282,6 +282,11 @@ Celi                    Expires February 2, 2019                [Page 5]
 Internet-Draft                Sym Alg JSON                   August 2018
 
 
+   |                    | validations                   | prereqAlgVal |
+   |                    |                               | objects      |
+   |                    |                               | described in |
+   |                    |                               | Table 1      |
+   | direction          | The IUT processing direction  | array of     |
    |                    |                               | strings      |
    | keyLen             | The supported key lengths in  | array of     |
    |                    | bits                          | integers     |
@@ -289,8 +294,8 @@ Internet-Draft                Sym Alg JSON                   August 2018
    |                    | cipher text lengths in bits.  |              |
    |                    | This varies depending on the  |              |
    |                    | algorithm type, for           |              |
-   |                    | additional details see        |              |
-   |                    | Table 4 and Table 6           |              |
+   |                    | additional details see Table  |              |
+   |                    | 4 and Table 6                 |              |
    | ivLen              | The supported IV/Nonce        | domain       |
    |                    | lengths in bits, see Table 4  |              |
    | ivGen              | IV generation method for AES- | string       |
@@ -325,11 +330,6 @@ Internet-Draft                Sym Alg JSON                   August 2018
    |                    | deprecated (K1, K1, K1).      |              |
    | overflowCounter    | Indicates if the              | boolean      |
    |                    | implementation can handle a   |              |
-   |                    | counter exceeding the maximum |              |
-   |                    | value                         |              |
-   | incrementalCounter | Indicates if the              | boolean      |
-   |                    | implementation increments the |              |
-   |                    | counter (versus decrementing  |              |
 
 
 
@@ -338,6 +338,11 @@ Celi                    Expires February 2, 2019                [Page 6]
 Internet-Draft                Sym Alg JSON                   August 2018
 
 
+   |                    | counter exceeding the maximum |              |
+   |                    | value                         |              |
+   | incrementalCounter | Indicates if the              | boolean      |
+   |                    | implementation increments the |              |
+   |                    | counter (versus decrementing  |              |
    |                    | the counter)                  |              |
    +--------------------+-------------------------------+--------------+
 
@@ -348,8 +353,9 @@ Internet-Draft                Sym Alg JSON                   August 2018
    tagLen.  Failure to provide these values will result in the ACVP
    server returning an error to the ACVP client during registration.
 
-   The following grid outlines which properties are required, as well as
-   their possible values for each standard block cipher algorithm:
+   The following grid outlines which properties are REQUIRED, as well as
+   all the possible values a server MAY support for each standard block
+   cipher algorithm:
 
    +-------------+----------------------+---------------+--------------+
    | algorithm   | direction            | keyLen        | keyingOption |
@@ -376,13 +382,7 @@ Internet-Draft                Sym Alg JSON                   August 2018
     Table 3: Standard Block Cipher Algorithm Capabilities Applicability
                                    Grid
 
-   Note: keyingOption 2 is only available for decrypt operations.
-
-   The following grid outlines which properties are required, as well as
-   their possible values for each authenticated block cipher algorithm:
-
-
-
+   Note: keyingOption 2 SHALL only available for decrypt operations.
 
 
 
@@ -393,6 +393,10 @@ Celi                    Expires February 2, 2019                [Page 7]
 
 Internet-Draft                Sym Alg JSON                   August 2018
 
+
+   The following grid outlines which properties are REQUIRED, as well as
+   the possible values a server MAY support for each authenticated block
+   cipher algorithm:
 
    +------+------+----+-----+-----+-------+-------+-------+------+-----+
    | algo | dire | ke | dat | ivL | ivGen | ivGen | saltG | aadL | tag |
@@ -432,13 +436,9 @@ Internet-Draft                Sym Alg JSON                   August 2018
         Table 4: Authenticated Block Cipher Algorithm Capabilities
                             Applicability Grid
 
-   The following grid outlines which properties are required, as well as
-   their possible values for each key-wrap block cipher algorithm:
-
-
-
-
-
+   The following grid outlines which properties are REQUIRED, as well as
+   the possible values a server MAY support for each key-wrap block
+   cipher algorithm:
 
 
 
@@ -464,11 +464,11 @@ Internet-Draft                Sym Alg JSON                   August 2018
     Table 5: Key-Wrap Block Cipher Algorithm Capabilities Applicability
                                    Grid
 
-   Note: keyingOption 2 is only available for decrypt operations.
+   Note: keyingOption 2 SHALL only available for decrypt operations.
 
-   The following grid outlines which properties are required, as well as
-   their possible values for each miscellaneous block cipher algorithm:
-
+   The following grid outlines which properties are REQUIRED, as well as
+   the possible values a server MAY support for each miscellaneous block
+   cipher algorithm:
 
 
 
@@ -538,22 +538,22 @@ Internet-Draft                Sym Alg JSON                   August 2018
         Table 6: Miscellaneous Block Cipher Algorithm Capabilities
                             Applicability Grid
 
-   Note: keyingOption 2 is only available for decrypt operations.
+   Note: keyingOption 2 SHALL only available for decrypt operations.
 
 3.  Test Vectors
 
-   After receiving a registration of a cryptographic module, the ACVP
-   server provides test vectors in the form of a prompt to the ACVP
-   client, which are then processed and returned to the ACVP server for
-   validation.  A typical ACVP validation session would require the
-   client to download and process multiple test vector sets.  Each test
-   vector set represents an individual cryptographic algorithm, such as
-   AES-ECB, AES-CBC, TDES-CTR, etc.  This section describes the JSON
-   schema for a test vector set used with block cipher algorithms.
+   After receiving a valid registration of a cryptographic module, the
+   ACVP server SHALL provide test vectors in the form of a prompt to the
+   ACVP client, which then SHALL be processed and returned to the ACVP
+   server for validation.  A typical ACVP validation session would
+   require the client to download and process multiple test vector sets.
+   Each test vector set SHALL represent an individual cryptographic
+   algorithm, such as AES-ECB, AES-CBC, TDES-CTR, etc.  This section
+   describes the JSON schema for a test vector set used with block
+   cipher algorithms.
 
    The test vector set JSON schema is a multi-level hierarchy that
-   contains meta-data for the entire vector set.  It is comprised of
-   test groups which subsequently contain individual test cases to be
+   contains meta-data for the entire vector set.  The test vector set
 
 
 
@@ -562,8 +562,10 @@ Celi                    Expires February 2, 2019               [Page 10]
 Internet-Draft                Sym Alg JSON                   August 2018
 
 
-   processed by the ACVP client.  The following table describes the JSON
-   elements at the top level of the hierarchy:
+   SHALL be comprised of test groups which SHALL subsequently contain
+   individual test cases to be processed by the ACVP client.  The
+   following table describes the REQUIRED JSON elements at the top level
+   of the hierarchy:
 
    +------------+----------------------------------------+-------------+
    | JSON Value | Description                            | JSON type   |
@@ -572,8 +574,8 @@ Internet-Draft                Sym Alg JSON                   August 2018
    | vsId       | Unique numeric identifier for the      | integer     |
    |            | vector set                             |             |
    | algorithm  | The block cipher algorithm and mode    | string      |
-   |            | used for the test vectors. See         |             |
-   |            | Section 2.1 for possible values.       |             |
+   |            | used for the test vectors. See Section |             |
+   |            | 2.1 for possible values.               |             |
    | testGroups | Array of test group JSON objects,      | array of    |
    |            | which are defined in Section 3.1       | testGroup   |
    |            |                                        | objects     |
@@ -583,16 +585,14 @@ Internet-Draft                Sym Alg JSON                   August 2018
 
 3.1.  Test Groups
 
-   Test vectors contain one or many test groups, each sharing similar
-   properties.  For instance, all test vectors that use the same key
-   size would be grouped together.  The testGroups element at the top
-   level of the test vector JSON object is the array of test groups.
-   The Test Group JSON object contains meta-data that applies to all
-   test cases within the group.  The following table describes the JSON
-   elements of the Test Group JSON object:
-
-
-
+   Test vector sets MUST contain one or many test groups, each sharing
+   similar properties.  For instance, all test vectors that use the same
+   key size would be grouped together.  The testGroups element at the
+   top level of the test vector JSON object SHALL be the array of test
+   groups.  The Test Group JSON object MUST contain meta-data that
+   applies to all test cases within the group.  The following table
+   describes the JSON elements that MAY appear from the server in the
+   Test Group JSON object:
 
 
 
@@ -640,14 +640,14 @@ Internet-Draft                Sym Alg JSON                   August 2018
    |              | counter). See Section 5 for more        |          |
    |              | information about what these tests do,  |          |
    |              | and how to implement them.              |          |
-   | tests        | Array of individual test vector JSON    | array of |
-   |              | objects, which are defined in           | testCase |
-   |              | Section 3.2                             | objects  |
+   | tests        | Array of individual test case JSON      | array of |
+   |              | objects, which are defined in Section   | testCase |
+   |              | 3.2                                     | objects  |
    +--------------+-----------------------------------------+----------+
 
                       Table 8: Test Group JSON Object
 
-   Some properties must appear in the prompt file from the server for
+   Some properties MUST appear in the prompt file from the server for
    every testGroup object.  They are as follows:
 
    o  tgId
@@ -660,10 +660,10 @@ Internet-Draft                Sym Alg JSON                   August 2018
 
    o  tests
 
-   The other properties may appear depending on the algorithm selected
-   for the test vector set.  The following grid defines the
-   applicability of each property for a standard block cipher:
-
+   The other properties MAY appear depending on the algorithm selected
+   for the test vector set.  The following grid defines the REQUIRED
+   properties for each standard block cipher, as well as the valid
+   values a server MAY use:
 
 
 
@@ -698,8 +698,8 @@ Internet-Draft                Sym Alg JSON                   August 2018
 
         Table 9: Prompt Test Group Block Cipher Applicability Grid
 
-   The following grid defines the applicability of each property for an
-   authenticated block cipher:
+   The following grid defines when each property is REQUIRED from a
+   server for each authenticated block cipher:
 
 
 
@@ -754,8 +754,14 @@ Internet-Draft                Sym Alg JSON                   August 2018
    Table 10: Prompt Test Group Authenticated Block Cipher Applicability
                                    Grid
 
-   The following grid defines the applicability of each property for a
-   key-wrap block cipher:
+   Note: The particular values of a domain are REQUIRED to be an integer
+   element of the domain present in the registration used.  The ACVP
+   server MAY select predetermined or random values with particular
+   features (ex. on a block boundary, or not on a block boundary) within
+   the domain the client provided in the registration.
+
+   The following grid defines when each property is REQUIRED from a
+   server for a key-wrap block cipher:
 
    +-----------+-----------+--------------+---------------+------------+
    | algorithm | keyLen    | keyingOption | kwCipher      | dataLen    |
@@ -770,14 +776,8 @@ Internet-Draft                Sym Alg JSON                   August 2018
 
    Table 11: Prompt Test Group Key-Wrap Block Cipher Applicability Grid
 
-   The following grid defines the applicability of each property for the
-   miscellaneous block ciphers:
-
-
-
-
-
-
+   Note: The particular values of a domain are REQUIRED to be an integer
+   element of the domain present in the registration used.  The ACVP
 
 
 
@@ -785,6 +785,13 @@ Celi                    Expires February 2, 2019               [Page 14]
 
 Internet-Draft                Sym Alg JSON                   August 2018
 
+
+   server MAY select predetermined or random values with particular
+   features (ex. on a block boundary, or not on a block boundary) within
+   the domain the client provided in the registration.
+
+   The following grid defines when each property is REQUIRED from a
+   server for the miscellaneous block ciphers:
 
    +--------+------+----------+-----------+---------+---------+--------+
    | algori | keyL | keyingOp | increment | overflo | tweakMo | dataLe |
@@ -803,25 +810,18 @@ Internet-Draft                Sym Alg JSON                   August 2018
    Table 12: Prompt Test Group Miscellaneous Block Cipher Applicability
                                    Grid
 
-   Note: The particular values of a domain are explicitly dependent on
-   the exact registration used.  The ACVP server is allowed to select
-   predetermined or random values with particular features (ex. on a
-   block boundary, or not on a block boundary) within the domain the
-   client provided in the registration.
+   Note: The particular values of a domain are REQUIRED to be an integer
+   element of the domain present in the registration used.  The ACVP
+   server MAY select predetermined or random values with particular
+   features (ex. on a block boundary, or not on a block boundary) within
+   the domain the client provided in the registration.
 
 3.2.  Test Cases
 
-   Each test group contains an array of one or more test cases.  Each
-   test case is a JSON object that represents a single case to be
+   Each test group SHALL contain an array of one or more test cases.
+   Each test case is a JSON object that represents a single case to be
    processed by the ACVP client.  The following table describes the JSON
    elements for each test case.
-
-
-
-
-
-
-
 
 
 
@@ -878,14 +878,14 @@ Internet-Draft                Sym Alg JSON                   August 2018
    type within the test group requires specific operations to be
    performed and thus specific data returned to the server.  Consult
    Section 5 for more information.  The tcId property MUST appear within
-   every test case sent from the server.
+   every test case sent to and from the server.
 
 4.  Test Vector Responses
 
-   After the ACVP client downloads and processes a vector set, it must
-   send the response vectors back to the ACVP server.  The following
-   table describes the JSON object that represents a vector set
-   response.
+   After the ACVP client downloads and processes a vector set, it SHALL
+   send the response vectors back to the ACVP server within the alloted
+   timeframe.  The following table describes the JSON object that
+   represents a vector set response.
 
 
 
