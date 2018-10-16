@@ -21,7 +21,9 @@ validation of standardized algorithm test evidence to facilitate the [modernizat
 The new automated testing scope is currently planned to become available during 1QFY19 (Fall 2018). Once available this testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
 
 # Status
-The demo server supports ACVP, version 0.4. We continue to work on supporting additional algorithms and other enhancements, so stay tuned for updates. Currently, the demo server allows validation of the following NIST-approved algorithms:
+The demo server (demo.acvts.nist.gov) supports ACVP, version 0.4, with preliminary support of version 0.5 (as of 10/16/2018). Development of 0.5 will continue over the next few weeks in order to support all features described in the ACVP 0.5 specification.
+
+The demo server allows validation of the following NIST-approved algorithms (a superset of the algorithms available through the CAVS tool):
 
 |Block Cipher Modes									| Secure Hash 								|Message Authentication 							|DRBG 												|Digital Signature 												|Key Agreement 													|KDF's 																|
 |------------------									|------------								|----------------------								|----												|----------------- 												|------------- 													|-----																|
@@ -47,6 +49,22 @@ The demo server supports ACVP, version 0.4. We continue to work on supporting ad
 |[TDES-KW](./artifacts/acvp_sub_symmetric.txt)		|											|													|													|																|																|																	|
 |[TDES-OFB](./artifacts/acvp_sub_symmetric.txt)		|											|													|													|																|																|																	|
 |[TDES-OFBI](./artifacts/acvp_sub_symmetric.txt)	|											|													|													|																|																|																	|
+
+## Current 0.5 Support
+To access 0.5 use the following prefix for resources listed below:
+
+ https://demo.acvts.nist.gov/acvp/acvp/v1
+
+/login (POST)
+/algorithms (GET)    
+/algorithms/{algorithmId} (GET)    
+/testSessions    (GET|POST)    
+/testSessions/{testSessionId}    (GET)
+/testSessions/{testSessionId}/results (GET)        
+/testSessions/{testSessionId}/vectorSets (GET)            
+/testSessions/{testSessionId}/vectorSets/{vectorSetId} (GET)
+/testSessions/{testSessionId}/vectorSets/{vectorSetId}/results    (GET|POST)
+/testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected (GET)
 
 # Accessing the demo server
 
