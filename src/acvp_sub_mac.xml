@@ -56,7 +56,7 @@
                 <!-- uri and facsimile elements may also be added -->
             </address>
         </author>
-        <author fullname="Russell Hammett" initials="R.H." role="editor">
+        <author fullname="Russell Hammett" initials="R.H." role="editor" surname="Hammett">
             <organization>G2, Inc.</organization>
 
             <address>
@@ -120,6 +120,84 @@
                 <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
                     "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
                     interpreted in <xref target="RFC2119">RFC 2119</xref>. </t>
+            </section>
+        </section>
+        <section anchor="test_types" title="Test Types and Test Coverage">
+            <t>The ACVP server performs a set of tests on the MAC algorithms in order to assess the
+                correctness and robustness of the implementation. A typical ACVP validation session
+                would require multiple tests to be performed for every supported cryptographic
+                algorithm, such as CMAC-AES, CMAC-TDES, HMAC-SHA-1, HMAC-SHA2-256, etc. This section
+                describes the design of the tests used to validate implementations of MAC
+                algorithms. There is a single test type for MACs (broken into subsections for
+                CMACs). the single test type, algorithm functional test (AFT) can be described as
+                follows: <list style="testtype">
+                    <t>"AFT" - Algorithm Function Test. The IUT processes all of HMAC and the "gen"
+                        direction of CMAC by running the randomly chosen key and message data (with
+                        constraints as per the IUT's capabilities registration) through the MAC
+                        algorithm. CMAC has an additional "ver" direction present in its testing to
+                        ensure the IUT can successfully determine when a MAC does not match its
+                        originating message/key combination.</t>
+                </list>
+            </t>
+
+            <section anchor="test_coverage" title="Test Coverage">
+                <t>The tests described in this document have the intention of ensuring an
+                    implementation is conformant to <xref target="SP-800-38B"/> and <xref
+                        target="FIPS-198-1"/>.</t>
+
+                <section anchor="requirements_covered_cmac" title="CMAC Requirements Covered">
+                    <t>
+                    <list>
+                        <t> SP 800-38b - 6.2 Mac Generation. ACVP server creates random sets of keys
+                            and messages for the IUT to process, then compares the IUT's result to
+                            the ACVP result. </t>
+                        <t> SP 800-38b - 6.3 Mac Verification. ACVP server creates random sets of
+                            keys, messages, and macs. These test vectors are then randomly altered
+                            to ensure the MAC will not match the given key and message. Using the
+                            provided test case, the IUT is expected to validate the mac against the
+                            provided key and message. </t>
+                    </list>
+                    </t>
+                </section>
+
+                <section anchor="requirements_not_covered_cmac" title="CMACRequirements Not Covered">
+                    <t>
+                    <list>
+                        <t>SP 800-38b - 5.4 Sub-keys. While sub-keys are computed, as they are
+                            intermediate values, are not validated via current testing.</t>
+                        <t>SP 800-38b - 5.5 Input and Output Data. The mlen is currently provided
+                            and not inferred.</t>
+                        <t> SP 800-38b - Appendix A. Length of MAC. The ACVP server will generate
+                            vectors as per the IUT's specified criteria. The IUT should register its
+                            entire range of supported MAC lengths, regardless of security strength.
+                            The ACVP server will test a random sampling of valid MAC lengths as per
+                            the IUT registration - this generally includes the minimum and maximum
+                            mac length. </t>
+                    </list>
+                    </t>
+                </section>
+
+                <section anchor="requirements_covered_hmac" title="HMAC Requirements Covered">
+                    <t>
+                    <list>
+                        <t>FIPS 198-1 - 3 Cryptographic Keys. The ACVP server will test, depending
+                            on the nature of the IUT capabilities registration, keys that are below,
+                            at, or above the hashing algorithm block size.</t>
+                        <t>FIPS 198-1 - 4 HMAC Specification. Mac Generation. ACVP server creates
+                            random sets of keys and messages for the IUT to process, then compares
+                            the IUT's result to the ACVP result.</t>
+                        <t>FIPS 198-1 - 5 Truncation. The ACVP server is capable of generating MACs
+                            as per the capability registration of the IUT. Groups will be created
+                            containing a random sampling of valid MAC lengths from the IUT
+                            registration.</t>
+                    </list>
+                    </t>
+                </section>
+
+                <section anchor="requirements_not_covered_hmac"
+                    title="HMAC Requirements Not Covered">
+                    <t>N/A</t>
+                </section>
             </section>
         </section>
         <section anchor="caps_reg" title="Capabilities Registration">
@@ -2364,84 +2442,6 @@
             ]]>
                         </artwork>
                     </figure>
-                </section>
-            </section>
-        </section>
-        <section anchor="test_types" title="Test Types and Test Coverage">
-            <t>The ACVP server performs a set of tests on the MAC algorithms in order to assess the
-                correctness and robustness of the implementation. A typical ACVP validation session
-                would require multiple tests to be performed for every supported cryptographic
-                algorithm, such as CMAC-AES, CMAC-TDES, HMAC-SHA-1, HMAC-SHA2-256, etc. This section
-                describes the design of the tests used to validate implementations of MAC
-                algorithms. There is a single test type for MACs (broken into subsections for
-                CMACs). the single test type, algorithm functional test (AFT) can be described as
-                follows: <list style="testtype">
-                    <t>"AFT" - Algorithm Function Test. The IUT processes all of HMAC and the "gen"
-                        direction of CMAC by running the randomly chosen key and message data (with
-                        constraints as per the IUT's capabilities registration) through the MAC
-                        algorithm. CMAC has an additional "ver" direction present in its testing to
-                        ensure the IUT can successfully determine when a MAC does not match its
-                        originating message/key combination.</t>
-                </list>
-            </t>
-
-            <section anchor="test_coverage" title="Test Coverage">
-                <t>The tests described in this document have the intention of ensuring an
-                    implementation is conformant to <xref target="SP-800-38B"/> and <xref
-                        target="FIPS-198-1"/>.</t>
-
-                <section anchor="requirements_covered_cmac" title="CMAC Requirements Covered">
-                    <t>
-                    <list>
-                        <t> SP 800-38b - 6.2 Mac Generation. ACVP server creates random sets of keys
-                            and messages for the IUT to process, then compares the IUT's result to
-                            the ACVP result. </t>
-                        <t> SP 800-38b - 6.3 Mac Verification. ACVP server creates random sets of
-                            keys, messages, and macs. These test vectors are then randomly altered
-                            to ensure the MAC will not match the given key and message. Using the
-                            provided test case, the IUT is expected to validate the mac against the
-                            provided key and message. </t>
-                    </list>
-                    </t>
-                </section>
-
-                <section anchor="requirements_not_covered_cmac" title="CMACRequirements Not Covered">
-                    <t>
-                    <list>
-                        <t>SP 800-38b - 5.4 Sub-keys. While sub-keys are computed, as they are
-                            intermediate values, are not validated via current testing.</t>
-                        <t>SP 800-38b - 5.5 Input and Output Data. The mlen is currently provided
-                            and not inferred.</t>
-                        <t> SP 800-38b - Appendix A. Length of MAC. The ACVP server will generate
-                            vectors as per the IUT's specified criteria. The IUT should register its
-                            entire range of supported MAC lengths, regardless of security strength.
-                            The ACVP server will test a random sampling of valid MAC lengths as per
-                            the IUT registration - this generally includes the minimum and maximum
-                            mac length. </t>
-                    </list>
-                    </t>
-                </section>
-
-                <section anchor="requirements_covered_hmac" title="HMAC Requirements Covered">
-                    <t>
-                    <list>
-                        <t>FIPS 198-1 - 3 Cryptographic Keys. The ACVP server will test, depending
-                            on the nature of the IUT capabilities registration, keys that are below,
-                            at, or above the hashing algorithm block size.</t>
-                        <t>FIPS 198-1 - 4 HMAC Specification. Mac Generation. ACVP server creates
-                            random sets of keys and messages for the IUT to process, then compares
-                            the IUT's result to the ACVP result.</t>
-                        <t>FIPS 198-1 - 5 Truncation. The ACVP server is capable of generating MACs
-                            as per the capability registration of the IUT. Groups will be created
-                            containing a random sampling of valid MAC lengths from the IUT
-                            registration.</t>
-                    </list>
-                    </t>
-                </section>
-
-                <section anchor="requirements_not_covered_hmac"
-                    title="HMAC Requirements Not Covered">
-                    <t>N/A</t>
                 </section>
             </section>
         </section>
