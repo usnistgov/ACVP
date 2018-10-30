@@ -242,10 +242,6 @@
           purposes of internal organizational testing only may chose not to include some of those
           features.</t>
       </section>
-
-      <section title="Terminology">
-        <t> TBD </t>
-      </section>
     </section>
 
 
@@ -350,6 +346,41 @@
            ]]>          </artwork>
 
         </figure>
+      </section>
+
+      <section title="Terminology">
+        <t>The following terms are consistently used throughout this document and SHOULD be used throughout its extensions:</t>
+        <t>
+          <list style="symbols">
+            <t>Test Session - The largest structure of an instance of ACVP. Often generated from a 
+            single registration, it will contain many Test Vector Sets for the algorithms defined 
+            in the registration.</t>
+            <t>Test Vector Set - The set of tests and data corresponding to an individual algorithm
+            from within a registration. Uniquely identified throughout an instance of ACVP by the 
+            vsId. Contains many Test Groups.</t>
+            <t>Test Group - The set of tests that share common properties within a Test Vector Set. 
+            Uniquely identified within the Test Vector Set by the tgId. Contains many Test Cases.</t>
+            <t>Test Case - The smallest unit of the tests that represents an individual testable
+            operation as defined by the parent Test Group. Uniquely identified throughout the 
+            Test Vector Set by the tcId.</t>
+            <t>Registration - The JSON from the client to the server that describes the algorithms 
+            and capabilities for which the client is seeking test cases and a validation. A 
+            Registration can submit capabilities for multiple algorithms. Each algorithm will be
+            broken into individual Test Vector Sets.</t>
+            <t>Prompt - The JSON sent from the server to the client defining a single Test 
+            Vector Set to use as inputs for testing. Exactly one prompt will exist for each 
+            Test Vector Set.</t>
+            <t>Response - The JSON from the client providing the desired cryptographic output
+            for each of the Test Cases defined in the corresponding Prompt file. These are linked
+            via the Test Vector Set vsId. As exactly one prompt exists for each vsId, one response
+            will exist for each prompt.</t>
+            <t>Disposition - The JSON from the server after the Response is submitted by the client
+            detailing the correctness of the Test Cases. A "passed" disposition indicates that the
+            particular algorithm in the Test Vector Set is ready for validation.</t>
+            <t>OE - Operational Environment - The specific hardware and/or software the client's
+            cryptographic implementation uses to run.</t>
+          </list>  
+        </t>
       </section>
     </section>
     <section title="ACV Protocol">
@@ -651,7 +682,7 @@
         negotiated version value.</t>
     </section>
 
-    <section title="Messaging">
+    <section title="Messaging and Workflow">
 
       <section title="Product Registration/Capabilities Exchange">
         <t>The product registration will utilize the URI resources 
@@ -674,13 +705,6 @@
           however if vectorSets have not been completed the overall status will be incomplete.
           A minimal message flow is described below <xref target="xml_msgFlows"/>. </t>
       </section>
-    </section>
-
-    <section title="Message Formats">
-      <t>As described in        <xref target="uriComposition"/>
- servers may require a contextual path in
-        the URI prior to the API and version path parts used to reference a resource and
-        clients/proxies must be able to support contextual paths.</t>
 
       <section title="JSON Web Token (JWT)" anchor="jwtToken">
         <t>JSON Web Token is described in          <xref target="RFC7519">RFC 7519</xref> and is used as an
@@ -788,55 +812,55 @@
             <preamble>Workflow message flows. All exchanges shown are over HTTP.</preamble>
 
           <artwork align="left"><![CDATA[
-         +--------+-----------------------------------+------+--------+
-         | Client |                                   |Server|  Notes |
-         +--------+-----------------------------------+------+--------+
-         |        |POST /vendors                      |      |        | 
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |
-         |        |vendor URL                         |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
-         |        |                                   |      |        |
-         |        |POST /modules                      |      |        |
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |
-         |        |module URL                         |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
-         |        |                                   |      |        |  
-         |        |POST /oes                          |      |        |
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |        
-         |        |oes URL                            |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  -   |      |        |
-         |        |                                   |      |        |                      
-         |        |POST dependency                    |      |        | 
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |                      
-         |        |dependency URL                     |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
-         |        |                                   |      |        |                      
-         |        |POST testSessions                  |      |        | 
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |                      
-         |        |testSessios URL                    |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
-         |        |                                   |      |        |                      
-         |        |GET                                |      |        |                      
-         |        |testSessions/1/vectorSets/1        |      |        | 
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |                      
-         |        |send test vectors for vsId 1       |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
-         |        |                                   |      |        |                      
-         |        |POST results                       |      |        |                      
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |                      
-         |        |GET                                |      |        |                      
-         |        |testSessions/1/vectorSets/1/results|      |        |                      
-         |        |---------------------------------->|      |        |
-         |        |                                   |      |        |                      
-         |        |receive results                    |      |        |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |        |
+         +--------+-----------------------------------+------+------------+
+         | Client |                                   |Server|  Notes     |
+         +--------+-----------------------------------+------+------------+
+         |        |POST /vendors                      |      |            | 
+         |        |---------------------------------->|      |            |
+         |        |                                   |      |            |
+         |        |vendor URL                         |      |            |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+         |        |                                   |      |            |
+         |        |POST /modules                      |      |            |
+         |        |---------------------------------->|      |            |
+         |        |                                   |      |            |
+         |        |module URL                         |      |            |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+         |        |                                   |      |            | 
+         |        |POST /oes                          |      |            |
+         |        |---------------------------------->|      |            |
+         |        |                                   |      |            |      
+         |        |oes URL                            |      |            |
+         |        |<-  -  -  -  -  -  -  -  -  -  -   |      |            |
+         |        |                                   |      |            |                      
+         |        |POST dependency                    |      |            | 
+         |        |---------------------------------->|      |            |
+         |        |                                   |      |            |                      
+         |        |dependency URL                     |      |            |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+         |        |                                   |      |            |                      
+         |        |POST testSessions                  |      |            | 
+         |        |---------------------------------->|      |            |
+         |        |                                   |      |   Submit   |                      
+         |        |testSessions URL                   |      |Registration|
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+         |        |                                   |      |            |                      
+         |        |GET                                |      |            |                      
+         |        |testSessions/1/vectorSets/1        |      |            | 
+         |        |---------------------------------->|      |            |
+         |        |                                   |      |  Retrieve  |                      
+         |        |send test vectors for vsId 1       |      |   Prompt   |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+         |        |                                   |      |            |                      
+         |        |POST results                       |      |   Submit   |                      
+         |        |---------------------------------->|      |  Response  |
+         |        |                                   |      |            |                      
+         |        |GET                                |      |            |                      
+         |        |testSessions/1/vectorSets/1/results|      |            |                      
+         |        |---------------------------------->|      |            |
+         |        |                                   |      |  Retrieve  |                      
+         |        |receive results                    |      |Disposition |
+         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
          ]]></artwork>
         </figure>
 
@@ -1605,7 +1629,6 @@
             <spanx style="strong">GET /algorithms</spanx>
           </t>
           <t>Returns a list of available Algorithms on the server.</t>
-          <t>This is an optional operation.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1681,7 +1704,7 @@
             </t>
             <t>
               <spanx style="strong">passed</spanx>
-              <cref>need a better name</cref> -
+              <cref>disposition for consistency?</cref>
               <spanx style="verb">boolean</spanx>, indicates whether all of the vector set tests
               have passed 
             </t>
@@ -1689,7 +1712,7 @@
               <spanx style="strong">isSample</spanx> -              <spanx style="verb">boolean</spanx>, if true
               <xref target="vectorSet_expected_get">
                 /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected</xref> will return
-              expected result values.
+              expected result values. As well, Test Vector Sets MAY be contain fewer Test Cases for quicker generation and verification.
             </t>
             <t>
               <spanx style="strong">production</spanx> -              <spanx style="verb">boolean</spanx>,
@@ -1752,30 +1775,11 @@
 [
     {"acvVersion": <acvp-version>},
     {
-    "isSample" : "true",
+    "isSample" : true,
     "algorithms": [{
-        "algorithm": "AES-GCM",
-        "direction": [
-            "encrypt",
-            "decrypt"
-        ],
-        "ivGen": "internal",
-        "ivGenMode": "8.2.1",
-        "keyLen": [
-            128,
-            256
-        ],
-        "tagLen": [96],
-        "ivLen": [96],
-        "dataLength": [
-            0,
-            128,
-            136
-        ],
-        "aadLen": [
-            128,
-            136
-        ]
+        "algorithm": "TEST_ALGO_1",
+        "property1": true,
+        "property2": ["operation1", "operation2"]
     }]}
 ]
            ]]>              </artwork>
@@ -1911,14 +1915,14 @@
         "moduleUrl": "/acvp/v1/modules/20",
         "oeUrl": "/acvp/v1/oes/60",
         "algorithmPrerequisites": [{
-            "algorithm": "AES-GCM",
+            "algorithm": "TEST_ALGO_1",
             "prerequisites": [
                 {
-                    "algorithm": "AES",
+                    "algorithm": "TEST_ALGO_0",
                     "validationId": "123456"
                 },
                 {
-                    "algorithm": "DRBG",
+                    "algorithm": "TEST_ALGO_0.1",
                     "validationId": "123456"
                 }
             ]
@@ -1973,7 +1977,7 @@
       </section>
 
       <section anchor="vectorSet" title="Vector Sets">
-        <t>The available properties for vector set resources are:          <list>
+        <t>The REQUIRED properties for vector set resources are:          <list>
             <t>
               <spanx style="strong">url</spanx> -              <spanx style="verb">string</spanx>, identifier
               for this resource
@@ -1995,6 +1999,9 @@
                   are zero or more test group properties. 
                 </t>
                 <t>
+                  <spanx style="strong">testType</spanx> - string defined in algorithm extensions outlining the procedure
+                  to complete the corresponding test cases.
+                  <spanx style="strong">tgId</spanx> - <spanx style="verb">number</spanx>
                   <spanx style="strong">tests</spanx> - array of test objects,                  <list>
                     <t>
                       <spanx style="strong">tcId</spanx> -                      <spanx style="verb">number</spanx>
@@ -2050,39 +2057,35 @@
 [
     {"acvVersion": <acvp-version>},
     {
-        "vsId": 11,
-        "algorithm": "AES-CBC",
+        "vsId": 1,
+        "algorithm": "TEST_ALGO_1",
         "testGroups": [
             {
-                "direction": "encrypt",
-                "testType": "AFT",
-                "keyLen": 128,
+                "tgId": 1,
+                "testGroupProperty1": 1,
+                "testType": "type1",
                 "tests": [
                     {
                         "tcId": 1,
-                        "iv": "00000000000000000000000000000000",
-                        "key": "00000000000000000000000000000000",
-                        "pt": "F34481EC3CC627BACD5DC3FB08F273E6"
+                        "testCaseProperty1": 1,
+                        "testCaseProperty2": "2"
                     },
                     {
                         "tcId": 2,
-                        "iv": "00000000000000000000000000000000",
-                        "key": "00000000000000000000000000000000",
-                        "pt": "9798C4640BAD75C7C3227DB910174E72"
+                        "testCaseProperty1": 3,
+                        "testCaseProperty2": "4"
                     }
                     ... additional tests ...
                 ]
             },
             ... additional test groups ...
             {
-                "direction": "encrypt",
-                "testType": "MCT",
-                "keyLen": 128,
+                "tgId": 3,
+                "testGroupProperty1": 2,
+                "testType": "type2",
                 "tests": [{
                     "tcId": 2139,
-                    "iv": "036B918F3DAB01649FC9EA13675D714A",
-                    "key": "CC3CCB78B161504A9D5698FA75E88D49",
-                    "pt": "9CA6930792FA735C160011EC1C1B5118"
+                    "testCaseProperty3": 10
                 }]
             }
             ... additional test groups ...
@@ -2097,8 +2100,8 @@
               <artwork align="left"><![CDATA[
 [
   { "acvVersion": <acvp-version> },
-  { "vsId": 1437,
-    "retry" : 10
+  { "vsId": 1,
+    "retry" : 30
   }
 ]
            ]]>              </artwork>
@@ -2216,7 +2219,7 @@
             {
                 "tcId": 12342,
                 "result": "failed",
-                "reason": "Authentication tag mismatch"
+                "reason": "Algorithm reason XXX"
             }
         ]
     }}
@@ -2244,15 +2247,13 @@
       "tgId": 1,
       "tests": [{
           "tcId": 12340,
-          "iv": "01020304C077A707E56C22AC",
-          "ct": "",
-          "tag": "53B15E85E377F8B5B6BFC2DE915FD622"
+          "testCaseProperty1": "ABCD",
+          "testCaseProperty2": "1234"
         },
         {
           "tcId": 12341,
-          "iv": "01020304D666587803BCBAD7",
-          "ct": "",
-          "tag": "E7B1F2D77D82C6EB3C9CEFF16C376D9C"
+          "testCaseProperty1": "5678",
+          "testCaseProperty2": "FEDC"
         }, ...
       ]
     }, ...
@@ -2345,20 +2346,23 @@
     {
         "vsId": 1437,
         "expiry": "2018-12-31 23:59:59",
-        "algorithm": "AES-GCM",
-        "testGroups": [{
-            "direction": "encrypt",
-            "keyLen": 128,
-            "ivLen": 96,
-            "ptLen": 0,
-            "aadLen": 128,
-            "tagLen": 128,
-            "tests": [{
-                "tcId": 12340,
-                "key": "1529BAC6229586F057FAA59353851686",
-                "pt": "",
-                "aad": "4B11160620475D8EE440C3795CF62D26"
-            },
+        "algorithm": "TEST_ALGO_1",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "testGroupProperty1": 1,
+                "testType": "type1",
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "testCaseProperty1": 1,
+                        "testCaseProperty2": "2"
+                    },
+                    {
+                        "tcId": 2,
+                        "testCaseProperty1": 3,
+                        "testCaseProperty2": "4"
+                    },
             .
             .
             .
@@ -2400,9 +2404,9 @@
     </section>
 
     <section title="Algorithm Test Extensions">
-      <t>ACVP is an extensible protocol that supports testing of a large number of cryptographic 
-        algorithms from several different classes. See        <xref target="EXT"/>
- for datails. </t>
+      <t>ACVP is intended to be an extensible protocol that supports testing of a large number of cryptographic 
+        algorithms from several different classes defined by the community. See <xref target="EXT"/> for details.
+        All algorithm identifiers intended for public use SHALL be documented by IANA in the ACVP Registry <xref target="EXT"/>.</t>
     </section>
 
     <section title="Custom Specification Objects">
