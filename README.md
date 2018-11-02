@@ -21,7 +21,7 @@ validation of standardized algorithm test evidence to facilitate the [modernizat
 The new automated testing scope is currently planned to become available during 1QFY19 (Fall 2018). Once available this testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
 
 # Status
-The demo server (demo.acvts.nist.gov) supports ACVP, version 0.4, with preliminary support of version 0.5 (as of 10/16/2018). Development of 0.5 will continue over the next few weeks in order to support all features described in the ACVP 0.5 specification.
+The demo server (demo.acvts.nist.gov) supports ACVP, version 0.4, with full support for all algorithm testing in version 0.5, but not yet full 0.5 support (as of 11/02/2018). Development of 0.5 will continue in order to support all features described in the ACVP 0.5 specification.
 
 The demo server allows validation of the following NIST-approved algorithms (a superset of the algorithms available through the CAVS tool):
 
@@ -56,17 +56,17 @@ To access 0.5 use the following prefix for resources listed below:
  https://demo.acvts.nist.gov/acvp/acvp/v1
 
 - /login (POST)
-- /algorithms (GET)    
-- /algorithms/{algorithmId} (GET)    
-- /testSessions    (GET|POST)    
-- /testSessions/{testSessionId}    (GET)
-- /testSessions/{testSessionId}/results (GET)        
-- /testSessions/{testSessionId}/vectorSets (GET)            
+- /algorithms (GET)
+- /algorithms/{algorithmId} (GET)
+- /testSessions (GET|POST)
+- /testSessions/{testSessionId} (GET)
+- /testSessions/{testSessionId}/results (GET)
+- /testSessions/{testSessionId}/vectorSets (GET)
 - /testSessions/{testSessionId}/vectorSets/{vectorSetId} (GET)
-- /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results    (GET|POST)
+- /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results (GET|POST)
 - /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected (GET)
 
-10/16/2018 NOTE: AES-CBC is the only algorithm fully tested for 0.5, other algorithms may work but they are still undergoing internal testing for conformance with the ACVP specification.
+11/02/2018: All algorithms are now available for testing in 0.5.
 
 # Accessing the demo server
 
