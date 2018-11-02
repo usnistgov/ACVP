@@ -21,7 +21,9 @@ validation of standardized algorithm test evidence to facilitate the [modernizat
 The new automated testing scope is currently planned to become available during 1QFY19 (Fall 2018). Once available this testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
 
 # Status
-The demo server (demo.acvts.nist.gov) supports ACVP, version 0.4, with full support for all algorithm testing in version 0.5, but not yet full 0.5 support (as of 11/02/2018). Development of 0.5 will continue in order to support all features described in the ACVP 0.5 specification.
+The demo server (demo.acvts.nist.gov) supports ACVP, version 0.4 and version 0.5. As of 11/02/2018, not all endpoints are available, but development of will continue in order to support all features described in the ACVP 0.5 (or 1.0) specification.
+
+Please move to 0.5 for testing as we would like to remove support for 0.4 as soon as possible.
 
 The demo server allows validation of the following NIST-approved algorithms (a superset of the algorithms available through the CAVS tool):
 
