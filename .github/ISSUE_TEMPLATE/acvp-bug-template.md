@@ -4,6 +4,9 @@ about: Use this issue template when encountering an ACVP implementation server i
 
 ---
 
+**testSessionId**
+The test session ID
+
 **vsId**
 The vectorSet ID displaying the issue
 
