@@ -180,13 +180,13 @@
             </t>
 
             <t>
-                The block cipher algorithm capabilities MUST be advertised as JSON objects within the 'algorithms'
+                The SHA3 and SHAKE capabilities MUST be advertised as JSON objects within the 'algorithms'
                 value of the ACVP registration message. The 'algorithms' value MUST be an array, where each
                 array element is an individual JSON object defined in this section. The 'algorithms'
                 value MUST be part of the 'capability_exchange' element of the ACVP JSON registration message.
                 See the ACVP Protocol Specification Section XXX for details on the registration message.
 
-                Each block cipher algorithm capability advertised SHALL be a self-contained JSON object.
+                Each SHA3 and SHAKE algorithm capability advertised SHALL be a self-contained JSON object.
             </t>
 
             <t>
@@ -194,189 +194,206 @@
   				JSON values are used for hash algorithm capabilities:
             </t>
 
-			<section anchor="hash_caps_reg" title="HASH Algorithm Capabilities Registration">
-				<texttable anchor="caps_table" title="Hash Algorithm Capabilities JSON Values" suppress-title="false" style="full">
-
+			<section anchor="hash_caps_reg" title="SHA3 and SHAKE Algorithm Capabilities Registration">
+				<texttable anchor="caps_table" title="SHA3 and SHAKE Algorithm Capabilities JSON Values" suppress-title="false" style="full">
 					<ttcol align="left">JSON Value</ttcol>
 					<ttcol align="left">Description</ttcol>
 					<ttcol align="left">JSON type</ttcol>
-					<ttcol align="left">Valid Values</ttcol>
-					<ttcol align="left">Optional</ttcol>
-
 					<c>algorithm</c>
 					<c>The hash algorithm and mode to be validated.</c>
-					<c>value</c>
-					<c>See						<xref target="supported_algs"/>
-					</c>
-					<c>No</c>
+					<c>string</c>
 
 					<c>inBit</c>
 					<c>Implementation does accept bit-oriented messages</c>
-					<c>value</c>
-					<c>true or false</c>
-					<c>No</c>
+					<c>boolean</c>
 
 					<c>inEmpty</c>
 					<c>Implementation does accept null (zero-length) messages</c>
-					<c>value</c>
-					<c>true or false</c>
-					<c>No</c>
+					<c>boolean</c>
 
 					<c>outLength</c>
 					<c>Output length for SHAKE</c>
-					<c>array</c>
-					<c>16-65536</c>
-					<c>Required for SHAKE</c>
+					<c>domain</c>
 
 					<c>outBit</c>
 					<c>SHAKE can output bit-oriented messages</c>
-					<c>value</c>
-					<c>true or false</c>
-					<c>Required for SHAKE</c>
+					<c>boolean</c>
 				</texttable>
+
+                <t>
+                    The following grid outlines which properties are REQUIRED, as well as all the possible values a server MAY support for SHA3 and SHAKE algorithms:
+                </t>
+                <texttable anchor="property_grid" title="SHA3 and SHAKE Capabilities Applicability Grid">
+                <ttcol align="left">algorithm</ttcol><ttcol align="left">inBit</ttcol><ttcol align="left">inEmpty</ttcol><ttcol align="left">outLength</ttcol><ttcol align="left">outBit</ttcol>
+                    <c>SHA3-224</c><c>true, false</c><c>true, false</c><c></c><c></c>
+                    <c>SHA3-256</c><c>true, false</c><c>true, false</c><c></c><c></c>
+                    <c>SHA3-384</c><c>true, false</c><c>true, false</c><c></c><c></c>
+                    <c>SHA3-512</c><c>true, false</c><c>true, false</c><c></c><c></c>
+                    <c>SHAKE-128</c><c>true, false</c><c>true, false</c><c>{"Min": 16, "Max": 65536, "Inc": any}</c><c>true, false</c>
+                    <c>SHAKE-256</c><c>true, false</c><c>true, false</c><c>{"Min": 16, "Max": 65536, "Inc": any}</c><c>true, false</c>
+                </texttable>
 			</section>
 		</section>
 
-
 		<section anchor="test_vectors" title="Test Vectors">
-			<t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to
-  		    	the ACVP server for validation.  A typical ACVP validation session would require multiple test vector
-  		    	sets to be downloaded and processed by the ACVP client.  Each test vector set represents an individual
-  		    	crypto algorithm, such as SHA3-224, SHA3-256, etc.  This section
-  				describes the JSON schema for a test vector set used with hash crypto algorithms.</t>
+            <t>
+                After receiving a valid registration of a cryptographic module, the ACVP server SHALL provide test vectors in the form of a prompt
+                to the ACVP client, which then SHALL be processed and returned to the ACVP server for validation.  A typical ACVP validation session would require the client to
+                download and process multiple test vector sets.  Each test vector set SHALL represent an individual
+                cryptographic algorithm, such as SHA3-256, SHA3-512, SHAKE-128.  This section
+                describes the JSON schema for a test vector set used with SHA3 and SHAKE algorithms.
+            </t>
 
-			<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire
-  				vector set as well as individual test vectors to be processed by the ACVP client.  The following table
-  				describes the JSON elements at the top level of the hierarchy.
-			</t>
-			<texttable anchor="vs_top_table" title="Vector Set JSON Object">
+            <t>
+                The test vector set JSON schema is a multi-level hierarchy that contains meta-data for the entire
+                vector set. The test vector set SHALL be comprised of test groups which SHALL subsequently contain individual test cases to be processed by the ACVP client. 
+                The following table describes the REQUIRED JSON elements at the top level of the hierarchy:
+            </t>
+			<texttable anchor="vs_top_table" title="Test Vector Set JSON Object">
 				<ttcol align="left">JSON Value</ttcol>
 				<ttcol align="left">Description</ttcol>
 				<ttcol align="left">JSON type</ttcol>
-
 				<c>acvVersion</c>
 				<c>Protocol version identifier</c>
-				<c>value</c>
+				<c>string</c>
 
 				<c>vsId</c>
 				<c>Unique numeric identifier for the vector set</c>
-				<c>value</c>
+				<c>integer</c>
 
 				<c>algorithm</c>
-				<c>The hash algorithm and mode used for the test vectors.  See					<xref target="supported_algs"/>
- for possible values.</c>
-				<c>value</c>
+				<c>The hash algorithm and mode used for the test vectors.  See <xref target="supported_algs"/> for possible values.</c>
+				<c>string</c>
 
 				<c>testGroups</c>
-				<c>Array of test group JSON objects, which are defined in					<xref target="tgjs"/>
-				</c>
-				<c>array</c>
+				<c>Array of test group JSON objects, which are defined in <xref target="tgjs"/></c>
+				<c>array of testGroup objects</c>
 			</texttable>
 
-			<section title="Test Groups JSON Schema" anchor="tgjs">
-				<t>The testGroups element at the top level in the test vector JSON object is an array of test
-  					groups.  Test vectors are grouped into similar test cases to reduce the amount of data transmitted
-  		        	in the vector set.  The Test Group JSON object contains meta data that applies to all test vectors within
-  		        	the group.  The following table describes the secure hash JSON elements of the Test Group JSON object.</t>
-
+			<section title="Test Groups" anchor="tgjs">
+                <t>
+                    Test vector sets MUST contain one or many test groups, each sharing similar properties.
+                    For instance, all test vectors that use the same key size would be grouped
+                    together.  The testGroups element at the top level of the test vector JSON object SHALL be the array of test
+                    groups.  The Test Group JSON object MUST contain meta-data that applies to all test cases within
+                    the group.  The following table describes the JSON elements that MUST appear from the server in the Test Group JSON object:
+                </t>
 				<texttable anchor="vs_tg_table" title="Test Group JSON Object">
 					<ttcol align="left">JSON Value</ttcol>
 					<ttcol align="left">Description</ttcol>
 					<ttcol align="left">JSON type</ttcol>
-					<ttcol align="left">Optional</ttcol>
+                    <c>tgId</c>
+                    <c>Numeric identifier for the test group, unique across the entire vector set.</c>
+                    <c>integer</c>
 
 					<c>testType</c>
-					<c>Test category type. For Algorithm Functional Tests (also known as short and long message): 'AFT'. Or for Monte Carlo: 'MCT'. An option for SHAKE only is 'VOT' for Variable Output Test.</c>
+					<c>Test category type. AFT, MCT or VOT as defined in <xref target="testtypes"/></c>
 					<c>value</c>
-					<c>No</c>
 
 					<c>tests</c>
-					<c>Array of individual test case JSON objects, which are defined in						<xref target="tcjs"/>
-					</c>
-					<c>array</c>
-					<c>No</c>
-
-					<c>inBit</c>
-					<c>States that each test case in the group is bit-oriented</c>
-					<c>true or false</c>
-					<c>No</c>
-
-					<c>inEmpty</c>
-					<c>States that the empty message is included in the group</c>
-					<c>true or false</c>
-					<c>No for Algorithm Functional Tests. Yes for all others.</c>
+					<c>Array of individual test case JSON objects, which are defined in	<xref target="tcjs"/></c>
+					<c>array of testCase objects</c>
 				</texttable>
 			</section>
 
 			<section title="Test Case JSON Schema" anchor="tcjs">
-				<t>Each test group contains an array of one or more test cases.  Each test case is a JSON object
-  					that represents a single test vector to be processed by the ACVP client.  The following table describes
-  		    		the JSON elements for each secure hash test vector for the listed algorithms in					<xref target="supported_algs"/>
-.</t>
+                <t>
+                    Each test group SHALL contain an array of one or more test cases.  Each test case is a JSON object
+                    that represents a single case to be processed by the ACVP client.  The following table describes
+                    the JSON elements for each test case.
+                </t>
 
 				<texttable anchor="vs_tc_table" title="Test Case JSON Object">
 					<ttcol align="left">JSON Value</ttcol>
 					<ttcol align="left">Description</ttcol>
 					<ttcol align="left">JSON type</ttcol>
-					<ttcol align="left">Optional</ttcol>
-
 					<c>tcId</c>
 					<c>Numeric identifier for the test case, unique across the entire vector set.</c>
-					<c>value</c>
-					<c>No</c>
+					<c>integer</c>
 
 					<c>len</c>
 					<c>Length of the message or seed</c>
-					<c>value</c>
-					<c>No</c>
+					<c>integer</c>
 
 					<c>outLen</c>
 					<c>Length of the digest</c>
-					<c>16-65536</c>
-					<c>Required for SHAKE</c>
+					<c>integer</c>
 
 					<c>msg</c>
 					<c>Value of the message or seed.  Messages are represented as little-endian hex for all SHA3 variations.</c>
-					<c>value</c>
-					<c>No</c>
-
-					<c>md</c>
-					<c>Hash value generated</c>
-					<c>value</c>
-					<c>Yes</c>
+					<c>string (hex)</c>
 				</texttable>
+                <t>
+                    Note: All properties listed in the above table are REQUIRED except for outLen which is only REQUIRED when the algorithm is SHAKE-128 or SHAKE-256.
+                </t>
 			</section>
 
 			<section anchor="vector_responses" title="Test Vector Responses">
-				<t>After the ACVP client downloads and processes a vector set, it must send the response vectors
-  					back to the ACVP server.  The following table describes the JSON object that represents a vector set response.</t>
-
+                <t>
+                    After the ACVP client downloads and processes a vector set, it SHALL send the response vectors
+                    back to the ACVP server within the alloted timeframe. The following table describes the JSON object that represents a vector set response.
+                </t>
 				<texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
 					<ttcol align="left">JSON Value</ttcol>
 					<ttcol align="left">Description</ttcol>
 					<ttcol align="left">JSON type</ttcol>
-
 					<c>acvVersion</c>
 					<c>Protocol version identifier</c>
-					<c>value</c>
+					<c>string</c>
 
 					<c>vsId</c>
 					<c>Unique numeric identifier for the vector set</c>
-					<c>value</c>
+					<c>integer</c>
 
-					<c>testResults</c>
-					<c>Array of JSON objects that represent each test vector result, which uses the same
-  		      			JSON schema as defined in						<xref target="tcjs"/>
-					</c>
-					<c>array</c>
-					<c/>
-					<c/>
-					<c/>
-
-					<c>resultsArray</c>
-					<c>Array of JSON objects that represent each iteration of a Monte Carlo Test.  Each iteration will contain an md value.</c>
-					<c>array</c>
+					<c>testGroups</c>
+					<c>Array of JSON objects that represent each test vector result, which uses the same JSON schema as defined in <xref target="tcjs"/></c>
+					<c>array of testGroup objects</c>
 				</texttable>
+
+                <t>
+                    The testGroup Response section is used to organize the ACVP client response in a similar manner
+                    to how it receives vectors.  Several algorithms SHALL require the client to send back group
+                    level properties in its response.  This structure helps accommodate that.
+                </t>
+
+                <texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <c>tgId</c>
+                    <c>The test group identifier</c>
+                    <c>integer</c>
+
+                    <c>tests</c>
+                    <c>The tests associated to the group specified in tgId</c>
+                    <c>array of testCase objects</c>
+                </texttable>
+
+                <t>
+                    Each test case is a JSON object that represents a single test object to be processed by the ACVP client.
+                    The following table describes the JSON elements for each test case object.
+                </t>
+
+                <texttable anchor="vs_tr_table" title="Test Case Results JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+
+                    <c>tcId</c>
+                    <c>Numeric identifier for the test case, unique across the entire vector set.</c>
+                    <c>integer</c>
+
+                    <c>md</c>
+                    <c>The IUT's digest response to a VOT or AFT</c>
+                    <c>string (hex)</c>
+
+                    <c>resultsArray</c>
+                    <c>Array of JSON objects that represent each iteration of a Monte Carlo Test. Each iteration will contain the msg and md (and outLen for SHAKE-128 and SHAKE-256)</c>
+                    <c>array of objects containing msg, md (and potentially outLen)</c>
+                </texttable>
+                <t>
+                    Note: The tcId MUST be included in every test case object sent between the client and the server.
+                </t>
 			</section>
 
 			<!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
@@ -388,7 +405,7 @@
 			<!-- Possibly a 'Contributors' section ... -->
 
 			<section anchor="IANA" title="IANA Considerations">
-				<t>This memo includes no request to IANA.</t>
+                <t>This memo include requests to IANA to join draft XXX.</t>
 			</section>
 
 			<section anchor="Security" title="Security Considerations">
@@ -465,26 +482,28 @@
 			<figure>
 				<artwork>
 					<![CDATA[
-   [
-      { "acvVersion": <acvp-version> },
-      { "vsId": 1564,
-  	"algorithm": "SHA3-512",
-  	"testGroups": [
-  	{
-  		"testType": "AFT",
-  		"tests": [
-  		{
-  			"tcId": 0,
-  			"len": 0,
-  			"msg": "00"
-  		},
-  		{
-  			"tcId": 1,
-  			"len": 1,
-  			"msg": "01"
-  		}]
-  	}]
-     }]
+[
+    { "acvVersion": <acvp-version> },
+    { 
+        "vsId": 1564,
+  	    "algorithm": "SHA3-512",
+  	    "testGroups": [
+  	    {
+            "tgId": 1,
+    		"testType": "AFT",
+    		"tests": [
+    		{
+    			"tcId": 1,
+    			"len": 0,
+    			"msg": "00"
+    		},
+    		{
+    			"tcId": 2,
+    			"len": 1,
+    			"msg": "01"
+    		}]
+    	}]
+    }
 ]]>
 				</artwork>
 			</figure>
@@ -492,26 +511,28 @@
 			<figure>
 				<artwork>
 					<![CDATA[
-   [
-      { "acvVersion": <acvp-version> },
-      { "vsId": 1564,
-  	"algorithm": "SHA3-256",
-  	"testGroups": [
-    {
-      	"testType": "AFT",
-      	"tests": [
+[
+    { "acvVersion": <acvp-version> },
+    { 
+        "vsId": 1564,
+        "algorithm": "SHA3-256",
+        "testGroups": [
         {
-          	"tcId": 2170,
-          	"len": 1304,
-          	"msg": "7f65733c73c6d9b06838ca3fd3f0fed4c642c58bba59ed0c8b2ae618c4aa24611d3fc59f427574e0d6f38d1fb8ad8119855b7d5c5e2946a1ebb0685b9f258f903ed035e89dc07d04aabe5f10ab7f069ccb1e76a7d2c972fd34ba9dc44d68df51ebff0a400d0ebec3ea808a3a35ce5304a073fa959f9f39c96e2fce7855dddc4b2bb48ece19c8fdc6a02354c4dd0232fa0c424f4e4c1563ada1f943a23feb4d2706d707"
-        },
-        {
-          	"tcId": 2171,
-          	"len": 2096,
-          	"msg": "e2c3b1a24fbc47a05acbc950e3a32baa968ea1e2610fb2322bc68ed9c395a1641601682ca6db8420371f0dc4cb1c287ad1d5dc019aa8213b0c2d3a339a61455e74041121fa3f2f94778a4c860ccdbec1eac55c8ec4aa937c850fb65e3e0996936293538a3531718482d42e9c8cfe13054826ca94c95e2f7efc33a96295d5bb8a4978d66e3ef97279c0c55d1035f752d153c0cd18900c1ec8da62bc48890cddcb927943d5fddf59fb99247eeaeeffa1aa735b0e2401fc87e28864971701f823dfa35f42c75a2b4f9075bb3c309e5f281a10be34bf047593556c01e1d7e4dfb64de6f17a4d3d247bc2bc503cec2f6011a892b2e8f281c16aa8f00143901c0abd9dc1f9946e8e13"
+            "tgId": 1,
+            "testType": "AFT",
+            "tests": [
+            {
+                "tcId": 2170,
+                "len": 1304,
+                "msg": "7f65733c73c6d9b06838ca3fd3f0fed4c642c58bba59ed0c8b2ae618c4aa24611d3fc59f427574e0d6f38d1fb8ad8119855b7d5c5e2946a1ebb0685b9f258f903ed035e89dc07d04aabe5f10ab7f069ccb1e76a7d2c972fd34ba9dc44d68df51ebff0a400d0ebec3ea808a3a35ce5304a073fa959f9f39c96e2fce7855dddc4b2bb48ece19c8fdc6a02354c4dd0232fa0c424f4e4c1563ada1f943a23feb4d2706d707"
+            },
+            {
+                "tcId": 2171,
+                "len": 2096,
+                "msg": "e2c3b1a24fbc47a05acbc950e3a32baa968ea1e2610fb2322bc68ed9c395a1641601682ca6db8420371f0dc4cb1c287ad1d5dc019aa8213b0c2d3a339a61455e74041121fa3f2f94778a4c860ccdbec1eac55c8ec4aa937c850fb65e3e0996936293538a3531718482d42e9c8cfe13054826ca94c95e2f7efc33a96295d5bb8a4978d66e3ef97279c0c55d1035f752d153c0cd18900c1ec8da62bc48890cddcb927943d5fddf59fb99247eeaeeffa1aa735b0e2401fc87e28864971701f823dfa35f42c75a2b4f9075bb3c309e5f281a10be34bf047593556c01e1d7e4dfb64de6f17a4d3d247bc2bc503cec2f6011a892b2e8f281c16aa8f00143901c0abd9dc1f9946e8e13"
+            }]
         }]
-     }]
-  }]
+    }
 ]]>
 				</artwork>
 			</figure>
@@ -520,20 +541,22 @@
 				<artwork>
 					<![CDATA[
 [
-  { "acvVersion": <acvp-version> },
-  { "vsId": 1564,
-    "algorithm": "SHA3-384",
-    "testGroups": [
-    {
-        "testType": "MCT",
-        "tests": [
+    { "acvVersion": <acvp-version> },
+    { 
+        "vsId": 1564,
+        "algorithm": "SHA3-384",
+        "testGroups": [
         {
-            "tcId": 2175,
-            "len": 384,
-            "msg": "30850bd984b14ff5aff18993329268f45785a43cc5a837d45248c90d18e36c06cb3289cf4a661ace73b31a623c0b3ac7",
+            "tgId": 2,
+            "testType": "MCT",
+            "tests": [
+            {
+                "tcId": 2175,
+                "len": 384,
+                "msg": "30850bd984b14ff5aff18993329268f45785a43cc5a837d45248c90d18e36c06cb3289cf4a661ace73b31a623c0b3ac7",
+            }]
         }]
-     }]
-  }]
+    }
 ]]>
 				</artwork>
 			</figure>
@@ -545,18 +568,20 @@
 				<artwork>
 					<![CDATA[
 [
-  { "acvVersion": <acvp-version> },
-  { "vsId": 1564,
-    "testResults": [
-    {
-        "tcId": 2170,
-        "md": "7115011d389f379798455039d5da962a077d1620d52d7e983af9b49e3c4283f3"
-    },
-    {
-        "tcId": 2171,
-        "md": "79820a5256eb1371cf8bc94fa17eaedc25aa5d28ae8706cbf77b9a6e3a79acd5"
-     }]
-  }]
+    { "acvVersion": <acvp-version> },
+    { 
+        "vsId": 1564,
+        "testGroups": [
+        {
+            "tgId": 2,
+            "tests": [
+                {
+                    "tcId": 2175,
+                    "md": "CE2372967F76F2A6A41C3BF115BEBF6ECA3F63269579F6FC25861B64"
+                }
+            ]
+        }]
+    }
 ]]>
 				</artwork>
 			</figure>
@@ -565,17 +590,29 @@
 				<artwork>
 					<![CDATA[
 [
-  { "acvVersion": <acvp-version> },
-  { "vsId": 1564,
-    "testResults": [
-    {
-        "tcId": 2175,
-		"resultsArray": [
-  			"md": "682d83f6d59bac119ade78ec06e0cd01ff504692fe1a8e5652313014a7ca17255e86b86093d90a868cc3a6a472304ebb",
-  			"md": "5cd9aaaba53392ad22df6ee42d5f22f3475416b52b85d61ccd4c59d34ecc07bd8973a4e3868cb324772c895f5184cc55"
-  		]
-     }]
-  }]
+    { "acvVersion": <acvp-version> },
+    { 
+        "vsId": 1564,
+        "testGroups": [
+        {
+            "tgId": 2,
+            "tests": [
+                {
+                    "tcId": 1254,
+                    "resultsArray": [
+                        {
+                            "msg": "DAE0367015D3019BE3B2A35B9699D22D4D0B81D453EFD32724C149EE",
+                            "md": "CE2372967F76F2A6A41C3BF115BEBF6ECA3F63269579F6FC25861B64"
+                        },
+                        {
+                            "msg": "CE2372967F76F2A6A41C3BF115BEBF6ECA3F63269579F6FC25861B64",
+                            "md": "A811B806FE4811B9CC822D7149F7BAC76EF3FA6A40863A865440E244"
+                        }
+                    ]
+                }
+            ]
+        }]
+    }
 ]]>
 				</artwork>
 			</figure>
@@ -587,27 +624,29 @@
 				<artwork>
 					<![CDATA[
 [
-      { "acvVersion": <acvp-version> },
-      { "vsId": 1564,
-  	"algorithm": "SHAKE-128",
-  	"testGroups": [
-    {
-      	"testType": "VOT",
-      	"tests": [
+    { "acvVersion": <acvp-version> },
+    { 
+        "vsId": 1564,
+        "algorithm": "SHAKE-128",
+        "testGroups": [
         {
-          	"tcId": 3456,
-          	"inputLen": 128,
-          	"msg": "7a4c48eb710299e4ff2be3f446327a6f",
-          	"outputLen": 16
-        },
-        {
-          	"tcId": 3457,
-          	"inputLen": 128,
-          	"msg": "b16f331b3a0cf4507124b4358f9d15f5",
-          	"outputLen": 144
+            "tgId": 1,
+            "testType": "VOT",
+            "tests": [
+            {
+                "tcId": 3456,
+                "len": 128,
+                "msg": "7a4c48eb710299e4ff2be3f446327a6f",
+                "outputLen": 16
+            },
+            {
+                "tcId": 3457,
+                "len": 128,
+                "msg": "b16f331b3a0cf4507124b4358f9d15f5",
+                "outputLen": 144
+            }]
         }]
-     }]
-  }]
+    }
 ]]>
 				</artwork>
 			</figure>
@@ -616,20 +655,26 @@
 				<artwork>
 					<![CDATA[
 [
-  { "acvVersion": <acvp-version> },
-  { "vsId": 1564,
-    "testResults": [
-    {
-        "tcId": 2170,
-        "outputLen": 16
-        "md": "c604"
-    },
-    {
-        "tcId": 2171,
-        "outputLen": 144
-        "md": "cfc6ed48bb2e61e0a48222d34a424ce9fdbe"
-    }]
-  }]
+    { "acvVersion": <acvp-version> },
+    { 
+        "vsId": 1564,
+        "testGroups": [
+        {
+            "tgId": 1,
+            "tests": [
+                {
+                    "tcId": 2170,
+                    "outputLen": 16
+                    "md": "c604"
+                },
+                {
+                    "tcId": 2171,
+                    "outputLen": 144
+                    "md": "cfc6ed48bb2e61e0a48222d34a424ce9fdbe"
+                }
+            ]
+        }]
+    }
 ]]>
 				</artwork>
 			</figure>
