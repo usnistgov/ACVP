@@ -13,11 +13,11 @@ Expires: January 2, 2019
 
 Abstract
 
-   This document defines the IANA registry for supported cryptographic
-   algorithm test specifications in the Automated Cryptographic
-   Validation Protocol (ACVP) [acvp].  This document also shows how to
-   extend the capabilities of ACVP with testing for new cryptographic
-   algorithms.
+   This document defines a set of IANA registries for supported
+   cryptographic algorithm test specifications in the Automated
+   Cryptographic Validation Protocol (ACVP) [acvp].  This document also
+   shows how to extend the capabilities of ACVP with testing for new
+   cryptographic algorithms.
 
 Status of This Memo
 
@@ -61,24 +61,16 @@ Internet-Draft                  ACVP-IANA                      July 2018
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
-   2.  Registry hierarchy  . . . . . . . . . . . . . . . . . . . . .   3
-     2.1.  Algorithm types . . . . . . . . . . . . . . . . . . . . .   3
-       2.1.1.  Block cipher types  . . . . . . . . . . . . . . . . .   3
-       2.1.2.  Digital signature types . . . . . . . . . . . . . . .   3
-       2.1.3.  Secure hash types . . . . . . . . . . . . . . . . . .   4
-       2.1.4.  Deterministic random bit generator types  . . . . . .   4
-     2.2.  Algorithm registry  . . . . . . . . . . . . . . . . . . .   5
-   3.  Aligning with RFC 8126  . . . . . . . . . . . . . . . . . . .   5
-   4.  Adding a new algorithm to an existing class . . . . . . . . .   6
-     4.1.  Adding a new algorithm with existing test types . . . . .   6
-     4.2.  Adding a new test type to a new or existing algorithm . .   6
-   5.  Adding a new algorithm to a new class . . . . . . . . . . . .   7
-   6.  Requirements Language . . . . . . . . . . . . . . . . . . . .   7
-   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
-   10. Normative References  . . . . . . . . . . . . . . . . . . . .   7
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
+   2.  IANA namespaces . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Algorithm registry  . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Requirements Language . . . . . . . . . . . . . . . . . . . .   4
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   5
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
+     6.1.  ACVP URN Sub-namespace  . . . . . . . . . . . . . . . . .   5
+     6.2.  ACVP URN Parameters . . . . . . . . . . . . . . . . . . .   5
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
 
 1.  Introduction
 
@@ -99,12 +91,20 @@ Table of Contents
    provides the binding between the protocol and the supported algorithm
    test extensions.
 
-   This document also outlines the procedure for adding support for
-   testing a new cryptographic algorithm, including hints for how to
-   develop the testing methodology and the corresponding JSON constructs
-   for performing the validation with ACVP.
+2.  IANA namespaces
 
+   There are three namespaces envisioned for extensions to the ACVP:
 
+   o  ACVP - the approved algorithms for testing with one or more
+      validation authorities
+
+   o  EXPERIMENTAL - candidate algorithms for approval.
+
+   o  LOCAL - locally supported algorithms, not guaranteed for
+      interoperability.  Algorithms in this namespace cannot be
+      registered with IANA.
+
+   TBD
 
 
 
@@ -114,54 +114,54 @@ Vassilev                 Expires January 2, 2019                [Page 2]
 Internet-Draft                  ACVP-IANA                      July 2018
 
 
-2.  Registry hierarchy
+3.  Algorithm registry
 
-   The IANA registry for ACVP is based on the high-level taxonomy of
-   supported algorithm classes shown below.
+   Each entry in the algorithm registry must record the following
+   fields:
 
-                    +-------------------------+------+
-                    | Algorithm class         | Code |
-                    +-------------------------+------+
-                    | Symmetric block ciphers | 0x01 |
-                    | Digital signature       | 0x02 |
-                    | Hash                    | 0x03 |
-                    | XOF                     | 0x04 |
-                    | MAC                     | 0x05 |
-                    | DRBG                    | 0x06 |
-                    | KAS                     | 0x07 |
-                    | KDF                     | 0x08 |
-                    +-------------------------+------+
+   o  Name: a URN segment that conforms to the pattern
+      {namespace}-{algorithm}. The keywords are defined as follows:
 
-                     Table 1: Algorithm class taxonomy
+      *  {namespace}: one of the options from Section 2.
 
-2.1.  Algorithm types
+      *  {algorithm}: A required US-ASCII string that conforms to the
+         URN syntax requirements (see [RFC8141]).  This string must be
+         unique within the corresponding namespace.
 
-   Each algorithm class may contain two or more different types of
-   algorithms, each type with some characteristic feature distinguishing
-   it from the other algorithm types in the same class.
+   o  Reference: A static link to the specification and section where
+      the definition of the parameter can be found.
 
-2.1.1.  Block cipher types
-
-   The types of different symmetric block ciphers are shown in Table 2
-   below.
-
-     +--------------------------------+------+------+---------------+
-     | Type                           | Name | Code | Rec'd for use |
-     +--------------------------------+------+------+---------------+
-     | 128-bit symmetric block cipher | AES  | 0x01 |      Yes      |
-     | 64-bit symmetric block cipher  | TDES | 0x02 |     Yes--     |
-     +--------------------------------+------+------+---------------+
-
-   -- several restrictions on TDES exist to ensure secure use under the
-    growing threats of recent attacks.  For specific guidance see TBD.
-
-                        Table 2: Block Cipher Types
-
-2.1.2.  Digital signature types
-
-   The types of different digital signature algorithms are shown in
-   Table 3 below.
-
+              +--------------------------+-----------------+
+              | Name                     |    Reference    |
+              +--------------------------+-----------------+
+              | "ACVP-AES-ECB"           | [sub-symmetric] |
+              | "ACVP-AES-CBC"           | [sub-symmetric] |
+              | "ACVP-AES-OFB"           | [sub-symmetric] |
+              | "ACVP-AES-CFB1"          | [sub-symmetric] |
+              | "ACVP-AES-CFB8"          | [sub-symmetric] |
+              | "ACVP-AES-CFB128"        | [sub-symmetric] |
+              | "ACVP-AES-CTR"           | [sub-symmetric] |
+              | "ACVP-AES-GCM"           | [sub-symmetric] |
+              | "ACVP-AES-CCM"           | [sub-symmetric] |
+              | "ACVP-AES-XPN"           | [sub-symmetric] |
+              | "ACVP-AES-CMAC"          | [sub-symmetric] |
+              | "ACVP-AES-GMAC"          | [sub-symmetric] |
+              | "ACVP-AES-KW"            | [sub-symmetric] |
+              | "ACVP-AES-KWP"           | [sub-symmetric] |
+              | "ACVP-AES-XTS"           | [sub-symmetric] |
+              | "ACVP-TDES-ECB"          | [sub-symmetric] |
+              | "ACVP-TDES-CBC"          | [sub-symmetric] |
+              | "ACVP-TDES-OFB"          | [sub-symmetric] |
+              | "ACVP-TDES-CFB1"         | [sub-symmetric] |
+              | "ACVP-TDES-CFB8"         | [sub-symmetric] |
+              | "ACVP-TDES-CFB64"        | [sub-symmetric] |
+              | "ACVP-TDES-CTR"          | [sub-symmetric] |
+              | "ACVP-TDES-KW"           | [sub-symmetric] |
+              | "ACVP-SHA-1"             |       TBD       |
+              | "ACVP-SHA2-224"          |       TBD       |
+              | "ACVP-SHA2-256"          |       TBD       |
+              | "ACVP-SHA2-384"          |       TBD       |
+              | "ACVP-SHA2-512"          |       TBD       |
 
 
 
@@ -170,52 +170,52 @@ Vassilev                 Expires January 2, 2019                [Page 3]
 Internet-Draft                  ACVP-IANA                      July 2018
 
 
-   +--------------------------+----------------------+------+----------+
-   | Type                     |         Name         | Code |  Rec'd   |
-   |                          |                      |      | for use  |
-   +--------------------------+----------------------+------+----------+
-   | Discrete Log             |     Finite Field     | 0x01 |   Yes    |
-   | Cryptography (DLC)       |  Cryptography (FFC)  |      |          |
-   |                          |                      |      |          |
-   | DLC                      |    Elliptic Curve    | 0x02 |   Yes    |
-   |                          |  Cryptography (ECC)  |      |          |
-   |                          |                      |      |          |
-   | Integer Factorization    |         n/a          | 0x03 |   Yes    |
-   | Cryptography (IFC)       |                      |      |          |
-   +--------------------------+----------------------+------+----------+
+              | "ACVP-SHA2-512/224"      |       TBD       |
+              | "ACVP-SHA2-512/256"      |       TBD       |
+              | "ACVP-SHA3-224"          |       TBD       |
+              | "ACVP-SHA3-256"          |       TBD       |
+              | "ACVP-SHA3-384"          |       TBD       |
+              | "ACVP-SHA3-512"          |       TBD       |
+              | "ACVP-SHAKE128"          |       TBD       |
+              | "ACVP-SHAKE256"          |       TBD       |
+              | "ACVP-DSA"               |    [sub-dsa]    |
+              | "ACVP-RSA"               |    [sub-rsa]    |
+              | "ACVP-ECDSA"             |   [sub-ecdsa]   |
+              | "ACVP-RSA"               |    [sub-rsa]    |
+              | "ACVP-CMAC-AES"          |       TBD       |
+              | "ACVP-CMAC-TDES"         |       TBD       |
+              | "ACVP-HMAC-SHA-1"        |       TBD       |
+              | "ACVP-HMAC-SHA2-224"     |       TBD       |
+              | "ACVP-HMAC-SHA2-256"     |       TBD       |
+              | "ACVP-HMAC-SHA2-384"     |       TBD       |
+              | "ACVP-HMAC-SHA2-512"     |       TBD       |
+              | "ACVP-HMAC-SHA2-512/224" |       TBD       |
+              | "ACVP-HMAC-SHA2-512/256" |       TBD       |
+              | "ACVP-HMAC-SHA3-224"     |       TBD       |
+              | "ACVP-HMAC-SHA3-256"     |       TBD       |
+              | "ACVP-HMAC-SHA3-384"     |       TBD       |
+              | "ACVP-HMAC-SHA3-512"     |       TBD       |
+              | "ACVP-hashDRBG"          |       TBD       |
+              | "ACVP-hmacDRBG"          |       TBD       |
+              | "ACVP-ctrDRBG"           |       TBD       |
+              | "ACVP-KAS-ECC"           |       TBD       |
+              | "ACVP-KAS-FFC"           |       TBD       |
+              | "ACVP-KDF"               |       TBD       |
+              | "ACVP-kdf-components"    |       TBD       |
+              | "ACVP-TPM"               |       TBD       |
+              | "EXPERIMENTAL-AES-SIV"   |       TBD       |
+              | "EXPERIMENTAL-EDDSA"     |       TBD       |
+              +--------------------------+-----------------+
 
-                     Table 3: Digital Signature Types
+                        Table 1: Algorithm registry
 
-2.1.3.  Secure hash types
+4.  Requirements Language
 
-   The secure hash types are shown in Table 4 below.
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119].
 
-   +------------------------------+--------------+------+--------------+
-   | Type                         |     Name     | Code |  Rec'd for   |
-   |                              |              |      |     use      |
-   +------------------------------+--------------+------+--------------+
-   | Fixed length output          |    SHA-1     | 0x01 |     No++     |
-   |                              |    SHA-2     | 0x02 |     Yes      |
-   |                              |    SHA-3     | 0x03 |     Yes      |
-   |                              |              |      |              |
-   | Variable length output       |  TupleHash   | 0x04 |     Yes      |
-   |                              |    cSHAKE    | 0x05 |     Yes      |
-   |                              |     KMAC     | 0x06 |     Yes      |
-   |                              | ParallelHash | 0x07 |     Yes      |
-   |                              |              |      |              |
-   | Extendable output functions  |    SHAKE     | 0x08 |     Yes      |
-   | (XoF)                        |              |      |              |
-   +------------------------------+--------------+------+--------------+
 
-   ++ SHA-1 may be used in some limited cases such as to verify existing
-            old digital signatures.  See TBD for more details.
-
-                        Table 4: Secure Hash Types
-
-2.1.4.  Deterministic random bit generator types
-
-   The deterministic random bit generator (DRBG) types are shown in
-   Table 5 below.
 
 
 
@@ -226,53 +226,53 @@ Vassilev                 Expires January 2, 2019                [Page 4]
 Internet-Draft                  ACVP-IANA                      July 2018
 
 
-              +---------------+------+------+---------------+
-              | Type          | Name | Code | Rec'd for use |
-              +---------------+------+------+---------------+
-              | Counter-based | n/a  | 0x01 |      Yes      |
-              | Hash-based    | n/a  | 0x02 |      Yes      |
-              | HMAC-based    | n/a  | 0x03 |      Yes      |
-              +---------------+------+------+---------------+
+5.  Acknowledgements
 
-                            Table 5: DRBG Types
+   Many thanks to David Waltermire for his helpful comments to get us
+   started on the right path.
 
-2.2.  Algorithm registry
+6.  IANA Considerations
 
-   +------------------+------------------+-----------+-----------------+
-   | Supported        |       Code       | Rec'd for |    Reference    |
-   | algorithms       | {class,type,id}  |    use    |                 |
-   +------------------+------------------+-----------+-----------------+
-   | ACVP_AES_ECB     | {0x01,0x01,0x01} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_CBC     | {0x01,0x01,0x02} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_OFB     | {0x01,0x01,0x03} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_CFB1    | {0x01,0x01,0x04} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_CFB8    | {0x01,0x01,0x05} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_CFB128  | {0x01,0x01,0x06} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_CTR     | {0x01,0x01,0x07} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_GCM     | {0x01,0x01,0x08} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_CCM     | {0x01,0x01,0x09} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_XPN     | {0x01,0x01,0x0A} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_CMAC    | {0x01,0x01,0x0B} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_GMAC    | {0x01,0x01,0x0C} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_KW      | {0x01,0x01,0x0D} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_KWP     | {0x01,0x01,0x0E} |    Yes    | [sub-symmetric] |
-   | ACVP_AES_XTS     | {0x01,0x01,0x0F} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_ECB    | {0x01,0x02,0x01} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_CBC    | {0x01,0x02,0x02} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_OFB    | {0x01,0x02,0x03} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_CFB1   | {0x01,0x02,0x04} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_CFB8   | {0x01,0x02,0x05} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_CFB64  | {0x01,0x02,0x06} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_CTR    | {0x01,0x02,0x07} |    Yes    | [sub-symmetric] |
-   | ACVP_TDES_TKW    | {0x01,0x02,0x08} |    Yes    | [sub-symmetric] |
-   +------------------+------------------+-----------+-----------------+
+   This memo includes several requests to IANA.
 
-                        Table 6: Algorithm registry
+6.1.  ACVP URN Sub-namespace
 
-3.  Aligning with RFC 8126
+   IANA should add an entry to the "IETF URN Sub-namespace for
+   Registered Protocol Parameter Identifiers" registry located at
+   https://www.iana.org/assignments/params/ as per [RFC3553].
 
-   IANA registries require specific registry policy for changing and
-   adding to a registry - see [RFC8126].  To align with this standard,
+   The entry should be as follows:
+
+      Registered Parameter Identifier: ACVP
+
+      Specification: this document
+
+      Repository: ACVP URN Parameters (see Section 6.2)
+
+6.2.  ACVP URN Parameters
+
+   A new top-level registry should be created, titled "Automated
+   Cryptographic Validation Protocol (ACVP) URN Parameters".
+
+   Registration in the "ACVP URN Parameters" registry is via the
+   Specification Required policy [RFC8126].  Registration requests must
+   be sent to both the ACVP Working Group mailing list (acvp@ietf.org)
+   and IANA.  IANA will forward registration requests to the Designated
+   Expert.
+
+   Each entry in this subregistry must record the following fields:
+
+      Name: A URN segment that adheres to the pattern {label}. A
+      required US-ASCII string that conforms to the URN syntax
+      requirements (see [RFC8141]).  This string must be unique within
+      the entire subregistry and constructed according to the
+      specification in Section 3.  Note: entries from the namespace
+      "LOCAL" shall be forbidden from this table.
+
+      Reference: A static link to the specification and section where
+      the definition of the parameter can be found.
+
+   This repository SHALL have as initial values the entries in Table 1.
 
 
 
@@ -282,54 +282,54 @@ Vassilev                 Expires January 2, 2019                [Page 5]
 Internet-Draft                  ACVP-IANA                      July 2018
 
 
-   all changes to this registry are subject to "Expert Review" unless
-   otherwise specified.
+7.  Security Considerations
 
-4.  Adding a new algorithm to an existing class
+   Security considerations are addressed by the ACVP specification.
 
-   To add testing for a new algorithm first confirm that the class the
-   new algorithm belongs to exists within the taxonomy in Section 2.
-   This is subject to "Specification Required" - see [RFC8126]
+8.  Normative References
 
-4.1.  Adding a new algorithm with existing test types
+   [acvp]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", 2018,
+              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
+              draft-fussell-acvp-spec-00.txt>.
 
-   If it belongs to an already-suppoted class, check if it is similar to
-   some of the already supported algorithms from that class.  Typically,
-   the algorithms in a given class share similar testing methodology.
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
 
-   For example, the testing of symmetric block ciphers is comprised of
-   two test types: Algorithm Functional Tests and Monte Carlo Tests -
-   see [sub-symmetric].
+   [RFC3553]  Mealling, M., Masinter, L., Hardie, T., and G. Klyne, "An
+              IETF URN Sub-namespace for Registered Protocol
+              Parameters", BCP 73, RFC 3553, DOI 10.17487/RFC3553, June
+              2003, <https://www.rfc-editor.org/info/rfc3553>.
 
-   Assuming that the existing test types provide sufficient test
-   coverage for the new algorithm, one needs to add the new block cipher
-   algorithm to the symmertic block cipher specification
-   [sub-symmetric], including the JSON schemas for the corresponding
-   test data exchanges between the validation server and the client.
-   See in particular Section "Adding new algorithms" in the
-   corresponding algorithm specification.
+   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+              Writing an IANA Considerations Section in RFCs", BCP 26,
+              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+              <https://www.rfc-editor.org/info/rfc8126>.
 
-   Next, depending on the block size of the new cipher, one may need to
-   create a new entry in Table 2.  Lastly, one needs to create an entry
-   in Table 6 with the proper algorithm class and type and a new unique
-   identifier.  Note that this action is subject to a "Specification
-   required" policy - see [RFC8126] for details.
+   [RFC8141]  Saint-Andre, P. and J. Klensin, "Uniform Resource Names
+              (URNs)", RFC 8141, DOI 10.17487/RFC8141, April 2017,
+              <https://www.rfc-editor.org/info/rfc8141>.
 
-   Once this is completed and the corresponding server test generation
-   and validation for that algorithm is implemented, testing can
-   commence.  Clients implementing that algorithm may register it for
-   testing as described in Section "Capabilities Registration" in
-   [sub-symmetric], process the test vectors generated by the validation
-   server and return the results for validation.
+   [sub-dsa]  Fussell, B., "ACVP DSA Algorithm JSON Specification",
+              2018,
+              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
+              acvp_sub_dsa.txt>.
 
-4.2.  Adding a new test type to a new or existing algorithm
+   [sub-ecdsa]
+              Fussell, B., "ACVP ECDSA Algorithm JSON Specification",
+              2018,
+              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
+              acvp_sub_ecdsa.txt>.
 
-   If the available test types for an algorithm, existing or new, in a
-   given class do not provide good test coverage of the algorithm, one
-   could develop a new test type and incorporate it into the
-   corresponding test specification for the existing class.  See for
-   example Section "Adding new algorithms" in [sub-symmetric] for how to
-   add a new test type.  Note that this action would require
+   [sub-rsa]  Vassilev, A., "ACVP RSA Algorithm JSON Specification",
+              2018,
+              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
+              acvp_sub_ecdsa.txt>.
+
+
+
 
 
 
@@ -337,72 +337,6 @@ Vassilev                 Expires January 2, 2019                [Page 6]
 
 Internet-Draft                  ACVP-IANA                      July 2018
 
-
-   modifications of [sub-symmetric] and is subject to a "Specification
-   required" policy - see [RFC8126] for details.
-
-5.  Adding a new algorithm to a new class
-
-   Cryptography is a fast evolving field.  It is conceivable to think
-   that new cryptographic algorithm classes and algorithms will emerge
-   in the future.  It is also likely that their implementations would
-   need to be tested for correctness similar to the existing algorithms.
-   When such algorithms become available they may be added as extensions
-   to ACVP.  To do this, one would have to first develop a test
-   specification for the new algorithm similar to [sub-symmetric].
-   Next, one would have to update Table 1 and develop a new table of
-   corresponding algorithm types for the new class, similar to Table 2
-   or Table 3.  Lastly, one would have to create an entry in Table 6
-   with the proper algorithm class and type and a new unique identifier.
-
-   This action is subject to a "Specification Required" policy - see
-   [RFC8126]
-
-6.  Requirements Language
-
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-   document are to be interpreted in RFC 2119 [RFC2119].
-
-7.  Acknowledgements
-
-   TBD...
-
-8.  IANA Considerations
-
-   This memo includes no request to IANA.
-
-9.  Security Considerations
-
-   Security considerations are addressed by the ACVP specification.
-
-10.  Normative References
-
-   [acvp]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
-              Cryptographic Validation Protocol", 2018,
-              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
-              draft-fussell-acvp-spec-00.txt>.
-
-
-
-
-
-
-
-Vassilev                 Expires January 2, 2019                [Page 7]
-
-Internet-Draft                  ACVP-IANA                      July 2018
-
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
-
-   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
-              Writing an IANA Considerations Section in RFCs", BCP 26,
-              RFC 8126, DOI 10.17487/RFC8126, June 2017,
-              <https://www.rfc-editor.org/info/rfc8126>.
 
    [sub-symmetric]
               Celi, C., "ACVP Symmetric Algorithm JSON Specification",
@@ -445,4 +379,14 @@ Author's Address
 
 
 
-Vassilev                 Expires January 2, 2019                [Page 8]
+
+
+
+
+
+
+
+
+
+
+Vassilev                 Expires January 2, 2019                [Page 7]
