@@ -63,7 +63,7 @@
 			</address>
 		</author>
 
-		<date month="February" year="2017"/>
+		<date month="November" year="2018"/>
 
 		<!-- If the month and year are both specified and are the current ones, xml2rfc will fill
   	         in the current day for you. If only the current year is specified, xml2rfc will fill
@@ -99,75 +99,32 @@
 
 	<middle>
 		<section title="Introduction">
-			<t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically
-				verify the cryptographic implementation of a software or hardware crypto module. The
-				ACVP specification defines how a crypto module communicates with an ACVP server,
-				including crypto capabilities negotiation, session management, authentication,
-				vector processing and more. The ACVP specification does not define algorithm
-				specific JSON constructs for performing the crypto validation. A series of ACVP
-				sub-specifications define the constructs for testing individual crypto algorithms.
-				Each sub-specification addresses a specific class of crypto algorithms. This
-				sub-specification defines the JSON constructs for testing hash and MAC crypto
-				algorithms using ACVP.</t>
+			<t>
+                The Automated Cryptographic Validation Protocol (ACVP) defines a mechanism to automatically
+                verify the cryptographic implementation of a software or hardware cryptographic module. The intention of the protocol
+                is to minimize human involvement in the testing of cryptography.
+                The ACVP specification defines how a cryptographic module communicates with an ACVP
+                server, including cryptographic capabilities negotiation, session management, authentication,
+                vector processing and more. Note that the ACVP specification does not define algorithm-specific
+                JSON constructs for performing the cryptographic validation. However, a series of ACVP sub-specifications
+                defines the constructs for testing individual cryptographic algorithms. Each sub-specification
+                addresses a specific class or subset of cryptographic algorithms. This sub-specification defines the JSON
+                constructs for testing hash cryptographic algorithms using ACVP.  The ACVP server performs a set
+                of tests on the hash functions in order to assess the correctness and robustness of the
+                implementation. A typical ACVP validation session would require multiple tests to be performed for every supported
+                cryptographic algorithm, such as SHA-1, SHA2-256 and SHA2-512.
+            </t>
 
 			<section title="Requirements Language">
 				<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 					"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-					interpreted in					<xref target="RFC2119">RFC 2119</xref>.
+					interpreted in <xref target="RFC2119">RFC 2119</xref>.
 				</t>
 			</section>
 		</section>
 
-		<section anchor="caps_reg" title="Capabilities Registration">
-			<t>ACVP requires crypto modules to register their capabilities. This allows the crypto
-				module to advertise support for specific algorithms, notifying the ACVP server which
-				algorithms need test vectors generated for the validation process. This section
-				describes the constructs for advertising support of hash algorithms to the ACVP
-				server.</t>
-
-			<t>The algorithm capabilities are advertised as JSON objects within the 'algorithms'
-				value of the ACVP registration message. The 'algorithms' value is an array, where
-				each array element is an individual JSON object defined in this section. The
-				'algorithms' value is part of the 'capability_exchange' element of the ACVP JSON
-				registration message. See the ACVP specification for details on the registration
-				message. Each algorithm capability advertised is a self-contained JSON object. The
-				following JSON values are used for hash algorithm capabilities:</t>
-
-
-			<section anchor="hash_caps_reg" title="HASH Algorithm Capabilities Registration">
-				<texttable anchor="caps_table" title="Hash Algorithm Capabilities JSON Values" suppress-title="false" style="full">
-
-					<ttcol align="left">JSON Value</ttcol>
-					<ttcol align="left">Description</ttcol>
-					<ttcol align="left">JSON type</ttcol>
-					<ttcol align="left">Valid Values</ttcol>
-					<ttcol align="left">Optional</ttcol>
-
-					<c>algorithm</c>
-					<c>The hash algorithm and mode to be validated.</c>
-					<c>value</c>
-					<c>See						<xref target="supported_algs"/>
-					</c>
-					<c>No</c>
-
-					<c>inBit</c>
-					<c>Implementation does accept bit-oriented messages</c>
-					<c>value</c>
-					<c>true or false</c>
-					<c>No</c>
-
-					<c>inEmpty</c>
-					<c>Implementation does accept null (zero-length) messages</c>
-					<c>value</c>
-					<c>true or false</c>
-					<c>No</c>
-				</texttable>
-			</section>
-		</section>
-
 		<section anchor="supported_algs" title="Supported Hash Algorithms">
-			<t>The following hash algorithms may be advertised by this ACVP compliant crypto
-				module:</t>
+			<t>The following hash algorithms MAY be advertised by the ACVP compliant cryptographic module:</t>
 			<t>
 				<list style="symbols">
 					<t>SHA-1</t>
@@ -179,124 +136,221 @@
 					<t>SHA2-512/256</t>
 				</list>
 			</t>
-			<t>Other hash algorithms may be advertised by the ACVP elsewhere.</t>
+		</section>
+
+		<section anchor="testtypes" title="Test Types and Test Coverage">
+			<t>
+				This section describes the design of the tests used to validate implementations of SHA-1 and SHA-2.
+				There are two types of tests for SHA-1 and SHA-2: functional tests and Monte Carlo tests. Each has a specific value to be used in the
+				testType field. The testType field definitions are:
+
+				<list style="symbols">
+					<t>
+						"AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'hash' operation.
+						AFTs cause the implementation under test to exercise nomral operations on a single block, multiple blocks, or partial blocks. In all cases,
+						random data is used. The functional tests are designed to verify that the logical components of the hash function (block chunking, block padding etc.)
+						are opertaing correctly.
+					</t>
+					<t>
+						"MCT" - Monte Carlo Test. These tests exercise the implementation under test under stenuous circumstances. The implementation under test
+						must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect potential memory leaks
+						over time, and problems in allocation of resources, addressing variables, error handling, and generally improper behavior in response to
+						random inputs. Each MCT processes 100 pseudorandom tests. Each algorithm and mode SHOULD have at least one MCT group. See <xref target="MC_test"/>
+						for implementation details.
+					</t>
+				</list>
+			</t>
+
+			<section anchor="MC_test" title="Monte Carlo tests for SHA-1 and SHA-2">
+				<t>
+					The MCTs start with an initial condition (SEED which is a single message) and perform a series of chained computations.
+				</t>
+
+				<t>
+					The algorithm is shown in <xref target="xml_figureMCT"/>.
+				</t>
+				<figure align="center" anchor="xml_figureMCT">
+					<preamble>SHA-1 and SHA-2 Monte Carlo Test</preamble>
+					<artwork align="left">
+						<![CDATA[
+For j = 0 to 99
+MD[0] = MD[1] = MD[2] = SEED
+	For i = 3 to 1003
+		MSG[i] = MD[i-3] || MD[i-2] || MD[i-1]
+		MD[i] = SHA(MSG[i])
+	Output MD[1002]
+						]]>
+					</artwork>
+				</figure>
+			</section>
+
+			<section anchor="test_coverage" title="Test Coverage">
+				<t>
+					The tests described in this document have the intention of ensuring an implementation is conformant to <xref target="FIPS-180-4"/>.
+				</t>
+				<section anchor="sha-coverage" title="SHA Requirements Covered">
+					<t>
+						Sections 3 and 4 in <xref target="FIPS-180-4"/> outline the core functions used within the hash algorithms. Normal AFTs test these operations.
+						Section 5 outlines the hash function preprocessing. It is worth noting that not all test cases will cover the message padding process, but through 
+						the entire vector set, this operation will be fully tested.
+					</t>
+				</section>
+				<section anchor="sha-not-coverage" title="SHA Requirements Not Covered">
+					<t>
+						Section 1 in <xref target="FIPS-180-4"/> outlines the maximum message sizes for each hash function. Due to the large size (either 2^64 or 2^128 bits)
+						of these maximums, they are not tested by this specification.
+						Section 7 outlines digest truncation for applications where a shortened digest is needed. These operations are not tested via this specification.
+					</t>
+				</section>
+			</section>
+		</section>
+
+		<section anchor="caps_reg" title="Capabilities Registration">
+            <t>
+                This section describes the constructs for advertising support of hash algorithms to the
+                ACVP server. ACVP REQURIES cryptographic modules to register their capabilities in a registration.
+                This allows the cryptographic module to advertise support for specific algorithms, notifying the ACVP server which
+                algorithms need test vectors generated for the validation process.
+            </t>
+
+            <t>
+                The hash algorithm capabilities MUST be advertised as JSON objects within the 'algorithms'
+                value of the ACVP registration message. The 'algorithms' value MUST be an array, where each
+                array element is an individual JSON object defined in this section. The 'algorithms'
+                value MUST be part of the 'capability_exchange' element of the ACVP JSON registration message.
+                See the ACVP Protocol Specification Section XXX for details on the registration message.
+
+                Each hash algorithm capability advertised SHALL be a self-contained JSON object.
+            </t>
+
+			<section anchor="hash_caps_reg" title="HASH Algorithm Capabilities Registration">
+				<texttable anchor="caps_table" title="Hash Algorithm Capabilities JSON Values" suppress-title="false" style="full">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+
+					<c>algorithm</c>
+					<c>The hash algorithm and mode to be validated.</c>
+					<c>string</c>
+
+					<c>inBit</c>
+					<c>Implementation does accept bit-oriented messages</c>
+					<c>boolean</c>
+
+					<c>inEmpty</c>
+					<c>Implementation does accept null (zero-length) messages</c>
+					<c>boolean</c>
+				</texttable>
+				<t>
+					The value of the algorithm property MUST be one of the elements from the list in <xref target="supported_algs"/>.
+				</t>
+			</section>
 		</section>
 
 		<section anchor="test_vectors" title="Test Vectors">
-			<t>The ACVP server provides test vectors to the ACVP client, which are then processed
-				and returned to the ACVP server for validation. A typical ACVP validation session
-				would require multiple test vector sets to be downloaded and processed by the ACVP
-				client. Each test vector set represents an individual crypto algorithm, such as
-				SHA-1, SHA-224, SHA-256, etc. This section describes the JSON schema for a test
-				vector set used with hash crypto algorithms.</t>
+            <t>
+                After receiving a valid registration of a cryptographic module, the ACVP server SHALL provide test vectors in the form of a prompt
+                to the ACVP client, which then SHALL be processed and returned to the ACVP server for validation.  A typical ACVP validation session would require the client to
+                download and process multiple test vector sets.  Each test vector set SHALL represent an individual
+                cryptographic algorithm, such as SHA-1, SHA2-256, SHA2-512, etc.  This section
+                describes the JSON schema for a test vector set used with hash algorithms.
+            </t>
 
-			<t>The test vector set JSON schema is a multi-level hierarchy that contains meta data
-				for the entire vector set as well as individual test vectors to be processed by the
-				ACVP client. The following table describes the JSON elements at the top level of the
-				hierarchy. </t>
+            <t>
+                The test vector set JSON schema is a multi-level hierarchy that contains meta-data for the entire
+                vector set. The test vector set SHALL be comprised of test groups which SHALL subsequently contain individual test cases to be processed by the ACVP client. The following table
+                describes the REQUIRED JSON elements at the top level of the hierarchy:
+            </t>
 			<texttable anchor="vs_top_table" title="Vector Set JSON Object">
 				<ttcol align="left">JSON Value</ttcol>
 				<ttcol align="left">Description</ttcol>
 				<ttcol align="left">JSON type</ttcol>
-
 				<c>acvVersion</c>
 				<c>Protocol version identifier</c>
-				<c>value</c>
+				<c>string</c>
 
 				<c>vsId</c>
 				<c>Unique numeric identifier for the vector set</c>
-				<c>value</c>
+				<c>integer</c>
 
 				<c>algorithm</c>
-				<c>The hash algorithm and mode used for the test vectors. See					<xref target="supported_algs"/>
- for possible values.</c>
-				<c>value</c>
+				<c>The hash algorithm and mode used for the test vectors. See <xref target="supported_algs"/> for possible values.</c>
+				<c>string</c>
 
 				<c>testGroups</c>
-				<c>Array of test group JSON objects, which are defined in					<xref target="tgjs"/>
-				</c>
-				<c>array</c>
+				<c>Array of test group JSON objects, which are defined in <xref target="tgjs"/></c>
+				<c>array of testGroup objects</c>
 			</texttable>
 
-			<section title="Test Groups JSON Schema" anchor="tgjs">
-				<t>The testGroups element at the top level in the test vector JSON object is an
-					array of test groups. Test vectors are grouped into similar test cases to reduce
-					the amount of data transmitted in the vector set. The Test Group JSON object
-					contains meta data that applies to all test vectors within the group. The
-					following table describes the secure hash JSON elements of the Test Group JSON
-					object.</t>
-
+			<section title="Test Groups" anchor="tgjs">
+                <t>
+                    Test vector sets MUST contain one or many test groups, each sharing similar properties.
+                    For instance, all test vectors that use the same testType would be grouped
+                    together.  The testGroups element at the top level of the test vector JSON object SHALL be the array of test
+                    groups.  The Test Group JSON object MUST contain meta-data that applies to all test cases within
+                    the group.  The following table describes the JSON elements that MAY appear from the server in the Test Group JSON object:
+                </t>
 				<texttable anchor="vs_tg_table" title="Test Group JSON Object">
 					<ttcol align="left">JSON Value</ttcol>
 					<ttcol align="left">Description</ttcol>
 					<ttcol align="left">JSON type</ttcol>
-					<ttcol align="left">Optional</ttcol>
+					<c>tgId</c>
+					<c>Numeric identifier for the test group, unique across the entire vector set</c>
+					<c>integer</c>
 
 					<c>testType</c>
-					<c>Test category type. For Algorithm Functional Tests (also known as short and long message): 'AFT'. Or for Monte Carlo: 'MCT'.</c>
-					<c>value</c>
-					<c>No</c>
-
-					<c>tests</c>
-					<c>Array of individual test case JSON objects, which are defined in						<xref target="tcjs"/>
-					</c>
-					<c>array</c>
-					<c>No</c>
+					<c>Test category type (AFT or MCT). See <xref target="testtypes"/> for more information</c>
+					<c>string</c>
 
 					<c>inBit</c>
-					<c>States that each test case in the group is bit-oriented (yes or no)</c>
-					<c>true or false</c>
-					<c>No</c>
+					<c>States that each test case in the group may contain a message with a length not at a byte boundary</c>
+					<c>boolean</c>
 
 					<c>inEmpty</c>
 					<c>States that the empty message is included in the group</c>
-					<c>true or false</c>
-					<c>No for Algorithm Functional Tests. Yes for all others.</c>
+					<c>boolean</c>
 
+					<c>tests</c>
+					<c>Array of individual test case JSON objects, which are defined in	<xref target="tcjs"/></c>
+					<c>array of testCase objects</c>
 				</texttable>
+				<t>
+					All properties described in the previous table MUST appear in the prompt file from the server for every testGroup object.
+				</t>
 			</section>
 
-			<section title="Test Case JSON Schema" anchor="tcjs">
-				<t>Each test group contains an array of one or more test cases. Each test case is a
-					JSON object that represents a single test vector to be processed by the ACVP
-					client. The following table describes the JSON elements for each secure hash
-					test vector for the listed algorithms in					<xref target="supported_algs"/>
-.</t>
-
+			<section title="Test Case" anchor="tcjs">
+                <t>
+                    Each test group SHALL contain an array of one or more test cases.  Each test case is a JSON object
+                    that represents a single case to be processed by the ACVP client.  The following table describes
+                    the JSON elements for each test case.
+                </t>
 				<texttable anchor="vs_tc_table" title="Test Case JSON Object">
 					<ttcol align="left">JSON Value</ttcol>
 					<ttcol align="left">Description</ttcol>
 					<ttcol align="left">JSON type</ttcol>
-					<ttcol align="left">Optional</ttcol>
-
 					<c>tcId</c>
-					<c>Numeric identifier for the test case, unique across the entire vector
-						set.</c>
-					<c>value</c>
-					<c>No</c>
+					<c>Numeric identifier for the test case, unique across the entire vector set.</c>
+					<c>integer</c>
 
 					<c>len</c>
-					<c>Length of the message or seed</c>
-					<c>value</c>
-					<c>No</c>
+					<c>Length of the message or MCT seed</c>
+					<c>integer</c>
 
 					<c>msg</c>
-					<c>Value of the message or seed in big-endian hex</c>
-					<c>value</c>
-					<c>No</c>
-
-					<c>md</c>
-					<c>Hash value generated</c>
-					<c>value</c>
-					<c>Yes</c>
+					<c>Value of the message or MCT seed in big-endian hex</c>
+					<c>integer</c>
 				</texttable>
+				<t>
+					All properties described in the previous table MUST appear in the prompt file from the server for every testCase object.
+				</t>
 			</section>
 
 			<section anchor="vector_responses" title="Test Vector Responses">
-				<t>After the ACVP client downloads and processes a vector set, it must send the
-					response vectors back to the ACVP server. The following table describes the JSON
-					object that represents a vector set response.</t>
-
+				<t>
+					After the ACVP client downloads and processes a vector set, it SHALL send the response vectors
+					back to the ACVP server within the alloted timeframe. The following table describes the JSON object that represents a vector set response.
+				</t>
 				<texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
 					<ttcol align="left">JSON Value</ttcol>
 					<ttcol align="left">Description</ttcol>
@@ -304,25 +358,62 @@
 
 					<c>acvVersion</c>
 					<c>Protocol version identifier</c>
-					<c>value</c>
+					<c>string</c>
 
 					<c>vsId</c>
 					<c>Unique numeric identifier for the vector set</c>
-					<c>value</c>
+					<c>integer</c>
 
 					<c>testResults</c>
 					<c>Array of JSON objects that represent each test vector result, which uses the
-						same JSON schema as defined in						<xref target="tcjs"/>
-					</c>
-					<c>array</c>
-					<c/>
-					<c/>
-					<c/>
+						same JSON schema as defined in <xref target="tcjs"/></c>
+					<c>array of testGroup objects</c>
+				</texttable>
+
+				<t>
+					The testGroup Response section is used to organize the ACVP client response in a similar manner
+					to how it receives vectors.  Several algorithms SHALL require the client to send back group
+					level properties in its response.  This structure helps accommodate that.
+				</t>
+
+				<texttable anchor="vr_group_table" title="Vector Set Group Response JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+
+					<c>tgId</c>
+					<c>The test group identifier</c>
+					<c>integer</c>
+
+					<c>tests</c>
+					<c>The tests associated to the group specified in tgId</c>
+					<c>array of testCase objects</c>
+				</texttable>
+
+				<t>
+					Each test case is a JSON object that represents a single test object to be processed by the ACVP client.
+					The following table describes the JSON elements for each test case object.
+				</t>
+				<texttable anchor="vs_tr_table" title="Test Case Results JSON Object">
+					<ttcol align="left">JSON Value</ttcol>
+					<ttcol align="left">Description</ttcol>
+					<ttcol align="left">JSON type</ttcol>
+
+					<c>tcId</c>
+					<c>Numeric identifier for the test case, unique across the entire vector set.</c>
+					<c>integer</c>
+
+					<c>md</c>
+					<c>The IUT's message digest response to an AFT test</c>
+					<c>string (hex)</c>
 
 					<c>resultsArray</c>
-					<c>Array of JSON objects that represent each iteration of a Monte Carlo Test.  Each iteration will contain an md value.</c>
-					<c>array</c>
+					<c>Array of JSON objects that represent each iteration of an MCT. Each iteration will contain the msg and md</c>
+					<c>array of objects containing msg and md</c>
 				</texttable>
+				<t>
+					Note: The tcId MUST be included in every test case object sent between the client and the server.
+				</t>
 			</section>
 
 			<!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
@@ -334,7 +425,7 @@
 			<!-- Possibly a 'Contributors' section ... -->
 
 			<section anchor="IANA" title="IANA Considerations">
-				<t>This memo includes no request to IANA.</t>
+				<t>This memo includes requests to IANA to join draft XXX.</t>
 			</section>
 
 			<section anchor="Security" title="Security Considerations">
@@ -367,8 +458,17 @@
 					<date year="2014"/>
 				</front>
 			</reference>
-		</references>
 
+			<reference anchor="FIPS-180-4">
+				<front>
+					<title>Secure Hash Standard (SHS)</title>
+					<author>
+						<organization>NIST</organization>
+					</author>
+					<date year="2015" month="August"/>
+				</front>
+			</reference>
+		</references>
 
 		<section anchor="app-reg-ex" title="Example Secure Hash Capabilities JSON Object">
 			<t>The following is a example JSON object advertising support for SHA-256.</t>
@@ -514,9 +614,9 @@
 		{
 			"msg": "5eec0361d25bfbc2468d70e2262783145523ffe627052585069413d30ff2caf95eec0361d25bfbc2468d70e2262783145523ffe627052585069413d30ff2caf95eec0361d25bfbc2468d70e2262783145523ffe627052585069413d30ff2caf9",
 			"md": "efbed7619701beda3eeb79946565cf33643b45783f38a4f8a855607bd4d23ce6"
-		}
+		}]
     }]
-  }]
+  }
 ]]>
 				</artwork>
 			</figure>
