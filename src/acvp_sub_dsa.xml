@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
 
+
+
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -29,1183 +31,995 @@
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
 <rfc category="info" docName="draft-ietf-acvp-subdsa-0.5" ipr="trust200902">
-  <!-- category values: std, bcp, info, exp, and historic
+    <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN"
      they will automatically be output with "(if approved)" -->
-  <!-- ***** FRONT MATTER ***** -->
-  <front>
-    <!-- The abbreviated title is used in the page header - it is only necessary if the
+    <!-- ***** FRONT MATTER ***** -->
+    <front>
+        <!-- The abbreviated title is used in the page header - it is only necessary if the
          full title is longer than 39 characters -->
-    <title abbrev="Sym Alg JSON">ACVP DSA Algorithm JSON Specification</title>
-    <!-- add 'role="editor"' below for the editors if appropriate -->
-    <!-- Another author who claims to be an editor -->
-    <author fullname="Barry Fussell" initials="B.F." role="editor" surname="Fussell">
-      <organization>Cisco Systems, Inc.</organization>
-      <address>
-        <postal>
-          <street>170 West Tasman Dr.</street>
-          <!-- Reorder these if your country does things differently -->
-          <city>San Jose</city>
-          <region>CA</region>
-          <code>95134</code>
-          <country>USA</country>
-        </postal>
-        <email>bfussell@cisco.com</email>
-        <!-- uri and facsimile elements may also be added -->
-      </address>
-    </author>
-    <date month="June" year="2016" />
-    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+        <title abbrev="Sym Alg JSON">ACVP DSA Algorithm JSON Specification</title>
+        <!-- add 'role="editor"' below for the editors if appropriate -->
+        <!-- Another author who claims to be an editor -->
+        <author fullname="Barry Fussell" initials="B.F." role="editor" surname="Fussell">
+            <organization>Cisco Systems, Inc.</organization>
+            <address>
+                <postal>
+                    <street>170 West Tasman Dr.</street>
+                    <!-- Reorder these if your country does things differently -->
+                    <city>San Jose</city>
+                    <region>CA</region>
+                    <code>95134</code>
+                    <country>USA</country>
+                </postal>
+                <email>bfussell@cisco.com</email>
+                <!-- uri and facsimile elements may also be added -->
+            </address>
+        </author>
+        <date month="June" year="2016" />
+        <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
          in the current day for you. If only the current year is specified, xml2rfc will fill
          in the current day and month for you. If the year is not the current one, it is
          necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
          purpose of calculating the expiry date).  With drafts it is normally sufficient to
          specify just the year. -->
-    <!-- Meta-data Declarations -->
-    <area>General</area>
-    <workgroup>TBD</workgroup>
-    <!-- WG name at the upperleft corner of the doc,
+        <!-- Meta-data Declarations -->
+        <area>General</area>
+        <workgroup>TBD</workgroup>
+        <!-- WG name at the upperleft corner of the doc,
          IETF is fine for individual submissions.
          If this element is not present, the default is "Network Working Group",
          which is used by the RFC Editor as a nod to the history of the IETF. -->
-    <keyword>acvp</keyword>
-    <keyword>crypto</keyword>
-    <!-- Keywords will be incorporated into HTML output
+        <keyword>acvp</keyword>
+        <keyword>crypto</keyword>
+        <!-- Keywords will be incorporated into HTML output
          files in a meta tag but they have no effect on text or nroff
          output. If you submit your draft to the RFC Editor, the
          keywords will be used for the search engine. -->
-    <abstract>
-      <t>This document defines the JSON schema for using DSA algorithms with the ACVP specification.</t>
-    </abstract>
-  </front>
-  <middle>
-    <section title="Introduction">
-      <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically verify the cryptographic implementation of a software or hardware crypto module. The ACVP specification defines how a crypto module communicates with an ACVP server, including crypto capabilities negotiation, session management, authentication, vector processing and more. The ACVP specification does not define algorithm specific JSON constructs for performing the crypto validation. A series of ACVP sub-specifications define the constructs for testing individual crypto algorithms. Each sub-specification addresses a specific class of crypto algorithms. This sub-specification defines the JSON constructs for testing DSA algorithms using ACVP.</t>
-      <section title="Requirements Language">
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted in                                                                       
-          <xref target="RFC2119">RFC 2119</xref>.                                                        
-        </t>
-      </section>
-    </section>
-    <section anchor="caps_reg" title="Capabilities Registration">
-      <t>ACVP requires crypto modules to register their capabilities. This allows the crypto module to advertise support for specific algorithms, notifying the ACVP server which algorithms need test vectors generated for the validation process. This section describes the constructs for advertising support of DSA algorithms to the ACVP server.</t>
-      <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms' value of the ACVP registration message. The 'algorithms' value is an array, where each array element is an individual JSON object defined in this section. The 'algorithms' value is part of the 'capability_exchange' element of the ACVP JSON registration message. See the ACVP specification for details on the registration message.</t>
-      <section anchor="prereq_algs" title="Required Prerequisite Algorithms for DSA Validations">
-        <t>Each DSA implementation relies on other cryptographic primitives. For example, DSA uses an underlying SHA algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
-        <texttable anchor="rereqs_table" title="Required DSA Prerequisite Algorithms JSON Values">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-          <ttcol align="left">Valid Values</ttcol>
-          <ttcol align="left">Optional</ttcol>
-          <c>algorithm</c>
-          <c>a prerequisite algorithm</c>
-          <c>value</c>
-          <c>DRBG, SHA, SHA_OPT2</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>valValue</c>
-          <c>algorithm validation number</c>
-          <c>value</c>
-          <c>actual number or "same"</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>prereqAlgVal</c>
-          <c>prerequistie algorithm validation</c>
-          <c>object with algorithm and valValue properties</c>
-          <c>see above</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>prereqVals</c>
-          <c>prerequistie algorithm validations</c>
-          <c>array of prereqAlgVal objects</c>
-          <c>see above</c>
-          <c>No</c>
-        </texttable>
-      </section>
-      <section anchor="dsa_caps_reg" title="DSA Algorithm Capabilities Registration">
-        <t>Each algorithm capability advertised is a self-contained JSON object using the following values.</t>
-        <texttable anchor="caps_table" title="DSA Algorithm Capabilities JSON Values">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-          <ttcol align="left">Valid Values</ttcol>
-          <ttcol align="left">Optional</ttcol>
-          <c>algorithm</c>
-          <c>The algorithm under test</c>
-          <c>value</c>
-          <c>"DSA"</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>mode</c>
-          <c>The DSA mode to be validated</c>
-          <c>value</c>
-          <c>"pqgGen", "pqgVer", "keyGen", "sigGen", "sigVer"</c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>prereqVals</c>
-          <c>prerequistie algorithm validations</c>
-          <c>array of prereqAlgVal objects</c>
-          <c>See                                                                                     
-            <xref target="prereq_algs" />
-          </c>
-          <c>No</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>algSpecs</c>
-          <c>array of JSON objects, each with fields pertaining to the global DSA mode indicated above and identified uniquely by the combination of the DSA "mode" and indicated properties</c>
-          <c>Array of JSON objects</c>
-          <c>See                                                                                     
-            <xref target="supported_modes" />
-          </c>
-          <c>No</c>
-        </texttable>
-      </section>
-      <section anchor="supported_modes" title="Supported DSA Modes Capabilities">
-        <t>The DSA mode capabilities are advertised as JSON objects within the 'algSpecs'	value of the ACVP registration message - see                                                   
-          <xref target="caps_table"/>
-. The 'algSpecs' value is an array, where each	array element is a JSON object corresponding to a particular DSA mode defined in this section. The 'algSpecs'	value is part of the 'capability_exchange' element of the ACVP JSON registration message.	See the ACVP specification for details on the registration message.                                        
-        </t>
-        <t>Each DSA mode's capabilities are advertised as JSON objects.</t>
-        <section anchor="mode_pqgGen" title="The pqgGen Mode Capabilities">
-          <t>The DSA pqgGen mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
-          <t>Each DSA pqgGen mode capability set is advertised as a self-contained JSON object.</t>
-          <section anchor="mode_pqgGenFullSet" title="pqgGen Full Set of Capabilities">
-            <t>The complete list of DSA pqg generation capabilities may be advertised by the ACVP compliant crypto module:</t>
-            <texttable anchor="pqgGen_table" title="DSA pqgGen Capabilities JSON Values">
-              <ttcol align="left">JSON Value</ttcol>
-              <ttcol align="left">Description</ttcol>
-              <ttcol align="left">JSON type</ttcol>
-              <ttcol align="left">Valid Values</ttcol>
-              <ttcol align="left">Optional</ttcol>
-              <c>l</c>
-              <c>The length in bits of the field and the length in bits of prime p.</c>
-              <c>value</c>
-              <c>2048, or 3072</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>n</c>
-              <c>The length in bits of q which is a prime factor of (p-1).</c>
-              <c>value</c>
-              <c>224, or 256 when L is 2048. Otherwise 256.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>pqGen</c>
-              <c>The methods supported to generate p and q.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"probable", "provable"}.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>gGen</c>
-              <c>The methods supported to generate g.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"unverifiable", "canonical"}.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>hashAlg</c>
-              <c>The hash functions supported when generating p, q and g.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}. Note that the digest size of the hash function MUST be equal to or greater than N.</c>
-              <c>No</c>
+        <abstract>
+            <t>This document defines the JSON schema for using DSA algorithms with the ACVP specification.</t>
+        </abstract>
+    </front>
+    <middle>
+        <section title="Introduction">
+            <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically verify the cryptographic implementation of a software or hardware crypto module. The ACVP specification defines how a crypto module communicates with an ACVP server, including crypto capabilities negotiation, session management, authentication, vector processing and more. The ACVP specification does not define algorithm specific JSON constructs for performing the crypto validation. A series of ACVP sub-specifications define the constructs for testing individual crypto algorithms. Each sub-specification addresses a specific class of crypto algorithms. This sub-specification defines the JSON constructs for testing DSA algorithms using ACVP.</t>
+            <section title="Requirements Language">
+                <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted in                                                                       
+          
+                    
+                    <xref target="RFC2119">RFC 2119</xref>.                                                        
+        
+                
+                </t>
+            </section>
+        </section>
+        <section anchor="supported_algs" title="Supported DSA Algorithms">
+            <t>The following DSA algorithms MAY be advertised by the ACVP compliant cryptographic module:</t>
+            <t>
+                <list style="symbols">
+                    <t>DSA / keyGen</t>
+                    <t>DSA / pqgGen</t>
+                    <t>DSA / pqgVer</t>
+                    <t>DSA / sigGen</t>
+                    <t>DSA / sigVer</t>
+                </list>
+            </t>
+        </section>
+        <section anchor="test_types" title="Test Types and Test Coverage">
+            <t>The ACVP server performs a set of tests on the specified DSA algorithm in order to assess the
+                correctness and robustness of the implementation. A typical ACVP validation session
+                SHALL require multiple tests to be performed for every supported permutation of DSA
+                capabilities. This section describes the design of the tests used to validate
+                implementations of the DSA algorithms.  
+                
+                
+                <list style="testtype">
+                    <t>
+                    DSA / keyGen "AFT" - Algorithm Functional Test. The IUT is REQUIRED for each test 
+                    case provided, to generate a key pair based on a generated group level PQG. This information is then
+                    communicated to the ACVP server and validated.
+                  </t>
+                    <t>
+                    DSA / pqgGen "GDT" - Generated Data Test. The IUT in this test mode is REQUIRED to generate PQ or G as a response to the
+                    ACVP provided test vector set. 
+                  </t>
+                    <t> 
+                    DSA / pqgVer "GDT" - Generated Data Test. In this test mode, the ACVP server is REQUIRED to generate domain parameters for transmission 
+                    to the IUT. The IUT is expected to evaluate the validity of the domain parameters.
+                  </t>
+                    <t>
+                    DSA / sigGen "AFT" - Algorithm Functional Test. This testing mode expects the IUT to generate valid signatures based on the ACVP provided message.
+                    The IUT communicates the PQG, public key, and signature to the ACVP server, and the signature is then validated. 
+                  </t>
+                    <t>
+                    DSA / sigVer "AFT" - Algorithm Functional Test. The ACVP server generates a series of signatures to communicate to the IUT. The IUT is REQUIRED
+                    to determine the validity of the signature given the PQG, key, and message. 
+                  </t>
+                </list>
+            </t>
+            <section anchor="test_coverage" title="Test Coverage">
+                <t>The tests described in this document have the intention of ensuring an
+                    implementation is conformant to 
+                    
+                    <xref target="FIPS.186-4"/> and 
+                    
+                    <xref target="SP.800-89"/>. 
+                
+                </t>
+                <section anchor="requirements_covered" title="Requirements Covered">
+                    <t>
+                        <list>
+                            <t>
+                            FIPS.186-4 - 3 General Discussion. Domain parameter generation, key generation, signature generation, and signature validation
+                            are all within scope of ACVP server testing.
+                          </t>
+                            <t>
+                            FIPS.186-4 - 4 The Digital Signature Algorithm (DSA). The ACVP server provides a means of the generation and validation of domain
+                            parameters. The ACVP server is SHALL support a variety of parameter sizes/hash function for creation and delivery to/from the IUT.
+                            The ACVP server SHALL allow for the testing of the validity of domain parameters.  Key pair generation testing SHALL be provided by
+                            the ACVP server. Both Signature Generation and Validation testing mechanmisms SHALL be provided by the ACVP server.
+                          </t>
+                        </list>
+                    </t>
+                </section>
+                <section anchor="requirements_not_covered"
+                    title="Requirements Not Covered">
+                    <t>
+                        <list>
+                            <t>
+                            FIPS.186-4 - 3 General Discussion. Assurances of private key secrecy and ownership SHALL NOT be within scope of ACVP testing.
+                          </t>
+                            <t>
+                            FIPS.186-4 - 4 The Digital Signature Algorithm (DSA). The IUT's selection of parameter sizes and hash functions SHALL NOT be within scope
+                            of ACVP server testing.  Though the ACVP server SHALL support a variety of parameter sizes/hash functions, the IUT's selection of these is out of scope of testing.
+                            The ACVP server MAY provide testing for the validity of domain parameters, but testing SHALL NOT provide assurances the IUT has validated a set of domain parameters prior to their use.
+                            Domain parameter and key pair management SHALL NOT be within scope of ACVP testing.
+                          </t>
+                        </list>
+                    </t>
+                </section>
+            </section>
+        </section>
+        <section anchor="caps_reg" title="Capabilities Registration">
+            <t>ACVP requires crypto modules to register their capabilities. This allows the crypto module to advertise support for specific algorithms, notifying the ACVP server which algorithms need test vectors generated for the validation process. This section describes the constructs for advertising support of DSA algorithms to the ACVP server.</t>
+            <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms' value of the ACVP registration message. The 'algorithms' value is an array, where each array element is an individual JSON object defined in this section. The 'algorithms' value is part of the 'capability_exchange' element of the ACVP JSON registration message. See the ACVP specification for details on the registration message.</t>
+            <section anchor="prereq_algs" title="Required Prerequisite Algorithms for DSA Validations">
+                <t>Each DSA implementation relies on other cryptographic primitives. For example, DSA uses an underlying SHA algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:</t>
+                <texttable anchor="rereqs_table" title="Required DSA Prerequisite Algorithms JSON Values">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Valid Values</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>algorithm</c>
+                    <c>a prerequisite algorithm</c>
+                    <c>value</c>
+                    <c>DRBG, SHA, SHA_OPT2</c>
+                    <c>No</c>
+                    <c>valValue</c>
+                    <c>algorithm validation number</c>
+                    <c>value</c>
+                    <c>actual number or "same"</c>
+                    <c>No</c>
+                    <c>prereqAlgVal</c>
+                    <c>prerequistie algorithm validation</c>
+                    <c>object with algorithm and valValue properties</c>
+                    <c>see above</c>
+                    <c>No</c>
+                    <c>prereqVals</c>
+                    <c>prerequistie algorithm validations</c>
+                    <c>array of prereqAlgVal objects</c>
+                    <c>see above</c>
+                    <c>No</c>
+                </texttable>
+            </section>
+            <section anchor="dsa_caps_reg" title="DSA Algorithm Capabilities Registration">
+                <t>Each algorithm capability advertised is a self-contained JSON object using the following values.</t>
+                <texttable anchor="caps_table" title="DSA Algorithm Capabilities JSON Values">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Valid Values</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>algorithm</c>
+                    <c>The algorithm under test</c>
+                    <c>value</c>
+                    <c>"DSA"</c>
+                    <c>No</c>
+                    <c>mode</c>
+                    <c>The DSA mode to be validated</c>
+                    <c>value</c>
+                    <c>"pqgGen", "pqgVer", "keyGen", "sigGen", "sigVer"</c>
+                    <c>No</c>
+                    <c>prereqVals</c>
+                    <c>prerequistie algorithm validations</c>
+                    <c>array of prereqAlgVal objects</c>
+                    <c>See                                                                                     
+            
+                        
+                        <xref target="prereq_algs" />
+                    </c>
+                    <c>No</c>
+                    <c>capabilities</c>
+                    <c>array of JSON objects, each with fields pertaining to the global DSA mode indicated above and identified uniquely by the combination of the DSA "mode" and indicated properties</c>
+                    <c>Array of JSON objects</c>
+                    <c>See                                                                                     
+            
+                        
+                        <xref target="supported_modes" />
+                    </c>
+                    <c>No</c>
+                </texttable>
+            </section>
+            <section anchor="supported_modes" title="Supported DSA Modes Capabilities">
+                <t>The DSA mode capabilities are advertised as JSON objects within the 'capabilities'	value of the ACVP registration message - see                                                   
+          
+                    
+                    <xref target="caps_table"/>
+. The 'capabilities' value is an array, where each	array element is a JSON object corresponding to a particular DSA mode defined in this section. The 'capabilities'	value is part of the 'capability_exchange' element of the ACVP JSON registration message.	See the ACVP specification for details on the registration message.                                        
+        
+                
+                </t>
+                <t>Each DSA mode's capabilities are advertised as JSON objects.</t>
+                <section anchor="mode_pqgGen" title="The pqgGen Mode Capabilities">
+                    <t>The DSA pqgGen mode capabilities are advertised as JSON objects, which are elements of the 'capabilities' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+                    <t>Each DSA pqgGen mode capability set is advertised as a self-contained JSON object.</t>
+                    <section anchor="mode_pqgGenFullSet" title="pqgGen Full Set of Capabilities">
+                        <t>The complete list of DSA pqg generation capabilities may be advertised by the ACVP compliant crypto module:</t>
+                        <texttable anchor="pqgGen_table" title="DSA pqgGen Capabilities JSON Values">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>l</c>
+                            <c>The length in bits of the field and the length in bits of prime p.</c>
+                            <c>value</c>
+                            <c>2048, or 3072</c>
+                            <c>No</c>
+                            <c>n</c>
+                            <c>The length in bits of q which is a prime factor of (p-1).</c>
+                            <c>value</c>
+                            <c>224, or 256 when L is 2048. Otherwise 256.</c>
+                            <c>No</c>
+                            <c>pqGen</c>
+                            <c>The methods supported to generate p and q.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"probable", "provable"}.</c>
+                            <c>No</c>
+                            <c>gGen</c>
+                            <c>The methods supported to generate g.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"unverifiable", "canonical"}.</c>
+                            <c>No</c>
+                            <c>hashAlg</c>
+                            <c>The hash functions supported when generating p, q and g.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}. Note that the digest size of the hash function MUST be equal to or greater than N.</c>
+                            <c>No</c>
+                        </texttable>
+                    </section>
+                </section>
+                <section anchor="mode_pqgVer" title="The pqgVer Mode Capabilities">
+                    <t>The DSA pqgVer mode capabilities are advertised as JSON objects, which are elements of the 'capabilities' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+                    <t>Each DSA pqgVer mode capability set is advertised as a self-contained JSON object.</t>
+                    <section anchor="mode_pqgVerFullSet" title="pqgVer Full Set of Capabilities">
+                        <t>The complete list of DSA pqg verification capabilities may be advertised by the ACVP compliant crypto module:</t>
+                        <texttable anchor="pqgVer_table" title="DSA pqgVer Capabilities JSON Values">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>l</c>
+                            <c>The length in bits of the field and the length in bits of prime p.</c>
+                            <c>value</c>
+                            <c>1024, 2048, or 3072</c>
+                            <c>No</c>
+                            <c>n</c>
+                            <c>The length in bits of q which is a prime factor of (p-1).</c>
+                            <c>value</c>
+                            <c>160 when L is 1024. 224, or 256 when L is 2048. Otherwise 256.</c>
+                            <c>No</c>
+                            <c>pqGen</c>
+                            <c>The methods supported to generate p and q.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"probable", "provable"}.</c>
+                            <c>No</c>
+                            <c>gGen</c>
+                            <c>The methods supported to generate g.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"unverifiable", "canonical"}.</c>
+                            <c>No</c>
+                            <c>hashAlg</c>
+                            <c>The hash functions supported when generating p, q and g.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}. Note that the digest size of the hash function MUST be equal to or greater than N.</c>
+                            <c>No</c>
+                        </texttable>
+                    </section>
+                </section>
+                <section anchor="mode_keyGen" title="The keyGen Mode Capabilities">
+                    <t>The DSA keyGen mode capabilities are advertised as JSON objects, which are elements of the 'capabilities' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+                    <t>Each DSA keyGen mode capability set is advertised as a self-contained JSON object.</t>
+                    <section anchor="mode_keyGenFullSet" title="keyGen Full Set of Capabilities">
+                        <t>The complete list of DSA key generation capabilities may be advertised by the ACVP compliant crypto module:</t>
+                        <texttable anchor="keyGen_table" title="DSA keyGen Capabilities JSON Values">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>l</c>
+                            <c>The length in bits of the field and the length in bits of prime p.</c>
+                            <c>value</c>
+                            <c>2048, or 3072</c>
+                            <c>No</c>
+                            <c>n</c>
+                            <c>The length in bits of q which is a prime factor of (p-1).</c>
+                            <c>value</c>
+                            <c>224, or 256 when L is 2048. Otherwise 256.</c>
+                            <c>No</c>
+                        </texttable>
+                    </section>
+                </section>
+                <section anchor="mode_sigGen" title="The sigGen Mode Capabilities">
+                    <t>The DSA sigGen mode capabilities are advertised as JSON objects, which are elements of the 'capabilities' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+                    <t>Each DSA sigGen mode capability set is advertised as a self-contained JSON object.</t>
+                    <section anchor="mode_sigGenFullSet" title="sigGen Full Set of Capabilities">
+                        <t>The complete list of DSA signature generation capabilities may be advertised by the ACVP compliant crypto module:</t>
+                        <texttable anchor="sigGen_table" title="DSA sigGen Capabilities JSON Values">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>l</c>
+                            <c>The length in bits of the field and the length in bits of prime p.</c>
+                            <c>value</c>
+                            <c>2048, or 3072</c>
+                            <c>No</c>
+                            <c>n</c>
+                            <c>The length in bits of q which is a prime factor of (p-1).</c>
+                            <c>value</c>
+                            <c>224, or 256 when L is 2048. Otherwise 256.</c>
+                            <c>No</c>
+                            <c>hashAlg</c>
+                            <c>The hash functions supported when signing a message.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}.</c>
+                            <c>No</c>
+                        </texttable>
+                    </section>
+                </section>
+                <section anchor="mode_sigVer" title="The sigVer Mode Capabilities">
+                    <t>The DSA sigVer mode capabilities are advertised as JSON objects, which are elements of the 'capabilities' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
+                    <t>Each DSA sigVer mode capability set is advertised as a self-contained JSON object.</t>
+                    <section anchor="mode_sigVerFullSet" title="sigVer Full Set of Capabilities">
+                        <t>The complete list of DSA signature verification capabilities may be advertised by the ACVP compliant crypto module:</t>
+                        <texttable anchor="sigVer_table" title="DSA sigVer Capabilities JSON Values">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>l</c>
+                            <c>The length in bits of the field and the length in bits of prime p.</c>
+                            <c>value</c>
+                            <c>1024, 2048, or 3072</c>
+                            <c>No</c>
+                            <c>n</c>
+                            <c>The length in bits of q which is a prime factor of (p-1).</c>
+                            <c>value</c>
+                            <c>160 when L is 1024. 224, or 256 when L is 2048. Otherwise 256.</c>
+                            <c>No</c>
+                            <c>hashAlg</c>
+                            <c>The hash functions supported when verifying a message.</c>
+                            <c>array</c>
+                            <c>Any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}.</c>
+                            <c>No</c>
+                        </texttable>
+                    </section>
+                </section>
+            </section>
+        </section>
+        <section anchor="test_vectors" title="Test Vectors">
+            <t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to the ACVP server for validation. A typical ACVP validation session would require multiple test vector sets to be downloaded and processed by the ACVP client. Each test vector set represents an individual DSA function. This section describes the JSON schema for a test vector set used with DSA algorithms.</t>
+            <t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire vector set as well as individual test vectors to be processed by the ACVP client.The following table describes the JSON elements at the top level of the hierarchy. </t>
+            <texttable anchor="vs_top_table" title="Vector Set JSON Object">
+                <ttcol align="left">JSON Value</ttcol>
+                <ttcol align="left">Description</ttcol>
+                <ttcol align="left">JSON type</ttcol>
+                <c>acvVersion</c>
+                <c>Protocol version identifier</c>
+                <c>value</c>
+                <c>vsId</c>
+                <c>Unique numeric identifier for the vector set</c>
+                <c>value</c>
+                <c>algorithm</c>
+                <c>DSA</c>
+                <c>value</c>
+                <c>mode</c>
+                <c>The DSA mode used for the test vectors.</c>
+                <c>value</c>
+                <c>testGroups</c>
+                <c>Array of test group JSON objects, which are defined in                                                                               
+            
+                    
+                    <xref target="tgjs" />
+                </c>
+                <c>array</c>
             </texttable>
-          </section>
+            <section title="Test Groups JSON Schema" anchor="tgjs">
+                <t>The testGroups element at the top level in the test vector JSON object is an array of test  groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.</t>
+                <t> The test group for DSA is as follows:</t>
+                <texttable anchor="vs_tg_table5" title="Vector Group JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>l</c>
+                    <c>Length in bits of prime modulus p</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c>n</c>
+                    <c>Length in bits of prime divisor q</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c>p</c>
+                    <c>Domain parameter P</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>q</c>
+                    <c>Domain parameter Q</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>g</c>
+                    <c>Domain parameter G</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>x</c>
+                    <c>Private key X</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>y</c>
+                    <c>Public key Y</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>hashAlg</c>
+                    <c>The hash algorithm used in the test group</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c>pqMode</c>
+                    <c>The specific pq generation mode used in the test group</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c>gMode</c>
+                    <c>The specific g generation mode used in the test group</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c>tests</c>
+                    <c>Array of individual test vector JSON objects, which are defined in                                                                                             
+              
+                        
+                        <xref target="tvjs" />
+                    </c>
+                    <c>array</c>
+                    <c>No</c>
+                </texttable>
+            </section>
+            <section title="Test Case JSON Schema" anchor="tvjs">
+                <t>Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each DSA test vector.</t>
+                <texttable anchor="vs_tc_table5" title="Test Case JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>tcId</c>
+                    <c>Numeric identifier for the test case, unique across the entire vector set.</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c>p</c>
+                    <c>The prime modulus</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>q</c>
+                    <c>The prime divisor of p - 1</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>domainSeed</c>
+                    <c>The seed used to generate p and q in the probable method</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>counter</c>
+                    <c>The counter used to generate p and q in the probable method</c>
+                    <c>value - integer</c>
+                    <c>Yes</c>
+                    <c>pSeed</c>
+                    <c>The seed used to generate p in the provable method</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>qSeed</c>
+                    <c>The seed used to generate q in the provable method</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>pCounter</c>
+                    <c>The counter used to generate p in the provable method</c>
+                    <c>value - integer</c>
+                    <c>Yes</c>
+                    <c>qCounter</c>
+                    <c>The counter used to generate q in the provable method</c>
+                    <c>value - integer</c>
+                    <c>Yes</c>
+                    <c>g</c>
+                    <c>The generator</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>h</c>
+                    <c>The index value provided to the g generator in the unverifiable method</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>index</c>
+                    <c>The index value provided to the g generator in the canonical method</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>r</c>
+                    <c>The signature component R</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>s</c>
+                    <c>The signature component S</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>x</c>
+                    <c>The private key component X</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>y</c>
+                    <c>The public key component Y</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>message</c>
+                    <c>The message used to generate signature or verify signature</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                </texttable>
+            </section>
         </section>
-        <section anchor="mode_pqgVer" title="The pqgVer Mode Capabilities">
-          <t>The DSA pqgVer mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
-          <t>Each DSA pqgVer mode capability set is advertised as a self-contained JSON object.</t>
-          <section anchor="mode_pqgVerFullSet" title="pqgVer Full Set of Capabilities">
-            <t>The complete list of DSA pqg verification capabilities may be advertised by the ACVP compliant crypto module:</t>
-            <texttable anchor="pqgVer_table" title="DSA pqgVer Capabilities JSON Values">
-              <ttcol align="left">JSON Value</ttcol>
-              <ttcol align="left">Description</ttcol>
-              <ttcol align="left">JSON type</ttcol>
-              <ttcol align="left">Valid Values</ttcol>
-              <ttcol align="left">Optional</ttcol>
-              <c>l</c>
-              <c>The length in bits of the field and the length in bits of prime p.</c>
-              <c>value</c>
-              <c>1024, 2048, or 3072</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>n</c>
-              <c>The length in bits of q which is a prime factor of (p-1).</c>
-              <c>value</c>
-              <c>160 when L is 1024. 224, or 256 when L is 2048. Otherwise 256.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>pqGen</c>
-              <c>The methods supported to generate p and q.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"probable", "provable"}.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>gGen</c>
-              <c>The methods supported to generate g.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"unverifiable", "canonical"}.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>hashAlg</c>
-              <c>The hash functions supported when generating p, q and g.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}. Note that the digest size of the hash function MUST be equal to or greater than N.</c>
-              <c>No</c>
+        <section anchor="vector_responses" title="Test Vector Responses">
+            <t>After the ACVP client downloads and processes a vector set, it must send the response vectors back to the ACVP server. The following table describes the JSON object that represents a vector set response.</t>
+            <texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
+                <ttcol align="left">JSON Value</ttcol>
+                <ttcol align="left">Description</ttcol>
+                <ttcol align="left">JSON type</ttcol>
+                <c>acvVersion</c>
+                <c>Protocol version identifier</c>
+                <c>value</c>
+                <c>vsId</c>
+                <c>Unique numeric identifier for the vector set</c>
+                <c>value</c>
+                <c>testResults</c>
+                <c>Array of JSON objects that represent each test vector result, as defined by the tables below</c>
+                <c>array</c>
             </texttable>
-          </section>
-        </section>
-        <section anchor="mode_keyGen" title="The keyGen Mode Capabilities">
-          <t>The DSA keyGen mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
-          <t>Each DSA keyGen mode capability set is advertised as a self-contained JSON object.</t>
-          <section anchor="mode_keyGenFullSet" title="keyGen Full Set of Capabilities">
-            <t>The complete list of DSA key generation capabilities may be advertised by the ACVP compliant crypto module:</t>
-            <texttable anchor="keyGen_table" title="DSA keyGen Capabilities JSON Values">
-              <ttcol align="left">JSON Value</ttcol>
-              <ttcol align="left">Description</ttcol>
-              <ttcol align="left">JSON type</ttcol>
-              <ttcol align="left">Valid Values</ttcol>
-              <ttcol align="left">Optional</ttcol>
-              <c>l</c>
-              <c>The length in bits of the field and the length in bits of prime p.</c>
-              <c>value</c>
-              <c>2048, or 3072</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>n</c>
-              <c>The length in bits of q which is a prime factor of (p-1).</c>
-              <c>value</c>
-              <c>224, or 256 when L is 2048. Otherwise 256.</c>
-              <c>No</c>
+            <t>The following table describes the JSON object that represents a vector set response for DSA.</t>
+            <texttable anchor="vr_top_table5" title="Vector Set Response JSON Object">
+                <ttcol align="left">JSON Value</ttcol>
+                <ttcol align="left">Description</ttcol>
+                <ttcol align="left">JSON type</ttcol>
+                <ttcol align="left">Optional</ttcol>
+                <c>p</c>
+                <c>The prime modulus</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>q</c>
+                <c>The prime divisor of p - 1</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>g</c>
+                <c>The generator</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>x</c>
+                <c>The private key component X</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>y</c>
+                <c>The public key component Y</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>r</c>
+                <c>The signature component R</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>s</c>
+                <c>The signature component S</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>domainSeed</c>
+                <c>The seed used to generate p and q in the probable method</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>counter</c>
+                <c>The counter used to generate p and q in the probable method</c>
+                <c>value - integer</c>
+                <c>Yes</c>
+                <c>pSeed</c>
+                <c>The seed used to generate p in the provable method</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>qSeed</c>
+                <c>The seed used to generate q in the provable method</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>pCounter</c>
+                <c>The counter used to generate p in the provable method</c>
+                <c>value - integer</c>
+                <c>Yes</c>
+                <c>qCounter</c>
+                <c>The counter used to generate q in the provable method</c>
+                <c>value - integer</c>
+                <c>Yes</c>
+                <c>testPassed</c>
+                <c>The pass or fail result of the verify</c>
+                <c>boolean</c>
+                <c>Yes</c>
             </texttable>
-          </section>
         </section>
-        <section anchor="mode_sigGen" title="The sigGen Mode Capabilities">
-          <t>The DSA sigGen mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
-          <t>Each DSA sigGen mode capability set is advertised as a self-contained JSON object.</t>
-          <section anchor="mode_sigGenFullSet" title="sigGen Full Set of Capabilities">
-            <t>The complete list of DSA signature generation capabilities may be advertised by the ACVP compliant crypto module:</t>
-            <texttable anchor="sigGen_table" title="DSA sigGen Capabilities JSON Values">
-              <ttcol align="left">JSON Value</ttcol>
-              <ttcol align="left">Description</ttcol>
-              <ttcol align="left">JSON type</ttcol>
-              <ttcol align="left">Valid Values</ttcol>
-              <ttcol align="left">Optional</ttcol>
-              <c>l</c>
-              <c>The length in bits of the field and the length in bits of prime p.</c>
-              <c>value</c>
-              <c>2048, or 3072</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>n</c>
-              <c>The length in bits of q which is a prime factor of (p-1).</c>
-              <c>value</c>
-              <c>224, or 256 when L is 2048. Otherwise 256.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>hashAlg</c>
-              <c>The hash functions supported when signing a message.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}.</c>
-              <c>No</c>
-            </texttable>
-          </section>
+        <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
+        <section anchor="Acknowledgements" title="Acknowledgements">
+            <t>TBD...</t>
         </section>
-        <section anchor="mode_sigVer" title="The sigVer Mode Capabilities">
-          <t>The DSA sigVer mode capabilities are advertised as JSON objects, which are elements of the 'algSpecs' array in the ACVP registration message. See the ACVP specification for details on the registration message.</t>
-          <t>Each DSA sigVer mode capability set is advertised as a self-contained JSON object.</t>
-          <section anchor="mode_sigVerFullSet" title="sigVer Full Set of Capabilities">
-            <t>The complete list of DSA signature verification capabilities may be advertised by the ACVP compliant crypto module:</t>
-            <texttable anchor="sigVer_table" title="DSA sigVer Capabilities JSON Values">
-              <ttcol align="left">JSON Value</ttcol>
-              <ttcol align="left">Description</ttcol>
-              <ttcol align="left">JSON type</ttcol>
-              <ttcol align="left">Valid Values</ttcol>
-              <ttcol align="left">Optional</ttcol>
-              <c>l</c>
-              <c>The length in bits of the field and the length in bits of prime p.</c>
-              <c>value</c>
-              <c>1024, 2048, or 3072</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>n</c>
-              <c>The length in bits of q which is a prime factor of (p-1).</c>
-              <c>value</c>
-              <c>160 when L is 1024. 224, or 256 when L is 2048. Otherwise 256.</c>
-              <c>No</c>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c/>
-              <c>hashAlg</c>
-              <c>The hash functions supported when verifying a message.</c>
-              <c>array</c>
-              <c>Any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256"}.</c>
-              <c>No</c>
-            </texttable>
-          </section>
+        <!-- Possibly a 'Contributors' section ... -->
+        <section anchor="IANA" title="IANA Considerations">
+            <t>This memo includes no request to IANA.</t>
         </section>
-      </section>
-      <section anchor="test_vectors" title="Test Vectors">
-        <t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to the ACVP server for validation. A typical ACVP validation session would require multiple test vector sets to be downloaded and processed by the ACVP client. Each test vector set represents an individual DSA function. This section describes the JSON schema for a test vector set used with DSA algorithms.</t>
-        <t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire vector set as well as individual test vectors to be processed by the ACVP client.The following table describes the JSON elements at the top level of the hierarchy. </t>
-        <texttable anchor="vs_top_table" title="Vector Set JSON Object">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-          <c>acvVersion</c>
-          <c>Protocol version identifier</c>
-          <c>value</c>
-          <c/>
-          <c/>
-          <c/>
-          <c>vsId</c>
-          <c>Unique numeric identifier for the vector set</c>
-          <c>value</c>
-          <c/>
-          <c/>
-          <c/>
-          <c>algorithm</c>
-          <c>DSA</c>
-          <c>value</c>
-          <c/>
-          <c/>
-          <c/>
-          <c>mode</c>
-          <c>The DSA mode used for the test vectors.</c>
-          <c>value</c>
-          <c/>
-          <c/>
-          <c/>
-          <c>testGroups</c>
-          <c>Array of test group JSON objects, which are defined in                                                                               
-            <xref target="tgjs" />
-          </c>
-          <c>array</c>
-        </texttable>
-        <section title="Test Groups JSON Schema" anchor="tgjs">
-          <t>The testGroups element at the top level in the test vector JSON object is an array of test  groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.</t>
-          <t> The test group for DSA is as follows:</t>
-          <texttable anchor="vs_tg_table5" title="Vector Group JSON Object">
-            <ttcol align="left">JSON Value</ttcol>
-            <ttcol align="left">Description</ttcol>
-            <ttcol align="left">JSON type</ttcol>
-            <ttcol align="left">Optional</ttcol>
-            <c>l</c>
-            <c>Length in bits of prime modulus p</c>
-            <c>value</c>
-            <c>No</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>n</c>
-            <c>Length in bits of prime divisor q</c>
-            <c>value</c>
-            <c>No</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>p</c>
-            <c>Domain parameter P</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>q</c>
-            <c>Domain parameter Q</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>g</c>
-            <c>Domain parameter G</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>x</c>
-            <c>Private key X</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>y</c>
-            <c>Public key Y</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>hashAlg</c>
-            <c>The hash algorithm used in the test group</c>
-            <c>value</c>
-            <c>No</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>pqMode</c>
-            <c>The specific pq generation mode used in the test group</c>
-            <c>value</c>
-            <c>No</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>gMode</c>
-            <c>The specific g generation mode used in the test group</c>
-            <c>value</c>
-            <c>No</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>tests</c>
-            <c>Array of individual test vector JSON objects, which are defined in                                                                                             
-              <xref target="tvjs" />
-            </c>
-            <c>array</c>
-            <c>No</c>
-          </texttable>
+        <section anchor="Security" title="Security Considerations">
+            <t>Security considerations are addressed by the ACVP specification.</t>
         </section>
-        <section title="Test Case JSON Schema" anchor="tvjs">
-          <t>Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each DSA test vector.</t>
-          <texttable anchor="vs_tc_table5" title="Test Case JSON Object">
-            <ttcol align="left">JSON Value</ttcol>
-            <ttcol align="left">Description</ttcol>
-            <ttcol align="left">JSON type</ttcol>
-            <ttcol align="left">Optional</ttcol>
-            <c>tcId</c>
-            <c>Numeric identifier for the test case, unique across the entire vector set.</c>
-            <c>value</c>
-            <c>No</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>p</c>
-            <c>The prime modulus</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>q</c>
-            <c>The prime divisor of p - 1</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>domainSeed</c>
-            <c>The seed used to generate p and q in the probable method</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>counter</c>
-            <c>The counter used to generate p and q in the probable method</c>
-            <c>value - integer</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>pSeed</c>
-            <c>The seed used to generate p in the provable method</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>qSeed</c>
-            <c>The seed used to generate q in the provable method</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>pCounter</c>
-            <c>The counter used to generate p in the provable method</c>
-            <c>value - integer</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>qCounter</c>
-            <c>The counter used to generate q in the provable method</c>
-            <c>value - integer</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>g</c>
-            <c>The generator</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>h</c>
-            <c>The index value provided to the g generator in the unverifiable method</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>index</c>
-            <c>The index value provided to the g generator in the canonical method</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>r</c>
-            <c>The signature component R</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>s</c>
-            <c>The signature component S</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>x</c>
-            <c>The private key component X</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>y</c>
-            <c>The public key component Y</c>
-            <c>value</c>
-            <c>Yes</c>
-            <c/>
-            <c/>
-            <c/>
-            <c/>
-            <c>message</c>
-            <c>The message used to generate signature or verify signature</c>
-            <c>value</c>
-            <c>Yes</c>
-          </texttable>
+    </middle>
+    <!--  *****BACK MATTER ***** -->
+    <back>
+        <references title="Normative References">
+            <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->      &RFC2119;                                                        
+      
+            
+            <reference anchor="ACVP">
+                <!-- the following is the minimum to make xml2rfc happy -->
+                <front>
+                    <title>ACVP Specification</title>
+                    <author initials="authInitials" surname="authSurName">
+                        <organization>NIST</organization>
+                    </author>
+                    <date year="2016" />
+                </front>
+            </reference>
+            <reference anchor="FIPS.186-4"
+                target="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf">
+                <front>
+                    <title>Digital Signature Standard (DSS)</title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="July" year="2013"/>
+                </front>
+            </reference>
+            <reference anchor="SP.800-89"
+                target="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-89.pdf">
+                <front>
+                    <title>Recommendation for Obtaining Assurances for Digital Signature Applications </title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="July" year="2013"/>
+                </front>
+            </reference>
+        </references>
+        <section anchor="app-reg-ex" title="Example Capabilities JSON Object">
+            <t>The following section contain example JSON for the various DSA modes: keyPair, sigGen, sigVer, pqgGen and pqgVer. Note that all binary HEX representations are in big-endian format.</t>
+            <figure>
+                <artwork>
+                    <![CDATA[
+[{
+		"algorithm": "DSA",
+		"mode": "pqgGen",
+		"prereqVals": [{
+				"algorithm": "SHA",
+				"valValue": "123456"
+			},
+			{
+				"algorithm": "DRBG",
+				"valValue": "123456"
+			}
+		],
+		"capabilities": [{
+				"pqGen": [
+					"probable",
+					"provable"
+				],
+				"gGen": [
+					"unverifiable",
+					"canonical"
+				],
+				"l": 2048,
+				"n": 224,
+				"hashAlg": [
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"pqGen": [
+					"probable",
+					"provable"
+				],
+				"gGen": [
+					"unverifiable",
+					"canonical"
+				],
+				"l": 2048,
+				"n": 256,
+				"hashAlg": [
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"pqGen": [
+					"probable",
+					"provable"
+				],
+				"gGen": [
+					"unverifiable",
+					"canonical"
+				],
+				"l": 3072,
+				"n": 256,
+				"hashAlg": [
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/256"
+				]
+			}
+		]
+	},
+	{
+		"algorithm": "DSA",
+		"mode": "pqgVer",
+		"prereqVals": [{
+				"algorithm": "SHA",
+				"valValue": "123456"
+			},
+			{
+				"algorithm": "DRBG",
+				"valValue": "123456"
+			}
+		],
+		"capabilities": [{
+				"pqGen": [
+					"probable",
+					"provable"
+				],
+				"gGen": [
+					"unverifiable",
+					"canonical"
+				],
+				"l": 1024,
+				"n": 160,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"pqGen": [
+					"probable",
+					"provable"
+				],
+				"gGen": [
+					"unverifiable",
+					"canonical"
+				],
+				"l": 2048,
+				"n": 224,
+				"hashAlg": [
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"pqGen": [
+					"probable",
+					"provable"
+				],
+				"gGen": [
+					"unverifiable",
+					"canonical"
+				],
+				"l": 2048,
+				"n": 256,
+				"hashAlg": [
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"pqGen": [
+					"probable",
+					"provable"
+				],
+				"gGen": [
+					"unverifiable",
+					"canonical"
+				],
+				"l": 3072,
+				"n": 256,
+				"hashAlg": [
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/256"
+				]
+			}
+		]
+	},
+	{
+		"algorithm": "DSA",
+		"mode": "keyGen",
+		"prereqVals": [{
+				"algorithm": "SHA",
+				"valValue": "123456"
+			},
+			{
+				"algorithm": "DRBG",
+				"valValue": "123456"
+			}
+		],
+		"capabilities": [{
+				"n": 224,
+				"l": 2048
+			},
+			{
+				"n": 256,
+				"l": 2048
+			},
+			{
+				"n": 256,
+				"l": 3072
+			}
+		]
+	},
+	{
+		"algorithm": "DSA",
+		"mode": "sigGen",
+		"prereqVals": [{
+				"n": 224,
+				"l": 2048,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"n": 256,
+				"l": 2048,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"n": 256,
+				"l": 3072,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			}
+		]
+	},
+	{
+		"algorithm": "DSA",
+		"mode": "sigVer",
+		"prereqVals": [{
+				"n": 160,
+				"l": 1024,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"n": 224,
+				"l": 2048,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"n": 256,
+				"l": 2048,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			},
+			{
+				"n": 256,
+				"l": 3072,
+				"hashAlg": [
+					"SHA-1",
+					"SHA2-224",
+					"SHA2-256",
+					"SHA2-384",
+					"SHA2-512",
+					"SHA2-512/224",
+					"SHA2-512/256"
+				]
+			}
+		]
+	}
+]
+            ]]>
+                </artwork>
+            </figure>
         </section>
-      </section>
-      <section anchor="vector_responses" title="Test Vector Responses">
-        <t>After the ACVP client downloads and processes a vector set, it must send the response vectors back to the ACVP server. The following table describes the JSON object that represents a vector set response.</t>
-        <texttable anchor="vr_top_table" title="Vector Set Response JSON Object">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-          <c>acvVersion</c>
-          <c>Protocol version identifier</c>
-          <c>value</c>
-          <c/>
-          <c/>
-          <c/>
-          <c>vsId</c>
-          <c>Unique numeric identifier for the vector set</c>
-          <c>value</c>
-          <c/>
-          <c/>
-          <c/>
-          <c>testResults</c>
-          <c>Array of JSON objects that represent each test vector result, as defined by the tables below</c>
-          <c>array</c>
-        </texttable>
-        <t>The following table describes the JSON object that represents a vector set response for DSA.</t>
-        <texttable anchor="vr_top_table5" title="Vector Set Response JSON Object">
-          <ttcol align="left">JSON Value</ttcol>
-          <ttcol align="left">Description</ttcol>
-          <ttcol align="left">JSON type</ttcol>
-          <ttcol align="left">Optional</ttcol>
-          <c>p</c>
-          <c>The prime modulus</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>q</c>
-          <c>The prime divisor of p - 1</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>g</c>
-          <c>The generator</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>x</c>
-          <c>The private key component X</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>y</c>
-          <c>The public key component Y</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>r</c>
-          <c>The signature component R</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>s</c>
-          <c>The signature component S</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>domainSeed</c>
-          <c>The seed used to generate p and q in the probable method</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>counter</c>
-          <c>The counter used to generate p and q in the probable method</c>
-          <c>value - integer</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>pSeed</c>
-          <c>The seed used to generate p in the provable method</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>qSeed</c>
-          <c>The seed used to generate q in the provable method</c>
-          <c>value</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>pCounter</c>
-          <c>The counter used to generate p in the provable method</c>
-          <c>value - integer</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>qCounter</c>
-          <c>The counter used to generate q in the provable method</c>
-          <c>value - integer</c>
-          <c>Yes</c>
-          <c/>
-          <c/>
-          <c/>
-          <c/>
-          <c>testPassed</c>
-          <c>The pass or fail result of the verify</c>
-          <c>boolean</c>
-          <c>Yes</c>
-        </texttable>
-      </section>
-      <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
-      <section anchor="Acknowledgements" title="Acknowledgements">
-        <t>TBD...</t>
-      </section>
-      <!-- Possibly a 'Contributors' section ... -->
-      <section anchor="IANA" title="IANA Considerations">
-        <t>This memo includes no request to IANA.</t>
-      </section>
-      <section anchor="Security" title="Security Considerations">
-        <t>Security considerations are addressed by the ACVP specification.</t>
-      </section>
-    </section>
-  </middle>
-  <!--  *****BACK MATTER ***** -->
-  <back>
-    <references title="Normative References">
-      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->      &RFC2119;                                                        
-      <reference anchor="ACVP">
-        <!-- the following is the minimum to make xml2rfc happy -->
-        <front>
-          <title>ACVP Specification</title>
-          <author initials="authInitials" surname="authSurName">
-            <organization>NIST</organization>
-          </author>
-          <date year="2016" />
-        </front>
-      </reference>
-    </references>
-    <section anchor="app-reg-ex" title="Example DSA JSON Object">
-      <t>The following sections contain example JSON for the various DSA modes: keyPair, sigGen, sigVer, pqgGen and pqgVer. Note that all binary HEX representations are in big-endian format.</t>
-      <section anchor="app-reg-ex0" title="Example DSA PQGGen Capabilities JSON Object">
-        <t>The following is a example JSON object advertising support for DSA pqgGen.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
-{
-    "algorithm": "DSA",
-    "mode": "pqgGen",
-    "prereqVals": [
-      {
-          "algorithm": "SHA",
-          "valValue": "123456"
-      },
-      {
-          "algorithm": "DRBG",
-          "valValue": "123456"
-      }
-    ],
-    "algSpecs": [
-    {
-      "pqGen": [
-        "probable",
-        "provable"
-      ],
-      "gGen": [
-        "unverifiable",
-        "canonical"
-      ],
-      "l": 2048,
-      "n": 224,
-      "hashAlg": [
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "pqGen": [
-        "probable",
-        "provable"
-      ],
-      "gGen": [
-        "unverifiable",
-        "canonical"
-      ],
-      "l": 2048,
-      "n": 256,
-      "hashAlg": [
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "pqGen": [
-        "probable",
-        "provable"
-      ],
-      "gGen": [
-        "unverifiable",
-        "canonical"
-      ],
-      "l": 3072,
-      "n": 256,
-      "hashAlg": [
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/256"
-      ]
-    }
-  ]
-}
-            ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-reg-ex1" title="Example DSA PQGVer Capabilities JSON Object">
-        <t>The following is a example JSON object advertising support for DSA pqgVer.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
-{
-    "algorithm": "DSA",
-    "mode": "pqgVer",
-    "prereqVals": [
-      {
-          "algorithm": "SHA",
-          "valValue": "123456"
-      },
-      {
-          "algorithm": "DRBG",
-          "valValue": "123456"
-      }
-    ],
-    "algSpecs": [
-    {
-      "pqGen": [
-        "probable",
-        "provable"
-      ],
-      "gGen": [
-        "unverifiable",
-        "canonical"
-      ],
-      "l": 1024,
-      "n": 160,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "pqGen": [
-        "probable",
-        "provable"
-      ],
-      "gGen": [
-        "unverifiable",
-        "canonical"
-      ],
-      "l": 2048,
-      "n": 224,
-      "hashAlg": [
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "pqGen": [
-        "probable",
-        "provable"
-      ],
-      "gGen": [
-        "unverifiable",
-        "canonical"
-      ],
-      "l": 2048,
-      "n": 256,
-      "hashAlg": [
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "pqGen": [
-        "probable",
-        "provable"
-      ],
-      "gGen": [
-        "unverifiable",
-        "canonical"
-      ],
-      "l": 3072,
-      "n": 256,
-      "hashAlg": [
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/256"
-      ]
-    }
-  ]
-}
-            ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-reg-ex2" title="Example DSA KeyGen Capabilities JSON Object">
-        <t>The following is a example JSON object advertising support for DSA keyGen.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
-{
-    "algorithm": "DSA",
-    "mode": "keyGen",
-    "prereqVals": [
-      {
-          "algorithm": "SHA",
-          "valValue": "123456"
-      },
-      {
-          "algorithm": "DRBG",
-          "valValue": "123456"
-      }
-    ],
-    "algSpecs": [
-    {
-      "n": 224,
-      "l": 2048
-    },
-    {
-      "n": 256,
-      "l": 2048
-    },
-    {
-      "n": 256,
-      "l": 3072
-    }
-  ]
-}
-            ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-reg-ex3" title="Example DSA SigGen Capabilities JSON Object">
-        <t>The following is a example JSON object advertising support for DSA sigGen.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
-{
-    "algorithm": "DSA",
-    "mode": "sigGen",
-    "prereqVals": [
-    {
-      "n": 224,
-      "l": 2048,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "n": 256,
-      "l": 2048,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "n": 256,
-      "l": 3072,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    }
-  ]
-}
-            ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-reg-ex4" title="Example DSA SigVer Capabilities JSON Object">
-        <t>The following is a example JSON object advertising support for DSA sigVer.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
-{
-    "algorithm": "DSA",
-    "mode": "sigVer",
-    "prereqVals": [
-    {
-      "n": 160,
-      "l": 1024,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "n": 224,
-      "l": 2048,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "n": 256,
-      "l": 2048,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    },
-    {
-      "n": 256,
-      "l": 3072,
-      "hashAlg": [
-        "SHA-1",
-        "SHA2-224",
-        "SHA2-256",
-        "SHA2-384",
-        "SHA2-512",
-        "SHA2-512/224",
-        "SHA2-512/256"
-      ]
-    }
-  ]
-}
-            ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-vs-ex5" title="Example Test DSA PQGGen JSON Object">
-        <t>The following is a example JSON object for DSA pqgGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+        <section anchor="app-vs-ex" title="Example Vector Set Request/Responses JSON Object">
+            <section anchor="app-vs-ex5" title="Example Test DSA PQGGen JSON Object">
+                <t>The following is a example JSON object for DSA pqgGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1277,12 +1091,12 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-        <t>The following is a example JSON object for DSA PQGGen test results sent from the crypto module to the ACVP server.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+                <t>The following is a example JSON object for DSA PQGGen test results sent from the crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1339,14 +1153,14 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-vs-ex6" title="Example Test DSA PQGVer JSON Object">
-        <t>The following is a example JSON object for DSA PQGVer, test vectors sent from the ACVP server to the crypto module and the response.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+            </section>
+            <section anchor="app-vs-ex6" title="Example Test DSA PQGVer JSON Object">
+                <t>The following is a example JSON object for DSA PQGVer, test vectors sent from the ACVP server to the crypto module and the response.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1430,12 +1244,12 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-        <t>The following is a example JSON object for DSA PQGVer test results sent from the crypto module to the ACVP server.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+                <t>The following is a example JSON object for DSA PQGVer test results sent from the crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1483,14 +1297,14 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-vs-ex7" title="Example Test DSA KeyGen JSON Object">
-        <t>The following is a example JSON object for DSA KeyGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+            </section>
+            <section anchor="app-vs-ex7" title="Example Test DSA KeyGen JSON Object">
+                <t>The following is a example JSON object for DSA KeyGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1514,12 +1328,12 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-        <t>The following is a example JSON object for DSA KeyGen test results sent from the crypto module to the ACVP server.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+                <t>The following is a example JSON object for DSA KeyGen test results sent from the crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1544,14 +1358,14 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-vs-ex8" title="Example Test DSA Generation JSON Object">
-        <t>The following is a example JSON object for DSA SigGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+            </section>
+            <section anchor="app-vs-ex8" title="Example Test DSA Generation JSON Object">
+                <t>The following is a example JSON object for DSA SigGen, test vectors sent from the ACVP server to the crypto module and the response.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1577,12 +1391,12 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-        <t>The following is a example JSON object for DSA SigGen test results sent from the crypto module to the ACVP server.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+                <t>The following is a example JSON object for DSA SigGen test results sent from the crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1608,14 +1422,14 @@
     }
 ]
           ]]>
-          </artwork>
-        </figure>
-      </section>
-      <section anchor="app-vs-ex9" title="Example Test DSA SigVer JSON Object">
-        <t>The following is a example JSON object for DSA SigVer, test vectors sent from the ACVP server to the crypto module and the response.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+            </section>
+            <section anchor="app-vs-ex9" title="Example Test DSA SigVer JSON Object">
+                <t>The following is a example JSON object for DSA SigVer, test vectors sent from the ACVP server to the crypto module and the response.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1646,12 +1460,12 @@
     }
 ]
             ]]>
-          </artwork>
-        </figure>
-        <t>The following is a example JSON object for DSA generation test results sent from the crypto module to the ACVP server.</t>
-        <figure>
-          <artwork>
-            <![CDATA[
+                    </artwork>
+                </figure>
+                <t>The following is a example JSON object for DSA generation test results sent from the crypto module to the ACVP server.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
 [
     {
         "acvVersion": <acvp-version>
@@ -1672,9 +1486,9 @@
     }
 ]
           ]]>
-          </artwork>
-        </figure>
-      </section>
-    </section>
-  </back>
+                    </artwork>
+                </figure>
+            </section>
+        </section>
+    </back>
 </rfc>
