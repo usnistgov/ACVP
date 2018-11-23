@@ -103,6 +103,8 @@ If you would like to talk to our developers, you may want to send email to our m
 - [Google Project Wycheproof](https://github.com/google/wycheproof)
 - [HACL*, a formally verified cryptographic library written in F*](https://github.com/mitls/hacl-star)
 - [Automated Module Validation Protocol](https://github.com/usnistgov/AMVP)
+- [ACVP Proxy](https://github.com/smuellerDD/acvpproxy)
+- [ACVP Parser](https://github.com/smuellerDD/acvpparser)
 
 # Licensing terms
 
