@@ -670,12 +670,26 @@
     </section>
     
     <section title="Submission Size Considerations">
-    	<t>Standard submission size handled by the server is 4MB.  In the case that the submission
-    	size is larger than 4MB, an additional port will be provided for the target end point.  In
-    	order to retrieve this "large submission" URI, the user must calculate the size of the
-    	submission in bytes and POST {submissionSize:bytes} to /acvp/acvp/large with their JWT 
-    	authentication token.  This end point will determine if the submission requires the
-    	"large submission" URI and if so, will return the URI to the user.</t>
+    	<t>Some server implementations MAY require alternative handling for submission sizes that exceed
+    	the configured server port threshold for posting. When performing authentication through the /login 
+    	endpoint the response MUST indicate whether the server requires large submission handling and what 
+    	size will constitute large. The response returned MUST include the standard JWT access token as well
+    	as the following properties:		<list>
+    	<t>
+              <spanx style="strong">largeEndpointRequired</spanx> -              <spanx style="verb">boolean</spanx>, 
+              indication of whether or not this server is required to support the large endpoint URI
+        </t>
+        <t>
+              <spanx style="strong">sizeConstraintMessage</spanx> -              <spanx style="verb">string</spanx>, 
+              provides indication of the standard submission size constraint for this server
+        </t>
+    	</list>
+        When clients determine they have a response which will exceed the server value specified in the 
+        sizeConstraintMessage property, clients MUST use the /large endpoint with a POST of
+        `[{"acvVersion" : "<current acvVersion>" },{"submissionSize": <integer bytes> }]`. The response MUST 
+        indicate which URI the client MUST use in order to submit the results. This URI MAY be a one-time use 
+        URI and clients SHOULD only attempt to use this URI once regardless of success or failure in submitting. 
+        If resubmission is required clients MUST re-POST to the /large endpoint in order to obtain the URI to use.</t>
     </section>
 
     <section title="Versioning">
