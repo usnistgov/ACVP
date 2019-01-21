@@ -5,9 +5,9 @@
 Internet Engineering Task Force                          B. Fussell, Ed.
 Internet-Draft                                             Cisco Systems
 Intended status: Informational                          A. Vassilev, Ed.
-Expires: May 11, 2019                                           H. Booth
+Expires: July 25, 2019                                          H. Booth
                           National Institute of Standards and Technology
-                                                        November 7, 2018
+                                                        January 21, 2019
 
 
               Automated Cryptographic Validation Protocol
@@ -38,11 +38,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 11, 2019.
+   This Internet-Draft will expire on July 25, 2019.
 
 Copyright Notice
 
-   Copyright (c) 2018 IETF Trust and the persons identified as the
+   Copyright (c) 2019 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Fussell, et al.           Expires May 11, 2019                  [Page 1]
+Fussell, et al.           Expires July 25, 2019                 [Page 1]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    to this document.  Code Components extracted from this document must
@@ -76,7 +76,7 @@ Table of Contents
      4.3.  Server/Proxy Architecture . . . . . . . . . . . . . . . .   7
      4.4.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   8
    5.  ACV Protocol  . . . . . . . . . . . . . . . . . . . . . . . .   9
-     5.1.  HTTP URI Hierarchy  . . . . . . . . . . . . . . . . . . .   9
+     5.1.  HTTP URI Hierarchy  . . . . . . . . . . . . . . . . . . .  10
      5.2.  HTTP URI Resources  . . . . . . . . . . . . . . . . . . .  10
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  13
      6.1.  Authentication  . . . . . . . . . . . . . . . . . . . . .  13
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Fussell, et al.           Expires May 11, 2019                  [Page 2]
+Fussell, et al.           Expires July 25, 2019                 [Page 2]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
        9.7.5.  Delete an Operational Environment . . . . . . . . . .  28
@@ -165,11 +165,12 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                  [Page 3]
+Fussell, et al.           Expires July 25, 2019                 [Page 3]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
+   Appendix C.  Adding a new algorithm . . . . . . . . . . . . . . .  53
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  53
 
 1.  Introduction
@@ -217,15 +218,15 @@ Internet-Draft                ACV Protocol                 November 2018
    ACVP defines how to communicate a request (to execute a cryptographic
    operation) to a cryptographic module, and how to communicate the
    corresponding response (containing the output of that operation) back
-   to a testing system.  It defines a transport (based on HTTP or HTTPS
 
 
 
-Fussell, et al.           Expires May 11, 2019                  [Page 4]
+Fussell, et al.           Expires July 25, 2019                 [Page 4]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
+   to a testing system.  It defines a transport (based on HTTP or HTTPS
    [RFC7230]), an encoding and message format (which is negotiated), and
    a set of message exchanges.  Each vector test set corresponds to a
    single message exchange driven from the client associated with the
@@ -276,10 +277,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-
-Fussell, et al.           Expires May 11, 2019                  [Page 5]
+Fussell, et al.           Expires July 25, 2019                 [Page 5]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    With that in mind there are several expectations when building a
@@ -333,9 +333,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                  [Page 6]
+Fussell, et al.           Expires July 25, 2019                 [Page 6]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
                               +----------------------------------------+
@@ -389,9 +389,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                  [Page 7]
+Fussell, et al.           Expires July 25, 2019                 [Page 7]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
                    +--------------------------------------------------+
@@ -445,9 +445,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                  [Page 8]
+Fussell, et al.           Expires July 25, 2019                 [Page 8]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    o  Response - The JSON from the client providing the desired
@@ -463,6 +463,17 @@ Internet-Draft                ACV Protocol                 November 2018
 
    o  OE - Operational Environment - The specific hardware and/or
       software the client's cryptographic implementation uses to run.
+
+   o  Realtime - For the purposes of this document realtime is defined
+      as the client receiving a vector set and immediately performing
+      the tests and returning the results to the server.  In general,
+      this is a case where the ACVP client and DUT reside in the same
+      box and directly commicate with each other.  Non-realtime would
+      refer to the case where the client may gather vector sets from the
+      server and through some means introduce them to the DUT gather the
+      results and send them back to the server.  In general, this is a
+      case where the DUT cannot communicate directly with the ACVP
+      client.
 
 5.  ACV Protocol
 
@@ -485,25 +496,17 @@ Internet-Draft                ACV Protocol                 November 2018
 
                                  Figure 4
 
-5.1.  HTTP URI Hierarchy
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-Fussell, et al.           Expires May 11, 2019                  [Page 9]
+Fussell, et al.           Expires July 25, 2019                 [Page 9]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
+
+
+5.1.  HTTP URI Hierarchy
 
 
             +-------------+--------------------+---------------+
@@ -551,17 +554,17 @@ Internet-Draft                ACV Protocol                 November 2018
    | /oes         | Return a   | Create a   |            |             |
    |              | List of    | new OE     |            |             |
    |              | OEs        | (Section   |            |             |
+
+
+
+Fussell, et al.           Expires July 25, 2019                [Page 10]
+
+Internet-Draft                ACV Protocol                  January 2019
+
+
    |              | (Section   | 9.7.2)     |            |             |
    |              | 9.7.1)     |            |            |             |
    | /oes/{oeId}  | Retrieve I |            | Update an  | Delete an   |
-
-
-
-Fussell, et al.           Expires May 11, 2019                 [Page 10]
-
-Internet-Draft                ACV Protocol                 November 2018
-
-
    |              | nformation |            | OE         | OE (Section |
    |              | for a OE   |            | (Section   | 9.7.5)      |
    |              | (Section   |            | 9.7.4)     |             |
@@ -607,17 +610,17 @@ Internet-Draft                ACV Protocol                 November 2018
    | {algorithmId | nformation |            |            |             |
    | }            | about an   |            |            |             |
    |              | Algorithm  |            |            |             |
+
+
+
+Fussell, et al.           Expires July 25, 2019                [Page 11]
+
+Internet-Draft                ACV Protocol                  January 2019
+
+
    |              | (Section   |            |            |             |
    |              | 9.9.2)     |            |            |             |
    | /testSession | Returns a  | Create a   |            |             |
-
-
-
-Fussell, et al.           Expires May 11, 2019                 [Page 11]
-
-Internet-Draft                ACV Protocol                 November 2018
-
-
    | s            | list of    | new Test   |            |             |
    |              | Test       | Session    |            |             |
    |              | Sessions   | (Section   |            |             |
@@ -663,17 +666,17 @@ Internet-Draft                ACV Protocol                 November 2018
    | s/{testSessi | Validation | Submission | Vector Set |             |
    | onId}/vector | Results    | of Vector  | Test       |             |
    | Sets/{vector | for a      | Set Test   | Results    |             |
+
+
+
+Fussell, et al.           Expires July 25, 2019                [Page 12]
+
+Internet-Draft                ACV Protocol                  January 2019
+
+
    | SetId}/resul | Vector Set | Results    | Submission |             |
    | ts           | (Section   | (Section   | (Section   |             |
    |              | 9.11.4)    | 9.11.5)    | 9.11.6)    |             |
-
-
-
-Fussell, et al.           Expires May 11, 2019                 [Page 12]
-
-Internet-Draft                ACV Protocol                 November 2018
-
-
    | /testSession | Expected   |            |            |             |
    | s/{testSessi | Test       |            |            |             |
    | onId}/vector | Results    |            |            |             |
@@ -722,12 +725,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-
-
-
-Fussell, et al.           Expires May 11, 2019                 [Page 13]
+Fussell, et al.           Expires July 25, 2019                [Page 13]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 7.  Encoding
@@ -781,9 +781,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 14]
+Fussell, et al.           Expires July 25, 2019                [Page 14]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.3.  JSON Web Token (JWT)
@@ -837,9 +837,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 15]
+Fussell, et al.           Expires July 25, 2019                [Page 15]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
      Workflow authorization flows.  All exchanges shown are over HTTP.
@@ -893,9 +893,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 16]
+Fussell, et al.           Expires July 25, 2019                [Page 16]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.4.  Message Flow
@@ -949,9 +949,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 17]
+Fussell, et al.           Expires July 25, 2019                [Page 17]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
          |        |---------------------------------->|      |  Response  |
@@ -1005,9 +1005,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 18]
+Fussell, et al.           Expires July 25, 2019                [Page 18]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
          *postalCode* - "string"
@@ -1061,9 +1061,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 19]
+Fussell, et al.           Expires July 25, 2019                [Page 19]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    [
@@ -1117,9 +1117,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 20]
+Fussell, et al.           Expires July 25, 2019                [Page 20]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.5.2.1.  Request
@@ -1173,9 +1173,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 21]
+Fussell, et al.           Expires July 25, 2019                [Page 21]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.5.3.1.  Response
@@ -1229,9 +1229,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 22]
+Fussell, et al.           Expires July 25, 2019                [Page 22]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    [
@@ -1285,9 +1285,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 23]
+Fussell, et al.           Expires July 25, 2019                [Page 23]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
       *type* - "string", valid values are:
@@ -1341,9 +1341,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 24]
+Fussell, et al.           Expires July 25, 2019                [Page 24]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.6.2.1.  Request
@@ -1397,9 +1397,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 25]
+Fussell, et al.           Expires July 25, 2019                [Page 25]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.6.4.1.  Request
@@ -1453,9 +1453,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 26]
+Fussell, et al.           Expires July 25, 2019                [Page 26]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 [
@@ -1509,9 +1509,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 27]
+Fussell, et al.           Expires July 25, 2019                [Page 27]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.7.3.1.  Response
@@ -1565,9 +1565,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 28]
+Fussell, et al.           Expires July 25, 2019                [Page 28]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
       "{varies}" depending on the value of "type" as defined by the
@@ -1621,9 +1621,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 29]
+Fussell, et al.           Expires July 25, 2019                [Page 29]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.8.2.2.  Response
@@ -1677,9 +1677,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 30]
+Fussell, et al.           Expires July 25, 2019                [Page 30]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 [
@@ -1733,9 +1733,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 31]
+Fussell, et al.           Expires July 25, 2019                [Page 31]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.8.4.  Retrieve information for a Dependency
@@ -1789,9 +1789,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 32]
+Fussell, et al.           Expires July 25, 2019                [Page 32]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.9.1.  Algorithms Listing
@@ -1845,9 +1845,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 33]
+Fussell, et al.           Expires July 25, 2019                [Page 33]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
       *acvpVersion* - "string", version of ACV protocol used to created
@@ -1901,9 +1901,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 34]
+Fussell, et al.           Expires July 25, 2019                [Page 34]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    [
@@ -1957,9 +1957,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 35]
+Fussell, et al.           Expires July 25, 2019                [Page 35]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.10.2.2.  Response
@@ -2013,9 +2013,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 36]
+Fussell, et al.           Expires July 25, 2019                [Page 36]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.10.4.  Submit For Validation
@@ -2069,9 +2069,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 37]
+Fussell, et al.           Expires July 25, 2019                [Page 37]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    [
@@ -2125,9 +2125,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 38]
+Fussell, et al.           Expires July 25, 2019                [Page 38]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
  [
@@ -2181,9 +2181,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 39]
+Fussell, et al.           Expires July 25, 2019                [Page 39]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    The property returned is:
@@ -2237,9 +2237,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 40]
+Fussell, et al.           Expires July 25, 2019                [Page 40]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    [
@@ -2293,9 +2293,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 41]
+Fussell, et al.           Expires July 25, 2019                [Page 41]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    Where:
@@ -2349,9 +2349,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 42]
+Fussell, et al.           Expires July 25, 2019                [Page 42]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
          *tcId* - "number"
@@ -2405,9 +2405,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 43]
+Fussell, et al.           Expires July 25, 2019                [Page 43]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 9.11.5.  Submit Results
@@ -2461,9 +2461,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 44]
+Fussell, et al.           Expires July 25, 2019                [Page 44]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    When one or more test cases fails, the client will need to correct
@@ -2517,9 +2517,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 45]
+Fussell, et al.           Expires July 25, 2019                [Page 45]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    protocol design implies the server must retain the test values to
@@ -2573,9 +2573,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 46]
+Fussell, et al.           Expires July 25, 2019                [Page 46]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    [
@@ -2629,9 +2629,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 47]
+Fussell, et al.           Expires July 25, 2019                [Page 47]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 12.  Error Codes
@@ -2646,9 +2646,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
    ACVP is intended to be an extensible protocol that supports testing
    of a large number of cryptographic algorithms from several different
-   classes defined by the community.  See [EXT] for details.  All
+   classes defined by the community.  See Appendix C for details.  All
    algorithm identifiers intended for public use SHALL be documented by
-   IANA in the ACVP Registry [EXT].
+   IANA in the ACVP IANA Registry [acvp-iana].
 
 14.  Custom Specification Objects
 
@@ -2685,9 +2685,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 48]
+Fussell, et al.           Expires July 25, 2019                [Page 48]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    may only include a portion of bits from the provided hex string.
@@ -2741,9 +2741,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 49]
+Fussell, et al.           Expires July 25, 2019                [Page 49]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
    {"myRange": {
@@ -2797,9 +2797,9 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 50]
+Fussell, et al.           Expires July 25, 2019                [Page 50]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 15.  IANA Considerations
@@ -2853,21 +2853,21 @@ Internet-Draft                ACV Protocol                 November 2018
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 51]
+Fussell, et al.           Expires July 25, 2019                [Page 51]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
 18.2.  Informative References
 
+   [acvp-iana]
+              NIST, N., "ACVP IANA Registry", February 2018,
+              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
+              draft-vassilev-acvp-iana-00.txt>.
+
    [CMVP]     Vass, A., "Cryptographic Algorithm Validation Program",
               February 2018, <https://csrc.nist.gov/projects/
               cryptographic-algorithm-validation-program>.
-
-   [EXT]      NIST, N., "ACVP Algorithm Test Extensions Specification",
-              February 2018,
-              <https://github.com/usnistgov/ACVP/blob/master/artifacts/
-              draft-vassilev-acvp-ext-00.txt>.
 
 Appendix A.  JSON Formatting Guidelines
 
@@ -2909,9 +2909,9 @@ Appendix B.  Error Messages
 
 
 
-Fussell, et al.           Expires May 11, 2019                 [Page 52]
+Fussell, et al.           Expires July 25, 2019                [Page 52]
 
-Internet-Draft                ACV Protocol                 November 2018
+Internet-Draft                ACV Protocol                  January 2019
 
 
     HTTP response: 400
@@ -2929,6 +2929,10 @@ Internet-Draft                ACV Protocol                 November 2018
          ACV Operation: SHA-512
          Error: Unsupported hash algorithm
 
+
+Appendix C.  Adding a new algorithm
+
+   Add instructions here.
 
 Authors' Addresses
 
@@ -2961,8 +2965,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-Fussell, et al.           Expires May 11, 2019                 [Page 53]
+Fussell, et al.           Expires July 25, 2019                [Page 53]
