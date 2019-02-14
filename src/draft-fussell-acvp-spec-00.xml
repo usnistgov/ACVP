@@ -4,6 +4,7 @@
 <!ENTITY RFC3339 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml">
 <!ENTITY RFC5246 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml">
 <!ENTITY RFC7230 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7230.xml">
+<!ENTITY RFC7159 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7159.xml">
 <!ENTITY RFC7519 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7519.xml">
 ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -119,7 +120,7 @@
         <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-    <date year="2018"/>
+    <date year="2019"/>
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
         in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -195,7 +196,7 @@
       <t>ACVP defines how to communicate a request (to execute a cryptographic operation) to a
         cryptographic module, and how to communicate the corresponding response (containing the
         output of that operation) back to a testing system. It defines a transport (based on HTTP or
-        HTTPS  <xref target="RFC7230"></xref>), an encoding and message format (which is negotiated), and a set of message
+        HTTPS  <xref target="RFC7230"></xref>), an JSON message structure(which is negotiated), and a set of message
         exchanges. Each vector test set corresponds to a single message exchange driven from the
         client associated with the module under test. ACVP does not define the cryptographic
         algorithms, nor does it detail the precise conditions for a response to be acceptable.
@@ -233,13 +234,13 @@
           </list>
         </t>
         <t>With that in mind there are several expectations when building a server used as a
-          validation authority. A validation authority SHALL use HTTPS
+          validation authority. A validation authority SHALL use a combination of HTTPS
           <xref target="RFC7230"></xref>, TLS 1.2
           <xref target="RFC5246"></xref>
           or greater and
           mutual authentication. Therefore a client that expects to be used with a validation
           authority SHALL have the same requirements. A server, proxy or client developed for the
-          purposes of internal organizational testing only MAY chose not to include some of those
+          purposes of internal organizational testing only MAY choose not to include some of those
           features.</t>
       </section>
     </section>
@@ -250,7 +251,8 @@
         <t>
           <list style="symbols">
             <t> ACV Client - Communicates
-              with the ACV server using Java Script Object Notation (JSON) and collects the
+              with the ACV server using Java Script Object Notation (JSON <xref
+      target="RFC7159"></xref>) and collects the
               test vectors and returns the test results using product specific methods.</t>
             <t> ACV Server - Sends JSON formatted messaging and test data to the ACV client and
               processes test responses.</t>
@@ -260,7 +262,7 @@
               example architecture is provided in Figure 3.</t>
             <t> Device Under Test - Contains the crypto module under test which
               can include various algorithms and functions that encrypt/decrypt, generate keys,
-              signatures, perform varifications and DRBG functions. May also contain the ACVP
+              signatures, perform verifications and DRBG functions. May also contain the ACVP
               client.</t>
             <t> Cryptographic Module API - This is the interface, manual or otherwise,
               to the crypto module. This interface is environment specific and will 
@@ -367,13 +369,13 @@
             and capabilities for which the client is seeking test cases and a validation. A 
             Registration can submit capabilities for multiple algorithms. Each algorithm will be
             broken into individual Test Vector Sets.</t>
-            <t>Prompt - The JSON sent from the server to the client defining a single Test 
-            Vector Set to use as inputs for testing. Exactly one prompt will exist for each 
+            <t>Request - The JSON sent from the server to the client defining a single Test 
+            Vector Set to use as inputs for testing. Exactly one request will exist for each 
             Test Vector Set.</t>
             <t>Response - The JSON from the client providing the desired cryptographic output
-            for each of the Test Cases defined in the corresponding Prompt file. These are linked
-            via the Test Vector Set vsId. As exactly one prompt exists for each vsId, one response
-            will exist for each prompt.</t>
+            for each of the Test Cases defined in the corresponding Request file. These are linked
+            via the Test Vector Set vsId. As exactly one request exists for each vsId, one response
+            will exist for each request.</t>
             <t>Disposition - The JSON from the server after the Response is submitted by the client
             detailing the correctness of the Test Cases. A "passed" disposition indicates that the
             particular algorithm in the Test Vector Set is ready for validation.</t>
@@ -470,7 +472,7 @@
 
           <c>/oes</c>
           <c>
-            <xref target="oes_get">Return a List of OEs</xref>
+            <xref target="oes_get">Return a list of OEs</xref>
           </c>
           <c>
             <xref target="oes_post">Create a new OE</xref>
@@ -492,7 +494,7 @@
 
           <c>/modules</c>
           <c>
-            <xref target="modules_get">Return a List of Modules</xref>
+            <xref target="modules_get">Return a list of Modules</xref>
           </c>
           <c>
             <xref target="modules_post">Register a new Module</xref>
@@ -545,7 +547,7 @@
 
           <c>/algorithms</c>
           <c>
-            <xref target="algorithms_get">Return a List of Available Algorithms</xref>
+            <xref target="algorithms_get">Return a list of available algorithms</xref>
           </c>
           <c/>
           <c/>
@@ -670,7 +672,8 @@
     </section>
 
     <section title="Encoding">
-      <t>The encoding used for the request/response messaging will be JSON. The data will be
+      <t>The encoding used for the request/response messaging will be JSON (<xref
+      target="RFC7159"></xref>). The data will be
         identified by: Content-type: application/json In order to allow environment specific
         extensions to a particular version of the ACV protocol, a top-level JSON keyword, extensions
         will be used to extend the OE description and/or the capabilities. Extensions MAY be ignored
@@ -862,7 +865,7 @@
          |        |testSessions/1/vectorSets/1        |      |            | 
          |        |---------------------------------->|      |            |
          |        |                                   |      |  Retrieve  |                      
-         |        |send test vectors for vsId 1       |      |   Prompt   |
+         |        |send test vectors for vsId 1       |      |  Request   |
          |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
          |        |                                   |      |            |                      
          |        |POST results                       |      |   Submit   |                      
@@ -1191,7 +1194,7 @@
           <t>
             <spanx style="strong">GET /modules</spanx>
           </t>
-          <t>Returns a List of available modules.</t>
+          <t>Returns a list of available modules.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1323,7 +1326,7 @@
           <t>
             <spanx style="strong">GET /oes</spanx>
           </t>
-          <t>Returns a List of available operational environments.</t>
+          <t>Returns a list of available operational environments.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1451,7 +1454,7 @@
           <t>
             <spanx style="strong">GET /dependencies</spanx>
           </t>
-          <t>Returns a List of available dependencies.</t>
+          <t>Returns a list of available dependencies.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1641,7 +1644,7 @@
           <t>
             <spanx style="strong">GET /algorithms</spanx>
           </t>
-          <t>Returns a list of available Algorithms on the server.</t>
+          <t>Returns a list of available algorithms on the server.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -2600,6 +2603,7 @@
       &RFC3339;
       &RFC5246;
       &RFC7230;
+      &RFC7159;
       &RFC7519;
 
       </references>
