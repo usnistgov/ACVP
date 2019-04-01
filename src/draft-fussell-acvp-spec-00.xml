@@ -3,6 +3,7 @@
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC3339 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml">
 <!ENTITY RFC5246 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml">
+<!ENTITY RFC7159 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7159.xml">
 <!ENTITY RFC7230 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7230.xml">
 <!ENTITY RFC7519 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7519.xml">
 ]>
@@ -119,7 +120,7 @@
         <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-    <date year="2018"/>
+    <date year="2019"/>
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
         in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -195,7 +196,7 @@
       <t>ACVP defines how to communicate a request (to execute a cryptographic operation) to a
         cryptographic module, and how to communicate the corresponding response (containing the
         output of that operation) back to a testing system. It defines a transport (based on HTTP or
-        HTTPS  <xref target="RFC7230"></xref>), an encoding and message format (which is negotiated), and a set of message
+        HTTPS  <xref target="RFC7230"></xref>), an JSON message structure(which is negotiated), and a set of message
         exchanges. Each vector test set corresponds to a single message exchange driven from the
         client associated with the module under test. ACVP does not define the cryptographic
         algorithms, nor does it detail the precise conditions for a response to be acceptable.
@@ -233,13 +234,13 @@
           </list>
         </t>
         <t>With that in mind there are several expectations when building a server used as a
-          validation authority. A validation authority SHALL use HTTPS
+          validation authority. A validation authority SHALL use a combination of HTTPS
           <xref target="RFC7230"></xref>, TLS 1.2
           <xref target="RFC5246"></xref>
           or greater and
           mutual authentication. Therefore a client that expects to be used with a validation
           authority SHALL have the same requirements. A server, proxy or client developed for the
-          purposes of internal organizational testing only MAY chose not to include some of those
+          purposes of internal organizational testing only MAY choose not to include some of those
           features.</t>
       </section>
     </section>
@@ -250,7 +251,8 @@
         <t>
           <list style="symbols">
             <t> ACV Client - Communicates
-              with the ACV server using Java Script Object Notation (JSON) and collects the
+              with the ACV server using Java Script Object Notation (JSON <xref
+              target="RFC7159"></xref>) and collects the
               test vectors and returns the test results using product specific methods.</t>
             <t> ACV Server - Sends JSON formatted messaging and test data to the ACV client and
               processes test responses.</t>
@@ -260,7 +262,7 @@
               example architecture is provided in Figure 3.</t>
             <t> Device Under Test - Contains the crypto module under test which
               can include various algorithms and functions that encrypt/decrypt, generate keys,
-              signatures, perform varifications and DRBG functions. May also contain the ACVP
+              signatures, perform verifications and DRBG functions. May also contain the ACVP
               client.</t>
             <t> Cryptographic Module API - This is the interface, manual or otherwise,
               to the crypto module. This interface is environment specific and will 
@@ -367,18 +369,26 @@
             and capabilities for which the client is seeking test cases and a validation. A 
             Registration can submit capabilities for multiple algorithms. Each algorithm will be
             broken into individual Test Vector Sets.</t>
-            <t>Prompt - The JSON sent from the server to the client defining a single Test 
-            Vector Set to use as inputs for testing. Exactly one prompt will exist for each 
+            <t>Request - The JSON sent from the server to the client defining a single Test 
+            Vector Set to use as inputs for testing. Exactly one request will exist for each 
             Test Vector Set.</t>
             <t>Response - The JSON from the client providing the desired cryptographic output
-            for each of the Test Cases defined in the corresponding Prompt file. These are linked
-            via the Test Vector Set vsId. As exactly one prompt exists for each vsId, one response
-            will exist for each prompt.</t>
+            for each of the Test Cases defined in the corresponding Request file. These are linked
+            via the Test Vector Set vsId. As exactly one request exists for each vsId, one response
+            will exist for each request.</t>
             <t>Disposition - The JSON from the server after the Response is submitted by the client
             detailing the correctness of the Test Cases. A "passed" disposition indicates that the
             particular algorithm in the Test Vector Set is ready for validation.</t>
             <t>OE - Operational Environment - The specific hardware and/or software the client's
             cryptographic implementation uses to run.</t>
+            <t>Realtime - For the purposes of this document realtime is defined as the client
+            receiving a vector set and immediately performing the tests and returning the results
+            to the server. In general, this is a case where the ACVP client and crypto module
+            reside in the same box and directly communicate with each other. Non-realtime would
+            refer to the case where the client may gather vector sets from the server and through
+            some means introduce them to the crypto module gather the results and send them back
+            to the server.  In general, this is a case where the device hosting the crypto module
+            cannot communicate directly with the ACVP client.</t>
           </list>  
         </t>
       </section>
@@ -406,11 +416,11 @@
         <figure align="center" anchor="xml_figure4">
           <artwork align="left"><![CDATA[
 
-         +-------------+--------------------+---------------+
-            server          path prefix          resource
-         +-------------+--------------------+---------------+
- https://acvts.nist.gov/acvp/validation/acvp/login
-         +-------------+--------------------+---------------+
+     +----------------------+---------------+---------------+
+        server                path prefix       resource
+     +----------------------+---------------+---------------+
+      https://acvts.nist.gov/acvp/validation/acvp/login
+     +----------------------+---------------+---------------+
                           context  API   
 
 
@@ -462,7 +472,7 @@
 
           <c>/oes</c>
           <c>
-            <xref target="oes_get">Return a List of OEs</xref>
+            <xref target="oes_get">Return a list of OEs</xref>
           </c>
           <c>
             <xref target="oes_post">Create a new OE</xref>
@@ -484,7 +494,7 @@
 
           <c>/modules</c>
           <c>
-            <xref target="modules_get">Return a List of Modules</xref>
+            <xref target="modules_get">Return a list of Modules</xref>
           </c>
           <c>
             <xref target="modules_post">Register a new Module</xref>
@@ -537,7 +547,7 @@
 
           <c>/algorithms</c>
           <c>
-            <xref target="algorithms_get">Return a List of Available Algorithms</xref>
+            <xref target="algorithms_get">Return a list of available algorithms</xref>
           </c>
           <c/>
           <c/>
@@ -631,7 +641,7 @@
           
           <c>/large</c>
           <c>
-            <xref target="large_post">Provides a one-time URI for large data submissions.</xref> (Optional)
+            <xref target="largeSubmission">Provides a one-time URI for large data submissions.</xref> (Optional)
           </c>
         </texttable>
 
@@ -667,34 +677,77 @@
     </section>
 
     <section title="Encoding">
-      <t>The encoding used for the request/response messaging will be JSON. The data will be
+      <t>The encoding used for the request/response messaging will be JSON (<xref
+      target="RFC7159"></xref>). The data will be
         identified by: Content-type: application/json In order to allow environment specific
         extensions to a particular version of the ACV protocol, a top-level JSON keyword, extensions
         will be used to extend the OE description and/or the capabilities. Extensions MAY be ignored
         by the ACV server. Vector and vector response data will be JSON encoded.</t>
     </section>
-    
+   
     <section title="Submission Size Considerations">
     	<t>Some server implementations MAY require alternative handling for submission sizes that exceed
-    	the configured server port threshold for posting. When performing authentication through the /login 
-    	endpoint the response MUST indicate whether the server requires large submission handling and what 
-    	size will constitute large. The response returned MUST include the standard JWT access token as well
-    	as the following properties:		<list>
-    	<t>
-              <spanx style="strong">largeEndpointRequired</spanx> -              <spanx style="verb">boolean</spanx>, 
-              indication of whether or not this server is required to support the large endpoint URI
-        </t>
+    	  resource limitations of the normal workflow for a <spanx style="verb">POST</spanx> response. Server
+    	  implementations MUST indicate whether the server requires large submission handling and what the maxmimum value
+    	  for non-large submissions is within the <xref target="login">/login</xref> response.
+    	</t>
+    </section>
+    
+    <section anchor="login" title="Login">
+      <t>
+        A login endpoint is mentioned throughout the document and although how to authenticate is left up to the server
+        the following description is an example of an implementation.
+        <list>
+          <t>
+            <spanx style="strong">password</spanx> - <spanx style="verb">string</spanx>, a password value
+          </t>
+          <t>
+            <spanx style="strong">accessToken</spanx> - <spanx style="verb">string</spanx>, a JWT associated with the
+            current user for which renewal of the expiration is desired
+          </t>
+          <t>
+            <spanx style="strong">largeEndpointRequired</spanx> - <spanx style="verb">boolean</spanx>, 
+            true if the server requires the large endpoint for submissions with a size that exceeds the value found in
+            <spanx style="strong">sizeConstraintMessage</spanx>.
+          </t>
+          <t>
+            <spanx style="strong">sizeConstraintMessage</spanx> - <spanx style="verb">number</spanx>, 
+            provides the maximum value, in bytes, of a submission not required to use the
+            <xref target="largeSubmission">large endpoint</xref> or null if no
+            <spanx style="verb">largeEndpointRequired</spanx> is <spanx style="verb">false</spanx>.
+          </t>
+        </list>
+      </t>
+      <section title="Request">
         <t>
-              <spanx style="strong">sizeConstraintMessage</spanx> -              <spanx style="verb">string</spanx>, 
-              provides indication of the standard submission size constraint for this server
+          <spanx style="strong">POST /login</spanx>
         </t>
-    	</list>
-        When clients determine they have a response which will exceed the server value specified in the 
-        sizeConstraintMessage property, clients MUST use the /large endpoint with a POST of
-        `[{"acvVersion" : "<current acvVersion>" },{"submissionSize": <integer bytes> }]`. The response MUST 
-        indicate which URI the client MUST use in order to submit the results. This URI MAY be a one-time use 
-        URI and clients SHOULD only attempt to use this URI once regardless of success or failure in submitting. 
-        If resubmission is required clients MUST re-POST to the /large endpoint in order to obtain the URI to use.</t>
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+  {
+ "password": "<password>",
+ "accessToken": "<jwt value>"
+  }
+]
+           ]]>              </artwork>
+        </figure>
+      </section>
+      <section title="Response">
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+    {
+        "accessToken": "<jwt value>",
+        "largeEndpointRequired": false,
+        "sizeConstraintMessage": null
+    }
+]
+           ]]>              </artwork>
+        </figure>
+      </section>
     </section>
 
     <section title="Versioning">
@@ -742,15 +795,15 @@
 "alg" : "none"
 }
    {
-      "iss" : "nist.gov",
-      "exp" : 1426420800,
-      "company" : "MyCompany",
-      "jti" : 0987654321,
-      "pkey" : "cc74f56acdba635079383a03941d68db55c7b3c2fcd0f9716c9b62d56d3f8f546e9ec0244203b6ab4a82c08a46b1dbc243c6434861e31ab51065f41dbce00482498d4474d1ed3b09dc727af6b9c788fdb5da283c5a98cf8ac9e473f34644c6bbfc146e28f8158f725ce25bcb73e0a2c05378739d101df15a0c1297a1a2e3abc7912e24caba5465e78f694ad0d3cf48f2f01c4580d774d592684756efbdf0cc7648470dd78a3b38973b18946e71c8feaf2f28b93a2ff36b1cc31236e5845145899e8a0438aeb1073bc0d23d5c7898845d5227867a38234739595d55a44e41a39feff8eb447757fc6b246d92f02fe43b46e46c7403a5966f40ba4e01ca64e955c5"
-   }
-   {
-   Empty octet string (since alg is none).
-   }
+     "iss" : "nist.gov",
+     "exp" : 1426420800,
+     "company" : "MyCompany",
+     "jti" : 0987654321,
+     "pkey" : "cc74f56acdba635079383a03941d68db55c7b3c2f (truncated)"
+  }
+  {
+  Empty octet string (since alg is none).
+  }
            ]]>          </artwork>
         </figure>
 
@@ -773,7 +826,7 @@
           </t>
           <figure align="center">
             <artwork align="left"><![CDATA[
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ
+         Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c (truncated)"
            ]]>            </artwork>
           </figure>
 
@@ -836,64 +889,64 @@
             <preamble>Workflow message flows. All exchanges shown are over HTTP.</preamble>
 
           <artwork align="left"><![CDATA[
-         +--------+-----------------------------------+------+------------+
-         | Client |                                   |Server|  Notes     |
-         +--------+-----------------------------------+------+------------+
-         |        |POST /vendors                      |      |            | 
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |            |
-         |        |vendor URL                         |      |            |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         |        |                                   |      |            |
-         |        |POST /modules                      |      |            |
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |            |
-         |        |module URL                         |      |            |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         |        |                                   |      |            | 
-         |        |POST /oes                          |      |            |
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |            |      
-         |        |oes URL                            |      |            |
-         |        |<-  -  -  -  -  -  -  -  -  -  -   |      |            |
-         |        |                                   |      |            |                      
-         |        |POST dependency                    |      |            | 
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |            |                      
-         |        |dependency URL                     |      |            |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         |        |                                   |      |            |                      
-         |        |POST testSessions                  |      |            | 
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |   Submit   |                      
-         |        |testSessions URL                   |      |Registration|
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         |        |                                   |      |            |                      
-         |        |GET                                |      |            |                      
-         |        |testSessions/1/vectorSets/1        |      |            | 
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |  Retrieve  |                      
-         |        |send test vectors for vsId 1       |      |   Prompt   |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         |        |                                   |      |            |                      
-         |        |POST results                       |      |   Submit   |                      
-         |        |---------------------------------->|      |  Response  |
-         |        |                                   |      |            |                      
-         |        |GET                                |      |            |                      
-         |        |testSessions/1/vectorSets/1/results|      |            |                      
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |  Retrieve  |                      
-         |        |receive results                    |      |Disposition |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         |        |                                   |      |            |
-         |        |POST                               |      |            |
-         |        |large                              |      |            |
-         |        |---------------------------------->|      |            |
-         |        |                                   |      |            |
-         |        |receive large submission URI       |      |            |
-         |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         ]]></artwork>
-        </figure>
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
+   |        |POST /vendors                      |      |            | 
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |            |
+   |        |vendor URL                         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |POST /modules                      |      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |            |
+   |        |module URL                         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            | 
+   |        |POST /oes                          |      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |            |      
+   |        |oes URL                            |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -   |      |            |
+   |        |                                   |      |            |                      
+   |        |POST dependency                    |      |            | 
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |            |                      
+   |        |dependency URL                     |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |                      
+   |        |POST testSessions                  |      |            | 
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |   Submit   |                      
+   |        |testSessions URL                   |      |Registration|
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |                      
+   |        |GET                                |      |            |                      
+   |        |testSessions/1/vectorSets/1        |      |            | 
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |  Retrieve  |                      
+   |        |send test vectors for vsId 1       |      |  Request   |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |                      
+   |        |POST results                       |      |   Submit   |                      
+   |        |---------------------------------->|      |  Response  |
+   |        |                                   |      |            |                      
+   |        |GET                                |      |            |                      
+   |        |testSessions/1/vectorSets/1/results|      |            |                      
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |  Retrieve  |                      
+   |        |receive results                    |      |Disposition |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |POST                               |      |            |
+   |        |large                              |      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |            |
+   |        |receive large submission URI       |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   ]]></artwork>
+       </figure>
 
       </section>
 
@@ -1209,7 +1262,7 @@
           <t>
             <spanx style="strong">GET /modules</spanx>
           </t>
-          <t>Returns a List of available modules.</t>
+          <t>Returns a list of available modules.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1222,7 +1275,7 @@
             "version": "1.0",
             "type": "Software",
             "vendorUrl": "/acvp/v1/vendors/2",
-            "implementationDescription" : "ACME test module."
+            "implementationDescription" : "ACME module."
         },
         {
             "url": "/acvp/v1/modules/2",
@@ -1230,7 +1283,7 @@
             "version": "2.0",
             "type": "Software",
             "vendorUrl": "/acvp/v1/vendors/2",
-            "implementationDescription" : "ACME test module with more features."
+            "implementationDescription" : "ACME module with features"
         }
     ]}
 ]
@@ -1253,7 +1306,7 @@
         "version": "3.0",
         "type": "Software",
         "vendorUrl": "/acvp/v1/vendors/2",
-        "implementationDescription" : "ACME test module with more bells and whistles."
+        "implementationDescription" : "ACME module with more"
     }
 ]
            ]]>              </artwork>
@@ -1287,7 +1340,7 @@
         "version": "2.0",
         "type": "Software",
         "vendorUrl": "/acvp/v1/vendors/2",
-        "implementationDescription": "ACME test module with more features."
+        "implementationDescription": "ACME module with features."
     }
 ]
            ]]>              </artwork>
@@ -1307,7 +1360,7 @@
 [
     {"acvVersion": <acvp-version>},
     {
-        "implementationDescription" : "ACME test module with more bells and whistles."
+        "implementationDescription" : "ACME module with more"
     }
 ]
            ]]>              </artwork>
@@ -1341,24 +1394,26 @@
           <t>
             <spanx style="strong">GET /oes</spanx>
           </t>
-          <t>Returns a List of available operational environments.</t>
+          <t>Returns a list of available operational environments.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
 [
-    {"acvVersion": <acvp-version>},
-    {"oes": [
-        {
-            "url": "/acvp/v1/oes/1",
-            "name": "Windows 10 on Intel Xeon 5100 Series Processor",
-            "dependencyUrls": [ "/acvp/v1/dependencies/1", "/acvp/v1/dependencies/2"]
-        },
-        {
-            "url": "/acvp/v1/oes/2",
-            "name": "Windows 10 on AMD 6272 Opteron Processor",
-            "dependencyUrls": [ "/acvp/v1/dependencies/1", "/acvp/v1/dependencies/3"]
-        }
-    ]}
+  {"acvVersion": <acvp-version>},
+  {"oes": [
+      {
+        "url": "/acvp/v1/oes/1",
+        "name": "Windows 10 on Intel Xeon 5100 Series Processor",
+        "dependencyUrls": [ "/acvp/v1/dependencies/1", 
+                            "/acvp/v1/dependencies/2"]
+      },
+      {
+        "url": "/acvp/v1/oes/2",
+        "name": "Windows 10 on AMD 6272 Opteron Processor",
+        "dependencyUrls": [ "/acvp/v1/dependencies/1", 
+                            "/acvp/v1/dependencies/3"]
+      }
+  ]}
 ]
            ]]>              </artwork>
             </figure>
@@ -1375,7 +1430,8 @@
 [
     {"acvVersion": <acvp-version>},
     {
-        "name": "Ubuntu Linux 3.1 on AMD 6272 Opteron Processor with Acme package installed",
+        "name": "Ubuntu Linux 3.1 on AMD 6272 Opteron Processor 
+                 with Acme installed",
         "dependencyUrls": [
             "/acvp/v1/dependencies/4",
             "/acvp/v1/dependencies/5",
@@ -1469,7 +1525,7 @@
           <t>
             <spanx style="strong">GET /dependencies</spanx>
           </t>
-          <t>Returns a List of available dependencies.</t>
+          <t>Returns a list of available dependencies.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1552,51 +1608,58 @@
             <figure align="center">
               <artwork align="left"><![CDATA[
 [
-    {"acvVersion": <acvp-version>},
-    {"properties": [
-        {
-            "name": "name",
-            "dataType": "string",
-            "validTypes": [
-                "software",
-                "processor"
-            ],
-            "description": "The name of the dependency."
-        },
-        {
-            "name": "swid",
-            "dataType": "string",
-            "validTypes": ["software"],
-            "description": "A Software identification (SWID) tag as described in ISO/IEC 19770-2:2015. NIST IR 8060, https://csrc.nist.gov/publications/detail/nistir/8060/final, provides guidance on creating and maintaining SWID tags."
-        },
-        {
-            "name": "cpe",
-            "dataType": "string",
-            "validTypes": [
-                "software",
-                "processor"
-            ],
-            "description": "A Common Platform Enumeration (CPE) formatted name according to Version 2.3 of the CPE Naming Specification found in NISTIR 7695, https://csrc.nist.gov/publications/detail/nistir/7695/final."
-        },
-        {
-            "name": "manufacturer",
-            "dataType": "string",
-            "validTypes": ["processor"],
-            "description": "The name of the manufacturer of the processor dependency."
-        },
-        {
-            "name": "family",
-            "dataType": "string",
-            "validTypes": ["processor"],
-            "description": "The name of the family of the processor."
-        },
-        {
-            "name": "series",
-            "dataType": "string",
-            "validTypes": ["processor"],
-            "description": "The name of the series of the processor."
-        }
-    ]}
+  {"acvVersion": <acvp-version>},
+  {"properties": [
+    {
+       "name": "name",
+       "dataType": "string",
+       "validTypes": [
+           "software",
+           "processor"
+       ],
+       "description": "The name of the dependency."
+    },
+    {
+       "name": "swid",
+       "dataType": "string",
+       "validTypes": ["software"],
+       "description": "A Software identification (SWID) tag as
+        described in ISO/IEC 19770-2:2015. NIST IR 8060, 
+        https://csrc.nist.gov/publications/detail/nistir/8060/final, 
+        provides guidance on creating and maintaining SWID tags."
+    },
+    {
+       "name": "cpe",
+       "dataType": "string",
+       "validTypes": [
+           "software",
+           "processor"
+       ],
+       "description": "A Common Platform Enumeration (CPE) 
+        formatted name according to Version 2.3 of the CPE
+        Naming Specification found in NISTIR 7695, 
+        https://csrc.nist.gov/publications/detail/nistir/7695/final."
+    },
+    {
+       "name": "manufacturer",
+       "dataType": "string",
+       "validTypes": ["processor"],
+       "description": "The name of the manufacturer of
+                       the processor dependency."
+    },
+    {
+       "name": "family",
+       "dataType": "string",
+       "validTypes": ["processor"],
+       "description": "The name of the family of the processor."
+    },
+    {
+       "name": "series",
+       "dataType": "string",
+       "validTypes": ["processor"],
+       "description": "The name of the series of the processor."
+    }
+  ]}
 ]
            ]]>              </artwork>
             </figure>
@@ -1659,7 +1722,7 @@
           <t>
             <spanx style="strong">GET /algorithms</spanx>
           </t>
-          <t>Returns a list of available Algorithms on the server.</t>
+          <t>Returns a list of available algorithms on the server.</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1820,7 +1883,7 @@
             <t>
               <spanx style="verb">accessToken</spanx> is a              <xref target="RFC7519">JWT Token</xref>
               which MUST be supplied as described in              <xref target="jwtToken"/>
- in order to access
+              in order to access
               the Test Session.</t>
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1837,7 +1900,7 @@
         "passed": true,
         "production": false,
         "isSample": true,
-        "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiAibmlzdC5vcmciLCJleHAiOiAxNDYyOTg0OTUzLCJjb21wYW55IjogIkNpc2NvIiwianRpIjo0NTh9.zDhd3WrLcb1Xf5-VKOX6k-G70mACbi1tdir8qHAMPyQ"
+        "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6Ik (truncated)"
     }
 ]
            ]]>              </artwork>
@@ -1986,20 +2049,20 @@
             <figure align="center">
               <artwork align="left"><![CDATA[
 [
-    {"acvVersion": <acvp-version>},
-    {
-        "passed": false,
-        "results": [
-            {
-                "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/1",
-                "status": "incomplete"
-            },
-            {
-                "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/2",
-                "status": "passed"
-            }
-        ]
-    }
+  {"acvVersion": <acvp-version>},
+  {
+    "passed": false,
+    "results": [
+        {
+          "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/1",
+          "status": "incomplete"
+        },
+        {
+           "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/2",
+           "status": "passed"
+        }
+    ]
+  }
 ]
            ]]>              </artwork>
             </figure>
@@ -2090,6 +2153,7 @@
     {
         "vsId": 1,
         "algorithm": "TEST_ALGO_1",
+        "revision": "1.0.0",
         "testGroups": [
             {
                 "tgId": 1,
@@ -2274,6 +2338,7 @@
   {"acvVersion": <acvp-version>},
   {
     "vsId": 1437,
+    "revision": "1.0.0",
     "testGroups": [{
       "tgId": 1,
       "tests": [{
@@ -2330,42 +2395,49 @@
     </section>
     
     <section anchor="largeSubmission" title="Large Submission">
-        <t>The REQUIRED properties for large submissions posted through login are:          <list>
-            <t>
-              <spanx style="strong">largeEndpointRequired</spanx> -              <spanx style="verb">boolean</spanx>, indication 
-              of whether or not this server is required to support the large endpoint URI.
-            </t>
-            <t>
-              <spanx style="strong">sizeConstraintMessage</spanx> -              <spanx style="verb">string</spanx>, provides 
-              indication of the standard submission size constraint for this server.
-            </t>
-            </list>
-            
-    <section anchor="largeSubmission_post" title="Request">
+      <t>When clients have a response which exceeds the <spanx style="verb">sizeConstraintMessage</spanx> in
+        <xref target="login"/>, this endpoint MUST be used to obtain a URI in order to submit the results. The URI MAY
+        be a one-time use URI and clients SHOULD only attempt to use this URI once regardless of success or failure in
+        submitting.  If resubmission is required clients MUST re-POST to the /large endpoint in order to obtain the URI
+        to use.
+      </t>
+      <t>The REQUIRED properties for large submissions:
+        <list>
           <t>
-            <spanx style="strong">POST /large</spanx>
+            <spanx style="strong">submissionSize</spanx> - <spanx style="verb">number</spanx>, the maximum size in
+            bytes of the desired submission.
           </t>
-          <t> When clients determine they have a response which will exceed the 
-  			  server value specified in the sizeConstraintMessage property, clients 
-  			  MUST use the /large endpoint.</t>
-          <figure align="center">
+          <t>
+            <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, a one-time use url value to use
+            for a large submission.
+          </t>
+        </list>
+      </t>
+      <section title="Request">
+        <figure align="center">
           <artwork align="left"><![CDATA[
 [
-  {"acvVersion" : "<current acvVersion>" },
-  {"submissionSize": <integer bytes> }
+  {"acvVersion": <acvp-version>},
+  {
+      "submissionSize": 5000000
+  }
 ]
-			]]>              </artwork>
-            </figure>
-          </section>
-          
-     <section anchor="largeSubmission_post" title="Response">
-     <t>The response MUST indicate which URI the client MUST use in order to 
-        submit the results. This URI is provided via JSON as {"largeSubmissionURL"} 
-        and MAY be a one-time use URI. Clients SHOULD only attempt to use this 
-        URI once regardless of success or failure in submitting. If resubmission 
-        is required clients MUST re-POST to the /large endpoint in order to obtain 
-        the URI to use.</t>
-        </section>              
+           ]]>              </artwork>
+        </figure>
+      </section>
+      <section title="Response">
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+  {
+      "submissionSize": 5000000
+  }
+]
+           ]]>              </artwork>
+        </figure>        
+      </section>
+    </section>    
 
     <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
     <?rfc needLines="8" ?>
@@ -2416,6 +2488,7 @@
         "vsId": 1437,
         "expiry": "2018-12-31 23:59:59",
         "algorithm": "TEST_ALGO_1",
+        "revision": "1.0.0",
         "testGroups": [
             {
                 "tgId": 1,
@@ -2474,8 +2547,8 @@
 
     <section title="Algorithm Test Extensions">
       <t>ACVP is intended to be an extensible protocol that supports testing of a large number of cryptographic 
-        algorithms from several different classes defined by the community. Each supported by ACVP algorithm represents an extension of the protocol. See <xref target="EXT"/> for details.
-        All algorithm identifiers intended for public use SHALL be documented by IANA in the ACVP Registry <xref target="EXT"/>. The remainder of this section provides guidelines for how to extend ACVP with different algorithms and make them available to the community.</t>
+        algorithms from several different classes defined by the community.
+        All algorithm identifiers intended for public use SHALL be documented by IANA in the ACVP IANA Registry <xref target="acvp-iana"/>.</t>
 
         <t>To add testing for a new algorithm first try to find an algorithm of the same type that is already supported by the protocol.</t> 
         <t>If it belongs to an already-supported type, check the test specification for the similar algorithm. Typically, similar algorithms share similar testing methodology. </t> 
@@ -2488,14 +2561,14 @@
         including the JSON schema for the corresponding test data exchanges between the validation server and the client. 
         See in particular Section "Adding new algorithms" in the corresponding algorithm specification.</t>
 
-	<t>Next, one needs to update the IANA registry with the new algorithm by adding it to the corresponding namespace and subject to the policies stated in <xref target="EXT"/>.</t>
+	<t>Next, one needs to update the IANA registry with the new algorithm by adding it to the corresponding namespace and subject to the policies stated in <xref target="acvp-iana"/>.</t>
         <t>Once this is completed and the corresponding server test generation and validation for that algorithm are implemented, 
         testing can commence. Clients implementing that algorithm may register it for testing as described in Section "Capabilities Registration" in 
         <xref target="sub-symmetric"/>, process the test vectors generated by the validation server and return the results for validation. 
         </t>
         <t>If the available test types for an algorithm, existing or new, in a given class do not provide good test coverage of the algorithm, 
         one could develop a new test type and incorporate it into the corresponding test specification for the that algorithm. See for example Section "Adding new algorithms" in 
-        <xref target="sub-symmetric"/> for how to add a new test type. Note that this action would require modifications of the corresponding algorithm test specification and would result in a new version of that test specification to be reflected in the IANA registry  <xref target="EXT"/>.</t>	      
+        <xref target="sub-symmetric"/> for how to add a new test type. Note that this action would require modifications of the corresponding algorithm test specification and would result in a new version of that test specification to be reflected in the IANA registry  <xref target="acvp-iana"/>.</t>	      
     </section>
 
     <section title="Custom Specification Objects">
@@ -2616,7 +2689,7 @@
     </section>
 
     <section anchor="IANA" title="IANA Considerations">
-      <t>The IANA considerations for this memo are provided by <xref target="EXT"/>.</t>
+      <t>The IANA considerations for this memo are provided by <xref target="acvp-iana"/>.</t>
     </section>
 
     <section title="Other Considerations">
@@ -2655,12 +2728,13 @@
       &RFC2119;
       &RFC3339;
       &RFC5246;
+      &RFC7159;
       &RFC7230;
       &RFC7519;
 
       </references>
     <references title="Informative References">
-      <reference anchor="EXT" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-vassilev-acvp-ext-00.txt">      
+      <reference anchor="acvp-iana" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-vassilev-acvp-iana-00.txt">      
               <!-- the following is the minimum to make xml2rfc happy -->
 
         <front>
@@ -2710,7 +2784,7 @@
       <t>Metadata assigned to the keyword may use any format which best reflects the information
         being represented including hyphens, underscores alternating case, numbers, etc. However,
         brevity should be a major consideration, for example:</t>
-      <t> "algorithms" : [ { "algorithm" : "AES-GCM", "mode" : "modes", "ivGen" : "internal",
+      <t> "algorithms" : [ { "algorithm" : "ACVP-AES-GCM", "mode" : "modes", "ivGen" : "internal",
         "ivGenMode" : "8.2.1" } All metadata representing strings or big numbers SHALL use double
         quotes at both ends. Big numbers require conversion from strings to whatever format is used
         by the DUT. Numerical values of integer size or with decimal points may use quotations if
@@ -2728,7 +2802,8 @@
               <![CDATA[
     HTTP response: 400
 
-    "error" : "Incorrectly formatted JSON (51:18): expected field name was not provided: inBit"
+    "error" : "Incorrectly formatted JSON (51:18): 
+               expected field name was not provided: inBit"
           ]]>
             </artwork>
           </figure>

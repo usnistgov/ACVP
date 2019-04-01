@@ -1,0 +1,4648 @@
+
+
+
+
+TBD                                                         C. Celi, Ed.
+Internet-Draft            National Institute of Standards and Technology
+Intended status: Informational                          February 1, 2019
+Expires: August 5, 2019
+
+
+        ACVP Symmetric Block Cipher Algorithm JSON Specification
+                        draft-celi-block-ciph-00
+
+Abstract
+
+   This document defines the JSON schema for using symmetric block
+   cipher algorithms with the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on August 5, 2019.
+
+Copyright Notice
+
+   Copyright (c) 2019 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (https://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 1]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+   2.  Supported Block Cipher Algorithms . . . . . . . . . . . . . .   3
+   3.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     3.1.  Monte Carlo tests for block ciphers . . . . . . . . . . .   5
+       3.1.1.  AES Monte Carlo Test - ECB mode . . . . . . . . . . .   6
+       3.1.2.  AES Monte Carlo Test - CBC mode . . . . . . . . . . .   6
+       3.1.3.  AES Monte Carlo Test - OFB mode . . . . . . . . . . .   7
+       3.1.4.  AES Monte Carlo Test - CFB1 mode  . . . . . . . . . .   8
+       3.1.5.  AES Monte Carlo Test - CFB8 mode  . . . . . . . . . .   9
+       3.1.6.  AES Monte Carlo Test - CFB128 mode  . . . . . . . . .  10
+       3.1.7.  AES Monte Carlo Key Shuffle . . . . . . . . . . . . .  11
+       3.1.8.  TDES Monte Carlo Test - ECB mode  . . . . . . . . . .  12
+       3.1.9.  TDES Monte Carlo Test - CBC mode  . . . . . . . . . .  12
+       3.1.10. TDES Monte Carlo Test - CBC-I mode  . . . . . . . . .  13
+       3.1.11. TDES Monte Carlo Test - CFB1, CFB8, CFB64 modes . . .  15
+       3.1.12. TDES Monte Carlo Test - CFB1-P, CFB8-P, CFB64-P modes  15
+       3.1.13. TDES Monte Carlo Test - OFB mode  . . . . . . . . . .  16
+       3.1.14. TDES Monte Carlo Test - OFB-I mode  . . . . . . . . .  17
+     3.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .  18
+       3.2.1.  AES Requirements Covered  . . . . . . . . . . . . . .  18
+       3.2.2.  AES Requirements Not Covered  . . . . . . . . . . . .  19
+       3.2.3.  TDES Requirements Covered . . . . . . . . . . . . . .  19
+       3.2.4.  TDES Requirements Not Covered . . . . . . . . . . . .  19
+       3.2.5.  AEAD Requirements Covered . . . . . . . . . . . . . .  19
+       3.2.6.  AEAD Requirements Not Covered . . . . . . . . . . . .  20
+       3.2.7.  KeyWrap Requirements Covered  . . . . . . . . . . . .  20
+       3.2.8.  KeyWrap Requirements Not Covered  . . . . . . . . . .  20
+   4.  Capabilities Registration . . . . . . . . . . . . . . . . . .  20
+     4.1.  Required Prerequisite Algorithms for Block Cipher
+           Validations . . . . . . . . . . . . . . . . . . . . . . .  21
+     4.2.  Block Cipher Algorithm Capabilities JSON Values . . . . .  21
+   5.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  27
+     5.1.  Test Groups . . . . . . . . . . . . . . . . . . . . . . .  28
+     5.2.  Test Cases  . . . . . . . . . . . . . . . . . . . . . . .  32
+   6.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  33
+   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  35
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  35
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  35
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  35
+     10.1.  Normative References . . . . . . . . . . . . . . . . . .  36
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  36
+   Appendix A.  Example Capabilities JSON Object . . . . . . . . . .  37
+   Appendix B.  Example Vector Set Request/Responses JSON Object . .  46
+   Appendix C.  Example TDES Test and Results JSON Object  . . . . .  78
+   Appendix D.  Example TDES MCT Test and Results JSON Object  . . .  81
+
+
+
+Celi                     Expires August 5, 2019                 [Page 2]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  83
+
+1.  Introduction
+
+   The Automated Cryptographic Validation Protocol (ACVP) defines a
+   mechanism to automatically verify the cryptographic implementation of
+   a software or hardware cryptographic module.  The intention of the
+   protocol is to minimize human involvement in the testing of
+   cryptography.  The ACVP specification defines how a cryptographic
+   module communicates with an ACVP server, including cryptographic
+   capabilities negotiation, session management, authentication, vector
+   processing and more.  Note that the ACVP specification does not
+   define algorithm-specific JSON constructs for performing the
+   cryptographic validation.  However, a series of ACVP sub-
+   specifications defines the constructs for testing individual
+   cryptographic algorithms.  Each sub-specification addresses a
+   specific class or subset of cryptographic algorithms.  This sub-
+   specification defines the JSON constructs for testing symmetric block
+   cipher cryptographic algorithms using ACVP.  The ACVP server performs
+   a set of tests on the block ciphers in order to assess the
+   correctness and robustness of the implementation.  A typical ACVP
+   validation session would require multiple tests to be performed for
+   every supported cryptographic algorithm, such as AES-ECB, AES-CBC,
+   AES-CTR, AES-GCM, TDES-CBC, TDES-CTR, etc.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119] .
+
+2.  Supported Block Cipher Algorithms
+
+   The following block cipher algorithms MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   o  ACVP-AES-ECB
+
+   o  ACVP-AES-CBC
+
+   o  ACVP-AES-OFB
+
+   o  ACVP-AES-CFB1
+
+   o  ACVP-AES-CFB8
+
+   o  ACVP-AES-CFB128
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 3]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   o  ACVP-AES-CTR
+
+   o  ACVP-AES-GCM
+
+   o  ACVP-AES-GCM-SIV
+
+   o  ACVP-AES-XPN
+
+   o  ACVP-AES-CCM
+
+   o  ACVP-AES-XTS
+
+   o  ACVP-AES-KW
+
+   o  ACVP-AES-KWP
+
+   o  ACVP-TDES-ECB
+
+   o  ACVP-TDES-CBC
+
+   o  ACVP-TDES-CBCI
+
+   o  ACVP-TDES-CFB1
+
+   o  ACVP-TDES-CFB8
+
+   o  ACVP-TDES-CFB64
+
+   o  ACVP-TDES-CFBP1
+
+   o  ACVP-TDES-CFBP8
+
+   o  ACVP-TDES-CFBP64
+
+   o  ACVP-TDES-OFB
+
+   o  ACVP-TDES-OFBI
+
+   o  ACVP-TDES-CTR
+
+   o  ACVP-TDES-KW
+
+3.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   implementations of block cipher algorithms.  There are three types of
+   tests for block ciphers: functional tests, Monte Carlo tests and
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 4]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   counter tests.  Each has a specific value to be used in the testType
+   field.  The testType field definitions are:
+
+   o  "AFT" - Algorithm Functional Test.  These tests can be processed
+      by the client using a normal 'encrypt' or 'decrypt' operation.
+      AFTs cause the implementation under test to exercise normal
+      operations on a single block, multiple blocks, or (where
+      applicable) partial blocks.  In some cases random data is used, in
+      others, static, predetermined tests are provided.  The functional
+      tests of the block cipher are designed to verify that the logical
+      components of the cipher (GFSbox, KeySbox, block chaining etc.)
+      are operating correctly.
+
+   o  "MCT" - Monte Carlo Test.  These tests exercise the implementation
+      under test under strenuous circumstances.  The implementation
+      under test must process the test vectors according to the correct
+      algorithm and mode in this document.  MCTs can help detect
+      potential memory leaks over time, and problems in allocation of
+      resources, addressing variables, error handling and generally
+      improper behavior in response to random inputs.  Each MCT
+      processes 100 pseudorandom tests.  Not every algorithm and mode
+      combination has an MCT.  See Section 3.1 for implementation
+      details.
+
+   o  "CTR" - Counter Mode Test.  Counter tests are specifically for
+      counter modes (AES-CTR and TDES-CTR) and require an implementation
+      under test to exercise their counter mechanism.  The server will
+      send a long message to the client for encryption or decryption and
+      back-compute the IVs used by the implementation under test.  These
+      IVs are then verified for uniqueness and an increasing (or
+      decreasing) nature.  The client processes these tests as normal
+      AFTs.  The different mode is highlighted here to signify the
+      difference on the server side for processing.
+
+3.1.  Monte Carlo tests for block ciphers
+
+   The MCTs start with an initial condition (plaintext/ciphertext, key,
+   and optional, or maybe multiple IVs) and perform a series of chained
+   computations.  For modes that use an IV, the IV is used in the
+   beginning of each pseudorandom process.  There are separate rounds of
+   MCT for encryption and decryption.  Because some block cipher modes
+   rely on an IV and perform calculations differently from other modes,
+   there are specific definitions of MCT for many of the block cipher
+   modes.
+
+   Note: For all the following, the pseudocode for decryption can be
+   obtained by replacing all PT's with CT's and all CT's with PT's.  As
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 5]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   well, replace the encrypt operation with the corresponding decrypt
+   operation.
+
+3.1.1.  AES Monte Carlo Test - ECB mode
+
+   The initial condition for the test is the tuple (KEY, PT) set to some
+   values.
+
+   The algorithm is shown in Figure 1 .
+
+                         AES-ECB Monte Carlo Test
+
+
+   Key[0] = KEY
+   PT[0] = PT
+   For i = 0 to 99
+       Output Key[i]
+       Output PT[0]
+       For j = 0 to 999
+           CT[j] = AES_ECB_ENCRYPT(Key[i], PT[j])
+           PT[j+1] = CT[j]
+       Output CT[j]
+       AES_KEY_SHUFFLE(Key, CT)
+       PT[0] = CT[j]
+
+
+                                 Figure 1
+
+3.1.2.  AES Monte Carlo Test - CBC mode
+
+   The initial condition for the test is the tuple (KEY, IV, PT) set to
+   some values.
+
+   The algorithm is shown in Figure 2 .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 6]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                         AES-CBC Monte Carlo Test
+
+
+   Key[0] = KEY
+   IV[0] = IV
+   PT[0] = PT
+   For i = 0 to 99
+       Output Key[i]
+       Output IV[i]
+       Output PT[0]
+       For j = 0 to 999
+           If ( j=0 )
+               CT[j] = AES_CBC_ENCRYPT(Key[i], IV[i], PT[j])
+               PT[j+1] = IV[i]
+           Else
+               CT[j] = AES_CBC_ENCRYPT(Key[i], PT[j])
+               PT[j+1] = CT[j-1]
+       Output CT[j]
+       AES_KEY_SHUFFLE(Key, CT)
+       IV[i+1] = CT[j]
+       PT[0] = CT[j-1]
+
+
+                                 Figure 2
+
+3.1.3.  AES Monte Carlo Test - OFB mode
+
+   The initial condition for the test is the tuple (KEY, IV, PT) set to
+   some values.
+
+   The algorithm is shown in Figure 3 .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 7]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                         AES-OFB Monte Carlo Test
+
+
+   Key[0] = Key
+   IV[0] = IV
+   PT[0] = PT
+   For i = 0 to 99
+       Output Key[i]
+       Output IV[i]
+       Output PT[0]
+       For j = 0 to 999
+           If ( j=0 )
+               CT[j] = AES_OFB_ENCRYPT(Key[i], IV[i], PT[j])
+               PT[j+1] = IV[i]
+           Else
+               CT[j] = AES_OFB_ENCRYPT(Key[i], PT[j])
+               PT[j+1] = CT[j-1]
+       Output CT[j]
+       AES_KEY_SHUFFLE(Key, CT)
+       IV[i+1] = CT[j]
+       PT[0] = CT[j-1]
+
+
+                                 Figure 3
+
+3.1.4.  AES Monte Carlo Test - CFB1 mode
+
+   The initial condition for the test is the tuple (KEY, IV, PT) set to
+   some values.
+
+   The algorithm is shown in Figure 4 .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 8]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                         AES-CFB1 Monte Carlo Test
+
+
+  Key[0] = Key
+  IV[0] = IV
+  PT[0] = PT
+  For i = 0 to 99
+      Output Key[i]
+      Output IV[i]
+      Output PT[0]
+      For j = 0 to 999
+          If ( j=0 )
+              CT[j] = AES_CFB1_ENCRYPT(Key[i], IV[i], PT[j])
+              PT[j+1] = BitJ(IV[i])
+          Else
+              CT[j] = AES_CFB1_ENCRYPT(Key[i], PT[j])
+              If ( j<128 )
+                  PT[j+1] = BitJ(IV[i])
+              Else
+                  PT[j+1] = CT[j-128]
+      Output CT[j]
+      If ( keylen = 128 )
+          Key[i+1] = Key[i] xor (CT[j-127] || CT[j-126] || ... || CT[j])
+      If ( keylen = 192 )
+          Key[i+1] = Key[i] xor (CT[j-191] || CT[j-190] || ... || CT[j])
+      If ( keylen = 256 )
+          Key[i+1] = Key[i] xor (CT[j-255] || CT[j-254] || ... || CT[j])
+      IV[i+1] = (CT[j-127] || CT[j-126] || ... || CT[j])
+      PT[0] = CT[j-128]
+
+
+                                 Figure 4
+
+3.1.5.  AES Monte Carlo Test - CFB8 mode
+
+   The initial condition for the test is the tuple (KEY, IV, PT) set to
+   some values.
+
+   The algorithm is shown in Figure 5 .
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                 [Page 9]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                         AES-CFB8 Monte Carlo Test
+
+
+   Key[0] = Key
+   IV[0] = IV
+   PT[0] = PT
+   For i = 0 to 99
+       Output Key[i]
+       Output IV[i]
+       Output PT[0]
+       For j = 0 to 999
+           If ( j=0 )
+               CT[j] = AES_CFB8_ENCRYPT(Key[i], IV[i], PT[j])
+               PT[j+1] = ByteJ(IV[i])
+           Else
+               CT[j] = AES_CFB8_ENCRYPT(Key[i], PT[j])
+               If ( j<16 )
+                   PT[j+1] = ByteJ(IV[i])
+               Else
+                   PT[j+1] = CT[j-16]
+       Output CT[j]
+       If ( keylen = 128 )
+           Key[i+1] = Key[i] xor (CT[j-15] || CT[j-14] || ... || CT[j])
+       If ( keylen = 192 )
+           Key[i+1] = Key[i] xor (CT[j-23] || CT[j-22] || ... || CT[j])
+       If ( keylen = 256 )
+           Key[i+1] = Key[i] xor (CT[j-31] || CT[j-30] || ... || CT[j])
+       IV[i+1] = (CT[j-15] || CT[j-14] || ... || CT[j])
+       PT[0] = CT[j-16]
+
+
+                                 Figure 5
+
+3.1.6.  AES Monte Carlo Test - CFB128 mode
+
+   The initial condition for the test is the tuple (KEY, IV, PT) set to
+   some values.
+
+   The algorithm is shown in Figure 6 .
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 10]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                        AES-CFB128 Monte Carlo Test
+
+
+   Key[0] = Key
+   IV[0] = IV
+   PT[0] = PT
+   For i = 0 to 99
+       Output Key[i]
+       Output IV[i]
+       Output PT[0]
+       For j = 0 to 999
+           If ( j=0 )
+               CT[j] = AES_CFB128_ENCRYPT(Key[i], IV[i], PT[j])
+               PT[j+1] = IV[i]
+           Else
+               CT[j] = AES_CFB128_ENCRYPT(Key[i], PT[j])
+               PT[j+1] = CT[j-1]
+       Output CT[j]
+       AES_KEY_SHUFFLE(Key, CT)
+       IV[i+1] = CT[j]
+       PT[0] = CT[j-1]
+
+
+                                 Figure 6
+
+3.1.7.  AES Monte Carlo Key Shuffle
+
+   Most AES MCTs use a shared key shuffle routine.  The algorithm is
+   shown in Figure 7 .  The initial condition for the routine is a tuple
+   (KEY, CT) set to some values.  This pseudocode is specifically for
+   encryption.  For decryption, swap all instances of CT with PT.
+
+                      AES Encrypt Key Shuffle Routine
+
+
+   If ( keylen = 128 )
+       Key[i+1] = Key[i] xor CT[j]
+   If ( keylen = 192 )
+       Key[i+1] = Key[i] xor (last 64-bits of CT[j-1] || CT[j])
+   If ( keylen = 256 )
+       Key[i+1] = Key[i] xor (CT[j-1] || CT[j])
+
+
+                                 Figure 7
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 11]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+3.1.8.  TDES Monte Carlo Test - ECB mode
+
+   The initial condition for the test is the tuple (KEY1, KEY2, KEY3,
+   PT) set to some values.
+
+   The algorithm is shown in Figure 8 .
+
+                         TDES-ECB Monte Carlo Test
+
+
+   Key1[0] = KEY1
+   Key2[0] = KEY2
+   Key3[0] = KEY3
+   PT[0] = PT
+   For i = 0 to 399
+       Output Key1[i]
+       Output Key2[i]
+       Output Key3[i]
+       Output PT[0]
+       For j = 0 to 9999
+           CT[j] = TDES_ECB_ENCRYPT(Key1[i], Key2[i], Key3[i], PT[j])
+           PT[j+1] = CT[i]
+       Output CT[j]
+       Key1[i+1] = Key1[i] xor CT[j]
+       Key2[i+1] = Key2[i] xor CT[j-1]
+       If ( keyingOption = 1 )
+           Key3[i+1] = Key3[i] xor CT[j-2]
+       Else
+           Key3[i+1] = Key1[i+1]
+       PT[0] = CT[j-1]
+
+
+                                 Figure 8
+
+3.1.9.  TDES Monte Carlo Test - CBC mode
+
+   The initial condition for the test is the tuple (KEY1, KEY2, KEY3,
+   IV, PT) set to some values.
+
+   The algorithm is shown in Figure 9 .
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 12]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                         TDES-CBC Monte Carlo Test
+
+
+   Key1[0] = KEY1
+   Key2[0] = KEY2
+   Key3[0] = KEY3
+   IV[0] = IV
+   PT[0] = PT
+   For i = 0 to 399
+       Output Key1[i]
+       Output Key2[i]
+       Output Key3[i]
+       Output IV[0]
+       Output PT[0]
+       For j = 0 to 9999
+           CT[j] = TDES_CBC_ENCRYPT(Key1[i], Key2[i], Key3[i],
+                                    PT[j], IV[j])
+           If ( j = 0 )
+               PT[j+1] = IV[0]
+           Else
+               PT[j+1] = CT[j-1]
+           IV[j+1] = CT[j]
+       Output CT[j]
+       Key1[i+1] = Key1[i] xor CT[j]
+       Key2[i+1] = Key2[i] xor CT[j-1]
+       If ( keyingOption = 1 )
+           Key3[i+1] = Key3[i] xor CT[j-2]
+       Else
+           Key3[i+1] = Key1[i+1]
+       PT[0] = CT[j-1]
+       IV[0] = CT[j]
+
+
+                                 Figure 9
+
+3.1.10.  TDES Monte Carlo Test - CBC-I mode
+
+   The initial condition for the test is the tuple (KEY1, KEY2, KEY3,
+   IV1, IV2, IV3, PT1, PT2, PT3) set to some values.
+
+   The algorithm is shown in Figure 10 .
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 13]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                        TDES-CBC-I Monte Carlo Test
+
+
+   Key1[0] = KEY1
+   Key2[0] = KEY2
+   Key3[0] = KEY3
+   IV1[0] = IV1
+   IV2[0] = IV2
+   IV3[0] = IV3
+   PT1[0] = PT1
+   PT2[0] = PT2
+   PT3[0] = PT3
+   For i = 0 to 399
+       Output Key1[i], Key2[i], Key3[i]
+       Output IV1[0], IV2[0], IV3[0]
+       Output PT1[0], PT2[0], PT3[0]
+       For j = 0 to 9999
+           CT[j] = TDES_CBC_I_ENCRYPT(Key1[i], Key2[i],
+                                      Key3[i], PT1[j], PT2[j],
+                                      PT3[j], IV1[j], IV2[j], IV3[j])
+           If ( j = 0 )
+               PT1[j+1] = IV1[0]
+               PT2[j+1] = IV2[0]
+               PT3[j+1] = IV3[0]
+           Else
+               PT1[j+1] = CT1[j-1]
+               PT2[j+1] = CT2[j-1]
+               PT3[j+1] = CT3[j-1]
+           IV1[j+1] = CT1[j]
+           IV2[j+1] = CT2[j]
+           IV3[j+1] = CT3[j]
+       Output CT1[j], CT2[j], CT3[j]
+       Key1[i+1] = Key1[i] xor CT[j]
+       Key2[i+1] = Key2[i] xor CT[j-1]
+       If ( keyingOption = 1 )
+           Key3[i+1] = Key3[i] xor CT[j-2]
+       Else
+           Key3[i+1] = Key1[i+1]
+       PT1[0] = CT1[j-1]
+       PT2[0] = CT2[j-1]
+       PT3[0] = CT3[j-1]
+       IV1[0] = CT1[j]
+       IV2[0] = CT2[j]
+       IV3[0] = CT3[j]
+
+
+                                 Figure 10
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 14]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+3.1.11.  TDES Monte Carlo Test - CFB1, CFB8, CFB64 modes
+
+   The initial condition for the test is the tuple (KEY1, KEY2, KEY3,
+   IV, PT) set to some values.  Note: PT and CT are k-bit where k is the
+   feedback size, for example CFB1 has a feedback size of 1-bit.
+
+   The algorithm is shown in Figure 11 .
+
+                         TDES-CFB Monte Carlo Test
+
+
+   Key1[0] = KEY1
+   Key2[0] = KEY2
+   Key3[0] = KEY3
+   IV[0] = IV
+   PT[0] = PT
+   For i = 0 to 399
+       Output Key1[i]
+       Output Key2[i]
+       Output Key3[i]
+       Output IV[0]
+       Output PT[0]
+       For j = 0 to 9999
+           CT[j] = TDES_CFB_ENCRYPT(Key1[i], Key2[i], Key3[i],
+                                    PT[j], IV[j])
+           PT[j+1] = LeftMost_K_Bits(IV[j])
+           IV[j+1] = RightMost_64-K_Bits(IV[j]) || CT[j]
+       Output CT[j]
+       C = LeftMost_192_Bits(CT[j] || CT[j-1] || ... || CT[0])
+       Key1[i+1] = Key1[i] xor bits 129-192 of C
+       Key2[i+1] = Key2[i] xor bits 65-128 of C
+       If ( keyingOption = 1 )
+           Key3[i+1] = Key3[i] xor bits 1-64 of C
+       Else
+           Key3[i+1] = Key1[i+1]
+       PT[0] = LeftMost_K_Bits(IV[j])
+       IV[0] = RightMost_64-K_Bits(IV[j]) || CT[j]
+
+
+                                 Figure 11
+
+3.1.12.  TDES Monte Carlo Test - CFB1-P, CFB8-P, CFB64-P modes
+
+   The initial condition for the test is the tuple (KEY1, KEY2, KEY3,
+   IV1, IV2, IV3, PT) set to some values.  Note: PT and CT are k-bit
+   where k is the feedback size, for example CFB8-P has a feedback size
+   of 8-bits.
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 15]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   The algorithm is shown in Figure 12 .
+
+                        TDES-CFB-P Monte Carlo Test
+
+
+   Key1[0] = KEY1
+   Key2[0] = KEY2
+   Key3[0] = KEY3
+   IV1[0] = IV1
+   IV2[0] = IV2
+   IV3[0] = IV3
+   PT[0] = PT
+   For i = 0 to 399
+       Output Key1[i], Key2[i], Key3[i]
+       Output IV1[0]
+       Output PT[0]
+       For j = 0 to 9999
+           CT[j] = TDES_CFB_P_ENCRYPT(Key1[i], Key2[i], Key3[i],
+                                      PT[j], IV1[j], IV2[j], IV3[j])
+           PT[j+1] = LeftMost_K_Bits(IV1[j])
+       Output CT[j]
+       C = LeftMost_192_Bits(CT[j] || CT[j-1] || ... || CT[0])
+       Key1[i+1] = Key1[i] xor bits 129-192 of C
+       Key2[i+1] = Key2[i] xor bits 65-128 of C
+       If ( keyingOption = 1 )
+           Key3[i+1] = Key3[i] xor bits 1-64 of C
+       Else
+           Key3[i+1] = Key1[i+1]
+       PT[0] = LeftMost_K_Bits(IV1[j])
+       IV1[0] = RightMost_64-K_Bits(IV[j]) || CT[j]
+       IV2[0] = IV1[0] + "5555555555555555" mod 2^64
+       IV3[0] = IV1[0] + "AAAAAAAAAAAAAAAA" mod 2^64
+
+
+                                 Figure 12
+
+3.1.13.  TDES Monte Carlo Test - OFB mode
+
+   The initial condition for the test is the tuple (KEY1, KEY2, KEY3,
+   IV, PT) set to some values.
+
+   The algorithm is shown in Figure 13 .
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 16]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                         TDES-OFB Monte Carlo Test
+
+
+   Key1[0] = KEY1
+   Key2[0] = KEY2
+   Key3[0] = KEY3
+   IV[0] = IV
+   PT[0] = PT
+   For i = 0 to 399
+       Output Key1[i]
+       Output Key2[i]
+       Output Key3[i]
+       Output IV[0]
+       Output PT[0]
+       For j = 0 to 9999
+           CT[j] = TDES_OFB_ENCRYPT(Key1[i], Key2[i], Key3[i],
+                                    PT[j], IV[j])
+           PT[j+1] = IV[j]
+       Output CT[j]
+       Key1[i+1] = Key1[i] xor CT[j]
+       Key2[i+1] = Key2[i] xor CT[j-1]
+       If ( keyingOption = 1 )
+           Key3[i+1] = Key3[i] xor CT[j-2]
+       Else
+           Key3[i+1] = Key1[i+1]
+       PT[0] = PT[0] xor IV[j]
+       IV[0] = CT[j]
+
+
+                                 Figure 13
+
+3.1.14.  TDES Monte Carlo Test - OFB-I mode
+
+   The initial condition for the test is the tuple (KEY1, KEY2, KEY3,
+   IV1, IV2, IV3, PT) set to some values.
+
+   The algorithm is shown in Figure 14 .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 17]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                        TDES-OFB-I Monte Carlo Test
+
+
+   Key1[0] = KEY1
+   Key2[0] = KEY2
+   Key3[0] = KEY3
+   IV1[0] = IV1
+   IV2[0] = IV2
+   IV3[0] = IV3
+   PT[0] = PT
+   For i = 0 to 399
+       Output Key1[i], Key2[i], Key3[i]
+       Output IV1[0], IV2[0], IV3[0]
+       Output PT[0]
+       For j = 0 to 9999
+           CT[j] = TDES_OFB-I_ENCRYPT(Key1[i], Key2[i], Key3[i],
+                                      PT[j], IV[j])
+           PT[j+1] = IV[j]
+       Output CT[j]
+       Key1[i+1] = Key1[i] xor CT[j]
+       Key2[i+1] = Key2[i] xor CT[j-1]
+       If ( keyingOption = 1 )
+           Key3[i+1] = Key3[i] xor CT[j-2]
+       Else
+           Key3[i+1] = Key1[i+1]
+       PT[0] = PT[0] xor IV1[j]
+       IV1[0] = CT[j]
+       IV2[0] = IV1[0] + "5555555555555555" mod 2^64
+       IV3[0] = IV1[0] + "AAAAAAAAAAAAAAAA" mod 2^64
+
+
+                                 Figure 14
+
+3.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [FIPS-197] and [SP800-38A] .
+
+3.2.1.  AES Requirements Covered
+
+   In [SP800-38A], both Section 5 and Section 6 which describe general
+   modes of operation for block ciphers are tested.  In [FIPS-197],
+   Section 4 outlines the AES engine and necessary functions to perform
+   simple encrypt an decrypt operations.  All AES tests perform such
+   operations and thus rely heavily on this section.  Section 5
+   specifically outlines the algorithm for AES and thus all AES tests
+   rely heavily on this section as well.  In [AES-XTS], the IEEE
+   outlines the encrypt and decrypt operations for AES-XTS.
+
+
+
+Celi                     Expires August 5, 2019                [Page 18]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+3.2.2.  AES Requirements Not Covered
+
+   Some requirements in the outlined specifications are not easily
+   tested.  Often they are not ideal for black-box testing such as the
+   ACVP.  In [SP800-38A], Appendix A outlines padding for when the data
+   being encrypted does not evenly fill the blocks.  In these tests, all
+   data, unless otherwise specified, is assumed to be a multiple of the
+   block length.  All exceptions to those cases are when stream ciphers
+   specifically are being tested.  In Section 5.3, IV generation which
+   is required for all modes of AES and TDES outside of ECB, is not
+   tested.  Appendix D outlines how errors are to be handled.  As some
+   symmetric ciphers aren't authenticated, ACVP does not include tests
+   that change random bits in payload, IV, key or results, as these
+   results can be successfully encrypted/decrypted, but errors aren't
+   necessarily detectable.  In [FIPS-197], Section 5.3 defines the
+   inverse cipher for AES.  This is not tested in the CBC, CFB (all),
+   OFB or CTR modes.  In [SP800-38E], the AES-XTS algorithm is
+   restricted to 2^20 AES blocks (128-bits each) per key.  Due to the
+   size of the data, ACVP does not test the proper usage of a key over
+   such large amounts of data.
+
+3.2.3.  TDES Requirements Covered
+
+   In [SP800-67r2], Section 3 outlines the use for TDES with keying
+   option 1 (three distinct keys) and decryption only for keying option
+   2 (K1 == K3 != K2).  Depending on the cipher mode, both the forward
+   and inverse cipher are tested.  The known answer tests address these
+   requirements.
+
+3.2.4.  TDES Requirements Not Covered
+
+   In [SP800-67r2], Section 3.3 outlines requirements for keys for
+   proper usage of TDES.  These requirements are not tested by ACVP.
+   All keys used in the tests are randomly or staticly generated by the
+   server.  There are no checks for key equality or potentially weak
+   keys.  Section 3.3.2 outlines specific keys which are to be avoided.
+   ACVP does not expect a client to be able to detect these keys.
+
+3.2.5.  AEAD Requirements Covered
+
+   In [SP800-38D], Section 7 outlines the encrypt and decrypt operations
+   for AES-GCM.  This and all prerequisites to these operations (such as
+   GHASH) are tested as AES-GCM encrypt and decrypt operations.  In
+   [SP800-38C], Section 6 outlines the encrypt and decrypt operations
+   for AES-CCM.  This and all prerequisites to these operations (such as
+   CBC-MAC) are tested as AES-CCM encrypt and decrypt operations.  In
+   [AES-GCM-SIV], the draft outlines the encrypt and decrypt operations
+   for AES-GCM-SIV.
+
+
+
+Celi                     Expires August 5, 2019                [Page 19]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+3.2.6.  AEAD Requirements Not Covered
+
+   In [SP800-38D], Section 8 outlines uniqueness requirements on IVs and
+   keys for AES-GCM.  This is considered out of bounds for the algorithm
+   testing done by the ACVP and will not be tested.
+
+3.2.7.  KeyWrap Requirements Covered
+
+   In [SP800-38F] Section 5.2 defines the authenticated encryption and
+   authenticated decryption operations for all three key-wrap
+   algorithms.  As well, the padding for key-wrap with padding is
+   defined.  Algorithm Functional Tests provide assurance of these
+   requirements for encrypt operations.  For decrypt operations, there
+   is a possibility to reject the ciphertext due to improper wrapping.
+   This is also assured by the Algorithm Functional Tests.  Sections 6
+   and 7 outline the specific ciphers in both encrypt and decrypt
+   directions.  All facsets of these processes are tested with random
+   data via the Algorithm Functional Tests.
+
+3.2.8.  KeyWrap Requirements Not Covered
+
+   In [SP800-38F] Section 5.3 defines the length requirements allowed by
+   an optimal implementation.  The upper bounds are unreasonably large
+   to test in a web-based model and thus an artificial maximum is
+   selected for the payloadLen property (corresponding to both plaintext
+   and ciphertext).  The Algorithm Functional Tests SHOULD utilize both
+   the minimum and maximum values provided in the client's registration
+   optimally with other values.
+
+4.  Capabilities Registration
+
+   This section describes the constructs for advertising support of
+   block cipher algorithms to the ACVP server.  ACVP REQURIES
+   cryptographic modules to register their capabilities in a
+   registration.  This allows the cryptographic module to advertise
+   support for specific algorithms, notifying the ACVP server which
+   algorithms need test vectors generated for the validation process.
+
+   The block cipher algorithm capabilities MUST be advertised as JSON
+   objects within the 'algorithms' value of the ACVP registration
+   message.  The 'algorithms' value MUST be an array, where each array
+   element is an individual JSON object defined in this section.  The
+   'algorithms' value MUST be part of the 'capability_exchange' element
+   of the ACVP JSON registration message.  See the ACVP Protocol
+   Specification Section XXX for details on the registration message.
+   Each block cipher algorithm capability advertised SHALL be a self-
+   contained JSON object.
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 20]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+4.1.  Required Prerequisite Algorithms for Block Cipher Validations
+
+   Some block cipher algorithm implementations rely on other
+   cryptographic primitives.  For example, AES-CCM uses an underlying
+   AES-ECB algorithm.  Each of these underlying algorithm primitives
+   MUST be validated, either separately or as part of the same
+   submission.  ACVP provides a mechanism for specifying the required
+   prerequisites:
+
+   +--------------+-----------------+--------+-------------------------+
+   | JSON Value   | Description     | JSON   | Example Values          |
+   |              |                 | type   |                         |
+   +--------------+-----------------+--------+-------------------------+
+   | algorithm    | a prerequisite  | string | AES, DRBG, TDES         |
+   |              | algorithm       |        |                         |
+   | valValue     | algorithm       | string | actual number or "same" |
+   |              | validation      |        | to refer to the same    |
+   |              | number          |        | submission              |
+   | prereqAlgVal | prerequisite    | object | exactly one algorithm   |
+   |              | algorithm       |        | property and one        |
+   |              | validation      |        | valValue property       |
+   +--------------+-----------------+--------+-------------------------+
+
+           Table 1: Required Prerequisite Algorithms JSON Values
+
+4.2.  Block Cipher Algorithm Capabilities JSON Values
+
+   Each algorithm capability advertised is a self-contained JSON object
+   and SHALL use the following values when appropriate:
+
+   +--------------------+-------------------------------+--------------+
+   | JSON Value         | Description                   | JSON type    |
+   +--------------------+-------------------------------+--------------+
+   | algorithm          | The block cipher algorithm    | string       |
+   |                    | and mode to be validated.     |              |
+   | revision           | The version of the testing    | string       |
+   |                    | methodology the IUT is        |              |
+   |                    | requesting to validate        |              |
+   |                    | against.                      |              |
+   | prereqVals         | Prerequisite algorithm        | array of     |
+   |                    | validations                   | prereqAlgVal |
+   |                    |                               | objects      |
+   |                    |                               | described in |
+   |                    |                               | Table 1      |
+   | direction          | The IUT processing direction  | array of     |
+   |                    |                               | strings      |
+   | keyLen             | The supported key lengths in  | array of     |
+   |                    | bits                          | integers     |
+
+
+
+Celi                     Expires August 5, 2019                [Page 21]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   | payloadLen         | The supported plain and       | domain       |
+   |                    | cipher text lengths in bits.  |              |
+   |                    | This varies depending on the  |              |
+   |                    | algorithm type, for           |              |
+   |                    | additional details see Table  |              |
+   |                    | 4 and Table 6                 |              |
+   | ivLen              | The supported IV/Nonce        | domain       |
+   |                    | lengths in bits, see Table 4  |              |
+   | ivGen              | IV generation method for AES- | string       |
+   |                    | GCM/AES-XPN algorithms        |              |
+   | ivGenMode          | IV generation mode for AES-   | string       |
+   |                    | GCM/AES-XPN algorithms        |              |
+   | saltGen            | Salt generation method for    | string       |
+   |                    | AES-XPN mode only             |              |
+   | aadLen             | The supported AAD lengths in  | domain       |
+   |                    | bits for AEAD algorithms      |              |
+   | tagLen             | The supported Tag lengths in  | domain       |
+   |                    | bits for AEAD algorithms, see |              |
+   |                    | Table 4                       |              |
+   | kwCipher           | The cipher as defined in      | array of     |
+   |                    | SP800-38F for key wrap mode   | strings      |
+   | tweakMode          | The format of tweak value     | array of     |
+   |                    | input for AES-XTS. Hex refers | strings      |
+   |                    | to the tweakValue being a     |              |
+   |                    | literal hex string. Number    |              |
+   |                    | refers to the tweakValue      |              |
+   |                    | being an integer number       |              |
+   |                    | represented as a hex string.  |              |
+   | keyingOption       | The Keying Option used in     | array of     |
+   |                    | TDES.  Keying option 1 (1) is | integers     |
+   |                    | 3 distinct keys (K1, K2, K3). |              |
+   |                    | Keying Option 2 (2) is 2      |              |
+   |                    | distinct keys only suitable   |              |
+   |                    | for decrypt (K1, K2, K1).     |              |
+   | overflowCounter    | Indicates if the              | boolean      |
+   |                    | implementation can handle a   |              |
+   |                    | counter exceeding the maximum |              |
+   |                    | value                         |              |
+   | incrementalCounter | Indicates if the              | boolean      |
+   |                    | implementation increments the |              |
+   |                    | counter (versus decrementing  |              |
+   |                    | the counter)                  |              |
+   +--------------------+-------------------------------+--------------+
+
+         Table 2: Block Cipher Algorithm Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   For example, AES-GCM requires ivLen, ivGen, ivGenMode, aadLen and
+
+
+
+Celi                     Expires August 5, 2019                [Page 22]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   tagLen.  Failure to provide these values will result in the ACVP
+   server returning an error to the ACVP client during registration.
+
+   The following grid outlines which properties are REQUIRED, as well as
+   all the possible values a server MAY support for each standard block
+   cipher algorithm:
+
+   +-------------+----------+-------------+--------+-------------------+
+   | algorithm   | revision | direction   | keyLen | keyingOption      |
+   +-------------+----------+-------------+--------+-------------------+
+   | AES-ECB     | "1.0.0"  | ["encrypt", | [128,  |                   |
+   |             |          | "decrypt"]  | 192,   |                   |
+   |             |          |             | 256]   |                   |
+   | AES-CBC     | "1.0.0"  | ["encrypt", | [128,  |                   |
+   |             |          | "decrypt"]  | 192,   |                   |
+   |             |          |             | 256]   |                   |
+   | AES-OFB     | "1.0.0"  | ["encrypt", | [128,  |                   |
+   |             |          | "decrypt"]  | 192,   |                   |
+   |             |          |             | 256]   |                   |
+   | AES-CFB1    | "1.0.0"  | ["encrypt", | [128,  |                   |
+   |             |          | "decrypt"]  | 192,   |                   |
+   |             |          |             | 256]   |                   |
+   | AES-CFB8    | "1.0.0"  | ["encrypt", | [128,  |                   |
+   |             |          | "decrypt"]  | 192,   |                   |
+   |             |          |             | 256]   |                   |
+   | AES-CFB128  | "1.0.0"  | ["encrypt", | [128,  |                   |
+   |             |          | "decrypt"]  | 192,   |                   |
+   |             |          |             | 256]   |                   |
+   | TDES-ECB    | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-CBC    | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-CBCI   | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-CFB1   | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-CFB8   | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+
+
+
+Celi                     Expires August 5, 2019                [Page 23]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   | TDES-CFB64  | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-CFBP1  | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-CFBP8  | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-CFBP64 | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-OFB    | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   | TDES-OFBI   | "1.0.0"  | ["encrypt", |        | [1, 2] Note: 2 is |
+   |             |          | "decrypt"]  |        | only available    |
+   |             |          |             |        | for decrypt       |
+   |             |          |             |        | operations        |
+   +-------------+----------+-------------+--------+-------------------+
+
+    Table 3: Standard Block Cipher Algorithm Capabilities Applicability
+                                   Grid
+
+   Note: keyingOption 2 SHALL only available for decrypt operations.
+
+   The following grid outlines which properties are REQUIRED, as well as
+   the possible values a server MAY support for each authenticated block
+   cipher algorithm:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 24]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   +----------+---------+-----------+--------+-----------+-------------+
+   | algorith | revisio | direction | keyLen | kwCipher  | keyingOptio |
+   | m        | n       |           |        |           | n           |
+   +----------+---------+-----------+--------+-----------+-------------+
+   | AES-KW   | "1.0.0" | ["encrypt | [128,  | ["cipher" |             |
+   |          |         | ", "decry | 192,   | , "invers |             |
+   |          |         | pt"]      | 256]   | e"]       |             |
+   | AES-KWP  | "1.0.0" | ["encrypt | [128,  | ["cipher" |             |
+   |          |         | ", "decry | 192,   | , "invers |             |
+   |          |         | pt"]      | 256]   | e"]       |             |
+   | TDES-KW  | "1.0.0" | ["encrypt |        | ["cipher" | [1, 2]      |
+   |          |         | ", "decry |        | , "invers | Note: 2 is  |
+   |          |         | pt"]      |        | e"]       | only        |
+   |          |         |           |        |           | available   |
+   |          |         |           |        |           | for decrypt |
+   |          |         |           |        |           | operations  |
+   +----------+---------+-----------+--------+-----------+-------------+
+
+        Table 4: Authenticated Block Cipher Algorithm Capabilities
+                            Applicability Grid
+
+   The following grid outlines which properties are REQUIRED, as well as
+   the possible values a server MAY support for each key-wrap block
+   cipher algorithm:
+
+   +-----+----+-----+----+------+-----+------+------+------+-----+-----+
+   | alg | re | dir | ke | payl | ivL | ivGe | ivGe | salt | aad | tag |
+   | ori | vi | ect | yL | oadL | en  | n    | nMod | Gen  | Len | Len |
+   | thm | si | ion | en | en   |     |      | e    |      |     |     |
+   |     | on |     |    |      |     |      |      |      |     |     |
+   +-----+----+-----+----+------+-----+------+------+------+-----+-----+
+   | AES | "1 | ["e | [1 | {"Mi | {"M | ["in | ["8. |      | {"M | {[3 |
+   | -   | .0 | ncr | 28 | n":  | in" | tern | 2.1" |      | in" | 2,  |
+   | GCM | .0 | ypt | ,  | 0, " | :   | al", | , "8 |      | :   | 64, |
+   |     | "  | ",  | 19 | Max" | 8,  | "ext | .2.2 |      | 0,  | 96, |
+   |     |    | "de | 2, | : 65 | "Ma | erna | "]   |      | "Ma | 104 |
+   |     |    | cry | 25 | 536, | x": | l"]  |      |      | x": | , 1 |
+   |     |    | pt" | 6] | "Inc | 102 |      |      |      | 655 | 12, |
+   |     |    | ]   |    | ":   | 4,  |      |      |      | 36, | 120 |
+   |     |    |     |    | any} | "In |      |      |      | "In | , 1 |
+   |     |    |     |    |      | c": |      |      |      | c": | 28] |
+   |     |    |     |    |      | any |      |      |      | any | }   |
+   |     |    |     |    |      | }   |      |      |      | }   |     |
+   | AES | "1 | ["e | [1 | {"Mi |     |      |      |      | {"M |     |
+   | -GC | .0 | ncr | 28 | n":  |     |      |      |      | in" |     |
+   | M-  | .0 | ypt | ,  | 0, " |     |      |      |      | :   |     |
+   | SIV | "  | ",  | 25 | Max" |     |      |      |      | 0,  |     |
+   |     |    | "de | 6] | : 65 |     |      |      |      | "Ma |     |
+
+
+
+Celi                     Expires August 5, 2019                [Page 25]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   |     |    | cry |    | 536, |     |      |      |      | x": |     |
+   |     |    | pt" |    | "Inc |     |      |      |      | 655 |     |
+   |     |    | ]   |    | ":   |     |      |      |      | 36, |     |
+   |     |    |     |    | 8}   |     |      |      |      | "In |     |
+   |     |    |     |    |      |     |      |      |      | c": |     |
+   |     |    |     |    |      |     |      |      |      | 8}  |     |
+   | AES | "1 | ["e | [1 | {"Mi |     | ["in | ["8. | ["in | {"M | {[3 |
+   | -   | .0 | ncr | 28 | n":  |     | tern | 2.1" | tern | in" | 2,  |
+   | XPN | .0 | ypt | ,  | 0, " |     | al", | , "8 | al", | :   | 64, |
+   |     | "  | ",  | 19 | Max" |     | "ext | .2.2 | "ext | 1,  | 96, |
+   |     |    | "de | 2, | : 65 |     | erna | "]   | erna | "Ma | 104 |
+   |     |    | cry | 25 | 536, |     | l"]  |      | l"]  | x": | , 1 |
+   |     |    | pt" | 6] | "Inc |     |      |      |      | 655 | 12, |
+   |     |    | ]   |    | ":   |     |      |      |      | 36, | 120 |
+   |     |    |     |    | any} |     |      |      |      | "In | , 1 |
+   |     |    |     |    |      |     |      |      |      | c": | 28] |
+   |     |    |     |    |      |     |      |      |      | any | }   |
+   |     |    |     |    |      |     |      |      |      | }   |     |
+   | AES | "1 | ["e | [1 | {"Mi | {"M |      |      |      | {"M | {"M |
+   | -   | .0 | ncr | 28 | n":  | in" |      |      |      | in" | in" |
+   | CCM | .0 | ypt | ,  | 0, " | :   |      |      |      | :   | :   |
+   |     | "  | ",  | 19 | Max" | 56, |      |      |      | 0,  | 32, |
+   |     |    | "de | 2, | :    | "Ma |      |      |      | "Ma | "Ma |
+   |     |    | cry | 25 | 256, | x": |      |      |      | x": | x": |
+   |     |    | pt" | 6] | "Inc | 104 |      |      |      | 524 | 128 |
+   |     |    | ]   |    | ":   | , " |      |      |      | 288 | , " |
+   |     |    |     |    | 8}   | Inc |      |      |      | , " | Inc |
+   |     |    |     |    |      | ":  |      |      |      | Inc | ":  |
+   |     |    |     |    |      | 8}  |      |      |      | ":  | 16} |
+   |     |    |     |    |      |     |      |      |      | any |     |
+   |     |    |     |    |      |     |      |      |      | }   |     |
+   +-----+----+-----+----+------+-----+------+------+------+-----+-----+
+
+    Table 5: Key-Wrap Block Cipher Algorithm Capabilities Applicability
+                                   Grid
+
+   The following grid outlines which properties are REQUIRED, as well as
+   the possible values a server MAY support for each miscellaneous block
+   cipher algorithm:
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 26]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   +-----+-----+------+----+-------+------+-------+---------+----------+
+   | alg | rev | dire | ke | paylo | twea | keyin | overflo | incremen |
+   | ori | isi | ctio | yL | adLen | kMod | gOpti | wCounte | talCount |
+   | thm | on  | n    | en |       | e    | on    | r       | er       |
+   +-----+-----+------+----+-------+------+-------+---------+----------+
+   | AES | "1. | ["en | [1 | {"Min |      |       | true,   | true,    |
+   | -   | 0.0 | cryp | 28 | ": 1, |      |       | false   | false    |
+   | CTR | "   | t",  | ,  | "Max" |      |       |         |          |
+   |     |     | "dec | 19 | :     |      |       |         |          |
+   |     |     | rypt | 2, | 128,  |      |       |         |          |
+   |     |     | "]   | 25 | "Inc" |      |       |         |          |
+   |     |     |      | 6] | :     |      |       |         |          |
+   |     |     |      |    | any}  |      |       |         |          |
+   | AES | "1. | ["en | [1 | {"Min | ["he |       |         |          |
+   | -   | 0.0 | cryp | 28 | ":    | x",  |       |         |          |
+   | XTS | "   | t",  | ,  | 128,  | "num |       |         |          |
+   |     |     | "dec | 25 | "Max" | ber" |       |         |          |
+   |     |     | rypt | 6] | : 655 | ]    |       |         |          |
+   |     |     | "]   |    | 36, " |      |       |         |          |
+   |     |     |      |    | Inc": |      |       |         |          |
+   |     |     |      |    | 128}  |      |       |         |          |
+   | TDE | "1. | ["en |    | {"Min |      | [1,   | true,   | true,    |
+   | S-  | 0.0 | cryp |    | ": 1, |      | 2]    | false   | false    |
+   | CTR | "   | t",  |    | "Max" |      | Note: |         |          |
+   |     |     | "dec |    | : 64, |      | 2 is  |         |          |
+   |     |     | rypt |    | "Inc" |      | only  |         |          |
+   |     |     | "]   |    | :     |      | avail |         |          |
+   |     |     |      |    | any}  |      | able  |         |          |
+   |     |     |      |    |       |      | for d |         |          |
+   |     |     |      |    |       |      | ecryp |         |          |
+   |     |     |      |    |       |      | t ope |         |          |
+   |     |     |      |    |       |      | ratio |         |          |
+   |     |     |      |    |       |      | ns    |         |          |
+   +-----+-----+------+----+-------+------+-------+---------+----------+
+
+        Table 6: Miscellaneous Block Cipher Algorithm Capabilities
+                            Applicability Grid
+
+   Note: keyingOption 2 SHALL only available for decrypt operations.
+
+5.  Test Vectors
+
+   After receiving a valid registration of a cryptographic module, the
+   ACVP server SHALL provide test vectors in the form of a prompt to the
+   ACVP client, which then SHALL be processed and returned to the ACVP
+   server for validation.  A typical ACVP validation session would
+   require the client to download and process multiple test vector sets.
+   Each test vector set SHALL represent an individual cryptographic
+
+
+
+Celi                     Expires August 5, 2019                [Page 27]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   algorithm, such as AES-ECB, AES-CBC, TDES-CTR, etc.  This section
+   describes the JSON schema for a test vector set used with block
+   cipher algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta-data for the entire vector set.  The test vector set
+   SHALL be comprised of test groups which SHALL subsequently contain
+   individual test cases to be processed by the ACVP client.  The
+   following table describes the REQUIRED JSON elements at the top level
+   of the hierarchy:
+
+   +------------+----------------------------------------+-------------+
+   | JSON Value | Description                            | JSON type   |
+   +------------+----------------------------------------+-------------+
+   | acvVersion | Protocol version identifier            | string      |
+   | vsId       | Unique numeric identifier for the      | integer     |
+   |            | vector set                             |             |
+   | algorithm  | The block cipher algorithm and mode    | string      |
+   |            | used for the test vectors. See Section |             |
+   |            | 2 for possible values.                 |             |
+   | revision   | The version of the testing             | string      |
+   |            | methodologies used in the vector set.  |             |
+   | testGroups | Array of test group JSON objects,      | array of    |
+   |            | which are defined in Section 5.1       | testGroup   |
+   |            |                                        | objects     |
+   +------------+----------------------------------------+-------------+
+
+                   Table 7: Test Vector Set JSON Object
+
+5.1.  Test Groups
+
+   Test vector sets MUST contain one or many test groups, each sharing
+   similar properties.  For instance, all test vectors that use the same
+   key size would be grouped together.  The testGroups element at the
+   top level of the test vector JSON object SHALL be the array of test
+   groups.  The Test Group JSON object MUST contain meta-data that
+   applies to all test cases within the group.  The following table
+   describes the JSON elements that MAY appear from the server in the
+   Test Group JSON object:
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 28]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   +--------------+-----------------------------------------+----------+
+   | JSON Value   | Description                             | JSON     |
+   |              |                                         | type     |
+   +--------------+-----------------------------------------+----------+
+   | tgId         | Numeric identifier for the test group,  | integer  |
+   |              | unique across the entire vector set.    |          |
+   | direction    | The IUT processing direction: encrypt   | string   |
+   |              | or decrypt                              |          |
+   | ivGen        | IV generation method                    | string   |
+   | ivGenMode    | IV generation method                    | string   |
+   | saltGen      | Salt generation method                  | string   |
+   | keyLen       | Length of key in bits to use            | integer  |
+   | keyingOption | The TDES keying option to use           | integer  |
+   | ivLen        | Length of IV in bits to use             | integer  |
+   | payloadLen   | Length of plaintext or ciphertext in    | integer  |
+   |              | bits to use                             |          |
+   | aadLen       | Length of AAD in bits to use            | integer  |
+   | tagLen       | Length of AEAD tag in bits to use       | integer  |
+   | testType     | The test category type (AFT, MCT or     | string   |
+   |              | counter). See Section 3 for more        |          |
+   |              | information about what these tests do,  |          |
+   |              | and how to implement them.              |          |
+   | tests        | Array of individual test case JSON      | array of |
+   |              | objects, which are defined in Section   | testCase |
+   |              | 5.2                                     | objects  |
+   +--------------+-----------------------------------------+----------+
+
+                      Table 8: Test Group JSON Object
+
+   Some properties MUST appear in the prompt file from the server for
+   every testGroup object.  They are as follows:
+
+   o  tgId
+
+   o  direction
+
+   o  payloadLen
+
+   o  testType
+
+   o  tests
+
+   The other properties MAY appear depending on the algorithm selected
+   for the test vector set.  The following grid defines the REQUIRED
+   properties for each standard block cipher, as well as the valid
+   values a server MAY use:
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 29]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+              +-------------+---------------+--------------+
+              | algorithm   | keyLen        | keyingOption |
+              +-------------+---------------+--------------+
+              | AES-ECB     | 128, 192, 256 |              |
+              | AES-CBC     | 128, 192, 256 |              |
+              | AES-OFB     | 128, 192, 256 |              |
+              | AES-CFB1    | 128, 192, 256 |              |
+              | AES-CFB8    | 128, 192, 256 |              |
+              | AES-CFB128  | 128, 192, 256 |              |
+              | TDES-ECB    |               | 1, 2         |
+              | TDES-CBC    |               | 1, 2         |
+              | TDES-CBCI   |               | 1, 2         |
+              | TDES-CFB1   |               | 1, 2         |
+              | TDES-CFB8   |               | 1, 2         |
+              | TDES-CFB64  |               | 1, 2         |
+              | TDES-CFBP1  |               | 1, 2         |
+              | TDES-CFBP8  |               | 1, 2         |
+              | TDES-CFBP64 |               | 1, 2         |
+              | TDES-OFB    |               | 1, 2         |
+              | TDES-OFBI   |               | 1, 2         |
+              +-------------+---------------+--------------+
+
+        Table 9: Prompt Test Group Block Cipher Applicability Grid
+
+   The following grid defines when each property is REQUIRED from a
+   server for each authenticated block cipher:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 30]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   +------+----+------+-------+-------+-----+-------+-----+-----+------+
+   | algo | ke | ivGe | ivGen | saltG | ivL | paylo | aad | tag | salt |
+   | rith | yL | n    | Mode  | en    | en  | adLen | Len | Len | Len  |
+   | m    | en |      |       |       |     |       |     |     |      |
+   +------+----+------+-------+-------+-----+-------+-----+-----+------+
+   | AES- | 12 | "int | "8.2. |       | wit | withi | wit | wit |      |
+   | GCM  | 8, | erna | 1", " |       | hin | n dom | hin | hin |      |
+   |      | 19 | l",  | 8.2.2 |       | dom | ain   | dom | dom |      |
+   |      | 2, | "ext | "     |       | ain |       | ain | ain |      |
+   |      | 25 | erna |       |       |     |       |     |     |      |
+   |      | 6  | l"   |       |       |     |       |     |     |      |
+   | AES- | 12 |      |       |       | 96  | withi | wit | 128 |      |
+   | GCM- | 8, |      |       |       |     | n dom | hin |     |      |
+   | SIV  | 25 |      |       |       |     | ain   | dom |     |      |
+   |      | 6  |      |       |       |     |       | ain |     |      |
+   | AES- | 12 | "int | "8.2. | "inte | wit | withi | wit | wit | with |
+   | XPN  | 8, | erna | 1", " | rnal" | hin | n dom | hin | hin | in d |
+   |      | 19 | l",  | 8.2.2 | , "ex | dom | ain   | dom | dom | omai |
+   |      | 2, | "ext | "     | terna | ain |       | ain | ain | n    |
+   |      | 25 | erna |       | l"    |     |       |     |     |      |
+   |      | 6  | l"   |       |       |     |       |     |     |      |
+   | AES- | 12 |      |       |       | wit | withi | wit | wit |      |
+   | CCM  | 8, |      |       |       | hin | n dom | hin | hin |      |
+   |      | 19 |      |       |       | dom | ain   | dom | dom |      |
+   |      | 2, |      |       |       | ain |       | ain | ain |      |
+   |      | 25 |      |       |       |     |       |     |     |      |
+   |      | 6  |      |       |       |     |       |     |     |      |
+   +------+----+------+-------+-------+-----+-------+-----+-----+------+
+
+   Table 10: Prompt Test Group Authenticated Block Cipher Applicability
+                                   Grid
+
+   Note: The particular values of a domain are REQUIRED to be an integer
+   element of the domain present in the registration used.  The ACVP
+   server MAY select predetermined or random values with particular
+   features (ex. on a block boundary, or not on a block boundary) within
+   the domain the client provided in the registration.
+
+   The following grid defines when each property is REQUIRED from a
+   server for a key-wrap block cipher:
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 31]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+    +-----------+---------------+---------------------+---------------+
+    | algorithm | keyLen        | kwCipher            | payloadLen    |
+    +-----------+---------------+---------------------+---------------+
+    | AES-KW    | 128, 192, 256 | "cipher", "inverse" | within domain |
+    | AES-KWP   | 128, 192, 256 | "cipher", "inverse" | within domain |
+    | TDES-KW   |               | "cipher", "inverse" | within domain |
+    +-----------+---------------+---------------------+---------------+
+
+   Table 11: Prompt Test Group Key-Wrap Block Cipher Applicability Grid
+
+   Note: The particular values of a domain are REQUIRED to be an integer
+   element of the domain present in the registration used.  The ACVP
+   server MAY select predetermined or random values with particular
+   features (ex. on a block boundary, or not on a block boundary) within
+   the domain the client provided in the registration.
+
+   The following grid defines when each property is REQUIRED from a
+   server for the miscellaneous block ciphers:
+
+   +--------+------+----------+----------+--------+---------+----------+
+   | algori | keyL | keyingOp | incremen | overfl | tweakMo | payloadL |
+   | thm    | en   | tion     | tal      | ow     | de      | en       |
+   +--------+------+----------+----------+--------+---------+----------+
+   | AES-   | 128, |          | true,    | true,  |         |          |
+   | CTR    | 192, |          | false    | false  |         |          |
+   |        | 256  |          |          |        |         |          |
+   | AES-   | 128, |          |          |        | "hex",  | within   |
+   | XTS    | 256  |          |          |        | "number | domain   |
+   |        |      |          |          |        | "       |          |
+   | TDES-  |      | 1, 2     | true,    | true,  |         |          |
+   | CTR    |      |          | false    | false  |         |          |
+   +--------+------+----------+----------+--------+---------+----------+
+
+   Table 12: Prompt Test Group Miscellaneous Block Cipher Applicability
+                                   Grid
+
+   Note: The particular values of a domain are REQUIRED to be an integer
+   element of the domain present in the registration used.  The ACVP
+   server MAY select predetermined or random values with particular
+   features (ex. on a block boundary, or not on a block boundary) within
+   the domain the client provided in the registration.
+
+5.2.  Test Cases
+
+   Each test group SHALL contain an array of one or more test cases.
+   Each test case is a JSON object that represents a single case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each test case.
+
+
+
+Celi                     Expires August 5, 2019                [Page 32]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   +------------+--------------------------------------------+---------+
+   | JSON Value | Description                                | JSON    |
+   |            |                                            | type    |
+   +------------+--------------------------------------------+---------+
+   | tcId       | Numeric identifier for the test case,      | integer |
+   |            | unique across the entire vector set.       |         |
+   | key        | Encryption key to use for AES              | string  |
+   |            |                                            | (hex)   |
+   | key1,      | Encryption keys to use for TDES            | string  |
+   | key2, key3 |                                            | (hex)   |
+   | iv         | IV to use                                  | string  |
+   |            |                                            | (hex)   |
+   | tweakValue | tweakValue used to form an IV for AES-XTS  | string  |
+   |            |                                            | (hex)   |
+   | salt       | The salt to use in AES-XPN (required for   | string  |
+   |            | AES-XPN only)                              | (hex)   |
+   | pt         | Plaintext to use                           | string  |
+   |            |                                            | (hex)   |
+   | ct         | Ciphertext to use                          | string  |
+   |            |                                            | (hex)   |
+   | payloadLen | Plaintext or Ciphertext length to use in   | string  |
+   |            | bits. Only the most significant            | (hex)   |
+   |            | 'payloadLen' bits will be used.            |         |
+   | aad        | AAD to use for AEAD algorithms             | string  |
+   |            |                                            | (hex)   |
+   | tag        | Tag to use for AEAD algorithms             | string  |
+   |            |                                            | (hex)   |
+   +------------+--------------------------------------------+---------+
+
+                      Table 13: Test Case JSON Object
+
+   Note: The applicability of each test case property is dependent on
+   the test group and test vector (algorithm) properties.  Each test
+   type within the test group requires specific operations to be
+   performed and thus specific data returned to the server.  Consult
+   Section 3 for more information.  The tcId property MUST appear within
+   every test case sent to and from the server.
+
+6.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it SHALL
+   send the response vectors back to the ACVP server within the alloted
+   timeframe.  The following table describes the JSON object that
+   represents a vector set response.
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 33]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   +------------+--------------------------------------+---------------+
+   | JSON Value | Description                          | JSON type     |
+   +------------+--------------------------------------+---------------+
+   | acvVersion | Protocol version identifier          | string        |
+   | vsId       | Unique numeric identifier for the    | integer       |
+   |            | vector set                           |               |
+   | testGroups | Array of JSON objects that represent | array of      |
+   |            | each test vector group. See Table 15 | testGroup     |
+   |            |                                      | objects       |
+   +------------+--------------------------------------+---------------+
+
+                 Table 14: Vector Set Response JSON Object
+
+   The testGroup Response section is used to organize the ACVP client
+   response in a similar manner to how it receives vectors.  Several
+   algorithms SHALL require the client to send back group level
+   properties in its response.  This structure helps accommodate that.
+
+   +---------+------------------------------------+--------------------+
+   | JSON    | Description                        | JSON type          |
+   | Value   |                                    |                    |
+   +---------+------------------------------------+--------------------+
+   | tgId    | The test group identifier          | integer            |
+   | tests   | The tests associated to the group  | array of testCase  |
+   |         | specified in tgId                  | objects            |
+   +---------+------------------------------------+--------------------+
+
+              Table 15: Vector Set Group Response JSON Object
+
+   Each test case is a JSON object that represents a single test object
+   to be processed by the ACVP client.  The following table describes
+   the JSON elements for each test case object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 34]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   +--------------+----------------------------------+-----------------+
+   | JSON Value   | Description                      | JSON type       |
+   +--------------+----------------------------------+-----------------+
+   | tcId         | Numeric identifier for the test  | integer         |
+   |              | case, unique across the entire   |                 |
+   |              | vector set.                      |                 |
+   | pt           | The IUT's pt response to a       | string (hex)    |
+   |              | decrypt test                     |                 |
+   | ct           | The IUT's ct response to an      | string (hex)    |
+   |              | encrypt test                     |                 |
+   | testPassed   | Some test cases included with    | boolean         |
+   |              | decrypt operations in AES-GCM,   |                 |
+   |              | AES-CCM, AES-XPN, AES-KW, AES-   |                 |
+   |              | KWP, and TDES-KW will have       |                 |
+   |              | expected failures.               |                 |
+   | resultsArray | Array of JSON objects that       | array of        |
+   |              | represent each iteration of a    | objects         |
+   |              | Monte Carlo Test. Each iteration | containing pt,  |
+   |              | will contain the key(s), pt, ct  | ct and iv       |
+   |              | and iv                           | (except for ECB |
+   |              |                                  | mode)           |
+   +--------------+----------------------------------+-----------------+
+
+                  Table 16: Test Case Results JSON Object
+
+   Note: The tcId MUST be included in every test case object sent
+   between the client and the server.
+
+7.  Acknowledgements
+
+   The authors thank John Foley for putting together an early draft of
+   this specification.
+
+8.  IANA Considerations
+
+   This memo include requests to IANA to join draft-vassilev-acvp-iana-
+   00.
+
+9.  Security Considerations
+
+   Security considerations are addressed by the ACVP Specification
+   [ACVP].
+
+10.  References
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 35]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+10.1.  Normative References
+
+   [ACVP]     Barry Fussell, BF., "draft-fussell-acvp-spec-00", 2018.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+10.2.  Informative References
+
+   [AES-GCM-SIV]
+              University of Haifa and Amazon Web Services, Google LLC,
+              and Bar Ilan University, "AES-GCM-SIV: Nonce Misuse-
+              Resistant Authenticated Encryption", 2018.
+
+   [AES-XTS]  Institute of Electrical and Electronics Engineers, Inc.,
+              "The XTS-AES Tweakable Block Cipher", 2008.
+
+   [FIPS-197]
+              NIST, "Specification for the Advanced Encryption Standard
+              (AES)", 2001.
+
+   [SP800-38A]
+              Morris Dworkin, MD., "Recommendation for Block Cipher
+              Modes of Operation: Methods and Techniques", 2001.
+
+   [SP800-38C]
+              Morris Dworkin, MD., "Recommendation for Block Cipher
+              Modes of Operation: The CCM Mode for Authentication and
+              Confidentiality", 2004.
+
+   [SP800-38D]
+              Morris Dworkin, MD., "Recommendation for Block Cipher
+              Modes of Operation: Galois/Counter Mode (GCM) and GMAC",
+              2007.
+
+   [SP800-38E]
+              Morris Dworkin, MD., "Recommendation for Block Cipher
+              Modes of Operation: The XTS-AES Mode for Confidentiality
+              on Storage Devices", 2010.
+
+   [SP800-38F]
+              Morris Dworkin, MD., "Recommendataion for Block Cipher
+              Modes of Operation: Methods for Key Wrapping", December
+              2012.
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 36]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [SP800-67r2]
+              Elaine Barker, EB., "Recommendation for the Triple Data
+              Encryption Algorithm (TDEA) Block Cipher", 2017.
+
+Appendix A.  Example Capabilities JSON Object
+
+   The following is a example JSON object advertising support for all
+   block ciphers.
+
+   POST [
+   [{
+       "acvVersion": <acvp-version>
+   },{
+           "algorithm": "ACVP-AES-GCM",
+           "revision": "1.0.0",
+           "prereqVals" :
+               [{
+                   "algorithm" : "ACVP-AES-ECB",
+                   "valValue" : "123456"
+               },
+               {
+                   "algorithm" : "DRBG",
+                   "valValue" : "123456"
+               }],
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "ivGen": "internal",
+           "ivGenMode": "8.2.2",
+           "keyLen": [
+               128,
+               192,
+               256
+           ],
+           "tagLen": [
+               96,
+               128
+           ],
+           "ivLen": [
+               96
+           ],
+           "payloadLen": [
+               0,
+               256
+           ],
+           "aadLen": [
+               128,
+
+
+
+Celi                     Expires August 5, 2019                [Page 37]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+               256
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-ECB",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-CBC",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-CFB8",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ],
+           "payloadLen": [
+               256
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-CFB128",
+           "revision": "1.0.0",
+
+
+
+Celi                     Expires August 5, 2019                [Page 38]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-OFB",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-XPN",
+           "revision": "1.0.0",
+           "prereqVals" :
+           [{
+               "algorithm" : "ACVP-AES-ECB",
+               "valValue" : "123456"
+           },
+           {
+               "algorithm" : "DRBG",
+               "valValue" : "123456"
+           }],
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "ivGen": "internal",
+           "ivGenMode": "8.2.2",
+           "saltGen": "internal",
+           "keyLen": [
+               128,
+               192,
+               256
+           ],
+           "tagLen": [
+
+
+
+Celi                     Expires August 5, 2019                [Page 39]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+               96,
+               128
+           ],
+           "payloadLen": [
+               0,
+               128
+           ],
+           "aadLen": [
+               120,
+               128
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-CTR",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ],
+           "payloadLen": [
+               128
+           ]
+           },
+           {
+           "algorithm": "ACVP-AES-CCM",
+           "revision": "1.0.0",
+           "prereqVals": [
+               {
+                   "algorithm": "ACVP-AES-ECB",
+                   "valValue": "same"
+               }
+           ],
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ],
+           "tagLen": [
+               128
+
+
+
+Celi                     Expires August 5, 2019                [Page 40]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+           ],
+           "ivLen": [
+               56
+           ],
+           "payloadLen": [
+               0,
+               256
+           ],
+           "aadLen": [
+               0,
+               65536
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-CFB1",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-KW",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "kwCipher": [
+               "cipher"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ],
+           "payloadLen": [
+               512,
+               192,
+               128
+           ]
+       },
+       {
+
+
+
+Celi                     Expires August 5, 2019                [Page 41]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+           "algorithm": "ACVP-AES-KWP",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "kwCipher": [
+               "cipher"
+           ],
+           "keyLen": [
+               128,
+               192,
+               256
+           ],
+           "payloadLen": [
+               8,
+               32,
+               96,
+               808
+           ]
+       },
+       {
+           "algorithm": "ACVP-AES-XTS",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyLen": [
+               128,
+               256
+           ],
+           "payloadLen": [
+               65536
+           ],
+           "tweakMode": [
+               "hex",
+               "number"
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-ECB",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+
+
+
+Celi                     Expires August 5, 2019                [Page 42]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CBC",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CBCI",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-OFB",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+
+
+
+Celi                     Expires August 5, 2019                [Page 43]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+       {
+           "algorithm": "ACVP-TDES-OFBI",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CFB64",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CFB8",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CFB1",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+
+
+
+Celi                     Expires August 5, 2019                [Page 44]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CFBP64",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CFBP8",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CFBP1",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+
+
+
+Celi                     Expires August 5, 2019                [Page 45]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-CTR",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "keyingOption": [
+               1
+           ],
+           "keyLen": [
+               192
+           ],
+           "payloadLen": [
+               64
+           ]
+       },
+       {
+           "algorithm": "ACVP-TDES-KW",
+           "revision": "1.0.0",
+           "direction": [
+               "encrypt",
+               "decrypt"
+           ],
+           "kwCipher": [
+               "cipher"
+           ],
+           "payloadLen": [
+               512,
+               192,
+               128
+           ]
+       }
+    ]]
+
+Appendix B.  Example Vector Set Request/Responses JSON Object
+
+   The following sections provide examples of the JSON objects for each
+   of the AES algorithms.  Examples will relfect what testTypes are
+   supported by each algorithm, ie AFT, MCT or counter.  MCT examples
+   have only 2 iterations shown for brevity.
+
+   The following shows AES-GCM AFT request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+
+
+
+Celi                     Expires August 5, 2019                [Page 46]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   },{
+           "vsId": 2055,
+           "algorithm": "ACVP-AES-GCM",
+       "revision": "1.0.0",
+           "testGroups": [{
+               tgId": 1,
+               "testType": "AFT",
+               "direction": "encrypt",
+               "keyLen": 128,
+               "ivLen": 96,
+               "ivGen": "external",
+               "ivGenMode": "8.2.2",
+               "payloadLen": 0,
+               "aadLen": 0,
+               "tagLen": 32,
+               "tests": [
+                   {
+                       "tcId": 1,
+                       "plainText": "",
+                       "key": "10B8D4C9658590A...",
+                       "aad": "",
+                       "iv": "3D026F3D590BF1A7..."
+                   },
+                   {
+                       "tcId": 2,
+                       "plainText": "",
+                       "key": "934865822A3ECCB...",
+                       "aad": "",
+                       "iv": "273F3B30341C779E..."
+                   }
+                           ]
+                   },
+                   {
+               "tgId": 19,
+               "testType": "AFT",
+               "direction": "decrypt",
+               "keyLen": 128,
+               "ivLen": 96,
+               "ivGen": "external",
+               "ivGenMode": "8.2.2",
+               "payloadLen": 0,
+               "aadLen": 120,
+               "tagLen": 32,
+               "tests": [
+                   {
+                       "tcId": 271,
+                       "key": "88AB5441AE2...",
+                       "aad": "4E956EF528D...",
+
+
+
+Celi                     Expires August 5, 2019                [Page 47]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                       "iv": "810628011BB0...",
+                       "cipherText": "",
+                       "tag": "1180FD89"
+                   },
+                   {
+                       "tcId": 272,
+                       "key": "9149BE47FAEB...",
+                       "aad": "938A8FA71324...",
+                       "iv": "FF6B72FF25B55...",
+                       "cipherText": "",
+                       "tag": "6C7528F0"
+                   }
+                           ]
+                   }
+           ]
+   }]
+
+   The following shows AES-GCM AFT responses.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 48]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2055,
+           "testGroups": [{
+                           "tgId": 1,
+                           "tests": [{
+                                           "tcId": 1,
+                                           "iv": "01020304F966B8...",
+                                           "ct": "",
+                                           "tag": "427F668E58F56..."
+                                   },
+                                   {
+                                           "tcId": 2,
+                                           "iv": "01020304C2855...",
+                                           "ct": "",
+                                           "tag": "D95BD66F7789..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 2,
+                           "tests": [{
+                                           "tcId": 902,
+                                           "pt": "763BF..."
+                                   },
+                                   {
+                                           "tcId": 903,
+                                           "testPassed": false
+                                   }
+                           ]
+                   }
+           ]
+   }]
+
+   The following shows AES-CCM AFT request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2061,
+           "algorithm": "ACVP-AES-CCM",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "direction": "encrypt",
+                   "testType": "AFT",
+                   "ivLen": 56,
+
+
+
+Celi                     Expires August 5, 2019                [Page 49]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                   "payloadLen": 256,
+                   "aadLen": 0,
+                   "tagLen": 128,
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 1,
+                           "pt": "361445511E0BD3E94E3...",
+                           "key": "7DB9E755181E4160C6...",
+                           "iv": "1C53ECD62BBED5",
+                           "aad": ""
+                   }, {
+                           "tcId": 2,
+                           "pt": "735CE37215A91074DBF...",
+                           "key": "7DB9E755181E4160C6...",
+                           "iv": "1C53ECD62BBED5",
+                           "aad": ""
+                   }]
+           }, {
+                   "tgId": 2,
+                   "direction": "decrypt",
+                   "testType": "AFT",
+                   "ivLen": 56,
+                   "payloadLen": 0,
+                   "aadLen": 0,
+                   "tagLen": 128,
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 181,
+                           "ct": "533427D475EBAC3FE5...",
+                           "key": "A8B7C7A69E5AB940B...",
+                           "iv": "1BD5816AF5BB9F",
+                           "aad": ""
+                   }, {
+                           "tcId": 182,
+                           "ct": "6B774BB2D20A8A23A1...",
+                           "key": "A8B7C7A69E5AB940B...",
+                           "iv": "8140308B19BCE8",
+                           "aad": ""
+                   }]
+           }]
+   }]
+
+   The following shows AES-CCM AFT responses.
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 50]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+       "vsId": 2061,
+       "testGroups": [{
+               "tgId": 1,
+               "tests": [{
+                       "tcId": 1,
+                       "ct": "C8AB4A739E1..."
+                   },
+                   {
+                       "tcId": 2,
+                       "ct": "8DE3EC5095B..."
+                   }
+               ]
+           },
+           {
+               "tgId": 2,
+               "tests": [{
+                       "tcId": 181,
+                       "testPassed": false
+                   },
+                   {
+                       "tcId": 182,
+                       "pt": ""
+                   }
+               ]
+           }
+       ]
+   }]
+
+   The following shows AES-CBC AFT and MCT request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2057,
+           "algorithm": "ACVP-AES-CBC",
+       "revision": "1.0.0",
+           "testGroups": [{
+                           "tgId": 1,
+                           "direction": "encrypt",
+                           "testType": "AFT",
+                           "keyLen": 128,
+                           "tests": [{
+                                   "tcId": 1,
+                                   "iv": "00C8F42C5B5...",
+                                   "key": "7F9863BCD5...",
+
+
+
+Celi                     Expires August 5, 2019                [Page 51]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                                   "pt": "97549D671FA..."
+                           }, {
+                                   "tcId": 2,
+                                   "iv": "CE6747E918F...",
+                                   "key": "25F73DBAF4...",
+                                   "pt": "D3A0AA732D7..."
+                           }]
+                   }, {
+                           "tgId": 2,
+                           "direction": "decrypt",
+                           "testType": "AFT",
+                           "keyLen": 128,
+                           "tests": [{
+                                   "tcId": 31,
+                                   "iv": "D498F4F8462...",
+                                   "key": "77D563ACE1...",
+                                   "ct": "78256FA155F..."
+                           }, {
+                                   "tcId": 32,
+                                   "iv": "AB99A939B688...",
+                                   "key": "0569B0C6DB3...",
+                                   "ct": "EEBF23A65E83..."
+                           }]
+                   },
+                   {
+                           "tgId": 3,
+                           "direction": "encrypt",
+                           "testType": "MCT",
+                           "keyLen": 256,
+                           "tests": [{
+                                   "tcId": 63,
+                                   "iv": "057FB7EEDE1EBF40...",
+                                   "key": "E5E2E9F088E2C06...",
+                                   "pt": "6DA46A0AADB59615..."
+                           }]
+                   }, {
+                           "tgId": 4,
+                           "direction": "decrypt",
+                           "testType": "MCT",
+                           "keyLen": 128,
+                           "tests": [{
+                                   "tcId": 64,
+                                   "iv": "FD5EDEC164E504D6...",
+                                   "key": "F7439EAC671FC4B...",
+                                   "ct": "37ECE2FF3F391D8C..."
+                           }]
+                   }
+           ]
+
+
+
+Celi                     Expires August 5, 2019                [Page 52]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   }]
+
+   The following shows AES-CBC AFT and MCT responses.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2057,
+           "testGroups": [{
+                           "tgId": 1,
+                           "tests": [{
+                                           "tcId": 1,
+                                           "ct": "DD95E867DFCFCC..."
+                                   },
+                                   {
+                                           "tcId": 2,
+                                           "ct": "540954F0016D40..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 2,
+                           "tests": [{
+                                           "tcId": 31,
+                                           "pt": "F7251EA3C68FE..."
+                                   },
+                                   {
+                                           "tcId": 32,
+                                           "pt": "CEC14A7B465A3..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 3,
+                           "tests": [{
+                                   "tcId": 63,
+                                   "resultsArray": [{
+                                                   "key": "E5E2...",
+                                                   "iv": "057FB...",
+                                                   "pt": "6DA46...",
+                                                   "ct": "3E794..."
+                                           },
+                                           {
+                                                   "key": "DE31...",
+                                                   "iv": "3E794...",
+                                                   "pt": "3BD32...",
+                                                   "ct": "9236D..."
+                                           }
+
+
+
+Celi                     Expires August 5, 2019                [Page 53]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                                   ]
+                           }]
+                   },
+                   {
+                           "tgId": 1,
+                           "tests": [{
+                                   "tcId": 64,
+                                   "resultsArray": [{
+                                                   "key": "F743...",
+                                                   "iv": "FD5ED...",
+                                                   "ct": "37ECE...",
+                                                   "pt": "52FC3..."
+                                           },
+                                           {
+                                                   "key": "A5BF...",
+                                                   "iv": "52FC3...",
+                                                   "ct": "4400F...",
+                                                   "pt": "66204..."
+                                           }
+                                   ]
+                           }]
+                   }
+           ]
+   }]
+
+   The following shows AES-ECB AFT and MCT request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2056,
+           "algorithm": "ACVP-AES-ECB",
+       "revision": "1.0.0",
+           "testGroups": [{
+                           "tgId": 1,
+               "testType": "AFT",
+               "direction": "encrypt",
+               "keylen": 128,
+               "tests": [
+                   {
+                       "tcId": 1,
+                       "plainText": "F34481E...",
+                       "key": "0000000000000..."
+                   },
+                   {
+                       "tcId": 2,
+                       "plainText": "9798C46...",
+                       "key": "0000000000000..."
+
+
+
+Celi                     Expires August 5, 2019                [Page 54]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                   }
+                           ]
+                   },
+                   {
+               "tgId": 25,
+               "testType": "AFT",
+               "direction": "encrypt",
+               "keylen": 128,
+               "tests": [
+                   {
+                       "tcId": 2079,
+                       "plainText": "1C46FA6...",
+                       "key": "18D3248D32630..."
+                   },
+                   {
+                       "tcId": 2080,
+                       "plainText": "5AC1B2D...",
+                       "key": "26007B74016FA..."
+                   }
+                           ]
+                   },
+           {
+           "tgId": 31,
+           "testType": "MCT",
+           "direction": "encrypt",
+           "keylen": 128,
+           "tests": [
+                   {
+                       "tcId": 2139,
+                       "key": "9489F6FFA4A74...",
+                                   "pt": "2D984D2F1FC178..."
+                   }
+               ]
+           },
+           {
+           "tgId": 34,
+           "testType": "MCT",
+           "direction": "decrypt",
+           "keylen": 128,
+           "tests": [
+                   {
+                       "tcId": 2142
+                       "key": "9489F6FFA4A74...",
+                                   "ct": "2D984D2F1FC178..."
+                   }
+               ]
+           }
+           ]
+
+
+
+Celi                     Expires August 5, 2019                [Page 55]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   }]
+
+   The following shows AES-ECB AFT and MCT responses.
+
+  [{
+          "acvVersion": <acvp-version>
+  },{
+          "vsId": 2056,
+          "testGroups": [{
+                          "tgId": 1,
+                          "tests": [{
+                                          "tcId": 1,
+                                          "ct": "43FB8A36F168E3..."
+                                  },
+                                  {
+                                          "tcId": 2,
+                                          "ct": "27549D65BE8056..."
+                                  }
+                          ]
+                  },
+                  {
+                          "tgId": 1,
+                          "tests": [{
+                                          "tcId": 31,
+                                          "pt": "F7F42B062BD643..."
+                                  },
+                                  {
+                                          "tcId": 32,
+                                          "pt": "EAF9AAA67B6C0E..."
+                                  }
+                          ]
+                  },
+                  {
+                          "tgId": 3,
+                          "tests": [{
+                                  "tcId": 61,
+                                  "resultsArray": [{
+                                                  "key": "A4A8255E7...",
+                                                  "pt": "B3B8F494D0...",
+                                                  "ct": "619D5B0921..."
+                                          },
+                                          {
+                                                  "key": "C5357E575...",
+                                                  "pt": "619D5B0921...",
+                                                  "ct": "28CF1C5DD2..."
+                                          }
+                                  ]
+                          }]
+
+
+
+Celi                     Expires August 5, 2019                [Page 56]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                  },
+                  {
+                          "tgId": 4,
+                          "tests": [{
+                                  "tcId": 64,
+                                  "resultsArray": [{
+                                                  "key": "4D3BE577E...",
+                                                  "ct": "0FE92E22BA...",
+                                                  "pt": "73ED187BFE..."
+                                          },
+                                          {
+                                                  "key": "3ED6FD0C1...",
+                                                  "ct": "73ED187BFE...",
+                                                  "pt": "59550A36E1..."
+                                          }
+                                  ]
+                          }]
+                  }
+          ]
+  }]
+
+   The following shows AES-OFB AFT and MCT request vectors.
+
+   [{
+       "acvVersion": <acvp-version>,
+   },{
+           "vsId": 2060,
+           "algorithm": "ACVP-AES-OFB",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "direction": "encrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 1,
+                           "iv": "0F24B3F7808F292BC39128...",
+                           "key": "8ECE26B1880C4B1F0A59E...",
+                           "pt": "A8EF19C7182527C8CBBEE1..."
+                   }, {
+                           "tcId": 2,
+                           "iv": "1D1CC64F9F004192B6BE35...",
+                           "key": "054240C952C99D5B6E387224F...,
+                           "pt": "EBFA3F5F990B678AA884FB..."
+                   }]
+           }, {
+                   "tgId": 2,
+                   "direction": "decrypt",
+
+
+
+Celi                     Expires August 5, 2019                [Page 57]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 31,
+                           "iv": "A5F67A6CB0238A5DFB166...",
+                           "key": "A3988AC61E9FB4820876...",
+                           "ct": "CF6F24E68CEC8B97CB88D..."
+                   }, {
+                           "tcId": 32,
+                           "iv": "4098786D4EF05639B5A20...",
+                           "key": "5D22EAF883FB2B1847BF...",
+                           "ct": "7203926F1210401F566E0..."
+                   }]
+           }, {
+                   "tgId": 3,
+                   "direction": "encrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 61,
+                           "iv": "39F33D19A09AAFD200D4C...",
+                           "key": "190316BF21DE21E96FCF...",
+                           "pt": "E4D7F490829710CADFD67..."
+                   }]
+           }, {
+                   "tgId": 4,
+                   "direction": "decrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 64,
+                           "iv": "1915C8A7AFEBB26AAE97C...",
+                           "key": "9489F6FFA4A7480D5B34...",
+                           "ct": "2D984D2F1FC178CAB247F..."
+                   }]
+           }]
+   }]
+
+   The following shows AES-OFB AFT and MCT responses.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2060,
+           "testGroups": [{
+                           "tgId": 1,
+                           "tests": [{
+                                           "tcId": 1,
+
+
+
+Celi                     Expires August 5, 2019                [Page 58]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                                           "ct": "B5D16C4219AC38..."
+                                   },
+                                   {
+                                           "tcId": 2,
+                                           "ct": "B85AF8646842A9..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 2,
+                           "tests": [{
+                                           "tcId": 31,
+                                           "pt": "0863AB3A0CA17C..."
+                                   },
+                                   {
+                                           "tcId": 32,
+                                           "pt": "BF69D1BE04D013..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 3,
+                           "tests": [{
+                                   "tcId": 61,
+                                   "resultsArray": [{
+                                                   "key": "190316BF...",
+                                                   "iv": "39F33D19A...",
+                                                   "pt": "E4D7F4908...",
+                                                   "ct": "F55626877..."
+                                           },
+                                           {
+                                                   "key": "EC553038...",
+                                                   "iv": "F55626877...",
+                                                   "pt": "A04BCACFF...",
+                                                   "ct": "1EAA7DE30..."
+                                           }
+                                   ]
+                           }]
+                   },
+                   {
+                           "tgId": 4,
+                           "tests": [{
+                                   "tcId": 64,
+                                   "resultsArray": [{
+                                                   "key": "9489F6FF...",
+                                                   "iv": "1915C8A7A...",
+                                                   "ct": "2D984D2F1...",
+                                                   "pt": "0FE5765E5..."
+
+
+
+Celi                     Expires August 5, 2019                [Page 59]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                                           },
+                                           {
+                                                   "key": "9B6C80A1...",
+                                                   "iv": "0FE5765E5...",
+                                                   "ct": "F29F68E2E...",
+                                                   "pt": "39AC0B63E..."
+                                           }
+                                   ]
+                           }]
+                   }
+           ]
+   }]
+
+   The following shows AES-CFB1 AFT and MCT request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2062,
+           "algorithm": "ACVP-AES-CFB1",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "direction": "encrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 67,
+                           "iv": "F34481EC3CC627BACD5DC3...",
+                           "key": "000000000000000000000...",
+                           "pt": "00",
+                           "payloadLen": 1
+                   }, {
+                           "tcId": 68,
+                           "iv": "9798C4640BAD75C7C3227D...",
+                           "key": "000000000000000000000...",
+                           "pt": "00",
+                           "payloadLen": 1
+                   }]
+           }, {
+                   "tgId": 2,
+                   "direction": "decrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 31,
+                           "iv": "C74388BA333118CDBDF578...",
+                           "key": "8DE5E0586C4EA40FC36C0...",
+
+
+
+Celi                     Expires August 5, 2019                [Page 60]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                           "ct": "80",
+                           "payloadLen": 1
+                   }, {
+                           "tcId": 32,
+                           "iv": "0B1B558F3AF46F2E6AB29D...",
+                           "key": "E52350E8E8EE950A3C2E3...",
+                           "ct": "80",
+                           "payloadLen": 1
+                   }]
+           }, {
+                   "tgId": 3,
+                   "direction": "encrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 61,
+                           "iv": "D4A4A028EEA3BCA708A31E...",
+                           "key": "A3B254EAB3B0C8C60EF6A...",
+                           "pt": "80",
+                           "payloadLen": 1
+                   }]
+           }, {
+                   "tgId": 4,
+                   "direction": "decrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 64,
+                           "iv": "75BEE06DEC8A99EC0C7E7F...",
+                           "key": "7C87174CB990272D0F2F2...",
+                           "ct": "00",
+                           "payloadLen": 1
+                   }]
+           }]
+   }]
+
+   The following shows AES-CFB1 AFT and MCT responses.
+
+  [{
+          "acvVersion": <acvp-version>
+  },{
+          "vsId": 2062,
+          "testGroups": [{
+                          "tgId": 1,
+                          "tests": [{
+                                          "tcId": 67,
+                                          "ct": "00"
+                                  },
+
+
+
+Celi                     Expires August 5, 2019                [Page 61]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                                  {
+                                          "tcId": 68,
+                                          "ct": "80"
+                                  }
+                          ]
+                  },
+                  {
+                          "tgId": 2,
+                          "tests": [{
+                                          "tcId": 31,
+                                          "pt": "00"
+                                  },
+                                  {
+                                          "tcId": 32,
+                                          "pt": "80"
+                                  }
+                          ]
+                  },
+                  {
+                          "tgId": 3,
+                          "tests": [{
+                                  "tcId": 61
+                                  "resultsArray": [{
+                                                  "key": "A3B254EAB...",
+                                                  "iv": "D4A4A028EE...",
+                                                  "pt": "80",
+                                                  "ct": "00"
+                                          },
+                                          {
+                                                  "key": "8FFC23126...",
+                                                  "iv": "2C4E77F8D0...",
+                                                  "pt": "00",
+                                                  "ct": "00"
+                                          }
+                                  ]
+                          }]
+                  }, {
+                          "tgId": 4,
+                          "tests": [{
+                                  "tcId": 64
+                                  "resultsArray": [{
+                                                  "key": "7C87174CB...",
+                                                  "iv": "75BEE06DEC...",
+                                                  "ct": "00",
+                                                  "pt": "00"
+                                          },
+                                          {
+                                                  "key": "4B2492A3F...",
+
+
+
+Celi                     Expires August 5, 2019                [Page 62]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                                                  "iv": "37A385EF42...",
+                                                  "ct": "80",
+                                                  "pt": "80"
+                                          }
+                                  ]
+                          }]
+                  }
+          ]
+  }]
+
+   The following shows AES-CFB8 AFT and MCT request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2058,
+           "algorithm": "ACVP-AES-CFB8",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "direction": "encrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 1,
+                           "iv": "4EBD4CE189E6DA65026C2A...",
+                           "key": "5FA02465F28B76C441C7B...",
+                           "pt": "AF5E"
+                   }, {
+                           "tcId": 2,
+                           "iv": "9A8017353E953B5AEC4D78...",
+                           "key": "538EB5E1CBFEA61CC6B3D...",
+                           "pt": "6ED3759B"
+                   }]
+           }, {
+                   "tgId": 2,
+                   "direction": "decrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 31,
+                           "iv": "1808A0F308838AA6F9F703...",
+                           "key": "DB7FFD9166E4A5BACB022...",
+                           "ct": "41DA"
+                   }, {
+                           "tcId": 32,
+                           "iv": "4D75785D44B1B247788186...",
+                           "key": "7201F5CC867A8DCE044DB...",
+
+
+
+Celi                     Expires August 5, 2019                [Page 63]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                           "ct": "E267BC1B"
+                   }]
+           }, {
+                   "tgId": 3,
+                   "direction": "encrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 61,
+                           "iv": "4B8F7DCCAD48776C746B79...",
+                           "key": "FD0B5848870C7431179EB...",
+                           "pt": "AD"
+                   }]
+           }, {
+                   "tgId": 4,
+                   "direction": "decrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 64,
+                           "iv": "5D2080050855970CE15DC1...",
+                           "key": "EA378F16FF6144EF58E67...",
+                           "ct": "83"
+                   }]
+           }]
+   }]
+
+   The following shows AES-CFB8 AFT and MCT responses.
+
+ [{
+         "acvVersion": <acvp-version>
+ },{
+         "vsId": 2058,
+         "testGroups": [{
+                         "tgId": 1,
+                         "tests": [{
+                                         "tcId": 1,
+                                         "ct": "181B"
+                                 },
+                                 {
+                                         "tcId": 2,
+                                         "ct": "DFF540F0"
+                                 }
+                         ]
+                 },
+                 {
+                         "tgId": 2,
+                         "tests": [{
+
+
+
+Celi                     Expires August 5, 2019                [Page 64]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                                         "tcId": 31,
+                                         "pt": "DA19"
+                                 },
+                                 {
+                                         "tcId": 32,
+                                         "pt": "B2133D11"
+                                 }
+                         ]
+                 },
+                 {
+                         "tgId": 3,
+                         "tests": [{
+                                 "tcId": 61,
+                                 "resultsArray": [{
+                                                 "key": "FD0B58488...",
+                                                 "iv": "4B8F7DCCAD...",
+                                                 "pt": "AD",
+                                                 "ct": "3A"
+                                         },
+                                         {
+                                                 "key": "6B96D9FD0...",
+                                                 "iv": "969D81B585...",
+                                                 "pt": "2F",
+                                                 "ct": "BD"
+                                         }
+                                 ]
+                         }]
+                 },
+                 {
+                         "tgId": 4,
+                         "tests": [{
+                                 "tcId": 64,
+                                 "resultsArray": [{
+                                                 "key": "EA378F16F...",
+                                                 "iv": "5D20800508...",
+                                                 "ct": "83",
+                                                 "pt": "E6"
+                                         },
+                                         {
+                                                 "key": "31A0B0001A...",
+                                                 "iv": "DB973F16E5D...",
+                                                 "ct": "24",
+                                                 "pt": "0A"
+                                         }
+                                 ]
+                         }]
+                 }
+         ]
+
+
+
+Celi                     Expires August 5, 2019                [Page 65]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+ }]
+
+   The following shows AES-CFB128 AFT and MCT request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2059,
+           "algorithm": "ACVP-AES-CFB128",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "direction": "encrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 1,
+                           "iv": "24AD71C9734E64B8AC458...",
+                           "key": "55B2490AD74A470F5CFE...",
+                           "pt": "FE9C6B296C58324FE8B48..."
+                   }, {
+                           "tcId": 2,
+                           "iv": "C0042889D189B508C5B88...",
+                           "key": "AB383065E16B17306B50...",
+                           "pt": "19F109316F7F740BD48FF..."
+                   }]
+           }, {
+                   "tgId": 2,
+                   "direction": "decrypt",
+                   "testType": "AFT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 31,
+                           "iv": "40619E2F346B02D49BCEE...",
+                           "key": "744F5B5D7813974E0DE2...",
+                           "ct": "5B12E9B418F720C344698..."
+                   }, {
+                           "tcId": 32,
+                           "iv": "D571797F5623F8442C2CE...",
+                           "key": "6559CA840CF8360A8AF7...",
+                           "ct": "0A17C2F7A82BBDE588262..."
+                   }]
+           }, {
+                   "tgId": 3,
+                   "direction": "encrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+
+
+
+Celi                     Expires August 5, 2019                [Page 66]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                           "tcId": 61,
+                           "iv": "4AAF5D6F6E25B8A868D8D...",
+                           "key": "0D0949FB32A2DC6BA267...",
+                           "pt": "98EE9313512D5BEC19715..."
+                   }]
+           }, {
+                   "tgId": 4,
+                   "direction": "decrypt",
+                   "testType": "MCT",
+                   "keyLen": 128,
+                   "tests": [{
+                           "tcId": 64,
+                           "iv": "663D4E1B6F09FE1935E69...",
+                           "key": "5924D41588E2DC657514...",
+                           "ct": "83C1C3AF23A3F658DF142..."
+                   }]
+           }]
+   }]
+
+   The following shows AES-CFB128 AFT and MCT responses.
+
+[{
+        "acvVersion": <acvp-version>
+},{
+        "vsId": 2059,
+        "testGroups": [{
+                        "tgId": 1,
+                        "tests": [{
+                                        "tcId": 1,
+                                        "ct": "1C9BF58FF640041F8E..."
+                                },
+                                {
+                                        "tcId": 2,
+                                        "ct": "2C822934B8D747336..."
+                                }
+                        ]
+                },
+                {
+                        "tgId": 2,
+                        "tests": [{
+                                        "tcId": 31,
+                                        "pt": "4BC37D318900379CD75..."
+                                },
+                                {
+                                        "tcId": 32,
+                                        "pt": "523057EC2E120826..."
+                                }
+                        ]
+
+
+
+Celi                     Expires August 5, 2019                [Page 67]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                },
+                {
+                        "tgId": 3,
+                        "tests": [{
+                                "tcId": 61,
+                                "resultsArray": [{
+                                                "key": "0D0949FB32A...",
+                                                "iv": "4AAF5D6F6E25...",
+                                                "pt": "98EE9313512D...",
+                                                "ct": "7E94144C4DD4..."
+                                        },
+                                        {
+                                                "key": "739D5DB77F7...",
+                                                "iv": "7E94144C4DD4...",
+                                                "pt": "E93E4CCB2BD1...",
+                                                "ct": "050CE71D2451..."
+                                        }
+                                ]
+                        }]
+                },
+                {
+                        "tgId": 4,
+                        "tests": [{
+                                "tcId": 64,
+                                "resultsArray": [{
+                                                "key": "5924D41588E...",
+                                                "iv": "663D4E1B6F09...",
+                                                "ct": "83C1C3AF23A3...",
+                                                "pt": "32D4D152D488..."
+                                        },
+                                        {
+                                                "key": "6BF005475C6...",
+                                                "iv": "32D4D152D488...",
+                                                "ct": "3CC4191B8EBE...",
+                                                "pt": "BB97ADEF9F08..."
+                                        }
+                                ]
+                        }]
+                }
+        ]
+}]
+
+   The following shows AES-CTR AFT and counter request vectors.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2066,
+
+
+
+Celi                     Expires August 5, 2019                [Page 68]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+           "algorithm": "ACVP-AES-CTR",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "direction": "encrypt",
+                   "keyLen": 128,
+                   "testType": "AFT",
+                   "tests": [{
+                           "tcId": 1,
+                           "key": "E870131CE703D6514E761F95E6EE9EFB",
+                           "payloadLen": 128,
+                           "iv": "53F225D8DE97F14BFE3EC65EC3FFF7D3",
+                           "pt": "91074131F1F86CCD548D22A69340FF39"
+                   }, {
+                           "tcId": 2,
+                           "key": "2C759788A49BF060353344413A1D0FFC",
+                           "payloadLen": 128,
+                           "iv": "A4DE6D846C3AE5D5FF78163FF209AFE4",
+                           "pt": "BA37A61FD041F2881921D4705AD329DD"
+                   }]
+           }, {
+                   "tgId": 2,
+                   "direction": "decrypt",
+                   "keyLen": 128,
+                   "testType": "AFT",
+                   "tests": [{
+                           "tcId": 31,
+                           "key": "51B4375D6FB348A55477E3C3163F59C7",
+                           "payloadLen": 128,
+                           "iv": "93893A056C6C6F866A04D657A544F1F8",
+                           "ct": "F2FF4B0C2E771A41525EA67AD036B459"
+                   }, {
+                           "tcId": 32,
+                           "key": "6A4F0B775490D554F19B5A061A362666",
+                           "payloadLen": 128,
+                           "iv": "9877D2AB7568CEF28BA945B046BA20BE",
+                           "ct": "09F4EEF2322BE13D75FF6DA86E8617B5"
+                   }]
+           }, {
+                   "tgId": 3,
+                   "direction": "encrypt",
+                   "keyLen": 128,
+                   "testType": "CTR",
+                   "tests": [{
+                           "tcId": 829,
+                           "key": "3A9A8485E1B7BA1987F88F8C095257C4",
+                           "payloadLen": 12800,
+                           "pt": "CE8E4B6F7C68DE5FDE3..."
+
+
+
+Celi                     Expires August 5, 2019                [Page 69]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+                   }]
+           }]
+   }]
+
+   The following shows AES-CTR AFT and counter responses.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2066,
+           "testGroups": [{
+                           "tgId": 1,
+                           "tests": [{
+                                           "tcId": 1,
+                                           "ct": "3AF64C7037EE4813D8..."
+                                   },
+                                   {
+                                           "tcId": 2,
+                                           "ct": "2DFDFCDDC4CFD3CBCE..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 2,
+                           "tests": [{
+                                           "tcId": 31,
+                                           "pt": "349012E0807CA95CA5..."
+                                   },
+                                   {
+                                           "tcId": 32,
+                                           "pt": "2986D4B3FB208F0189..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 3,
+                           "tests": [{
+                                   "tcId": 829,
+                                   "ct": "676EC652D5B095136..."
+                           }]
+                   }
+           ]
+   }]
+
+   The following shows AES-XPN AFT request vectors.
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 70]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+     "acvVersion": <acvp-version>
+   },{
+     "algorithm": "ACVP-AES-XPN",
+     "revision": "1.0.0",
+     "vsId": 1,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "direction": "encrypt",
+         "keyLen": 128,
+         "ivLen": 96,
+         "ivGen": "external",
+         "ivGenMode": "8.2.2",
+         "saltLen": 96,
+         "saltGen": "external",
+         "payloadLen": 128,
+         "aadLen": 120,
+         "tagLen": 64,
+         "tests": [
+           {
+             "tcId": 1,
+             "plainText": "4849547C706231E248148...",
+             "key": "4A23FDD31C1B321C1D3E1A74ECA9585A",
+             "aad": "6B55B1B784180DE574F7709E480273",
+             "iv": "A05134709620EAB47DE77FCB",
+             "salt": "F0C77CB78D20BBDCF3A3C5EB"
+           },
+           {
+             "tcId": 2,
+             "plainText": "BF1D8173DA7F0273B7DA8...",
+             "key": "254E5AFE555D807E5ECC2FFAB2E3E107",
+             "aad": "304A2EC82959B419B8852F5C6A09D1",
+             "iv": "1BA39F6A71F075FEB72B91D6",
+             "salt": "AF44CD3E80088B8FD252AAB0"
+           }
+         ]
+       }
+     ]
+   }]
+
+   The following shows AES-XPN AFT responses.
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 71]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+     "vsId": 1,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "testPassed": false
+           },
+           {
+             "tcId": 2,
+             "cipherText": "D3104958599BE7BB9E672F...",
+             "tag": "48408062AA84718B"
+           }
+         ]
+       }
+     ]
+   }]
+
+   The following shows AES-XTS AFT request vectors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 72]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2065,
+           "algorithm": "ACVP-AES-XTS",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "testType": "AFT",
+                   "direction": "encrypt",
+                   "keyLen": 128,
+                   "tweakMode": "hex",
+                   "payloadLen": 65536,
+                   "tests": [{
+                           "tcId": 1,
+                           "key": "2866E3659E11C7890313EDAC9...",
+                           "tweakValue": "C7850E1C99DA28C5E7...",
+                           "pt": "03F912D53EA625A7D206002864..."
+                   }, {
+                           "tcId": 2,
+                           "key": "98B66C26FF9E4EF2BCBC3A212...",
+                           "tweakValue": "57B127C8DAD60138C5...",
+                           "pt": "20D7E083519F39DB185CDA2397..."
+                   }]
+           }, {
+                   "tgId": 2,
+                   "testType": "AFT",
+                   "direction": "decrypt",
+                   "keyLen": 128,
+                   "tweakMode": "hex",
+                   "payloadLen": 65536,
+                   "tests": [{
+                           "tcId": 101,
+                           "key": "BB626CADBBFB907AC5C795080...",
+                           "tweakValue": "8B7E45A9200BDC72EB...",
+                           "ct": "B85B91029478C3E02EBC619EC7..."
+                   }, {
+                           "tcId": 102,
+                           "key": "9B859C56C1542C19F29AA7A4F...",
+                           "tweakValue": "99FE35549768F476E2...",
+                           "ct": "53CEE8379B03A38E33CCCC6EA0..."
+                   }]
+           }]
+   }]
+
+   The following shows AES-XTS AFT responses.
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 73]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2065,
+           "testGroups": [{
+                           "tgId": 1,
+                           "tests": [{
+                                           "tcId": 1,
+                                           "ct": "97ED8057287E4FD0E1..."
+                                   },
+                                   {
+                                           "tcId": 2,
+                                           "ct": "BCACA25E6A625DB16..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 2,
+                           "tests": [{
+                                           "tcId": 101,
+                                           "pt": "8AD40CBE09CD92FB0..."
+                                   },
+                                   {
+                                           "tcId": 102,
+                                           "pt": "07DD39402F4D427D7..."
+                                   }
+                           ]
+                   }
+           ]
+   }]
+
+   The following shows AES-KW request vectors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 74]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2063,
+           "algorithm": "ACVP-AES-KW",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "testType": "AFT",
+                   "direction": "encrypt",
+                   "kwCipher": "cipher",
+                   "keyLen": 128,
+                   "payloadLen": 192,
+                   "tests": [{
+                           "tcId": 1,
+                           "key": "71389B09A3EA1AAE1F265CD3DE8FABB7",
+                           "pt": "3D90BE277A057C024A485F02486D733..."
+                   }, {
+                           "tcId": 2,
+                           "key": "B75DB6D92A66A3E8E991FEDBA3DAACA7",
+                           "pt": "3323EC2514C2902C424ABE968CA09FD..."
+                   }]
+           }, {
+                   "tgId": 2,
+                   "testType": "AFT",
+                   "direction": "decrypt",
+                   "kwCipher": "cipher",
+                   "keyLen": 128,
+                   "payloadLen": 192,
+                   "tests": [{
+                           "tcId": 901,
+                           "key": "E5319E0061F89DE08CB590EA...",
+                           "ct": "1DE720863C759EC0682429AA4..."
+                   }, {
+                           "tcId": 902,
+                           "key": "D16C5C5FDE26C1962342AACF...",
+                           "ct": "F2EC43D61F2F356E1B2850D7C..."
+                   }]
+           }]
+   }]
+
+   The following shows AES-KW responses.
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 75]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2063,
+           "testGroups": [{
+                           "tgId": 1,
+                           "tests": [{
+                                           "tcId": 1,
+                                           "ct": "BD009027DA8F4176B..."
+                                   },
+                                   {
+                                           "tcId": 2,
+                                           "ct": "B8BB3D3C76FDFD359..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 2,
+                           "tests": [{
+                                           "tcId": 901,
+                                           "pt": "A6BA646D0D33808AB..."
+                                   },
+                                   {
+                                           "tcId": 902,
+                                           "pt": "B40AC5F6ED5A706CB..."
+                                   }
+                           ]
+                   }
+           ]
+   }]
+
+   The following shows AES-KWP request vectors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 76]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2064,
+           "algorithm": "ACVP-AES-KWP",
+       "revision": "1.0.0",
+           "testGroups": [{
+                   "tgId": 1,
+                   "testType": "AFT",
+                   "direction": "encrypt",
+                   "kwCipher": "cipher",
+                   "keyLen": 128,
+                   "payloadLen": 808,
+                   "tests": [{
+                           "tcId": 1,
+                           "key": "EE3B424525EE1B2D0B8CDC4CCB15F018",
+                           "pt": "269701A6DE9A2E8A8B2E28027..."
+                   }, {
+                           "tcId": 2,
+                           "key": "579C5EBBD1D07F828251FE567326C5DD",
+                           "pt": "634945E0FD1FA2E733CD60462..."
+                   }]
+           }, {
+                   "tgId": 2,
+                   "testType": "AFT",
+                   "direction": "decrypt",
+                   "kwCipher": "cipher",
+                   "keyLen": 128,
+                   "payloadLen": 808,
+                   "tests": [{
+                           "tcId": 301,
+                           "key": "0EB557E0F938E08662EB9EDAAE05725F",
+                           "ct": "1BB87C360F2B644CD0BC75369..."
+                   }, {
+                           "tcId": 302,
+                           "key": "644E2869C9698ADBB4417A8ED65748DC",
+                           "ct": "583741B7624759F37EED76F76..."
+                   }]
+           }]
+   }]
+
+   The following shows AES-KWP responses.
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 77]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+           "vsId": 2064,
+           "testGroups": [{
+                           "tgId": 1,
+                           "tests": [{
+                                           "tcId": 1,
+                                           "ct": "58385237F04FD67F0..."
+                                   },
+                                   {
+                                           "tcId": 2,
+                                           "ct": "0D6FE2D0A8605981E..."
+                                   }
+                           ]
+                   },
+                   {
+                           "tgId": 2,
+                           "tests": [{
+                                           "tcId": 300,
+                                           "ct": "D2A239230130B6077..."
+                                   },
+                                   {
+                                           "tcId": 301,
+                                           "testPassed": false
+                                   }
+                           ]
+                   }
+           ]
+   }]
+
+Appendix C.  Example TDES Test and Results JSON Object
+
+   The following is a example JSON object for test vectors sent from the
+   ACVP server to the crypto module for an TDES-ECB algorithm functional
+   test.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 78]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+       "vsId": 1564,
+       "algorithm": "ACVP-TDES-ECB",
+       "revision": "1.0.0",
+       "testGroups": [{
+           "tgId": 1,
+           "direction": "encrypt",
+           "testType": "AFT",
+           "tests": [{
+               "tcId": 236,
+               "key1": "5BE5B5FE9BB3E36D",
+               "key2": "26E92C6DD35D7AB3",
+               "key3": "4F89ADAD15D62FE3",
+               "pt": "7119CCA0648787AE"
+           }, {
+               "tcId": 237,
+               "key1": "2C7015EC2C044591",
+               "key2": "230D79A1D0F2469D",
+               "key3": "7A9EF7FDC4383131",
+               "pt": "772923F53BA2EA60E7AE232..."
+           }]
+       }]
+   }]
+
+   The following is a example JSON object for test results sent from the
+   crypto module to the ACVP server for an TDES-ECB algorithm functional
+   test.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+       "vsId": 1564,
+       "testGroups": [{
+           "tgId": 1,
+           "tests": [{
+                   "tcId": 236,
+                   "ct": "1E85F8256575B8B1"
+               },
+               {
+                   "tcId": 237,
+                   "ct": "BEFD0E02088D48648FEBAAF..."
+               }
+           ]
+       }]
+   }]
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 79]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   The following is a example JSON object for test vectors sent from the
+   ACVP server to the crypto module for the TDES-CFB1 algorithm
+   functional test.
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+       "vsId": 1564,
+       "algorithm": "ACVP-TDES-CFB1",
+       "revision": "1.0.0",
+       "testGroups": [{
+               "tgId": 1,
+               "direction": "encrypt",
+               "testType": "AFT",
+               "keyingOption": 1,
+               "tests": [{
+                   "tcId": 1,
+                   "key1": "1046913489980131",
+                   "key2": "1046913489980131",
+                   "key3": "1046913489980131",
+                   "pt": "00",
+                   "payloadLen": 1,
+                   "iv": "0000000000000000"
+               }]
+           },
+           {
+               "tgId": 2,
+               "direction": "encrypt",
+               "testType": "MCT",
+               "keyingOption": 1,
+               "tests": [{
+                   "tcId": 961,
+                   "key1": "337C857E01DE54B7",
+                   "key2": "F106296828FCCA0D",
+                   "key3": "2F65BF5A655FFFA3",
+                   "pt": "80",
+                   "payloadLen": 1,
+                   "iv": "0C4CCC40D9C8C5D7"
+               }]
+           }
+       ]
+   }]
+
+   The following is a example JSON object for test results sent from the
+   crypto module to the ACVP server for an TDES-CFB1 algorithm
+   functional test.
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 80]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+       "vsId": 1564,
+       "testGroups": [{
+               "tgId": 1,
+               "tests": [{
+                   "tcId": 1,
+                   "ct": "00"
+               }]
+           },
+           {
+               "tgId": 2,
+               "tests": [{
+                   "tcId": 961
+                   "resultsArray": [{
+                           "key1": "337C857E01DE54B7",
+                           "key2": "F106296828FCCA0D",
+                           "key3": "2F65BF5A655FFFA3",
+                           "pt": "80",
+                           "ct": "00",
+                           "iv": "0C4CCC40D9C8C5D7"
+                       },
+                       {
+                           "key1": "290E7326C8833420",
+                           "key2": "8FE6BF67EF0B2325",
+                           "key3": "3E2976E05EB0646D",
+                           "pt": "80",
+                           "ct": "80",
+                           "iv": "1A73F758C95C6196"
+                       }
+                   ]
+               }]
+           }
+       ]
+   }]
+
+Appendix D.  Example TDES MCT Test and Results JSON Object
+
+   The following is a example JSON object for test vectors sent from the
+   ACVP server to the crypto module for an TDES-ECB Monte Carlo test.
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 81]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+       "vsId": 1564,
+       "algorithm": "ACVP-TDES-ECB",
+       "revision": "1.0.0",
+       "testGroups": [{
+           "tgId": 1,
+           "direction": "encrypt",
+           "testType": "MCT",
+           "tests": [{
+               "tcId": 492,
+               "key1": "0EABB0E6B0F129D5",
+               "key2": "DF61EAD07315DA37",
+               "key3": "EFA2B6A252A18694",
+               "ct": "2970B363C1461FAF"
+           }]
+       }]
+   }]
+
+   The following is a example JSON object for test results sent from the
+   crypto module to the ACVP server for an TDES-ECB Monte Carlo test,
+   only 2 iterations shown for brevity.  For MCT results of each
+   iteration are fed into the next iteration.  Therefore the results
+   carry all fields to assist in any failure diagnosis.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 82]
+
+Internet-Draft                Sym Alg JSON                 February 2019
+
+
+   [{
+           "acvVersion": <acvp-version>
+   },{
+       "vsId": 1564,
+       "testGroups": [{
+           "tgId": 1,
+           "tests": [{
+               "tcId": 492,
+               "resultsArray": [{
+                       "key1": "0EABB0E6B0F129D5",
+                       "key2": "DF61EAD07315DA37",
+                       "key3": "EFA2B6A252A18694",
+                       "ct": "2970B363C1461FAF",
+                       "pt": "40F806F9DE3466C0"
+                   },
+                   {
+                       "key1": "4F52B61F6EC4...",
+                       "key2": "2FEC373726FE...",
+                       "key3": "37B57029B65B...",
+                       "ct": "40F806F9DE3466C0",
+                       "pt": "A498B9748F2FB1E5"
+                   }
+               ]
+           }]
+       }]
+   }]
+
+Author's Address
+
+   Christopher Celi (editor)
+   National Institute of Standards and Technology
+   100 Bureau Drive
+   Gaithersburg, MD  20899
+   USA
+
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                     Expires August 5, 2019                [Page 83]
