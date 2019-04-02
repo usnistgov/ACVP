@@ -170,11 +170,11 @@ Fussell, et al.          Expires October 4, 2019                [Page 3]
 Internet-Draft                ACV Protocol                    April 2019
 
 
-     12.2.  Response . . . . . . . . . . . . . . . . . . . . . . . .  55
+     12.2.  Response . . . . . . . . . . . . . . . . . . . . . . . .  56
    13. Vector Set Expiration . . . . . . . . . . . . . . . . . . . .  56
    14. Error Codes . . . . . . . . . . . . . . . . . . . . . . . . .  57
-   15. Algorithm Test Extensions . . . . . . . . . . . . . . . . . .  57
-   16. Custom Specification Objects  . . . . . . . . . . . . . . . .  58
+   15. Algorithm Test Extensions . . . . . . . . . . . . . . . . . .  58
+   16. Custom Specification Objects  . . . . . . . . . . . . . . . .  59
      16.1.  Date . . . . . . . . . . . . . . . . . . . . . . . . . .  59
      16.2.  BitString  . . . . . . . . . . . . . . . . . . . . . . .  59
        16.2.1.  Endianness . . . . . . . . . . . . . . . . . . . . .  59
@@ -3051,7 +3051,7 @@ Internet-Draft                ACV Protocol                    April 2019
    failure in submitting.  If resubmission is required clients MUST re-
    POST to the /large endpoint in order to obtain the URI to use.
 
-   The REQUIRED properties for large submissions:
+   The available properties for large submissions:
 
       *submissionSize* - "number", the maximum size in bytes of the
       desired submission.
@@ -3059,7 +3059,14 @@ Internet-Draft                ACV Protocol                    April 2019
       *url* - "string", a one-time use url value to use for a large
       submission.
 
+      *accessToken* - "string", an optional JWT, that if provided,
+      clients MUST use when accessing the "url".  If not provided,
+      clients MUST use their current "accessToken" when accessing the
+      "url".
+
 12.1.  Request
+
+   *POST /large*
 
    [
      {"acvVersion": <acvp-version>},
@@ -3068,13 +3075,6 @@ Internet-Draft                ACV Protocol                    April 2019
      }
    ]
 
-12.2.  Response
-
-
-
-
-
-
 
 
 Fussell, et al.          Expires October 4, 2019               [Page 55]
@@ -3082,10 +3082,13 @@ Fussell, et al.          Expires October 4, 2019               [Page 55]
 Internet-Draft                ACV Protocol                    April 2019
 
 
+12.2.  Response
+
    [
      {"acvVersion": <acvp-version>},
      {
-         "submissionSize": 5000000
+         "url": "https://acvts.authority.org:3954/large/QWERTY123",
+         "accessToken" : "<jwt token>"
      }
    ]
 
@@ -3127,9 +3130,6 @@ Internet-Draft                ACV Protocol                    April 2019
    timestamp must be in the 'expiry' JSON value, which is included in
    the JSON encoded vector set.  The expiry JSON value will be a string
    value of the UTC timestamp using form "YYYY-MM-DD HH:MM:SS".  The
-   following figure shows a partial JSON encoded vector set that
-   contains the expiry value.
-
 
 
 
@@ -3137,6 +3137,9 @@ Fussell, et al.          Expires October 4, 2019               [Page 56]
 
 Internet-Draft                ACV Protocol                    April 2019
 
+
+   following figure shows a partial JSON encoded vector set that
+   contains the expiry value.
 
    [
        {"acvVersion": <acvp-version>},
@@ -3181,11 +3184,8 @@ Internet-Draft                ACV Protocol                    April 2019
    information.  Examples of client and server error messages are in
    Appendix B.
 
-15.  Algorithm Test Extensions
 
-   ACVP is intended to be an extensible protocol that supports testing
-   of a large number of cryptographic algorithms from several different
-   classes defined by the community.  All algorithm identifiers intended
+
 
 
 
@@ -3194,6 +3194,11 @@ Fussell, et al.          Expires October 4, 2019               [Page 57]
 Internet-Draft                ACV Protocol                    April 2019
 
 
+15.  Algorithm Test Extensions
+
+   ACVP is intended to be an extensible protocol that supports testing
+   of a large number of cryptographic algorithms from several different
+   classes defined by the community.  All algorithm identifiers intended
    for public use SHALL be documented by IANA in the ACVP IANA Registry
    [acvp-iana].
 
@@ -3237,11 +3242,6 @@ Internet-Draft                ACV Protocol                    April 2019
    would result in a new version of that test specification to be
    reflected in the IANA registry [acvp-iana].
 
-16.  Custom Specification Objects
-
-
-
-
 
 
 
@@ -3249,6 +3249,8 @@ Fussell, et al.          Expires October 4, 2019               [Page 58]
 
 Internet-Draft                ACV Protocol                    April 2019
 
+
+16.  Custom Specification Objects
 
 16.1.  Date
 
@@ -3296,8 +3298,6 @@ Internet-Draft                ACV Protocol                    April 2019
 
    o  valueLen: 5, value: "FA", SHALL be parsed as the bits 11111, or
       the value 31.
-
-
 
 
 
