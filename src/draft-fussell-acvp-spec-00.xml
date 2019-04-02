@@ -700,6 +700,11 @@
           <c/>
           <c/>
           <c/>
+          
+          <c>/large</c>
+          <c>
+            <xref target="largeSubmission">Provides a one-time URI for large data submissions.</xref> (Optional)
+          </c>
         </texttable>
 
         <t> The resource path is appended to the path prefix to form the URI used with an HTTP
@@ -741,14 +746,70 @@
         will be used to extend the OE description and/or the capabilities. Extensions MAY be ignored
         by the ACV server. Vector and vector response data will be JSON encoded.</t>
     </section>
-    
+   
     <section title="Submission Size Considerations">
-    	<t>Standard submission size handled by the server is 4MB.  In the case that the submission
-    	size is larger than 4MB, an additional port will be provided for the target end point.  In
-    	order to retrieve this "large submission" URI, the user must calculate the size of the
-    	submission in bytes and POST {submissionSize:bytes} to /acvp/acvp/large with their JWT 
-    	authentication token.  This end point will determine if the submission requires the
-    	"large submission" URI and if so, will return the URI to the user.</t>
+    	<t>Some server implementations MAY require alternative handling for submission sizes that exceed
+    	  resource limitations of the normal workflow for a <spanx style="verb">POST</spanx> response. Server
+    	  implementations MUST indicate whether the server requires large submission handling and what the maxmimum value
+    	  for non-large submissions is within the <xref target="login">/login</xref> response.
+    	</t>
+    </section>
+    
+    <section anchor="login" title="Login">
+      <t>
+        A login endpoint is mentioned throughout the document and although how to authenticate is left up to the server
+        the following description is an example of an implementation.
+        <list>
+          <t>
+            <spanx style="strong">password</spanx> - <spanx style="verb">string</spanx>, a password value
+          </t>
+          <t>
+            <spanx style="strong">accessToken</spanx> - <spanx style="verb">string</spanx>, a JWT associated with the
+            current user for which renewal of the expiration is desired
+          </t>
+          <t>
+            <spanx style="strong">largeEndpointRequired</spanx> - <spanx style="verb">boolean</spanx>, 
+            true if the server requires the large endpoint for submissions with a size that exceeds the value found in
+            <spanx style="strong">sizeConstraint</spanx>.
+          </t>
+          <t>
+            <spanx style="strong">sizeConstraint</spanx> - <spanx style="verb">number</spanx>, 
+            provides the maximum value, in bytes, of a submission not required to use the
+            <xref target="largeSubmission">large endpoint</xref> or -1 if
+            <spanx style="verb">largeEndpointRequired</spanx> is <spanx style="verb">false</spanx>.
+          </t>
+        </list>
+      </t>
+      <section title="Request">
+        <t>
+          <spanx style="strong">POST /login</spanx>
+        </t>
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+  {
+ "password": "<password>",
+ "accessToken": "<jwt value>"
+  }
+]
+           ]]>              </artwork>
+        </figure>
+      </section>
+      <section title="Response">
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+    {
+        "accessToken": "<jwt value>",
+        "largeEndpointRequired": false,
+        "sizeConstraint": -1
+    }
+]
+           ]]>              </artwork>
+        </figure>
+      </section>
     </section>
 
     <section title="Versioning">
@@ -939,7 +1000,14 @@
    |        |                                   |      |  Retrieve  |                      
    |        |receive results                    |      |Disposition |
    |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-         ]]></artwork>
+   |        |                                   |      |            |
+   |        |POST                               |      |            |
+   |        |large                              |      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |            |
+   |        |receive large submission URI       |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   ]]></artwork>
        </figure>
       </section>
       
@@ -2673,6 +2741,66 @@
         </section>
       </section>
     </section>
+    
+    <section anchor="largeSubmission" title="Large Submission">
+      <t>When clients have a response which exceeds the <spanx style="verb">sizeConstraint</spanx> in
+        <xref target="login"/>, this endpoint MUST be used to obtain a URI in order to submit the results. The URI MAY
+        be a one-time use URI and clients SHOULD only attempt to use this URI once regardless of success or failure in
+        submitting.  If resubmission is required clients MUST re-POST to the /large endpoint in order to obtain the URI
+        to use.
+      </t>
+      <t>The available properties for large submissions:
+        <list>
+          <t>
+            <spanx style="strong">submissionSize</spanx> - <spanx style="verb">number</spanx>, the maximum size in
+            bytes of the desired submission.
+          </t>
+          <t>
+            <spanx style="strong">vectorSetUrl</spanx> - <spanx style="verb">string</spanx>, an identifier of the vector
+            set that will be uploaded as a large submission.
+          </t>
+          <t>
+            <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, a one-time use url value to use
+            for a large submission.
+          </t>
+          <t>
+            <spanx style="strong">accessToken</spanx> - <spanx style="verb">string</spanx>, an optional JWT, that if
+            provided, clients MUST use when accessing the <spanx style="verb">url</spanx>. If not provided, clients MUST
+            use their current <spanx style="verb">accessToken</spanx> when accessing the
+            <spanx style="verb">url</spanx>.
+          </t>
+        </list>
+      </t>
+      <section title="Request">
+        <t>
+          <spanx style="strong">POST /large</spanx>
+        </t>
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+  {
+      "submissionSize": 5000000,
+      "vectorSetUrl" : "/acvp/v1/testSessions/1/vectorSets/10"
+  }
+]
+           ]]></artwork>
+        </figure>
+      </section>
+      <section title="Response">
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+  {
+      "url": "https://acvts.authority.org:3954/large/QWERTY123",
+      "accessToken" : "<jwt token>"
+  }
+]
+           ]]>              </artwork>
+        </figure>        
+      </section>
+    </section>    
 
     <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
     <?rfc needLines="8" ?>
