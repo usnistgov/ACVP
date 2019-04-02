@@ -448,6 +448,22 @@
           <ttcol align="left" width="17%">PUT (update)</ttcol>
           <ttcol align="left" width="17%">DELETE</ttcol>
 
+          <c>/requests</c>
+          <c>
+            <xref target="requests_get">Returns a list of requests</xref>
+          </c>
+          <c/>
+          <c/>
+          <c/>
+
+          <c>/requests/{requestId}</c>
+          <c>
+            <xref target="request_get">Retrieve Information for a specific request</xref>
+          </c>
+          <c/>
+          <c/>        
+          <c/>
+
           <c>/vendors</c>
           <c>
             <xref target="vendors_get">Returns a list of vendors</xref>
@@ -468,6 +484,52 @@
           </c>
           <c>
             <xref target="vendor_delete">Delete a vendor</xref>
+          </c>
+
+          <c>/vendors/{vendorId}/addresses</c>
+          <c>
+            <xref target="addresses_get">Retrieve a list of addresses for a specific vendor</xref>
+          </c>
+          <c/>
+          <c/>
+          <c/>
+
+          <c>/vendors/{vendorId}/addresses/{addressId}</c>
+          <c>
+            <xref target="address_get">Retrieve Information for a specifc address</xref>
+          </c>
+          <c/>
+          <c/>
+          <c/>
+
+          <c>/vendors/{vendorId}/contacts</c>
+          <c>
+            <xref target="contacts_get">Retrieve a list of contacts for a vendor</xref>
+          </c>
+          <c/>
+          <c/>
+          <c/>
+
+          <c>/persons</c>
+          <c>
+            <xref target="persons_get">Return a list of Person objects</xref>
+          </c>
+          <c>
+            <xref target="persons_post">Create a new Person</xref>
+          </c>
+          <c/>
+          <c/>
+          
+          <c>/persons/{personId}</c>
+          <c>
+            <xref target="person_get">Retrieve Information for a Person</xref>
+          </c>
+          <c/>
+          <c>
+            <xref target="person_put">Update a Person</xref>
+          </c>
+          <c>
+            <xref target="person_delete">Delete a Person</xref>
           </c>
 
           <c>/oes</c>
@@ -879,67 +941,231 @@
    |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
          ]]></artwork>
        </figure>
+      </section>
+      
+      
 
+      <section title="Paging" anchor="paging">
+        <t>Some resource operations require paging in order to avoid returning large amounts of data. Each operation
+          that uses paging will indicate that uses paging and what the value for each element will be within the section
+          describing that operation. All paged responses MUST follow the format described in
+          <xref target="paging_response" />. Conversely, clients may navigate pages using the paging parameters
+          described in <xref target="paging_parameters"/>. Server implementations SHOULD impose limitations on
+          the page size limit based on resource constraints.
+        </t>
+        <section title="Parameters" anchor="paging_parameters">
+          <t>A Server MUST accept requests without paging parameters. If not all results are returned, the response MUST
+            indicate that not all of the results were provided using the <spanx style="verb">incomplete</spanx> property
+            of a paged response described in <xref target="paging_response" />.
+            The query parameters clients MUST use to specify paging are described below:
+            <list>
+              <t>
+                <spanx style="strong">limit</spanx> - <spanx style="verb">number</spanx>, the maximum number of entries
+                to return. Server implementations MUST allow requests without a provided value, but the default value is
+                a choice for server implementations.
+              </t>
+              <t>
+                <spanx style="strong">offset</spanx> - <spanx style="verb">number</spanx>, the offset into the list of
+                entries, MUST default to <spanx style="verb">0</spanx> if not provided.
+              </t>
+            </list>
+            GET /acvp/v1/vendors?offset=20&amp;limit=20 HTTP/1.1
+          </t>
+        </section>
+        <section title="Response" anchor="paging_response">
+          <t>A paged response has the following properties:
+            <list>
+              <t>
+                <spanx style="strong">totalCount</spanx> - <spanx style="verb">number</spanx>, the total number of
+                resources available to return
+              </t>
+              <t>
+                <spanx style="strong">incomplete</spanx> - <spanx style="verb">boolean</spanx>, true if more resources
+                are avaiable than what is returned in the response
+              </t>
+              <t>
+                <spanx style="strong">links</spanx> - <spanx style="verb">object</spanx>, links to use when navigating
+                the pages
+                <list>
+                  <t>
+                    <spanx style="strong">first</spanx> - <spanx style="verb">string</spanx>, a link to the first page
+                    in the result set
+                  </t>
+                  <t>
+                    <spanx style="strong">next</spanx> - <spanx style="verb">string</spanx>, a link to the next page in
+                    the result set, <spanx style="verb">null</spanx> if no next page is available
+                  </t>
+                  <t>
+                    <spanx style="strong">prev</spanx> - <spanx style="verb">string</spanx>, a link to the previous page
+                    in the result set, <spanx style="verb">null</spanx> if no previous page is available
+                  </t>
+                  <t>
+                    <spanx style="strong">last</spanx> - <spanx style="verb">string</spanx>, a link to the last page in
+                    the result set
+                  </t>
+                </list>
+              </t>
+              <t>
+                <spanx style="strong">data</spanx> - <spanx style="verb">array</spanx>, contains an array of data
+                appropriate to the resource requested
+              </t>
+            </list>
+          </t>
+          <figure align="center">
+            <artwork align="left"><![CDATA[
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "totalCount" : 22007,
+        "incomplete" : true,
+        "links" : {
+            "first" : "/acvp/v1/<resource>?offset=0&limit=20",
+            "next" : "/acvp/v1/<resource>?offset=20&limit=20",
+            "prev" : null,
+            "last" : "/acvp/v1/<resource>?offset=22000&limit=20"
+        },
+        "data" : [ <resource response> ]
+    }
+]
+           ]]></artwork>
+          </figure>
+        </section>
+      </section>
+      
+      <section title="Requests" anchor="requests">
+        <t>Some resource operations make a request to modify or create data. To facilitate an out-of-band approval step,
+          where data can be inspected to insure it meets the business requirements of the validation authority which
+          operates the server, the operations will return a <spanx style="verb">request</spanx> url that can be used to
+          obtain information about the status and disposition of the requested modification. Whether or how an authority
+          implements an approval step is outside the scope of this specification.
+        </t>
+        <t>A request resource is not externally updateable, but SHOULD update based on server processing. The
+          properties for a request response:
+          <list>
+            <t>
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for this resource
+            </t>            
+            <t>
+              <spanx style="strong">status</spanx> - <spanx style="verb">string</spanx>, one of:
+              <list>
+                <t>
+                  <spanx style="strong">initial</spanx> - initial state of the request, created
+                </t>
+                <t>
+                  <spanx style="strong">processing</spanx> - server is processing the request
+                </t>
+                <t>
+                  <spanx style="strong">accepted</spanx> - the requested operation was successfully processed
+                </t>
+                <t>
+                  <spanx style="strong">rejected</spanx> - the requested operation was rejected and no change was made
+                </t>
+              </list>
+            </t>
+            <t>
+              <spanx style="strong">message</spanx> - <spanx style="verb">string</spanx>, a placeholder for any message
+              describing a rejection
+            </t>                        
+            <t>
+              <spanx style="strong">approvedUrl</spanx> - <spanx style="verb">string</spanx>, a link to the resource
+              which was created or modified as a result of the requested operation
+            </t>                        
+          </list>
+        </t>
+        <section anchor="requests_get" title="Request Listing">
+          <t>
+            <spanx style="strong">GET /requests</spanx>
+          </t>
+          <t>Returns a paged listing of requests for the current user. Each element in the
+            <spanx style="verb">data</spanx> array is a <spanx style="verb">request object</spanx> as described in
+            <xref target="request_get"/>. See also  <xref target="paging_response"/> for a description of a paged
+            response.
+          </t>
+        </section>
+        <section anchor="request_get" title="Vendor Information">
+          <t>
+            <spanx style="strong">GET /requests/{requestId}</spanx>
+          </t>
+          <t>Retrieve Information for a specific request</t>
+          <section title="Response">
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "url": "/acvp/v1/requests/2",
+        "status": "approved",
+        "approvedUrl" : "/acvp/v1/vendors/2"
+    }
+]
+           ]]>              </artwork>
+            </figure>
+          </section>
+        </section>
       </section>
 
       <section anchor="vendors" title="Vendor Resources">
-        <t>The available properties for vendor resources are:          <list>
+        <t>The available properties for vendor resources are:
+          <list>
             <t>
-              <spanx style="strong">url</spanx> -              <spanx style="verb">string</spanx>, identifier
-              for this resource
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for the vendor resource
+              within which this property is located
             </t>
             <t>
-              <spanx style="strong">name</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">name</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
               <spanx style="strong">parentUrl</spanx> - a parent vendor identifier, allows for
               multiple divisions or business units to share a parent company identifier
             </t>
             <t>
-              <spanx style="strong">website</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">website</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">emails</spanx> - array of
-              <spanx style="verb">string</spanx>s
+              <spanx style="strong">emails</spanx> - array of <spanx style="verb">string</spanx>s
             </t>
             <t>
-              <spanx style="strong">contacts</spanx> - an array of contact objects,              <list>
+              <spanx style="strong">phoneNumbers</spanx> - array of phone objects,
+              <list>
                 <t>
-                  <spanx style="strong">name</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">number</spanx> - <spanx style="verb">string</spanx>
                 </t>
                 <t>
-                  <spanx style="strong">emails</spanx> - array of
-                  <spanx style="verb">string</spanx>s
-                </t>
-                <t>
-                  <spanx style="strong">phoneNumbers</spanx> - array of phone objects,                  <list>
-                    <t>
-                      <spanx style="strong">number</spanx> -                      <spanx style="verb">string</spanx>
-                    </t>
-                    <t>
-                      <spanx style="strong">type</spanx> -                      <spanx style="verb">string</spanx>, one
-                      of (fax, voice)
-                    </t>
-                  </list>
+                  <spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>, one of (fax, voice)
                 </t>
               </list>
             </t>
             <t>
-              <spanx style="strong">address</spanx> - an address object,              <list>
+              <spanx style="strong">contactsUrl</spanx> - <spanx style="verb">string</spanx>, identifier for the
+              list of person resources associated with this vendor
+            </t>
+            <t>
+              <spanx style="strong">addresses</spanx> - an address object,
+              <list>
                 <t>
-                  <spanx style="strong">street</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for the address
+                  resource
                 </t>
                 <t>
-                  <spanx style="strong">locality</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">street1</spanx> - <spanx style="verb">string</spanx>
                 </t>
                 <t>
-                  <spanx style="strong">region</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">street2</spanx> - <spanx style="verb">string</spanx>
                 </t>
                 <t>
-                  <spanx style="strong">country</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">street3</spanx> - <spanx style="verb">string</spanx>
                 </t>
                 <t>
-                  <spanx style="strong">postalCode</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">locality</spanx> - <spanx style="verb">string</spanx>
+                </t>
+                <t>
+                  <spanx style="strong">region</spanx> - <spanx style="verb">string</spanx>
+                </t>
+                <t>
+                  <spanx style="strong">country</spanx> - <spanx style="verb">string</spanx>
+                </t>
+                <t>
+                  <spanx style="strong">postalCode</spanx> - <spanx style="verb">string</spanx>
                 </t>
               </list>
             </t>
@@ -949,62 +1175,9 @@
           <t>
             <spanx style="strong">GET /vendors</spanx>
           </t>
-          <t>Returns a listing of vendors.</t>
-          <section title="Parameters">
-            <t>
-              <list>
-                <t>
-                  <xref target="paging">Paging Parameters</xref>
-                </t>
-              </list>
-            </t>
-          </section>
-          <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-    {"acvVersion": <acvp-version>},
-    {"vendors": [
-        {
-            "url": "/acvp/v1/vendors/1",
-            "name": "Cisco",
-            "website": "www.cisco.com",
-            "contacts": [{
-                "name": "John Doe",
-                "email": "johndoe@cisco.com"
-            }]
-        },
-        {
-            "url": "/acvp/v1/vendors/2",
-            "name": "Acme, LLC",
-            "website": "www.acme.acme",
-            "emails" : [ "inquiry@acme.acme" ],
-            "contacts": [{
-                "name": "Jane Smith",
-                "emails": ["jane.smith@acme.acme"],
-                "phoneNumbers" : [
-                    {
-                        "name": "555-555-0001",
-                        "type" : "fax"
-                    }, {
-                        "name": "555-555-0002",
-                        "type" : "voice"
-                    }
-                ],
-                "address" : {
-                    "street" : "123 Main Street",
-                    "locality" : "Any Town",
-                    "region" : "AnyState",
-                    "country" : "USA",
-                    "postalCode" : "123456"
-                }
-            }]
-        }
-    ]}
-]
-           ]]>              </artwork>
-            </figure>
-          </section>
+          <t>Returns a paged listing of vendors. Each element in the <spanx style="verb">data</spanx> array is a
+            <spanx style="verb">vendor object</spanx> as described in <xref target="vendor_get"/>. See also
+            <xref target="paging_response"/> for a description of a paged response.</t>
         </section>
         <section anchor="vendors_post" title="Create a New Vendor">
           <t>
@@ -1015,6 +1188,7 @@
             <t>
               <spanx style="verb">name</spanx> is required and all other properties are OPTIONAL.
               <spanx style="verb">url</spanx> is not allowed.
+              <spanx style="verb">contactUrl</spanx> is not allowed.
             </t>
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1024,25 +1198,16 @@
       "name": "Acme, LLC",
       "website": "www.acme.acme",
       "emails" : [ "inquiry@acme.acme" ],
-      "contacts": [{
-          "name": "Jane Smith",
-          "emails": ["jane.smith@acme.acme"],
-          "phoneNumbers" : [
-              {
-                  "name": "555-555-0001",
-                  "type" : "fax"
-              }, {
-                  "name": "555-555-0002",
-                  "type" : "voice"
-              }
-          ],
-          "address" : {
-              "street" : "123 Main Street",
-              "locality" : "Any Town",
-              "region" : "AnyState",
-              "country" : "USA",
-              "postalCode" : "123456"
-          }
+      "phoneNumbers" : [{
+          "number" : "555-555-1234",
+          "type" : "voice"
+      }],
+      "addresses" : [{
+          "street1" : "123 Main Street",
+          "locality" : "Any Town",
+          "region" : "AnyState",
+          "country" : "USA",
+          "postalCode" : "123456"
       }]
     }
 ]
@@ -1050,14 +1215,13 @@
             </figure>
           </section>
           <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-    {"acvVersion": <acvp-version>},
-    {"url": "/acvp/v1/vendors/2"}
-]
-         ]]>              </artwork>
-            </figure>
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the vendor resource which was
+              created. The url of any resources created incidental to the creation of the vendor resource would be
+              available through the <xref target="vendor_get">Vendor Information</xref> operation.
+            </t>
+            <t>Reply is a request response as described in <xref target="requests"/>.</t>
           </section>
         </section>
         <section anchor="vendor_get" title="Vendor Information">
@@ -1075,25 +1239,18 @@
         "name": "Acme, LLC",
         "website": "www.acme.acme",
         "emails" : [ "inquiry@acme.acme" ],
-        "contacts": [{
-            "name": "Jane Smith",
-            "emails": ["jane.smith@acme.acme"],
-            "phoneNumbers" : [
-                {
-                    "name": "555-555-0001",
-                    "type" : "fax"
-                }, {
-                    "name": "555-555-0002",
-                    "type" : "voice"
-                }
-            ],
-            "address" : {
-                "street" : "123 Main Street",
-                "locality" : "Any Town",
-                "region" : "AnyState",
-                "country" : "USA",
-                "postalCode" : "123456"
-            }
+        "phoneNumbers" : [{
+          "number" : "555-555-1234",
+          "type" : "voice"
+        }],
+        "contactsUrl": "/acvp/v1/vendors/2/contacts",
+        "addresses" : [{
+            "url" : "/acvp/v1/vendors/1/addresses/4",
+            "street1" : "123 Main Street",
+            "locality" : "Any Town",
+            "region" : "AnyState",
+            "country" : "USA",
+            "postalCode" : "123456"
         }]
     }
 ]
@@ -1106,12 +1263,16 @@
             <spanx style="strong">PUT /vendors/{vendorId}</spanx>
           </t>
           <t>Update a vendor</t>
-          <t>The            <spanx style="verb">url</spanx> property is not updateable.
+          <t>The <spanx style="verb">url</spanx> property is not updateable.
           </t>
           <section title="Request">
             <t>Can be any subset of the updateable properties. If a property is not included its
-              value is not changed. A              <spanx style="verb">null</spanx> value for a property
+              value is not changed. A <spanx style="verb">null</spanx> value for a property
               indicates the value should be removed.
+            </t>
+            <t>When updating the addresses array, the <spanx style="verb">url</spanx> of every
+              address resource to be kept MUST be included. Any missing addresses will be removed and any new addresses
+              will be created.
             </t>
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1121,107 +1282,330 @@
         "name": "Acme, LLC",
         "website": "www.acme.acme",
         "emails" : [ "inquiry@acme.acme" ],
-        "contacts": [{
-            "name": "Jane Smith",
-            "emails": ["jane.smith@acme.acme"],
-            "phoneNumbers" : [
-                {
-                    "name": "555-555-0001",
-                    "type" : "fax"
-                }, {
-                    "name": "555-555-0002",
-                    "type" : "voice"
-                }
-            ],
-            "address" : {
-                "street" : "123 Main Street",
+        "addresses" : [{
+                "url" : "/acvp/v1/vendors/2/addresses/4",
+                "street1" : "123 Main Street",
                 "locality" : "Any Town",
                 "region" : "AnyState",
                 "country" : "USA",
                 "postalCode" : "123456"
-            }
         }]
     }
 ]
            ]]>              </artwork>
             </figure>
           </section>
+          <section title="Response">
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the vendor resource which was
+              updated. A server implementation MAY create a new resource instead of updating the existing resource.
+            </t>
+          </section>
         </section>
         <section anchor="vendor_delete" title="Remove a Vendor">
           <t>
             <spanx style="strong">DELETE /vendors/{vendorId}</spanx>
           </t>
-          <t>Delete a specific vendor.</t>
-          <t>The server is not required to remove the resource but MUST return an error if the
-            resource will not be removed.</t>
+          <t>Request to delete a specific vendor. Reply is a request response as described in <xref target="requests"/>.
+          </t>
+          <t>The server is not required to remove the resource but MUST return a <spanx style="verb">rejection</spanx>
+            value for the <spanx style="verb">status</spanx> property if the resource will not be removed.
+          </t>
+        </section>
+        <section anchor="contacts_get" title="Contact Listing for a Vendor">
+          <t>
+            <spanx style="strong">GET /vendors/{vendorId}/contacts</spanx>
+          </t>
+          <t>Returns a paged listing of persons specific to the vendor. Each element in the
+            <spanx style="verb">data</spanx> array is a <spanx style="verb">person object</spanx> as described in
+            <xref target="person_get"/>. See also <xref target="paging_response"/> for a description of a paged
+            response.
+          </t>
         </section>
       </section>
 
-      <section anchor="modules" title="Modules">
-        <t>The available properties for module resources are:          <list>
+      <section anchor="addresses" title="Address Resources">
+        <t>The available properties for address resources are:
+          <list>
             <t>
-              <spanx style="strong">url</spanx> -              <spanx style="verb">string</spanx>, identifier
-              for this resource
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for this resource
             </t>
             <t>
-              <spanx style="strong">name</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">street1</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">version</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">street2</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">type</spanx> -              <spanx style="verb">string</spanx>, valid values are:              <list>
-                <t>
-                  <spanx style="verb">software</spanx> - software-based modules
-                </t>
-                <t>
-                  <spanx style="verb">hardware</spanx> - hardware-based modules
-                </t>
-              </list>
+              <spanx style="strong">street3</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">vendorUrl</spanx> -              <spanx style="verb">string</spanx>,
-              identifier for a              <xref target="vendors">vendor resource</xref>
+              <spanx style="strong">locality</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">implementationDescription</spanx> -
-              <spanx style="verb">string</spanx>, a description of the implementation
+              <spanx style="strong">region</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="strong">country</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="strong">postalCode</spanx> - <spanx style="verb">string</spanx>
             </t>
           </list>
         </t>
-
-        <section anchor="modules_get" title="List Modules">
+        <section anchor="addresses_get" title="Address Listing">
           <t>
-            <spanx style="strong">GET /modules</spanx>
+            <spanx style="strong">GET /vendors/{vendorId}/addresses</spanx>
           </t>
-          <t>Returns a list of available modules.</t>
+          <t>Returns a paged listing of addresses for the vendor. Each element in the <spanx style="verb">data</spanx>
+            array is an <spanx style="verb">address object</spanx> as described in <xref target="address_get"/>. See
+            also <xref target="paging_response"/> for a description of a paged response.</t>
+          <t>The addresses returned are equivalent to the address array returned in <xref target="vendor_get"/> for the
+            same vendor resource.</t>
+        </section>
+        <section anchor="address_get" title="Address Information">
+          <t>
+            <spanx style="strong">GET /vendors/{vendorId}/addresses/{addressId}</spanx>
+          </t>
+          <t>Retrieve Information for a specific address</t>
           <section title="Response">
             <figure align="center">
               <artwork align="left"><![CDATA[
 [
     {"acvVersion": <acvp-version>},
-    {"modules": [
-        {
-            "url": "/acvp/v1/modules/1",
-            "name": "ACME ACV Test Module",
-            "version": "1.0",
-            "type": "Software",
-            "vendorUrl": "/acvp/v1/vendors/2",
-            "implementationDescription" : "ACME module."
-        },
-        {
-            "url": "/acvp/v1/modules/2",
-            "name": "ACME ACV Test Module",
-            "version": "2.0",
-            "type": "Software",
-            "vendorUrl": "/acvp/v1/vendors/2",
-            "implementationDescription" : "ACME module with features"
-        }
-    ]}
+    {
+        "url" : "/vendors/2/addresses/4"
+        "street1" : "123 Main Street",
+        "locality" : "Any Town",
+        "region" : "AnyState",
+        "country" : "USA",
+        "postalCode" : "123456"
+    }
 ]
            ]]>              </artwork>
             </figure>
           </section>
+        </section>
+      </section>
+
+      <section anchor="persons" title="Person Resources">
+        <t>The available properties for person resources are:
+          <list>
+            <t>
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for this resource
+            </t>
+            <t>
+              <spanx style="strong">fullName</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="strong">vendorUrl</spanx> - <spanx style="verb">string</spanx>, identifier for the
+              vendor resource this person is associated with
+            </t>
+            <t>
+              <spanx style="strong">emails</spanx> - array of <spanx style="verb">string</spanx>s
+            </t>
+            <t>
+              <spanx style="strong">phoneNumbers</spanx> - array of phone objects,
+              <list>
+                <t>
+                  <spanx style="strong">number</spanx> - <spanx style="verb">string</spanx>
+                </t>
+                <t>
+                  <spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>, one of (fax, voice)
+                </t>
+              </list>
+            </t>
+            <t>The email and phone number values are specific to the person resource and are independent of the
+              equivalent information in the vendor resource.</t>
+          </list>
+        </t>
+        <section anchor="persons_get" title="Person Listing">
+          <t>
+            <spanx style="strong">GET /persons</spanx>
+          </t>
+          <t>Returns a paged listing of persons. Each element in the <spanx style="verb">data</spanx> array is a
+            <spanx style="verb">person object</spanx> as described in <xref target="person_get"/>. See also
+            <xref target="paging_response"/> for a description of a paged response.</t>
+        </section>
+        <section anchor="persons_post" title="Create a New Person">
+          <t>
+            <spanx style="strong">POST /persons</spanx>
+          </t>
+          <t>Request the creation of a new Person.</t>
+          <section title="Request">
+            <t>
+              <spanx style="verb">url</spanx> is not allowed.
+            </t>
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": <acvp-version>},
+    {
+      "name": "Jane Smith",
+      "vendorUrl" : "/acvp/v1/vendors/2"
+      "emails": ["jane.smith@acme.acme"],
+      "phoneNumbers" : [
+          {
+              "number": "555-555-0001",
+              "type" : "fax"
+          }, {
+              "number": "555-555-0002",
+              "type" : "voice"
+          }
+      ]
+    }
+]
+           ]]>              </artwork>
+            </figure>
+          </section>
+          <section title="Response">
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the person resource which was
+              created.
+            </t>
+          </section>
+        </section>
+        <section anchor="person_get" title="Person Information">
+          <t>
+            <spanx style="strong">GET /persons/{personId}</spanx>
+          </t>
+          <t>Retrieve Information for a specific person</t>
+          <section title="Response">
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": <acvp-version>},
+    {
+      "url": "/acvp/v1/persons/4",
+      "name": "Jane Smith",
+      "vendorUrl" : "/acvp/v1/vendors/2"
+      "emails": ["jane.smith@acme.acme"],
+      "phoneNumbers" : [
+          {
+              "number": "555-555-0001",
+              "type" : "fax"
+          }, {
+              "number": "555-555-0002",
+              "type" : "voice"
+          }
+      ]
+    }
+]
+           ]]>              </artwork>
+            </figure>
+          </section>
+        </section>
+        <section anchor="person_put" title="Update an existing Person">
+          <t>
+            <spanx style="strong">PUT /persons/{personId}</spanx>
+          </t>
+          <t>Update a person</t>
+          <t>The <spanx style="verb">url</spanx> property is not updateable.
+          </t>
+          <section title="Request">
+            <t>Can be any subset of the updateable properties. If a property is not included its
+              value is not changed. A <spanx style="verb">null</spanx> value for a property
+              indicates the value should be removed.
+            </t>
+            <figure align="center">
+              <artwork align="left"><![CDATA[
+[
+    {"acvVersion": <acvp-version>},
+    {
+      "name": "Jane Smith",
+      "emails": ["jane.smith@acme.acme"],
+      "phoneNumbers" : [
+          {
+              "number": "555-555-0001",
+              "type" : "fax"
+          }, {
+              "number": "555-555-0002",
+              "type" : "voice"
+          }
+      ]
+    }
+]
+           ]]>              </artwork>
+            </figure>
+          </section>
+          <section title="Response">
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the person resource which was
+              updated. A server implementation MAY create a new resource instead of updating the existing resource.
+            </t>
+          </section>
+        </section>
+        <section anchor="person_delete" title="Remove a Person">
+          <t>
+            <spanx style="strong">DELETE /persons/{personId}</spanx>
+          </t>
+          <t>Request to delete a specific person. Reply is a request response as described in <xref target="requests"/>.
+          </t>
+          <t>The server is not required to remove the resource but MUST return a <spanx style="verb">rejection</spanx>
+            value for the <spanx style="verb">status</spanx> property if the resource will not be removed.
+          </t>
+        </section>
+      </section>
+
+      <section anchor="modules" title="Modules">
+        <t>The available properties for module resources are:
+          <list>
+            <t>
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier
+              for this resource
+            </t>
+            <t>
+              <spanx style="strong">name</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="strong">version</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>, valid values are:
+              <list>
+                <t>
+                  <spanx style="verb">Software</spanx> - software-based modules
+                </t>
+                <t>
+                  <spanx style="verb">Hardware</spanx> - hardware-based modules
+                </t>
+                <t>
+                  <spanx style="verb">Firmware</spanx> - firmware-based modules
+                </t>
+              </list>
+            </t>
+            <t>
+              <spanx style="strong">website</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="strong">vendorUrl</spanx> - <spanx style="verb">string</spanx>,
+              identifier for a <xref target="vendors">vendor resource</xref>
+            </t>
+            <t>
+              <spanx style="strong">addressUrl</spanx> - <spanx style="verb">string</spanx>,
+              identifier for an <xref target="addresses">address resource</xref>
+            </t>
+            <t>
+            <spanx style="strong">contactUrls</spanx> - <spanx style="verb">string array</spanx>,
+            array of identifiers for a <xref target="persons">person resource</xref>
+          </t>
+          <t>
+            <spanx style="strong">description</spanx> - <spanx style="verb">string</spanx>, a description of the
+            implementation
+          </t>
+        </list>
+      </t>
+
+        <section anchor="modules_get" title="List Modules">
+          <t>
+            <spanx style="strong">GET /modules</spanx>
+          </t>
+          <t>Returns a paged listing of modules. Each element in the <spanx style="verb">data</spanx> array is a
+            <spanx style="verb">module object</spanx> as described in <xref target="module_get"/>. See also
+            <xref target="paging_response"/> for a description of a paged response.</t>
         </section>
         <section anchor="modules_post" title="Register a new Module">
           <t>
@@ -1238,21 +1622,21 @@
         "version": "3.0",
         "type": "Software",
         "vendorUrl": "/acvp/v1/vendors/2",
-        "implementationDescription" : "ACME module with more"
+        "addressUrl": "/acvp/v1/vendors/2/addresses/4",
+        "contactUrls": ["/acvp/v1/persons/1" ],
+        "description" : "ACME module with more"
     }
 ]
            ]]>              </artwork>
             </figure>
           </section>
           <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-    {"acvVersion": <acvp-version>},
-    {"url": "/acvp/v1/modules/5"}
-]
-         ]]>              </artwork>
-            </figure>
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the module resource which was
+              created. The url of any resources created incidental to the creation of the module resource would be
+              available through the <xref target="module_get">Module Information</xref> operation.
+            </t>
           </section>
         </section>
 
@@ -1271,8 +1655,11 @@
         "name": "ACME ACV Test Module",
         "version": "2.0",
         "type": "Software",
+        "website" : "www.acme.acme"
         "vendorUrl": "/acvp/v1/vendors/2",
-        "implementationDescription": "ACME module with features."
+        "addressUrl": "/acvp/v1/vendors/2/addresses/4",
+        "contactUrls": ["/acvp/v1/persons/1" ],
+        "description": "ACME module with features."
     }
 ]
            ]]>              </artwork>
@@ -1292,33 +1679,49 @@
 [
     {"acvVersion": <acvp-version>},
     {
-        "implementationDescription" : "ACME module with more"
+        "description" : "ACME module with more"
     }
 ]
            ]]>              </artwork>
             </figure>
+          </section>
+          <section title="Response">
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the module resource which was
+              updated. A server implementation MAY create a new resource instead of updating the existing resource.
+            </t>
           </section>
         </section>
         <section anchor="module_delete" title="Delete a Module">
           <t>
             <spanx style="strong">DELETE /modules/{moduleId}</spanx>
           </t>
-          <t>Delete a module or mark as no longer in use. (Optional)</t>
+          <t>Request to delete a specific module. Reply is a request response as described in <xref target="requests"/>.
+          </t>
+          <t>The server is not required to remove the resource but MUST return a <spanx style="verb">rejection</spanx>
+            value for the <spanx style="verb">status</spanx> property if the resource will not be removed.
+          </t>
         </section>
       </section>
 
       <section anchor="oes" title="Operational Environments (OEs)">
-        <t>The available properties for operational environment resources are:          <list>
+        <t>The available properties for operational environment resources are:
+          <list>
             <t>
-              <spanx style="strong">url</spanx> -              <spanx style="verb">string</spanx>, identifier
-              for this resource
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for this resource
             </t>
             <t>
-              <spanx style="strong">name</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">name</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">dependencyUrls</spanx> - an array of
-              <spanx style="verb">string</spanx>s which identify the              <xref target="dependencies">dependencies</xref> which comprise this OE.
+              <spanx style="strong">dependencyUrls</spanx> - an array of <spanx style="verb">string</spanx>s which
+              identify the <xref target="dependencies">dependencies</xref> which comprise this OE.
+            </t>
+            <t>
+              <spanx style="strong">dependencies</spanx> - an array of
+              <xref target="dependencies">dependency object</xref>s which comprise this OE. Only valid on update or
+              create and MAY be used in combination with the <spanx style="verb">dependencyUrls</spanx> property.
             </t>
           </list>
         </t>
@@ -1326,30 +1729,11 @@
           <t>
             <spanx style="strong">GET /oes</spanx>
           </t>
-          <t>Returns a list of available operational environments.</t>
-          <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-  {"acvVersion": <acvp-version>},
-  {"oes": [
-      {
-        "url": "/acvp/v1/oes/1",
-        "name": "Windows 10 on Intel Xeon 5100 Series Processor",
-        "dependencyUrls": [ "/acvp/v1/dependencies/1", 
-                            "/acvp/v1/dependencies/2"]
-      },
-      {
-        "url": "/acvp/v1/oes/2",
-        "name": "Windows 10 on AMD 6272 Opteron Processor",
-        "dependencyUrls": [ "/acvp/v1/dependencies/1", 
-                            "/acvp/v1/dependencies/3"]
-      }
-  ]}
-]
-           ]]>              </artwork>
-            </figure>
-          </section>
+          <t>Returns a paged listing of available operational environments. Each element in the
+            <spanx style="verb">data</spanx> array is a <spanx style="verb">operational environment object</spanx> as
+            described in <xref target="oe_get"/>. See also <xref target="paging_response"/> for a description of a paged
+            response.
+          </t>
         </section>
         <section anchor="oes_post" title="Create a new Operational Environment">
           <t>
@@ -1375,14 +1759,13 @@
             </figure>
           </section>
           <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-    {"acvVersion": <acvp-version>},
-    {"url": "/acvp/v1/oes/20"}
-]
-         ]]>              </artwork>
-            </figure>
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the operational environment
+              resource which was created. The url of any resources created incidental to the creation of the operational
+              environment resource would be available through the <xref target="vendor_get">Operational Environment
+                Information</xref> operation.
+            </t>
           </section>
         </section>
 
@@ -1428,28 +1811,48 @@
            ]]>              </artwork>
             </figure>
           </section>
+          <section title="Response">
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the operational environment
+              resource which was updated. A server implementation MAY create a new resource instead of updating the
+              existing resource.
+            </t>
+          </section>
+          
         </section>
         <section anchor="oe_delete" title="Delete an Operational Environment">
           <t>
             <spanx style="strong">DELETE /oes/{oeId}</spanx>
           </t>
-          <t>Delete an operational environment or mark as no longer in use. (Optional)</t>
+          <t>Request to delete an operation environment. Reply is a request response as described in
+            <xref target="requests"/>.
+          </t>
+          <t>The server is not required to remove the resource but MUST return a <spanx style="verb">rejection</spanx>
+            value for the <spanx style="verb">status</spanx> property if the resource will not be removed.
+          </t>
         </section>
       </section>
 
-
       <section anchor="dependencies" title="Dependencies">
-        <t>The available properties for dependency resources are:          <list>
+        <t>The available properties for dependency resources are:
+          <list>
             <t>
-              <spanx style="strong">url</spanx> -              <spanx style="verb">string</spanx>, identifier
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier
               for this resource
             </t>
             <t>
-              <spanx style="strong">type</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="verb">{varies}</spanx> depending on the value of
-              <spanx style="verb">type</spanx> as defined by the response of              <xref target="dependencies_properties_get"/>
+              <spanx style="strong">name</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="strong">description</spanx> - <spanx style="verb">string</spanx>
+            </t>
+            <t>
+              <spanx style="verb">{varies}</spanx> depending on the value of <spanx style="verb">type</spanx> as defined
+              by the response of <xref target="dependencies_properties_get"/>
             </t>
           </list>
         </t>
@@ -1457,31 +1860,9 @@
           <t>
             <spanx style="strong">GET /dependencies</spanx>
           </t>
-          <t>Returns a list of available dependencies.</t>
-          <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-    {"acvVersion": <acvp-version>},
-    {"dependencies": [
-        {
-            "type": "software",
-            "name": "Linux 3.1",
-            "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
-        },
-        {
-            "type": "processor",
-            "manufacturer": "Intel",
-            "family": "ARK",
-            "name": "Xeon",
-            "series": "5100",
-            "features": ["rdrand"]
-        }
-    ]}
-]
-           ]]>              </artwork>
-            </figure>
-          </section>
+          <t>Returns a paged listing of available dependencies. Each element in the <spanx style="verb">data</spanx>
+            array is a <spanx style="verb">dependency object</spanx> as described in <xref target="dependency_get"/>.
+            See also <xref target="paging_response"/> for a description of a paged response.</t>
         </section>
         <section anchor="dependencies_post" title="Register a new Dependency">
           <t>
@@ -1496,6 +1877,7 @@
     {
         "type": "software",
         "name": "Linux 3.1",
+        "description" : "Ubuntu Linux Distribution 3.1",
         "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
     }
 ]
@@ -1503,22 +1885,19 @@
             </figure>
           </section>
           <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-    {"acvVersion": <acvp-version>},
-    {"url": "/acvp/v1/dependencies/7"}
-]
-         ]]>              </artwork>
-            </figure>
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the dependency resource which
+              was created.
+            </t>
           </section>
         </section>
 
         <section anchor="dependencies_properties_get" title="List Dependency Properties">
           <t>
-            <spanx style="strong">GET /dependencies/properties</spanx>
+            (Optional) <spanx style="strong">GET /dependencies/properties</spanx>
           </t>
-          <t>Returns the list of available dependency properties.</t>
+          <t>Returns a <xref target="paging">paged</xref> list of available dependency properties.</t>
           <t>An array of property objects is returned with the following properties:            <list>
               <t>
                 <spanx style="strong">name</spanx> -                <spanx style="verb">string</spanx>
@@ -1536,21 +1915,9 @@
               </t>
             </list>
           </t>
-          <section title="Response">
+          <section title="Example Dependency Property Elements">
             <figure align="center">
               <artwork align="left"><![CDATA[
-[
-  {"acvVersion": <acvp-version>},
-  {"properties": [
-    {
-       "name": "name",
-       "dataType": "string",
-       "validTypes": [
-           "software",
-           "processor"
-       ],
-       "description": "The name of the dependency."
-    },
     {
        "name": "swid",
        "dataType": "string",
@@ -1591,8 +1958,6 @@
        "validTypes": ["processor"],
        "description": "The name of the series of the processor."
     }
-  ]}
-]
            ]]>              </artwork>
             </figure>
           </section>
@@ -1611,6 +1976,7 @@
     {
         "type": "software",
         "name": "Linux 3.1",
+        "description" : "Ubuntu Linux Distribution 3.1",
         "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
     }
 ]
@@ -1637,17 +2003,27 @@
            ]]>              </artwork>
             </figure>
           </section>
+          <section title="Response">
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">accepted</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the dependency resource which
+              was updated. A server implementation MAY create a new resource instead of updating the existing resource.
+            </t>
+          </section>
         </section>
         <section anchor="dependency_delete" title="Delete a Dependency">
           <t>
             <spanx style="strong">DELETE /dependencies/{dependencyId}</spanx>
           </t>
-          <t>Delete a dependency or mark as no longer in use. (Optional)</t>
+          <t>Request to delete a dependency. Reply is a request response as described in <xref target="requests"/>.</t>
+          <t>The server is not required to remove the resource but MUST return a <spanx style="verb">rejection</spanx>
+            value for the <spanx style="verb">status</spanx> property if the resource will not be removed.
+          </t>
         </section>
       </section>
 
       <section anchor="algorithms" title="Algorithms">
-        <t>The Algorithm resources are informational only.          <cref>Do we want to provide guidance on
+        <t>The Algorithm resources are informational only. <cref>Do we want to provide guidance on
             standardizing the output?</cref>
         </t>
         <section anchor="algorithms_get" title="Algorithms Listing">
@@ -1691,36 +2067,36 @@
           </t>
           <t>Retrieve Information for about a specific algorithm.</t>
           <section title="Response">
-            <t>Response may vary from server depending on internal representation.              <cref>Is this ok?
-                Or do we want to standardize?</cref>
+            <t>Response may vary from server depending on internal representation.
+              <cref>Is this ok? Or do we want to standardize?</cref>
             </t>
           </section>
         </section>
       </section>
 
       <section anchor="testSessions" title="Test Sessions">
-        <t>The available properties for test session resources are:          <list>
+        <t>The available properties for test session resources are:
+          <list>
             <t>
-              <spanx style="strong">url</spanx> -              <spanx style="verb">string</spanx>, identifier
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier
               for this resource
             </t>
             <t>
-              <spanx style="strong">acvpVersion</spanx> -              <spanx style="verb">string</spanx>,
-              version of ACV protocol used to created the test session.
+              <spanx style="strong">acvpVersion</spanx> - <spanx style="verb">string</spanx>, version of ACV protocol
+              used to created the test session.
             </t>
             <t>
-              <spanx style="strong">createdOn</spanx> -              <xref target="dateType">date</xref>
+              <spanx style="strong">createdOn</spanx> - <xref target="dateType">date</xref>
             </t>
             <t>
-              <spanx style="strong">expiresOn</spanx> -              <xref target="dateType">date</xref>
+              <spanx style="strong">expiresOn</spanx> - <xref target="dateType">date</xref>
             </t>
             <t>
-              <spanx style="strong">encryptAtRest</spanx> -              <spanx style="verb">boolean</spanx>
+              <spanx style="strong">encryptAtRest</spanx> - <spanx style="verb">boolean</spanx>
             </t>
             <t>
-              <spanx style="strong">vectorSetUrls</spanx>
-              <cref>should this instead be an array or should there be two different
-                properties?</cref> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">vectorSetsUrl</spanx> - <spanx style="verb">string</spanx>, resource for all of the
+              vector sets
             </t>
             <t>
               <spanx style="strong">publishable</spanx>
@@ -1735,16 +2111,11 @@
               have passed 
             </t>
             <t>
-              <spanx style="strong">isSample</spanx> -              <spanx style="verb">boolean</spanx>, if true
+              <spanx style="strong">isSample</spanx> - <spanx style="verb">boolean</spanx>, if true
               <xref target="vectorSet_expected_get">
                 /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected</xref> will return
-              expected result values. As well, Test Vector Sets MAY contain fewer Test Cases for quicker generation and verification.
-            </t>
-            <t>
-              <spanx style="strong">production</spanx> -              <spanx style="verb">boolean</spanx>,
-              indicates that the test session excludes tests that require intermediate values; this
-              may cause the test session to have a              <spanx style="verb">publishable</spanx> value of
-              <spanx style="verb">false</spanx>.
+              expected result values. As well, Test Vector Sets MAY contain fewer Test Cases for quicker generation and
+              verification.
             </t>
           </list>
         </t>
@@ -1752,29 +2123,10 @@
           <t>
             <spanx style="strong">GET /testSessions</spanx>
           </t>
-          <t>Returns a list of Test Sessions for the current user.</t>
           <t>This is an OPTIONAL operation.</t>
-          <section title="Response">
-            <figure align="center">
-              <artwork align="left"><![CDATA[
-[
-    {"acvVersion": <acvp-version>},
-    {"testSessions": [{
-        "url": "/acvp/v1/testSessions/2",
-        "acvpVersion": <acvp-version>,
-        "createdOn": "2018-05-31T12:03:43Z",
-        "expiresOn": "2018-06-30T12:03:43Z",
-        "encryptAtRest": false,
-        "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
-        "publishable": false,
-        "passed": true,
-        "production" : false,
-        "isSample": true
-    }]}
-]
-           ]]>              </artwork>
-            </figure>
-          </section>
+          <t>Returns a paged listing of test sessions for the current user. Each element in the <spanx style="verb">data</spanx> array is a
+            <spanx style="verb">test session object</spanx> as described in <xref target="testSession_get"/>. See also
+            <xref target="paging_response"/> for a description of a paged response.</t>
         </section>
         <section anchor="testSessions_post" title="Create a New Test Session">
           <t>
@@ -1784,17 +2136,16 @@
           <section title="Request">
             <t>
               <spanx style="verb">algorithms</spanx> is an array of algorithm objects. Each
-              algorithm object has the following available properties:              <list>
+              algorithm object has the following available properties:
+              <list>
                 <t>
-                  <spanx style="strong">algorithm</spanx> -                  <spanx style="verb">string</spanx>,
-                  required
+                  <spanx style="strong">algorithm</spanx> - <spanx style="verb">string</spanx>, required
                 </t>
-              </list> Additional properties for each algorithm are based on the algorithm definition
-              available in each sub-specification. 
+              </list> Additional properties for each algorithm are based on the algorithm definition available in each
+              sub-specification. 
             </t>
-            <t>If not provided              <spanx style="verb">isSample</spanx>,
-              <spanx style="verb">production</spanx> and              <spanx style="verb">encryptAtRest</spanx>
-              default to              <spanx style="verb">false</spanx>.
+            <t>If not provided <spanx style="verb">isSample</spanx>, and <spanx style="verb">encryptAtRest</spanx>
+              default to <spanx style="verb">false</spanx>.
             </t>
             <figure align="center">
               <artwork align="left"><![CDATA[
@@ -1813,10 +2164,9 @@
           </section>
           <section title="Response">
             <t>
-              <spanx style="verb">accessToken</spanx> is a              <xref target="RFC7519">JWT Token</xref>
-              which MUST be supplied as described in              <xref target="jwtToken"/>
-              in order to access
-              the Test Session.</t>
+              <spanx style="verb">accessToken</spanx> is a <xref target="RFC7519">JWT Token</xref> which MUST be
+              supplied as described in <xref target="jwtToken"/> in order to access the Test Session.
+            </t>
             <figure align="center">
               <artwork align="left"><![CDATA[
 [
@@ -1830,7 +2180,6 @@
         "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
         "publishable": false,
         "passed": true,
-        "production": false,
         "isSample": true,
         "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6Ik (truncated)"
     }
@@ -1858,7 +2207,6 @@
         "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
         "publishable": false,
         "passed": true,
-        "production": false,
         "isSample": true
     }
 ]
@@ -1872,51 +2220,45 @@
           </t>
           <t>Certify the Test Session for validation.</t>
           <t>Associates all of the testing information with the test session. The test session MUST
-            be have both            <spanx style="verb">publishable</spanx> and
-            <spanx style="verb">passed</spanx> set to            <spanx style="verb">true</spanx>.
+            be have both <spanx style="verb">publishable</spanx> and <spanx style="verb">passed</spanx> set to 
+            <spanx style="verb">true</spanx>.
           </t>
           <section title="Request">
-            <t>Available properties:              <list>
+            <t>Available properties:
+              <list>
                 <t>
-                  <spanx style="strong">moduleUrl</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">moduleUrl</spanx> - <spanx style="verb">string</spanx>
                 </t>
                 <t>
-                  <spanx style="strong">oeUrl</spanx> -                  <spanx style="verb">string</spanx>
+                  <spanx style="strong">module</spanx> - a <xref target="modules">module object</xref>, MAY be used
+                  instead of <spanx style="verb">moduleUrl</spanx>, but SHOULD only be used when the goal is to create a
+                  new module resource, otherwise use <spanx style="verb">moduleUrl</spanx> to use an existing module.
                 </t>
                 <t>
-                  <spanx style="strong">signature</spanx> - a signature object,                  <cref>no idea what
-                    should go inside the signature block really. sigature algorithm, text signed,
-                    certificate used?</cref>
-                  <list>
-                    <t>
-                      <spanx style="strong">algorithm</spanx> -
-                      <spanx style="verb">string</spanx>
-                    </t>
-                    <t>
-                      <spanx style="strong">certificate</spanx> -
-                      <spanx style="verb">string</spanx>
-                    </t>
-                    <t>
-                      <spanx style="strong">digitalSignature</spanx> -
-                      <spanx style="verb">string</spanx>
-                    </t>
-                  </list>
+                  <spanx style="strong">oeUrl</spanx> - <spanx style="verb">string</spanx>
+                </t>
+                <t>
+                  <spanx style="strong">oe</spanx> - an <xref target="oes">operating environment object</xref>, MAY be
+                  used instead of <spanx style="verb">oeUrl</spanx>, but SHOULD only be used when the goal is to create
+                  a new operating environment resource, otherwise use <spanx style="verb">oeUrl</spanx> to use an
+                  existing operating environment.
                 </t>
                 <t>
                   <spanx style="strong">algorithmPrerequisites</spanx> - array of algorithm
                   prerequiste objects, optional, for any algorithm that has a prerequisite that was
                   not included in testing, the prerequisite MUST be provided by adding an element to
-                  this array                  <list>
+                  this array
+                  <list>
                     <t>
-                      <spanx style="strong">algorithm</spanx> -                      <spanx style="verb">string</spanx>,
+                      <spanx style="strong">algorithm</spanx> - <spanx style="verb">string</spanx>,
                       name of the algorithm
                     </t>
                     <t>
-                      <spanx style="strong">mode</spanx> -                      <spanx style="verb">string</spanx>, mode
+                      <spanx style="strong">mode</spanx> - <spanx style="verb">string</spanx>, mode
                       of the algorithm, optional, not all algorithms have a mode
                     </t>
                     <t>
-                      <spanx style="strong">prerequisites</spanx> -                      <cref>this needs some
+                      <spanx style="strong">prerequisites</spanx> - <cref>this needs some
                         additional work</cref>
                       <spanx style="verb">string</spanx>, array of prerequiste objects                      <list>
                         <t>
@@ -2003,25 +2345,27 @@
       </section>
 
       <section anchor="vectorSet" title="Vector Sets">
-        <t>The REQUIRED properties for vector set resources are:          <list>
+        <t>The REQUIRED properties for vector set resources are:
+          <list>
             <t>
-              <spanx style="strong">url</spanx> -              <spanx style="verb">string</spanx>, identifier
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier
               for this resource
             </t>
             <t>
-              <spanx style="strong">vsId</spanx> -              <spanx style="verb">number</spanx>
+              <spanx style="strong">vsId</spanx> - <spanx style="verb">number</spanx>
             </t>
             <t>
-              <spanx style="strong">algorithm</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">algorithm</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">mode</spanx> -              <spanx style="verb">string</spanx>
+              <spanx style="strong">mode</spanx> - <spanx style="verb">string</spanx>
             </t>
             <t>
-              <spanx style="strong">testGroups</spanx> - array of test group objects,              <list>
+              <spanx style="strong">testGroups</spanx> - array of test group objects,
+              <list>
                 <t>
                   <spanx style="verb">{varies}</spanx> - based on the values of
-                  <spanx style="verb">algorithm</spanx> and                  <spanx style="verb">mode</spanx> there
+                  <spanx style="verb">algorithm</spanx> and <spanx style="verb">mode</spanx> there
                   are zero or more test group properties. 
                 </t>
                 <t>
@@ -2030,11 +2374,11 @@
                   <spanx style="strong">tgId</spanx> - <spanx style="verb">number</spanx>
                   <spanx style="strong">tests</spanx> - array of test objects,                  <list>
                     <t>
-                      <spanx style="strong">tcId</spanx> -                      <spanx style="verb">number</spanx>
+                      <spanx style="strong">tcId</spanx> - <spanx style="verb">number</spanx>
                     </t>
                     <t>
                       <spanx style="verb">{varies}</spanx> - based on the values of
-                      <spanx style="verb">algorithm</spanx> and                      <spanx style="verb">mode</spanx>
+                      <spanx style="verb">algorithm</spanx> and <spanx style="verb">mode</spanx>
                       there are zero or more test properties. 
                     </t>
                   </list>
@@ -2048,7 +2392,8 @@
             <spanx style="strong">GET /testSessions/{testSessionId}/vectorSets</spanx>
           </t>
           <t>Returns a list of Vector Sets for the specific Test Session.</t>
-          <t>The property returned is:            <list>
+          <t>The property returned is:
+            <list>
               <t>
                 <spanx style="strong">vectorSetUrls</spanx> - array of
                 <spanx style="verb">string</spanx>s
@@ -2140,7 +2485,7 @@
                 </t>
               </list>
             </t>
-            <t>The server may set the              <spanx style="verb">retry</spanx> value based on the current
+            <t>The server may set the <spanx style="verb">retry</spanx> value based on the current
               server load and expected processing time to generate the vector set.
             </t>
           </section>
@@ -2160,13 +2505,15 @@
           <t>Request Validation Results for a Vector Set.</t>
           <section title="Response">
             <t>The client will send this request to learn the validation results for an individual
-              vector set. Properties are:              <list>
+              vector set. Properties are:
+              <list>
                 <t>
-                  <spanx style="strong">vsId</spanx> -                  <spanx style="verb">number</spanx>
+                  <spanx style="strong">vsId</spanx> - <spanx style="verb">number</spanx>
                 </t>
                 <t>
-                  <spanx style="strong">disposition</spanx> -                  <spanx style="verb">string</spanx>,
-                  the overall result for the vector set with:                  <list>
+                  <spanx style="strong">disposition</spanx> - <spanx style="verb">string</spanx>,
+                  the overall result for the vector set with:
+                  <list>
                     <t>
                       <spanx style="verb">fail</spanx> - indicates at least one test case has
                       failed.
@@ -2192,11 +2539,12 @@
                 <t>
                   <spanx style="strong">tests</spanx> - array of test result objects,                  <list>
                     <t>
-                      <spanx style="strong">tcId</spanx> -                      <spanx style="verb">number</spanx>
+                      <spanx style="strong">tcId</spanx> - <spanx style="verb">number</spanx>
                     </t>
                     <t>
-                      <spanx style="strong">result</spanx> -                      <spanx style="verb">string</spanx>,
-                      the result for a test case with:                      <list>
+                      <spanx style="strong">result</spanx> - <spanx style="verb">string</spanx>,
+                      the result for a test case with:
+                      <list>
                         <t>
                           <spanx style="verb">fail</spanx> - indicates the test case has
                           failed.
@@ -2217,8 +2565,8 @@
                           <spanx style="verb">passed</spanx> - indicates the test case passed.
                         </t>
                       </list>
-                      <spanx style="strong">reason</spanx> -                      <spanx style="verb">number</spanx>,
-                      provides additional detail in case of a                      <spanx style="verb">failed</spanx>
+                      <spanx style="strong">reason</spanx> - <spanx style="verb">number</spanx>,
+                      provides additional detail in case of a <spanx style="verb">failed</spanx>
                       <spanx style="verb">result</spanx> value.
                     </t>
                   </list>
@@ -2406,25 +2754,6 @@
         ]]></artwork>
       </figure>
     </section>
-
-    <section title="Paging Parameters" anchor="paging">
-      <t>Some        <cref>should we instead add a property to indicate that paging was enabled to allow
-          implementations to decide?</cref> resources require paging in order to avoid returning
-        large amounts of data. To faciliate paging the following Query parameters SHOULD be allowed
-        on resources where paging is necessary.        <list>
-          <t>
-            <spanx style="verb">limit</spanx> - the number of entries to return
-          </t>
-          <t>
-            <spanx style="verb">offset</spanx> - the offset into the list of entries
-          </t>
-        </list>
-      </t>
-      <t>The response will indicate the offset and the total count using
-        <spanx style="verb">offset</spanx> and        <spanx style="verb">total</spanx> properties.
-      </t>
-    </section>
-
     <section title="Error Codes">
       <t>Errors will follow HTTP[S] numbering scheme. In addition errors as well as 200 messages may
         carry JSON encoded information that describes in detail the error and any associated
@@ -2634,7 +2963,7 @@
         </front>
       </reference>
 
-      <reference anchor="CMVP" target="https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program">      
+      <reference anchor="CAVP" target="https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program">      
               <!-- the following is the minimum to make xml2rfc happy -->
         <front>
           <title>Cryptographic Algorithm Validation Program</title>
