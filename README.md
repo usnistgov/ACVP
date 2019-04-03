@@ -18,10 +18,10 @@ The objective of this project is to define a protocol allowing independent imple
 The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and 
 validation of standardized algorithm test evidence to facilitate the [modernization](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) of [CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#).
 
-The new automated testing scope is currently planned to become available during 1QFY19 (Fall 2018). Once available this testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
+The new automated testing scope is available starting on April 8, 2019. This testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
 
 # Status
-The demo server (demo.acvts.nist.gov) supports ACVP version 0.5. Not all endpoints are currently available, but development will continue in order to support all features described in the ACVP 0.5 (or 1.0) specification.
+The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the protocol specification are available.
 
 The demo server allows validation of the following NIST-approved algorithms (a superset of the algorithms available through the CAVS tool):
 
@@ -50,21 +50,8 @@ The demo server allows validation of the following NIST-approved algorithms (a s
 |[TDES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)		|																					|																										|																							|																										|																											|																												|
 |[TDES-OFBI](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)	|																					|																										|																							|																										|																											|																												|
 
-## Current 0.5 Support
-To access 0.5 use the following prefix for resources listed below:
-
- https://demo.acvts.nist.gov/acvp/acvp/v1
-
-- /login (POST)
-- /algorithms (GET)
-- /algorithms/{algorithmId} (GET)
-- /testSessions (GET|POST)
-- /testSessions/{testSessionId} (GET)
-- /testSessions/{testSessionId}/results (GET)
-- /testSessions/{testSessionId}/vectorSets (GET)
-- /testSessions/{testSessionId}/vectorSets/{vectorSetId} (GET)
-- /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results (GET|POST)
-- /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected (GET)
+## Current 1.0 Support
+Please check the protocol specification for details on how to access the available resources. 
 
 # Accessing the demo server
 
