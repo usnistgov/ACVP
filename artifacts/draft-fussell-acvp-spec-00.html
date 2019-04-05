@@ -959,17 +959,15 @@
 <a href="#rfc.section.5.1">5.1.</a> <a href="#uriComposition" id="uriComposition">HTTP URI Hierarchy</a>
 </h1>
 <div id="rfc.figure.5"></div>
-<div id="xml_figure4"></div>
+<div id="uriDiagram"></div>
 <pre>
-
-     +----------------------+---------------+---------------+
-        server                path prefix       resource
-     +----------------------+---------------+---------------+
-      https://acvts.nist.gov/acvp/validation/acvp/login
-     +----------------------+---------------+---------------+
-                          context  API   
-
-
+        +-------------+------------------+-------------------------+
+           server          path prefix          resource
+        +-------------+------------------+-------------------------+
+https://acvts.nist.gov/validation/acvp/v1/testSessions/1
+        +-------------+----------+----+--+-------------------------+
+                         context  API   |
+                                     version
            
           </pre>
 <p class="figure">Figure 5</p>
@@ -1228,7 +1226,7 @@
 <p id="rfc.section.6.p.1">It is RECOMMENDED that HTTPS and TLS 1.2 or greater be used in order to enforce a secure communication method. Not all environments will have TLS so HTTP with some level of authentication may be the only option.</p>
 <h1 id="rfc.section.6.1">
 <a href="#rfc.section.6.1">6.1.</a> Authentication</h1>
-<p id="rfc.section.6.1.p.1">It is RECOMMENDED that an authentication scheme be used. Typically, a JSON Web Token (JWT) is created by the server upon successful client authentication and returned to the client to use as an authorization mechanism for accessing the server resources - see        <a href="#jwtToken" class="xref">Section 11.3</a> below for more information.  Depending on the target environment and usage objectives, the authentication can be as weak as basic HTTP authentication or as strong as TLS mutual certificate authentication. Definition of an authentication scheme will not be discussed here, but should be agreed upon between the client and server owning entities including the servers owned by the validation authorities. For the purposes of the message flow examples, no authentication will be used.  </p>
+<p id="rfc.section.6.1.p.1">It is RECOMMENDED that an authentication scheme be used. Typically, a JSON Web Token (JWT) is created by the server upon successful client authentication and returned to the client to use as an authorization mechanism for accessing the server resources - see <a href="#jwtToken" class="xref">Section 11.3</a> below for more information.  Depending on the target environment and usage objectives, the authentication can be as weak as basic HTTP authentication or as strong as TLS mutual certificate authentication. Definition of an authentication scheme will not be discussed here, but should be agreed upon between the client and server owning entities including the servers owned by the validation authorities. The <a href="#login" class="xref">login</a> endpoint will be discussed for the purposes of establishing a test session but how a client is authenticated to the server is not prescribed.  </p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> Encoding</h1>
 <p id="rfc.section.7.p.1">The encoding used for the request/response messaging will be JSON (<a href="#RFC7159" class="xref">[RFC7159]</a>). The data will be identified by: Content-type: application/json In order to allow environment specific extensions to a particular version of the ACV protocol, a top-level JSON keyword, extensions will be used to extend the OE description and/or the capabilities. Extensions MAY be ignored by the ACV server. Vector and vector response data will be JSON encoded.</p>
@@ -1238,11 +1236,11 @@
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#login" id="login">Login</a>
 </h1>
-<p id="rfc.section.9.p.1">A login endpoint is mentioned throughout the document and although how to authenticate is left up to the server the following description is an example of an implementation.  </p>
+<p id="rfc.section.9.p.1">A login endpoint is mentioned throughout the document and although how to authenticate is left up to the server the following description is an example of the login endpoint to establish a session and obtain a <a href="#jwtAuthFlows" class="xref">JWT</a>. See <a href="#largeSubmission" class="xref">Section 12</a> for more information on how to handle data which exceeds the <samp>sizeConstraint</samp> in the event the value of <samp>largeEndpointRequired</samp> is <samp>true</samp>.  </p>
 
 <ul class="empty">
 <li>
-<strong>password</strong> - <samp>string</samp>, a password value </li>
+<strong>password</strong> - <samp>string</samp>, a property for providing a password value </li>
 <li>
 <strong>accessToken</strong> - <samp>string</samp>, a JWT associated with the current user for which renewal of the expiration is desired </li>
 <li>
@@ -1254,7 +1252,17 @@
 <p> </p>
 <h1 id="rfc.section.9.1">
 <a href="#rfc.section.9.1">9.1.</a> Request</h1>
-<p><strong>POST /login</strong> </p>
+<p id="rfc.section.9.1.p.1">There are two forms of a login request. There is the initial form which just provides the authentication information without any JWT, and there is a renewal login that allows a user to obtain a new JWT containing the claims from an expired JWT in order to access a resource protected with those claims.</p>
+<p><strong>POST /login</strong> (Initial) </p>
+<pre>
+[
+  {"acvVersion": &lt;acvp-version&gt;},
+  {
+ "password": "&lt;password&gt;"
+  }
+]
+                         </pre>
+<p><strong>POST /login</strong> (Renewal) </p>
 <pre>
 [
   {"acvVersion": &lt;acvp-version&gt;},
@@ -1283,15 +1291,17 @@
 <a href="#rfc.section.11">11.</a> Messaging and Workflow</h1>
 <h1 id="rfc.section.11.1">
 <a href="#rfc.section.11.1">11.1.</a> Product Registration/Capabilities Exchange</h1>
-<p id="rfc.section.11.1.p.1">The product registration will utilize the URI resources <a href="#uriResources" class="xref">Section 5.2</a> to register and provide cryptographic capabilities.  This exchange will consist of several message exchanges and carry the Company name, primary contact (OE information) as well as a detailed list of the supported cryptographic algorithms and their options to be tested during the testSession, see <a href="#xml_msgFlows" class="xref">Figure 8</a>. </p>
+<p id="rfc.section.11.1.p.1">The product registration will utilize the URI resources  <a href="#uriResources" class="xref">Section 5.2</a> to register and provide cryptographic capabilities.  This exchange will consist of several message exchanges and will provide a detailed list of cryptographic algorithms and their options to be tested during the testSession, see <a href="#xml_msgFlows" class="xref">Figure 9</a>, retrieval of test vectors, submission of test responses, determining test result, and a certification step to associate the product and tested environment information with the completed test. A set URI resources are also available to retrieve and manage the available metadata such as companay name, primary contact, product descriptions, and operational environment descriptions.  </p>
 <h1 id="rfc.section.11.2">
 <a href="#rfc.section.11.2">11.2.</a> Test Exchange</h1>
-<p id="rfc.section.11.2.p.1">The test exchange consists of the ACV client requesting a particular vectorSet associated with the testSession. The server responds with the vectorSet. The client has the option to process the vectorSet and return results(realtime) or request more vectorSets for processing at a later time(non-realtime).  The client will repeat this process until all of the tests in the session test list have been processed. Once a vectorSet result has been POSTed to the server the client may request success/failure results from the server at any time, however if vectorSets have not been completed the overall status will be incomplete.  A minimal message flow is described below <a href="#xml_msgFlows" class="xref">Figure 8</a>. </p>
+<p id="rfc.section.11.2.p.1">The test exchange consists of the ACV client requesting a particular vectorSet associated with the testSession. The server responds with the vectorSet. The client MAY retreive and process the vectorSets in order and MAY retreive a vectorSet and immediately return results or request all of the vectorSets and return results at a later time.  The client repeats this process until all of the vectorSets in the testSession list have been processed. Once a vectorSet result has been POSTed to the server the client may request success/failure results from the server at any time, however if vectorSets have not been completed the overall status will be incomplete.  A minimal message flow is described below <a href="#xml_msgFlows" class="xref">Figure 9</a>. </p>
 <h1 id="rfc.section.11.3">
 <a href="#rfc.section.11.3">11.3.</a> <a href="#jwtToken" id="jwtToken">JSON Web Token (JWT)</a>
 </h1>
-<p id="rfc.section.11.3.p.1">JSON Web Token is described in          <a href="#RFC7519" class="xref">RFC 7519</a> and is used as an authorization mechanism for gaining access to different resources.  </p>
-<p id="rfc.section.11.3.p.2">An example JWT:</p>
+<p id="rfc.section.11.3.p.1">JSON Web Token is described in <a href="#RFC7519" class="xref">RFC 7519</a> and is used as an authorization mechanism for gaining access to different resources.  </p>
+<div id="rfc.figure.6"></div>
+<div id="jwt_example"></div>
+<p>An example JWT</p>
 <pre>
 {
 "alg" : "none"
@@ -1307,17 +1317,18 @@
   Empty octet string (since alg is none).
   }
                      </pre>
-<p id="rfc.section.11.3.p.3">The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values. Key agreement would follow RFC7518. </p>
-<p id="rfc.section.11.3.p.4">The first four claims are required, however "pkey" is an optional private claim used to pass the key used for encrypting the database at the server. Enabling this option is discussed further in          <a href="#testSessions_post" class="xref">Section 11.14.2</a> </p>
+<p class="figure">Figure 6</p>
+<p id="rfc.section.11.3.p.2">The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values. Key agreement would follow RFC7518. </p>
+<p id="rfc.section.11.3.p.3">The first four claims are required, however "pkey" is an optional private claim used to pass the key used for encrypting the database at the server. Enabling this option is discussed further in <a href="#testSessions_post" class="xref">Section 11.14.2</a> </p>
 <h1 id="rfc.section.11.3.1">
 <a href="#rfc.section.11.3.1">11.3.1.</a> <a href="#jwtAuthFlows" id="jwtAuthFlows">Authorization flows with JWT</a>
 </h1>
-<p id="rfc.section.11.3.1.p.1">JSON Web Token is described in            <a href="#RFC7519" class="xref">RFC 7519</a> and is used as an authorization mechanism for gaining access to different resources.  </p>
-<p id="rfc.section.11.3.1.p.2">In order to access any resource which requires authorization a client must supply the JWT as an            <samp>Authorization</samp> header value as a <samp>Bearer</samp> token. An example header value is: </p>
+<p id="rfc.section.11.3.1.p.1">JSON Web Token is described in <a href="#RFC7519" class="xref">RFC 7519</a> and is used as an authorization mechanism for gaining access to different resources.  </p>
+<p id="rfc.section.11.3.1.p.2">In order to access any resource which requires authorization a client must supply the JWT as an <samp>Authorization</samp> header value as a <samp>Bearer</samp> token. An example header value is: </p>
 <pre>
          Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c (truncated)"
                        </pre>
-<div id="rfc.figure.6"></div>
+<div id="rfc.figure.7"></div>
 <div id="xml_figureFlows"></div>
 <p>Workflow authorization flows. All exchanges shown are over HTTP.</p>
 <pre>
@@ -1332,12 +1343,12 @@
          |        |&lt;-  -  -  -  -  -  -  -  -  -  - |      |        |
          |        |                                 |      |        |                                  
          </pre>
-<p class="figure">Figure 6</p>
+<p class="figure">Figure 7</p>
 <h1 id="rfc.section.11.3.2">
 <a href="#rfc.section.11.3.2">11.3.2.</a> <a href="#jwtExpire" id="jwtExpire">JWT Expiration/Renewal</a>
 </h1>
-<p id="rfc.section.11.3.2.p.1">The JWT access tokens received from either the /login server endpoint SHALL be set to expire after a pre-defined period, The specific length of the expiration period is out of scope for this specification. However, the expiration period length impacts both the security and protocol overhead. Longer expiration periods reduce the overhead but increase the window for attacks.  Attempting to access a service with an expired JWT SHALL result in a "401 Unauthorized" HTTP status code.  A client may renew an expired JWT access token using the mechanism shown in            <a href="#xml_figureRenewalFlows" class="xref">Figure 7</a> below. </p>
-<div id="rfc.figure.7"></div>
+<p id="rfc.section.11.3.2.p.1">The JWT access tokens received from either the  /login server endpoint SHALL be set to expire after a pre-defined period,  The specific length of the expiration period is   out of scope for this specification.  However, the expiration period length impacts both the security and protocol overhead. Longer expiration periods reduce the overhead but increase the window for attacks.  Attempting to access a service with an expired JWT SHALL result in a "401 Unauthorized" HTTP status code.  A client may renew an expired JWT access token using the mechanism shown in <a href="#xml_figureRenewalFlows" class="xref">Figure 8</a>below.</p>
+<div id="rfc.figure.8"></div>
 <div id="xml_figureRenewalFlows"></div>
 <p>JWT access token renewal flows. All exchanges shown are over HTTP.</p>
 <pre>
@@ -1354,73 +1365,111 @@
          |        |receive the renewed access token |      |        |
          |        |&lt;-  -  -  -  -  -  -  -  -  -  - |      |        |
         </pre>
-<p class="figure">Figure 7</p>
+<p class="figure">Figure 8</p>
 <h1 id="rfc.section.11.4">
 <a href="#rfc.section.11.4">11.4.</a> <a href="#flow" id="flow">Message Flow</a>
 </h1>
-<p id="rfc.section.11.4.p.1">The minimum message flow between client and server after receiving the JWT: <a href="#xml_msgFlows" class="xref">Figure 8</a> </p>
-<div id="rfc.figure.8"></div>
+<p id="rfc.section.11.4.p.1">An example minimum message flow between client and server after receiving the JWT is seen in the figure below.  </p>
+<div id="rfc.figure.9"></div>
 <div id="xml_msgFlows"></div>
-<p>Workflow message flows. All exchanges shown are over HTTP.</p>
+<p>An example minimal message flow. All exchanges shown are over HTTP.</p>
 <pre>
    +--------+-----------------------------------+------+------------+
    | Client |                                   |Server|  Notes     |
    +--------+-----------------------------------+------+------------+
-   |        |POST /vendors                      |      |            | 
+   |        |POST testSessions                  |      |            |
    |        |----------------------------------&gt;|      |            |
-   |        |                                   |      |            |
-   |        |vendor URL                         |      |            |
-   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |
-   |        |POST /modules                      |      |            |
-   |        |----------------------------------&gt;|      |            |
-   |        |                                   |      |            |
-   |        |module URL                         |      |            |
-   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            | 
-   |        |POST /oes                          |      |            |
-   |        |----------------------------------&gt;|      |            |
-   |        |                                   |      |            |      
-   |        |oes URL                            |      |            |
-   |        |&lt;-  -  -  -  -  -  -  -  -  -  -   |      |            |
-   |        |                                   |      |            |                      
-   |        |POST dependency                    |      |            | 
-   |        |----------------------------------&gt;|      |            |
-   |        |                                   |      |            |                      
-   |        |dependency URL                     |      |            |
-   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |                      
-   |        |POST testSessions                  |      |            | 
-   |        |----------------------------------&gt;|      |            |
-   |        |                                   |      |   Submit   |                      
+   |        |                                   |      |   Submit   |
    |        |testSessions URL                   |      |Registration|
    |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |                      
-   |        |GET                                |      |            |                      
-   |        |testSessions/1/vectorSets/1        |      |            | 
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/testSessions/1/vectorSets/1       |      |            |
    |        |----------------------------------&gt;|      |            |
-   |        |                                   |      |  Retrieve  |                      
+   |        |                                   |      |  Retrieve  |
    |        |send test vectors for vsId 1       |      |  Request   |
    |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |                      
-   |        |POST results                       |      |   Submit   |                      
+   |        |                                   |      |            |
+   |        |POST results                       |      |   Submit   |
    |        |----------------------------------&gt;|      |  Response  |
-   |        |                                   |      |            |                      
-   |        |GET                                |      |            |                      
-   |        |testSessions/1/vectorSets/1/results|      |            |                      
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |testSessions/1/vectorSets/1/results|      |            |
    |        |----------------------------------&gt;|      |            |
-   |        |                                   |      |  Retrieve  |                      
+   |        |                                   |      |  Retrieve  |
    |        |receive results                    |      |Disposition |
    |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
    |        |                                   |      |            |
+   |        |PUT                                |      |            |
+   |        |/testSessions/1                    |      |            |
+   |        |----------------------------------&gt;|      |  Certify   |
+   |        |                                   |      |Test Session|
+   |        |receive request identifier         |      |            |
+   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/1                        |      |            |
+   |        |----------------------------------&gt;|      |  Retrieve  |
+   |        |                                   |      |  Request   |
+   |        |receive validation identifier      |      |            |
+   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+</pre>
+<p class="figure">Figure 9</p>
+<div id="rfc.figure.10"></div>
+<div id="metadata_msgFlow"></div>
+<p>Metadata creation and update example. The list of available metadata endpoints can be found in <a href="#uriResources" class="xref">Section 5.2</a>.</p>
+<pre>
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
+   |        |POST /vendors                      |      | Create     |
+   |        |----------------------------------&gt;|      | Metadata   |
+   |        |                                   |      |            |
+   |        |receive request identifier         |      |            |
+   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/1                        |      | Retrieve   |
+   |        |----------------------------------&gt;|      | Request    |
+   |        |                                   |      |            |
+   |        |receive vendor URL                 |      |            |
+   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |PUT /vendors                       |      | Update     |
+   |        |----------------------------------&gt;|      | Metadata   |
+   |        |                                   |      |            |
+   |        |receive request identifier         |      |            |
+   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/2                        |      |  Retrieve  |
+   |        |----------------------------------&gt;|      |  Request   |
+   |        |                                   |      |            |
+   |        |receive vendor URL                 |      |  updated   |
+   |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |  or new    |
+</pre>
+<p class="figure">Figure 10</p>
+<div id="rfc.figure.11"></div>
+<div id="large_msgFlow"></div>
+<p>In the event a submission response exceeds server defined thresholds the following workflow will need to be followed in order to submit the test result. See <a href="#largeSubmission" class="xref">Section 12</a> for more information.  </p>
+<pre>
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
    |        |POST                               |      |            |
-   |        |large                              |      |            |
+   |        |/large                             |      |            |
    |        |----------------------------------&gt;|      |            |
    |        |                                   |      |            |
    |        |receive large submission URI       |      |            |
+   |        |and JWT access token               |      |            |
    |        |&lt;-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   </pre>
-<p class="figure">Figure 8</p>
+   |        |                                   |      |            |
+   |        |POST                               |      |&lt;uri&gt;       |
+   |        |/&lt;uri&gt;                             |      |received    |
+   |        |----------------------------------&gt;|      |from prior  |
+   |        |MUST use specific JWT              |      |step        |
+</pre>
+<p class="figure">Figure 11</p>
 <h1 id="rfc.section.11.5">
 <a href="#rfc.section.11.5">11.5.</a> <a href="#paging" id="paging">Paging</a>
 </h1>
@@ -2450,6 +2499,9 @@
     }
 ]
                          </pre>
+<h1 id="rfc.section.11.14.4.2">
+<a href="#rfc.section.11.14.4.2">11.14.4.2.</a> Response</h1>
+<p id="rfc.section.11.14.4.2.p.1">Reply is a request response as described in <a href="#requests" class="xref">Section 11.6</a>. If <samp>status</samp> is <samp>approved</samp> the <samp>approvedUrl</samp> returned will be the identifier of the validation resource which was created or updated as a result of this certification.  </p>
 <h1 id="rfc.section.11.14.5">
 <a href="#rfc.section.11.14.5">11.14.5.</a> <a href="#testSession_delete" id="testSession_delete">Cancel Test Session</a>
 </h1>
