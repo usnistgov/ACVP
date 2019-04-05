@@ -149,10 +149,10 @@
 
     <abstract>
       <t>The ACV Protocol provides a method for communication between a cryptographic module 
-        that is embedded inside of a
-        device or otherwise running on a platform accessible via computer network, and an external
-        testing system, using standard network communication interfaces and protocols. This
-        communication protocol can also be used to validate the correctness of the algorithm implementations in the cryptographic module with a validation authority.</t>
+        that is embedded inside of a device or otherwise running on a platform accessible via computer network, and an
+        external testing system, using standard network communication interfaces and protocols. This communication
+        protocol can also be used to validate the correctness of the algorithm implementations in the cryptographic
+        module with a validation authority.</t>
     </abstract>
 
   </front>
@@ -213,8 +213,7 @@
             <t> Crypto module developers who require validation testing</t>
             <t> Crypto module developers who require runtime crypto assessment testing</t>
             <t> Crypto validation organizations who will perform validation testing</t>
-            <t> Crypto module customers that desire validation testing results or verifiable
-              artifacts of testing</t>
+            <t> Crypto module customers that desire validation testing results or verifiable artifacts of testing</t>
           </list>
         </t>
       </section>
@@ -237,11 +236,9 @@
           validation authority. A validation authority SHALL use a combination of HTTPS
           <xref target="RFC7230"></xref>, TLS 1.2
           <xref target="RFC5246"></xref>
-          or greater and
-          mutual authentication. Therefore a client that expects to be used with a validation
+          or greater and mutual authentication. Therefore a client that expects to be used with a validation
           authority SHALL have the same requirements. A server, proxy or client developed for the
-          purposes of internal organizational testing only MAY choose not to include some of those
-          features.</t>
+          purposes of internal organizational testing only MAY choose not to include some of those features.</t>
       </section>
     </section>
 
@@ -250,10 +247,9 @@
         <t>A server/client/proxy model is used where the roles are defined as:</t>
         <t>
           <list style="symbols">
-            <t> ACV Client - Communicates
-              with the ACV server using Java Script Object Notation (JSON <xref
-              target="RFC7159"></xref>) and collects the
-              test vectors and returns the test results using product specific methods.</t>
+            <t> ACV Client - Communicates with the ACV server using Java Script Object Notation (JSON <xref
+              target="RFC7159"></xref>) and collects the test vectors and returns the test results using product
+              specific methods.</t>
             <t> ACV Server - Sends JSON formatted messaging and test data to the ACV client and
               processes test responses.</t>
             <t> ACV Proxy - Resides between the ACV server and ACV client to proxy the connection
@@ -351,7 +347,8 @@
       </section>
 
       <section title="Terminology">
-        <t>The following terms are consistently used throughout this document and SHOULD be used throughout its extensions:</t>
+        <t>The following terms are consistently used throughout this document and SHOULD be used throughout its
+          extensions:</t>
         <t>
           <list style="symbols">
             <t>Test Session - The largest structure of an instance of ACVP. Often generated from a 
@@ -413,17 +410,15 @@
         </artwork>
       </figure>
       <section title="HTTP URI Hierarchy" anchor="uriComposition">
-        <figure align="center" anchor="xml_figure4">
+        <figure align="center" anchor="uriDiagram">
           <artwork align="left"><![CDATA[
-
-     +----------------------+---------------+---------------+
-        server                path prefix       resource
-     +----------------------+---------------+---------------+
-      https://acvts.nist.gov/acvp/validation/acvp/login
-     +----------------------+---------------+---------------+
-                          context  API   
-
-
+        +-------------+------------------+-------------------------+
+           server          path prefix          resource
+        +-------------+------------------+-------------------------+
+https://acvts.nist.gov/validation/acvp/v1/testSessions/1
+        +-------------+----------+----+--+-------------------------+
+                         context  API   |
+                                     version
            ]]>
           </artwork>
 
@@ -726,14 +721,14 @@
         authentication may be the only option.</t>
 
     <section title="Authentication">
-      <t>It is RECOMMENDED that an authentication scheme be used. Typically, a JSON Web Token (JWT) is created by the server
-       upon successful client authentication and returned to the client to use as an authorization mechanism for accessing
-       the server resources - see        <xref target="jwtToken"/> below for more information.  Depending on the target
-        environment and usage objectives, the authentication can be as weak as basic HTTP authentication or as
-        strong as TLS mutual certificate authentication. Definition of an authentication scheme will
-        not be discussed here, but should be agreed upon between the client and server owning
-        entities including the servers owned by the validation authorities. For the purposes of the
-        message flow examples, no authentication will be used.
+      <t>It is RECOMMENDED that an authentication scheme be used. Typically, a JSON Web Token (JWT) is created by the
+        server upon successful client authentication and returned to the client to use as an authorization mechanism for
+        accessing the server resources - see <xref target="jwtToken"/> below for more information.  Depending on the
+        target environment and usage objectives, the authentication can be as weak as basic HTTP authentication or as
+        strong as TLS mutual certificate authentication. Definition of an authentication scheme will not be discussed
+        here, but should be agreed upon between the client and server owning entities including the servers owned by the
+        validation authorities. The <xref target="login">login</xref> endpoint will be discussed for the purposes of
+        establishing a test session but how a client is authenticated to the server is not prescribed.
       </t>
     </section>
     </section>
@@ -758,10 +753,14 @@
     <section anchor="login" title="Login">
       <t>
         A login endpoint is mentioned throughout the document and although how to authenticate is left up to the server
-        the following description is an example of an implementation.
+        the following description is an example of the login endpoint to establish a session and obtain a
+        <xref target="jwtAuthFlows">JWT</xref>. See <xref target="largeSubmission"/> for more information on how to
+        handle data which exceeds the <spanx style="verb">sizeConstraint</spanx> in the event the value of
+        <spanx style="verb">largeEndpointRequired</spanx> is <spanx style="verb">true</spanx>.
         <list>
           <t>
-            <spanx style="strong">password</spanx> - <spanx style="verb">string</spanx>, a password value
+            <spanx style="strong">password</spanx> - <spanx style="verb">string</spanx>, a property for providing a
+            password value
           </t>
           <t>
             <spanx style="strong">accessToken</spanx> - <spanx style="verb">string</spanx>, a JWT associated with the
@@ -781,8 +780,23 @@
         </list>
       </t>
       <section title="Request">
+        <t>There are two forms of a login request. There is the initial form which just provides the authentication
+        information without any JWT, and there is a renewal login that allows a user to obtain a new JWT containing the
+        claims from an expired JWT in order to access a resource protected with those claims.</t>
         <t>
-          <spanx style="strong">POST /login</spanx>
+          <spanx style="strong">POST /login</spanx> (Initial)
+        </t>
+        <figure align="center">
+          <artwork align="left"><![CDATA[
+[
+  {"acvVersion": <acvp-version>},
+  {
+ "password": "<password>"
+  }
+]
+           ]]>              </artwork>
+        </figure>        <t>
+          <spanx style="strong">POST /login</spanx> (Renewal)
         </t>
         <figure align="center">
           <artwork align="left"><![CDATA[
@@ -824,21 +838,22 @@
     <section title="Messaging and Workflow">
 
       <section title="Product Registration/Capabilities Exchange">
-        <t>The product registration will utilize the URI resources 
-        <xref target="uriResources"/> to register and provide cryptographic capabilities. 
-          This exchange will consist of several message exchanges and carry the Company name, 
-          primary contact (OE information) 
-          as well as a detailed list of the supported cryptographic algorithms and their options
-          to be tested during the testSession, see <xref target="xml_msgFlows"/>. </t>
-
+        <t>The product registration will utilize the URI resources  <xref target="uriResources"/> to register and
+          provide cryptographic capabilities.  This exchange will consist of several message exchanges and will provide
+          a detailed list of cryptographic algorithms and their options to be tested during the testSession, see
+          <xref target="xml_msgFlows"/>, retrieval of test vectors, submission of test responses, determining test
+          result, and a certification step to associate the product and tested environment information with the
+          completed test. A set URI resources are also available to retrieve and manage the available metadata such as
+          companay name, primary contact, product descriptions, and operational environment descriptions.
+        </t>
       </section>
 
       <section title="Test Exchange">
         <t>The test exchange consists of the ACV client requesting a particular vectorSet
-          associated with the testSession. The server responds with the vectorSet. The client
-          has the option to process the vectorSet and return results(realtime) or request
-          more vectorSets for processing at a later time(non-realtime).
-          The client will repeat this process until all of the tests in the session test
+          associated with the testSession. The server responds with the vectorSet. The client MAY retreive and process
+          the vectorSets in order and MAY retreive a vectorSet and immediately return results or request all of the
+          vectorSets and return results at a later time.
+          The client repeats this process until all of the vectorSets in the testSession
           list have been processed. Once a vectorSet result has been POSTed to the server
           the client may request success/failure results from the server at any time,
           however if vectorSets have not been completed the overall status will be incomplete.
@@ -846,12 +861,12 @@
       </section>
 
       <section title="JSON Web Token (JWT)" anchor="jwtToken">
-        <t>JSON Web Token is described in          <xref target="RFC7519">RFC 7519</xref> and is used as an
+        <t>JSON Web Token is described in <xref target="RFC7519">RFC 7519</xref> and is used as an
           authorization mechanism for gaining access to different resources.
         </t>
 
-        <t>An example JWT:</t>
-        <figure align="center">
+        <figure align="center" anchor="jwt_example">
+          <preamble>An example JWT</preamble>
           <artwork align="left"><![CDATA[
 {
 "alg" : "none"
@@ -874,16 +889,16 @@
 
         <t> The first four claims are required, however "pkey" is an optional private claim used to
           pass the key used for encrypting the database at the server. Enabling this option is
-          discussed further in          <xref target="testSessions_post"/>
+          discussed further in <xref target="testSessions_post"/>
         </t>
 
         <section title="Authorization flows with JWT" anchor="jwtAuthFlows">
-          <t>JSON Web Token is described in            <xref target="RFC7519">RFC 7519</xref> and is used as an
+          <t>JSON Web Token is described in <xref target="RFC7519">RFC 7519</xref> and is used as an
           authorization mechanism for gaining access to different resources.
           </t>
 
           <t>In order to access any resource which requires authorization a client must supply the JWT
-          as an            <spanx style="verb">Authorization</spanx> header value as a
+          as an <spanx style="verb">Authorization</spanx> header value as a
             <spanx style="verb">Bearer</spanx> token. An example header value is:
           </t>
           <figure align="center">
@@ -891,7 +906,6 @@
          Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c (truncated)"
            ]]>            </artwork>
           </figure>
-
 
           <figure align="center" anchor="xml_figureFlows">
             <preamble>Workflow authorization flows. All exchanges shown are over HTTP.</preamble>
@@ -911,15 +925,14 @@
         </figure>
         </section>
         <section title="JWT Expiration/Renewal" anchor="jwtExpire">
-          <t>The JWT access tokens received from either the 
-              /login server endpoint SHALL be set to expire after a pre-defined period, 
-              The specific length of the expiration period is  
-              out of scope for this specification. However, the expiration period length impacts both the security and protocol overhead. Longer
-              expiration periods reduce the overhead but increase the window for attacks. 
-              Attempting to access a service with an expired JWT SHALL result in a "401 Unauthorized" HTTP status code. 
-              
-              A client may renew an expired JWT access token using the mechanism shown in            <xref target="xml_figureRenewalFlows"/>
- below. </t>
+          <t>The JWT access tokens received from either the  /login server endpoint SHALL be set to expire after a
+            pre-defined period,  The specific length of the expiration period is   out of scope for this specification.
+            However, the expiration period length impacts both the security and protocol overhead. Longer expiration
+            periods reduce the overhead but increase the window for attacks.  Attempting to access a service with an
+            expired JWT SHALL result in a "401 Unauthorized" HTTP status code.
+            
+            A client may renew an expired JWT access token using the mechanism shown in
+            <xref target="xml_figureRenewalFlows"/>below.</t>
           <figure align="center" anchor="xml_figureRenewalFlows">
             <preamble>JWT access token renewal flows. All exchanges shown are over HTTP.</preamble>
 
@@ -941,77 +954,111 @@
           </section>
       </section>
 
-
       <section anchor="flow" title="Message Flow">
-        <t>The minimum message flow between client and server after receiving the JWT:
-         <xref target="xml_msgFlows"/>
-            </t>
-
-          <figure align="center" anchor="xml_msgFlows">
-            <preamble>Workflow message flows. All exchanges shown are over HTTP.</preamble>
-
+        <t>An example minimum message flow between client and server after receiving the JWT is seen in the figure
+          below.
+        </t>
+        <figure align="center" anchor="xml_msgFlows">
+          <preamble>An example minimal message flow. All exchanges shown are over HTTP.</preamble>
           <artwork align="left"><![CDATA[
    +--------+-----------------------------------+------+------------+
    | Client |                                   |Server|  Notes     |
    +--------+-----------------------------------+------+------------+
-   |        |POST /vendors                      |      |            | 
+   |        |POST testSessions                  |      |            |
    |        |---------------------------------->|      |            |
-   |        |                                   |      |            |
-   |        |vendor URL                         |      |            |
-   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |
-   |        |POST /modules                      |      |            |
-   |        |---------------------------------->|      |            |
-   |        |                                   |      |            |
-   |        |module URL                         |      |            |
-   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            | 
-   |        |POST /oes                          |      |            |
-   |        |---------------------------------->|      |            |
-   |        |                                   |      |            |      
-   |        |oes URL                            |      |            |
-   |        |<-  -  -  -  -  -  -  -  -  -  -   |      |            |
-   |        |                                   |      |            |                      
-   |        |POST dependency                    |      |            | 
-   |        |---------------------------------->|      |            |
-   |        |                                   |      |            |                      
-   |        |dependency URL                     |      |            |
-   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |                      
-   |        |POST testSessions                  |      |            | 
-   |        |---------------------------------->|      |            |
-   |        |                                   |      |   Submit   |                      
+   |        |                                   |      |   Submit   |
    |        |testSessions URL                   |      |Registration|
    |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |                      
-   |        |GET                                |      |            |                      
-   |        |testSessions/1/vectorSets/1        |      |            | 
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/testSessions/1/vectorSets/1       |      |            |
    |        |---------------------------------->|      |            |
-   |        |                                   |      |  Retrieve  |                      
+   |        |                                   |      |  Retrieve  |
    |        |send test vectors for vsId 1       |      |  Request   |
    |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |                      
-   |        |POST results                       |      |   Submit   |                      
+   |        |                                   |      |            |
+   |        |POST results                       |      |   Submit   |
    |        |---------------------------------->|      |  Response  |
-   |        |                                   |      |            |                      
-   |        |GET                                |      |            |                      
-   |        |testSessions/1/vectorSets/1/results|      |            |                      
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |testSessions/1/vectorSets/1/results|      |            |
    |        |---------------------------------->|      |            |
-   |        |                                   |      |  Retrieve  |                      
+   |        |                                   |      |  Retrieve  |
    |        |receive results                    |      |Disposition |
    |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
    |        |                                   |      |            |
+   |        |PUT                                |      |            |
+   |        |/testSessions/1                    |      |            |
+   |        |---------------------------------->|      |  Certify   |
+   |        |                                   |      |Test Session|
+   |        |receive request identifier         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/1                        |      |            |
+   |        |---------------------------------->|      |  Retrieve  |
+   |        |                                   |      |  Request   |
+   |        |receive validation identifier      |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+]]></artwork>
+       </figure>
+       <figure anchor="metadata_msgFlow">
+         <preamble>Metadata creation and update example. The list of available metadata endpoints can be found in
+           <xref target="uriResources"/>.</preamble>
+         <artwork align="left"><![CDATA[
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
+   |        |POST /vendors                      |      | Create     |
+   |        |---------------------------------->|      | Metadata   |
+   |        |                                   |      |            |
+   |        |receive request identifier         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/1                        |      | Retrieve   |
+   |        |---------------------------------->|      | Request    |
+   |        |                                   |      |            |
+   |        |receive vendor URL                 |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |PUT /vendors                       |      | Update     |
+   |        |---------------------------------->|      | Metadata   |
+   |        |                                   |      |            |
+   |        |receive request identifier         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/2                        |      |  Retrieve  |
+   |        |---------------------------------->|      |  Request   |
+   |        |                                   |      |            |
+   |        |receive vendor URL                 |      |  updated   |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |  or new    |
+]]></artwork>
+       </figure>
+       <figure anchor="large_msgFlow">
+         <preamble>In the event a submission response exceeds server defined thresholds the following workflow will need
+           to be followed in order to submit the test result. See <xref target="largeSubmission"/> for more information.
+         </preamble>
+         <artwork align="left"><![CDATA[
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
    |        |POST                               |      |            |
-   |        |large                              |      |            |
+   |        |/large                             |      |            |
    |        |---------------------------------->|      |            |
    |        |                                   |      |            |
    |        |receive large submission URI       |      |            |
+   |        |and JWT access token               |      |            |
    |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   ]]></artwork>
+   |        |                                   |      |            |
+   |        |POST                               |      |<uri>       |
+   |        |/<uri>                             |      |received    |
+   |        |---------------------------------->|      |from prior  |
+   |        |MUST use specific JWT              |      |step        |
+]]></artwork>
        </figure>
       </section>
-      
-      
 
       <section title="Paging" anchor="paging">
         <t>Some resource operations require paging in order to avoid returning large amounts of data. Each operation
@@ -1903,24 +1950,39 @@
       </section>
 
       <section anchor="dependencies" title="Dependencies">
+        <t>An operational environment is composed of one or more dependencies which fully characterize and describe the
+          operational environment under which a module was tested. An operational environment MAY have many different
+          types of dependencies.</t>
         <t>The available properties for dependency resources are:
           <list>
             <t>
-              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier
-              for this resource
+              <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, identifier for this resource
             </t>
             <t>
-              <spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>
+              <spanx style="strong">type</spanx> - <spanx style="verb">string</spanx>, the type of the dependency, a
+              non-inclusive list of values that MAY be allowed are:
+              <list>
+                <t><spanx style="strong">os</spanx> - operating system</t>
+                <t><spanx style="strong">cpu</spanx> - Central Processing Unit (CPU) chip</t>
+                <t><spanx style="strong">software</spanx> - a software dependency</t>
+                <t><spanx style="strong">firmware</spanx> - a firmware dependency</t>
+              </list>
             </t>
             <t>
-              <spanx style="strong">name</spanx> - <spanx style="verb">string</spanx>
+              <spanx style="strong">name</spanx> - <spanx style="verb">string</spanx>, a short name of the dependency
             </t>
             <t>
-              <spanx style="strong">description</spanx> - <spanx style="verb">string</spanx>
+              <spanx style="strong">description</spanx> - <spanx style="verb">string</spanx>, a longer description of
+              the dependency providing any additional detail that may be useful
             </t>
             <t>
-              <spanx style="verb">{varies}</spanx> depending on the value of <spanx style="verb">type</spanx> as defined
-              by the response of <xref target="dependencies_properties_get"/>
+              <spanx style="verb">{varies}</spanx> the value of <spanx style="verb">type</spanx> for a dependency MAY
+              require or allow for different name/value pairs to be added to a dependency to better describe and define
+              the dependency which in turn describes the operational environment that a module will operate under. The
+              possible name/value pairs for a given value of <spanx style="verb">type</spanx> MAY be provided by
+              the response of <xref target="dependencies_properties_get"/>, if the server implements this endpoint.
+              Otherwise a server MAY choose to restrict or not restrict the range of name/value pairs available, but any
+              restrictions MUST be clearly documented.
             </t>
           </list>
         </t>
@@ -1962,8 +2024,9 @@
         </section>
 
         <section anchor="dependencies_properties_get" title="List Dependency Properties">
-          <t>
-            (Optional) <spanx style="strong">GET /dependencies/properties</spanx>
+           <t>
+             <cref>This section still needs plenty of work to iron it out.</cref>
+             (Optional) <spanx style="strong">GET /dependencies/properties</spanx>
           </t>
           <t>Returns a <xref target="paging">paged</xref> list of available dependency properties.</t>
           <t>An array of property objects is returned with the following properties:            <list>
@@ -2372,6 +2435,13 @@
 ]
            ]]>              </artwork>
             </figure>
+          </section>
+          <section title="Response">
+            <t>Reply is a request response as described in <xref target="requests"/>. If
+              <spanx style="verb">status</spanx> is <spanx style="verb">approved</spanx> the
+              <spanx style="verb">approvedUrl</spanx> returned will be the identifier of the validation resource which
+              was created or updated as a result of this certification.
+            </t>
           </section>
         </section>
         <section anchor="testSession_delete" title="Cancel Test Session">
