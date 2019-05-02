@@ -131,6 +131,9 @@
                 <list style="symbols">
                     <t>ACVP-AES-ECB</t>
                     <t>ACVP-AES-CBC</t>
+                    <t>ACVP-AES-CBC-CS1</t>
+                    <t>ACVP-AES-CBC-CS2</t>
+                    <t>ACVP-AES-CBC-CS3</t>
                     <t>ACVP-AES-OFB</t>
                     <t>ACVP-AES-CFB1</t>
                     <t>ACVP-AES-CFB8</t>
@@ -267,6 +270,41 @@ For i = 0 to 99
                         </artwork>
                     </figure>
                 </section>
+<section anchor="AES-CBC-CS-MCT" title="AES Monte Carlo Test - CBC-CS* mode">
+                    <t>
+                        The initial condition for the test is the tuple (KEY, IV, PT) set to some values.  An initial payload length is chosen based on the payloadLen values the IUT registers with.
+                    </t>
+                    <t>
+                        The algorithm is shown in
+                        <xref target="xml_figureMCTCBCCS"/>
+                        .
+                    </t>
+                    <figure align="center" anchor="xml_figureMCTCBCCS">
+                        <preamble>AES-CBC-CS* Monte Carlo Test</preamble>
+                        <artwork align="left">
+                            <![CDATA[
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+	Output Key[i]
+	Output IV[i]
+	Output PT[0]
+	For j = 0 to 999
+		If ( j=0 )
+			CT[j] = AES_CBC_CS_ENCRYPT(Key[i], IV[i], PT[j])
+			PT[j+1] = IV[i] || MSB(CT, PT.length - IV.length)
+		Else
+			CT[j] = AES_CBC_CS_ENCRYPT(Key[i], PT[j])
+			PT[j+1] = CT[j-1]
+	Output CT[j]
+	AES_KEY_SHUFFLE(Key, CT)
+	IV[i+1] = MSB(CT[j], IV.length)
+	PT[0] = CT[j-1]
+                                ]]>
+                        </artwork>
+                    </figure>
+                </section>                
                 <section anchor="AES-OFB-MCT" title="AES Monte Carlo Test - OFB mode">
                     <t>
                         The initial condition for the test is the tuple (KEY, IV, PT) set to some
@@ -440,11 +478,11 @@ For i = 0 to 99
                         <artwork align="left">
                             <![CDATA[
 If ( keylen = 128 )
-    Key[i+1] = Key[i] xor CT[j]
+    Key[i+1] = Key[i] xor MSB(CT[j], 128)
 If ( keylen = 192 )
-    Key[i+1] = Key[i] xor (last 64-bits of CT[j-1] || CT[j])
+    Key[i+1] = Key[i] xor (last 64-bits of CT[j-1] || MSB(CT[j], 128))
 If ( keylen = 256 )
-    Key[i+1] = Key[i] xor (CT[j-1] || CT[j])
+    Key[i+1] = Key[i] xor (MSB(CT[j-1], 128) || MSB(CT[j], 128))
                                 ]]>
                         </artwork>
                     </figure>
@@ -785,6 +823,8 @@ For i = 0 to 399
                         encrypt an decrypt operations. All AES tests perform such operations and thus rely heavily on this section. Section 5 specifically outlines
                         the algorithm for AES and thus all AES tests rely heavily on this section as well.
 
+                        All of <xref target="SP800-38A-Add"/> requirements are covered.
+
                         In <xref target="AES-XTS"/>, the IEEE outlines the encrypt and decrypt operations for AES-XTS.
                     </t>
                 </section>
@@ -1003,46 +1043,49 @@ For i = 0 to 399
                 <t>The following grid outlines which properties are REQUIRED, as well as all the possible values a server MAY support for each standard block cipher algorithm:</t>
                 <texttable anchor="property_grid" title="Standard Block Cipher Algorithm Capabilities Applicability Grid">
                     <ttcol align="left">algorithm</ttcol><ttcol align="left">revision</ttcol><ttcol align="left">direction</ttcol><ttcol align="left">keyLen</ttcol><ttcol align="left">keyingOption</ttcol>
-                    <c>AES-ECB</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
-                    <c>AES-CBC</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
-                    <c>AES-OFB</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
-                    <c>AES-CFB1</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
-                    <c>AES-CFB8</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
-                    <c>AES-CFB128</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
-                    <c>TDES-ECB</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CBC</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CBCI</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CFB1</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CFB8</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CFB64</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CFBP1</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CFBP8</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-CFBP64</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-OFB</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
-                    <c>TDES-OFBI</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>AES-ECB</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
+                    <c>AES-CBC</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
+                    <c>AES-OFB</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
+                    <c>AES-CFB1</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
+                    <c>AES-CFB8</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
+                    <c>AES-CFB128</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c></c>
+                    <c>TDES-ECB</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CBC</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CBCI</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CFB1</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CFB8</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CFB64</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CFBP1</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CFBP8</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-CFBP64</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-OFB</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>TDES-OFBI</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
                 </texttable>
                 <t>Note: keyingOption 2 SHALL only available for decrypt operations.</t>
                 <t>The following grid outlines which properties are REQUIRED, as well as the possible values a server MAY support for each authenticated block cipher algorithm:</t>
-                <texttable anchor="property_grid_auth" title="Authenticated Block Cipher Algorithm Capabilities Applicability Grid">
+                <texttable anchor="property_grid_auth" title="Key-Wrap Block Cipher Algorithm Capabilities Applicability Grid">
                     <ttcol align="left">algorithm</ttcol><ttcol align="left">revision</ttcol><ttcol align="left">direction</ttcol><ttcol align="left">keyLen</ttcol><ttcol align="left">kwCipher</ttcol><ttcol align="left">keyingOption</ttcol>
-                    <c>AES-KW</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>["cipher", "inverse"]</c><c></c>
-                    <c>AES-KWP</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>["cipher", "inverse"]</c><c></c>
-                    <c>TDES-KW</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>["cipher", "inverse"]</c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
+                    <c>AES-KW</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>["cipher", "inverse"]</c><c></c>
+                    <c>AES-KWP</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>["cipher", "inverse"]</c><c></c>
+                    <c>TDES-KW</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>["cipher", "inverse"]</c><c>[1, 2] Note: 2 is only available for decrypt operations</c>
                 </texttable>
                 <t>The following grid outlines which properties are REQUIRED, as well as the possible values a server MAY support for each key-wrap block cipher algorithm:</t>
-                <texttable anchor="property_grid_kw" title="Key-Wrap Block Cipher Algorithm Capabilities Applicability Grid">
+                <texttable anchor="property_grid_kw" title="Authenticated Block Cipher Algorithm Capabilities Applicability Grid">
                     <ttcol align="left">algorithm</ttcol><ttcol align="left">revision</ttcol><ttcol align="left">direction</ttcol><ttcol align="left">keyLen</ttcol><ttcol align="left">payloadLen</ttcol><ttcol align="left">ivLen</ttcol><ttcol align="left">ivGen</ttcol><ttcol align="left">ivGenMode</ttcol><ttcol align="left">saltGen</ttcol><ttcol align="left">aadLen</ttcol><ttcol align="left">tagLen</ttcol>
-                    <c>AES-GCM</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 0, "Max": 65536, "Inc": any}</c><c>{"Min": 8, "Max": 1024, "Inc": any}</c><c>["internal", "external"]</c><c>["8.2.1", "8.2.2"]</c><c></c><c>{"Min": 0, "Max": 65536, "Inc": any}</c><c>{[32, 64, 96, 104, 112, 120, 128]}</c>
-                    <c>AES-GCM-SIV</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 256]</c><c>{"Min": 0, "Max": 65536, "Inc": 8}</c><c></c><c></c><c></c><c></c><c>{"Min": 0, "Max": 65536, "Inc": 8}</c><c></c>
-                    <c>AES-XPN</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 0, "Max": 65536, "Inc": any}</c><c></c><c>["internal", "external"]</c><c>["8.2.1", "8.2.2"]</c><c>["internal", "external"]</c><c>{"Min": 1, "Max": 65536, "Inc": any}</c><c>{[32, 64, 96, 104, 112, 120, 128]}</c>
-                    <c>AES-CCM</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 0, "Max": 256, "Inc": 8}</c><c>{"Min": 56, "Max": 104, "Inc": 8}</c><c></c><c></c><c></c><c>{"Min": 0, "Max": 524288, "Inc": any}</c><c>{"Min": 32, "Max": 128, "Inc": 16}</c>
+                    <c>AES-GCM</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 0, "Max": 65536, "Inc": any}</c><c>{"Min": 8, "Max": 1024, "Inc": any}</c><c>["internal", "external"]</c><c>["8.2.1", "8.2.2"]</c><c></c><c>{"Min": 0, "Max": 65536, "Inc": any}</c><c>{[32, 64, 96, 104, 112, 120, 128]}</c>
+                    <c>AES-GCM-SIV</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 256]</c><c>{"Min": 0, "Max": 65536, "Inc": 8}</c><c></c><c></c><c></c><c></c><c>{"Min": 0, "Max": 65536, "Inc": 8}</c><c></c>
+                    <c>AES-XPN</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 0, "Max": 65536, "Inc": any}</c><c></c><c>["internal", "external"]</c><c>["8.2.1", "8.2.2"]</c><c>["internal", "external"]</c><c>{"Min": 1, "Max": 65536, "Inc": any}</c><c>{[32, 64, 96, 104, 112, 120, 128]}</c>
+                    <c>AES-CCM</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 0, "Max": 256, "Inc": 8}</c><c>{"Min": 56, "Max": 104, "Inc": 8}</c><c></c><c></c><c></c><c>{"Min": 0, "Max": 524288, "Inc": any}</c><c>{"Min": 32, "Max": 128, "Inc": 16}</c>
                 </texttable>
                 <t>The following grid outlines which properties are REQUIRED, as well as the possible values a server MAY support for each miscellaneous block cipher algorithm:</t>
                 <texttable anchor="property_grid_misc" title="Miscellaneous Block Cipher Algorithm Capabilities Applicability Grid">
                     <ttcol align="left">algorithm</ttcol><ttcol align="left">revision</ttcol><ttcol align="left">direction</ttcol><ttcol align="left">keyLen</ttcol><ttcol align="left">payloadLen</ttcol><ttcol align="left">tweakMode</ttcol><ttcol align="left">keyingOption</ttcol><ttcol align="left">overflowCounter</ttcol><ttcol align="left">incrementalCounter</ttcol>
-                    <c>AES-CTR</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 1, "Max": 128, "Inc": any}</c><c></c><c></c><c>true, false</c><c>true, false</c>
-                    <c>AES-XTS</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 256]</c><c>{"Min": 128, "Max": 65536, "Inc": 128}</c><c>["hex", "number"]</c><c></c><c></c><c></c>
-                    <c>TDES-CTR</c><c>"1.0.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>{"Min": 1, "Max": 64, "Inc": any}</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c><c>true, false</c><c>true, false</c>
+                    <c>AES-CBC-CS1</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 128, "Max": 65536, "Inc": any}</c><c></c><c></c><c></c><c></c>
+                    <c>AES-CBC-CS2</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 128, "Max": 65536, "Inc": any}</c><c></c><c></c><c></c><c></c>
+                    <c>AES-CBC-CS3</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 128, "Max": 65536, "Inc": any}</c><c></c><c></c><c></c><c></c>
+                    <c>AES-CTR</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 192, 256]</c><c>{"Min": 1, "Max": 128, "Inc": any}</c><c></c><c></c><c>true, false</c><c>true, false</c>
+                    <c>AES-XTS</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c>[128, 256]</c><c>{"Min": 128, "Max": 65536, "Inc": 128}</c><c>["hex", "number"]</c><c></c><c></c><c></c>
+                    <c>TDES-CTR</c><c>"1.0"</c><c>["encrypt", "decrypt"]</c><c></c><c>{"Min": 1, "Max": 64, "Inc": any}</c><c></c><c>[1, 2] Note: 2 is only available for decrypt operations</c><c>true, false</c><c>true, false</c>
                 </texttable>
                 <t>Note: keyingOption 2 SHALL only available for decrypt operations.</t>
             </section>
@@ -1331,6 +1374,14 @@ For i = 0 to 399
                     <ttcol align="left">overflow</ttcol>
                     <ttcol align="left">tweakMode</ttcol>
                     <ttcol align="left">payloadLen</ttcol>
+                    <c>AES-CBC-CS1</c>
+                    <c>128, 192, 256</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>within domain</c>
+                    
                     <c>AES-CTR</c>
                     <c>128, 192, 256</c>
                     <c/>
@@ -1622,6 +1673,16 @@ For i = 0 to 399
                 </front>
             </reference>
 
+            <reference anchor="SP800-38A-Add">
+                <front>
+                    <title>Recommendation for Block Cipher Modes of Operation: Three Variants of Ciphertext Stealing for CBC Mode</title>
+                    <author initials="MD" surname="Morris Dworkin">
+                        <organization>NIST</organization>
+                    </author>
+                    <date year="2010"/>
+                </front>
+            </reference>
+
             <reference anchor="SP800-38F">
                 <front>
                     <title>Recommendataion for Block Cipher Modes of Operation: Methods for Key Wrapping</title>
@@ -1706,6 +1767,60 @@ POST [
     {
         "algorithm": "ACVP-AES-CBC",
         "revision": "1.0",
+        "direction": [
+            "encrypt",
+            "decrypt"
+        ],
+        "keyLen": [
+            128,
+            192,
+            256
+        ]
+    },
+    {
+        "algorithm": "ACVP-AES-CBC-CS1",
+        "revision": "1.0",
+        "payloadLen": [{
+            "min": 128,
+            "max": 65536,
+            "increment": 1
+        }],
+        "direction": [
+            "encrypt",
+            "decrypt"
+        ],
+        "keyLen": [
+            128,
+            192,
+            256
+        ]
+    },
+    {
+        "algorithm": "ACVP-AES-CBC-CS2",
+        "revision": "1.0",
+        "payloadLen": [{
+            "min": 128,
+            "max": 65536,
+            "increment": 1
+        }],
+        "direction": [
+            "encrypt",
+            "decrypt"
+        ],
+        "keyLen": [
+            128,
+            192,
+            256
+        ]
+    },
+    {
+        "algorithm": "ACVP-AES-CBC-CS3",
+        "revision": "1.0",
+        "payloadLen": [{
+            "min": 128,
+            "max": 65536,
+            "increment": 1
+        }],
         "direction": [
             "encrypt",
             "decrypt"
@@ -2112,7 +2227,7 @@ POST [
         </section>
 
         <section anchor="app-vs-ex" title="Example Vector Set Request/Responses JSON Object">
-            <t>The following sections provide examples of the JSON objects for each of the AES algorithms. Examples will relfect what testTypes are supported by each algorithm, ie AFT, MCT or counter.  MCT examples have only 2 iterations shown for brevity.</t>
+            <t>The following sections provide examples of the JSON objects for each of the AES algorithms. Examples will reflect what testTypes are supported by each algorithm, ie AFT, MCT or counter.  MCT examples have only 2 iterations shown for brevity.</t>
             <t>The following shows AES-GCM AFT request vectors.</t>
 
             <figure>
@@ -2464,7 +2579,453 @@ POST [
 }]
             ]]>                </artwork>
             </figure>
+<t> The following shows AES-CBC-CS1 AFT and MCT request vectors.</t>
+            <figure>
+                <artwork><![CDATA[
+[{
+	"acvVersion": <acvp-version>
+},{
+	"vsId": 2058,
+	"algorithm": "ACVP-AES-CBC-CS1",
+    "revision": "1.0",
+	"testGroups": [{
+			"tgId": 1,
+			"direction": "encrypt",
+			"testType": "AFT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 1,
+				"iv": "1216A541024...",
+				"key": "A6A8346C47...",
+				"pt": "71AC206DD0A...",
+                "payloadLen": 512
+			}, {
+				"tcId": 2,
+				"iv": "9A6A276AB96...",
+				"key": "7CDAE90854...",
+				"pt": "6D4AEE90179...",
+                "payloadLen": 178
+			}]
+		}, {
+			"tgId": 2,
+			"direction": "decrypt",
+			"testType": "AFT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 31,
+				"iv": "908543E2646...",
+				"key": "CB12AAFA25B...",
+				"ct": "AB99A939B688...",
+                "payloadLen": 378
+			}, {
+				"tcId": 32,
+				"iv": "AB99A939B688...",
+				"key": "0569B0C6DB3...",
+				"ct": "DD14A9A9A916A...",
+                "payloadLen": 471
+			}]
+		},
+		{
+			"tgId": 3,
+			"direction": "encrypt",
+			"testType": "MCT",
+			"keyLen": 256,
+			"tests": [{
+				"tcId": 63,
+				"iv": "205734F67...",
+				"key": "7C446BA54C41B6F98D5C0...",
+				"pt": "806800AE3952ED97...",
+                "payloadLen": 521
+			}]
+		}, {
+			"tgId": 4,
+			"direction": "decrypt",
+			"testType": "MCT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 64,
+				"iv": "3E1D14BDDE1F5CB09EBA67F6...",
+				"key": "C5AB9CE14549A...",
+				"ct": "9A916A449949073...",
+                "payloadLen": 310
+			}]
+		}
+	]
+}]
+            ]]>                </artwork>
+            </figure>
 
+            <t> The following shows AES-CBC-CS1 AFT and MCT responses.</t>
+            <figure>
+                <artwork><![CDATA[
+[{
+	"acvVersion": <acvp-version>
+},{
+	"vsId": 2057,
+	"testGroups": [{
+			"tgId": 1,
+			"tests": [{
+					"tcId": 1,
+					"ct": "E25DC48F39E4DA..."
+				},
+				{
+					"tcId": 2,
+					"ct": "360D25D820C3BA..."
+				}
+			]
+		},
+		{
+			"tgId": 2,
+			"tests": [{
+					"tcId": 31,
+					"pt": "33346D02A070A..."
+				},
+				{
+					"tcId": 32,
+					"pt": "8F52D6E73783A..."
+				}
+			]
+		},
+		{
+			"tgId": 3,
+			"tests": [{
+				"tcId": 63,
+				"resultsArray": [{
+						"key": "E5E2...",
+						"iv": "057FB...",
+						"pt": "6DA46...",
+						"ct": "3E794..."
+					},
+					{
+						"key": "DE31...",
+						"iv": "3E794...",
+						"pt": "3BD32...",
+						"ct": "9236D..."
+					}
+				]
+			}]
+		},
+		{
+			"tgId": 1,
+			"tests": [{
+				"tcId": 64,
+				"resultsArray": [{
+						"key": "F743...",
+						"iv": "FD5ED...",
+						"ct": "37ECE...",
+						"pt": "52FC3..."
+					},
+					{
+						"key": "A5BF...",
+						"iv": "52FC3...",
+						"ct": "4400F...",
+						"pt": "66204..."
+					}
+				]
+			}]
+		}
+	]
+}]
+            ]]>                </artwork>
+            </figure>
+<t> The following shows AES-CBC-CS2 AFT and MCT request vectors.</t>
+            <figure>
+                <artwork><![CDATA[
+[{
+	"acvVersion": <acvp-version>
+},{
+	"vsId": 2058,
+	"algorithm": "ACVP-AES-CBC-CS2",
+    "revision": "1.0",
+	"testGroups": [{
+			"tgId": 1,
+			"direction": "encrypt",
+			"testType": "AFT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 1,
+				"iv": "1216A541024...",
+				"key": "A6A8346C47...",
+				"pt": "71AC206DD0A...",
+                "payloadLen": 512
+			}, {
+				"tcId": 2,
+				"iv": "9A6A276AB96...",
+				"key": "7CDAE90854...",
+				"pt": "6D4AEE90179...",
+                "payloadLen": 178
+			}]
+		}, {
+			"tgId": 2,
+			"direction": "decrypt",
+			"testType": "AFT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 31,
+				"iv": "908543E2646...",
+				"key": "CB12AAFA25B...",
+				"ct": "AB99A939B688...",
+                "payloadLen": 378
+			}, {
+				"tcId": 32,
+				"iv": "AB99A939B688...",
+				"key": "0569B0C6DB3...",
+				"ct": "DD14A9A9A916A...",
+                "payloadLen": 471
+			}]
+		},
+		{
+			"tgId": 3,
+			"direction": "encrypt",
+			"testType": "MCT",
+			"keyLen": 256,
+			"tests": [{
+				"tcId": 63,
+				"iv": "205734F67...",
+				"key": "7C446BA54C41B6F98D5C0...",
+				"pt": "806800AE3952ED97...",
+                "payloadLen": 521
+			}]
+		}, {
+			"tgId": 4,
+			"direction": "decrypt",
+			"testType": "MCT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 64,
+				"iv": "3E1D14BDDE1F5CB09EBA67F6...",
+				"key": "C5AB9CE14549A...",
+				"ct": "9A916A449949073...",
+                "payloadLen": 310
+			}]
+		}
+	]
+}]
+            ]]>                </artwork>
+            </figure>
+
+            <t> The following shows AES-CBC-CS2 AFT and MCT responses.</t>
+            <figure>
+                <artwork><![CDATA[
+[{
+	"acvVersion": <acvp-version>
+},{
+	"vsId": 2057,
+	"testGroups": [{
+			"tgId": 1,
+			"tests": [{
+					"tcId": 1,
+					"ct": "E25DC48F39E4DA..."
+				},
+				{
+					"tcId": 2,
+					"ct": "360D25D820C3BA..."
+				}
+			]
+		},
+		{
+			"tgId": 2,
+			"tests": [{
+					"tcId": 31,
+					"pt": "33346D02A070A..."
+				},
+				{
+					"tcId": 32,
+					"pt": "8F52D6E73783A..."
+				}
+			]
+		},
+		{
+			"tgId": 3,
+			"tests": [{
+				"tcId": 63,
+				"resultsArray": [{
+						"key": "E5E2...",
+						"iv": "057FB...",
+						"pt": "6DA46...",
+						"ct": "3E794..."
+					},
+					{
+						"key": "DE31...",
+						"iv": "3E794...",
+						"pt": "3BD32...",
+						"ct": "9236D..."
+					}
+				]
+			}]
+		},
+		{
+			"tgId": 1,
+			"tests": [{
+				"tcId": 64,
+				"resultsArray": [{
+						"key": "F743...",
+						"iv": "FD5ED...",
+						"ct": "37ECE...",
+						"pt": "52FC3..."
+					},
+					{
+						"key": "A5BF...",
+						"iv": "52FC3...",
+						"ct": "4400F...",
+						"pt": "66204..."
+					}
+				]
+			}]
+		}
+	]
+}]
+            ]]>                </artwork>
+            </figure>
+<t> The following shows AES-CBC-CS3 AFT and MCT request vectors.</t>
+            <figure>
+                <artwork><![CDATA[
+[{
+	"acvVersion": <acvp-version>
+},{
+	"vsId": 2058,
+	"algorithm": "ACVP-AES-CBC-CS3",
+    "revision": "1.0",
+	"testGroups": [{
+			"tgId": 1,
+			"direction": "encrypt",
+			"testType": "AFT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 1,
+				"iv": "1216A541024...",
+				"key": "A6A8346C47...",
+				"pt": "71AC206DD0A...",
+                "payloadLen": 512
+			}, {
+				"tcId": 2,
+				"iv": "9A6A276AB96...",
+				"key": "7CDAE90854...",
+				"pt": "6D4AEE90179...",
+                "payloadLen": 178
+			}]
+		}, {
+			"tgId": 2,
+			"direction": "decrypt",
+			"testType": "AFT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 31,
+				"iv": "908543E2646...",
+				"key": "CB12AAFA25B...",
+				"ct": "AB99A939B688...",
+                "payloadLen": 378
+			}, {
+				"tcId": 32,
+				"iv": "AB99A939B688...",
+				"key": "0569B0C6DB3...",
+				"ct": "DD14A9A9A916A...",
+                "payloadLen": 471
+			}]
+		},
+		{
+			"tgId": 3,
+			"direction": "encrypt",
+			"testType": "MCT",
+			"keyLen": 256,
+			"tests": [{
+				"tcId": 63,
+				"iv": "205734F67...",
+				"key": "7C446BA54C41B6F98D5C0...",
+				"pt": "806800AE3952ED97...",
+                "payloadLen": 521
+			}]
+		}, {
+			"tgId": 4,
+			"direction": "decrypt",
+			"testType": "MCT",
+			"keyLen": 128,
+			"tests": [{
+				"tcId": 64,
+				"iv": "3E1D14BDDE1F5CB09EBA67F6...",
+				"key": "C5AB9CE14549A...",
+				"ct": "9A916A449949073...",
+                "payloadLen": 310
+			}]
+		}
+	]
+}]
+            ]]>                </artwork>
+            </figure>
+
+            <t> The following shows AES-CBC-CS3 AFT and MCT responses.</t>
+            <figure>
+                <artwork><![CDATA[
+[{
+	"acvVersion": <acvp-version>
+},{
+	"vsId": 2057,
+	"testGroups": [{
+			"tgId": 1,
+			"tests": [{
+					"tcId": 1,
+					"ct": "E25DC48F39E4DA..."
+				},
+				{
+					"tcId": 2,
+					"ct": "360D25D820C3BA..."
+				}
+			]
+		},
+		{
+			"tgId": 2,
+			"tests": [{
+					"tcId": 31,
+					"pt": "33346D02A070A..."
+				},
+				{
+					"tcId": 32,
+					"pt": "8F52D6E73783A..."
+				}
+			]
+		},
+		{
+			"tgId": 3,
+			"tests": [{
+				"tcId": 63,
+				"resultsArray": [{
+						"key": "E5E2...",
+						"iv": "057FB...",
+						"pt": "6DA46...",
+						"ct": "3E794..."
+					},
+					{
+						"key": "DE31...",
+						"iv": "3E794...",
+						"pt": "3BD32...",
+						"ct": "9236D..."
+					}
+				]
+			}]
+		},
+		{
+			"tgId": 1,
+			"tests": [{
+				"tcId": 64,
+				"resultsArray": [{
+						"key": "F743...",
+						"iv": "FD5ED...",
+						"ct": "37ECE...",
+						"pt": "52FC3..."
+					},
+					{
+						"key": "A5BF...",
+						"iv": "52FC3...",
+						"ct": "4400F...",
+						"pt": "66204..."
+					}
+				]
+			}]
+		}
+	]
+}]
+            ]]>                </artwork>
+            </figure>
 
             <t> The following shows AES-ECB AFT and MCT request vectors.</t>
             <figure>
