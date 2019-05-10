@@ -154,6 +154,9 @@
 							The ACVP server SHALL support a variety of curves/hash function for creation and delivery to/from the IUT.
                             Key pair generation/verification testing SHALL be provided by the ACVP server. Both Signature Generation and Validation testing mechanmisms SHALL be provided by the ACVP server.
                           </t>
+                          <t>
+                            SP800-106 - (3) Randomized Hashing and (4) Digital Signatures Using Randomized Hashing.  The IUT SHALL be provided or provide a random value that should be used to "randomize" a message prior to signing and/or verifying an original message.
+                          </t>
                         </list>
                     </t>
                 </section>
@@ -169,6 +172,9 @@
                             The ACVP server SHALL NOT provide testing for the validity of domain parameters as testing is (currently) limited to approved NIST curves. 
 							Testing SHALL NOT provide assurances the IUT has validated a set of domain parameters prior to their use.
                             Domain parameter and key pair management SHALL NOT be within scope of ACVP testing.
+                          </t>
+                          <t>
+                          SP800-106 - 3.3 The Random Value. DSA, ECDSA, and RSA have random values generated as per their signing process, this random value can be used as the input to the message randomization function, doing so however is out of scope of this testing.
                           </t>
                         </list>
                     </t>
@@ -247,6 +253,15 @@
 						
                         
                         <xref target="supported_modes" />
+                    </c>
+                    <c>Yes</c>
+                    <c>conformances</c>
+                    <c>Used to denote the conformances that can apply to specific modes of DSA.</c>
+                    <c>Array of strings</c>
+                    <c>See                                                                                     
+
+                        
+                        <xref target="supported_conformances" />
                     </c>
                     <c>Yes</c>
                 </texttable>
@@ -364,6 +379,19 @@
                 </section>
             </section>
         </section>
+        <section anchor="supported_conformances" title="Supported DSA Conformances">
+            <t>Conformances MAY be used to test additional features of certain algorithms.</t>
+            <texttable anchor="conformances_table" title="DSA Conformances">
+                            <ttcol align="left">String Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">Valid algorithm modes</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>SP800-106</c>
+                            <c>This conformance signifies the SigGen and/or SigVer modes support randomized message hashing as described in <xref target="SP.800-106"/>. Utilizing this conformance SHALL generate additional test groups, denoted with a group level property of "isMessageRandomized".</c>
+                            <c>SigGen, SigVer</c>
+                            <c>Yes</c>
+                        </texttable>
+        </section>
         <section anchor="test_vectors" title="Test Vectors">
             <t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to the ACVP server for validation. A typical ACVP validation session would require multiple test vector sets to be downloaded and processed by the ACVP client. Each test vector set represents an individual ECDSA function. This section describes the JSON schema for a test vector set used with ECDSA algorithms.</t>
             <t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire vector set as well as individual test vectors to be processed by the ACVP client.The following table describes the JSON elements at the top level of the hierarchy.</t>
@@ -422,6 +450,10 @@
                     <c>The public key curve point y</c>
                     <c>value</c>
                     <c>Yes</c>
+                    <c>isMessageRandomized</c>
+                    <c>Signifies all test cases within the group should utilize random message hashing as described in <xref target="SP.800-106" />.</c>
+                    <c>boolean</c>
+                    <c>Yes</c>
                     <c>tests</c>
                     <c>Array of individual test vector JSON objects, which are defined in 																																							
 							
@@ -461,6 +493,14 @@
                     <c>Yes</c>
                     <c>message</c>
                     <c>The message used to generate signature or verify signature</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>randomValue</c>
+                    <c>The random value to be used as an input into the message randomization function as described in <xref target="SP.800-106" />.</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>randomValueLen</c>
+                    <c>The random value's bit length.</c>
                     <c>value</c>
                     <c>Yes</c>
                 </texttable>
@@ -506,6 +546,14 @@
                 <c>Yes</c>
                 <c>s</c>
                 <c>The signature component S</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>randomValue</c>
+                <c>The random value to be used as an input into the message randomization function as described in <xref target="SP.800-106" />.</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>randomValueLen</c>
+                <c>The random value's bit length.</c>
                 <c>value</c>
                 <c>Yes</c>
                 <c>testPassed</c>
@@ -560,6 +608,16 @@
                         <organization>NIST</organization>
                     </author>
                     <date month="July" year="2013"/>
+                </front>
+            </reference>
+            <reference anchor="SP.800-106"
+                target="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-106.pdf">
+                <front>
+                    <title>Randomized Hashing for Digital Signatures</title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="February" year="2009"/>
                 </front>
             </reference>
         </references>
@@ -667,7 +725,10 @@
 				"SHA2-512/224",
 				"SHA2-512/256"
 			]
-		}]
+		}],
+		"conformances": [
+			"SP800-106"
+		]
 	},
 	{
 		"algorithm": "ECDSA",
@@ -709,7 +770,10 @@
 				"SHA2-512/224",
 				"SHA2-512/256"
 			]
-		}]
+		}],
+		"conformances": [
+			"SP800-106"
+		]
 	}
 ]
             ]]>
@@ -852,13 +916,25 @@
         "revision": "1.0",
         "testGroups": [
             {
-				"tgId": 1,
+                "tgId": 1,
                 "curve": "P-224",
                 "hashAlg": "SHA2-224",
                 "tests": [
                     {
                         "tcId": 1,
                         "message": "AB6F57713A3BD323B4AFDCFBE202EE00A9CF5C787D19FD9094323C57FEA8B7FBE31559EC1CAC6D29C3229A58811CF2BAE2B78183DFDABD055B741EA86496454F085D17D5BCD1B82B533B533A1E5804B2DAA0ED43F8BF59FBEB16BDD4D7C065165CB9B085CECD5BCFFA794339D5A81B1949F569CAACA208B9E3E6A217A1B3A596"
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "curve": "P-224",
+                "hashAlg": "SHA2-224",
+                "isMessageRandomized": true
+                "tests": [
+                    {
+                        "tcId": 2,
+                        "message": "23B4AFDCFBE202EE00A9CF5C787D19FD90..."
                     }
                 ]
             }
@@ -880,16 +956,30 @@
         "vsId": 1564,
         "testGroups": [
             {
-				"tgId": 1,
-				"qx": "3B1D9E4D986F651C3C213B2A1304693BDB8BA632CB93A3547B89EF31",
+                "tgId": 1,
+                "qx": "3B1D9E4D986F651C3C213B2A1304693BDB8BA632CB93A3547B89EF31",
                 "qy": "E56F7B7C9E6355E573B7B3B6C0E1ECD70E4ABDF1554EAD8A68ABA1A4",
-				"tests": [
-					{
-						"tcId": 1,
-						"r": "3E2A9588DF3D3F11B16368A30C8C34C572655BA8516AF5C914E94FF4",
-						"s": "C6E4A8C51E0A0E11C4C6D6F8F3C51A0FA440BC6FF28EBACDBB20922A"
-					}
-				]
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "r": "3E2A9588DF3D3F11B16368A30C8C34C572655BA8516AF5C914E94FF4",
+                        "s": "C6E4A8C51E0A0E11C4C6D6F8F3C51A0FA440BC6FF28EBACDBB20922A"
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "qx": "A1304693BDBA632CB93A3B8BA632CB93A3...",
+                "qy": "ECD70E4ABBA632CB93A3BA632CB93A3DF1...",
+                "tests": [
+                    {
+                        "tcId": 2,
+                        "r": "3E2A9588DF3D3F11B16368A30C8C34C572655BA8516AF5C914E94FF4",
+                        "s": "C6E4A8C51E0A0E11C4C6D6F8F3C51A0FA440BC6FF28EBACDBB20922A",
+                        "randomValue": "0A0E11C4C6D6F8F3C51..."
+                        "randomValueLen": 1024
+                    }
+                ]
             }
         ]
     }
@@ -914,7 +1004,7 @@
         "revision": "1.0",
         "testGroups": [
             {
-				"tgId": 1,
+                "tgId": 1,
                 "curve": "P-192",
                 "hashAlg": "SHA-1",
                 "tests": [
@@ -925,6 +1015,24 @@
                         "qy": "55847857E5E48025BE9053952E0E1ECFB1D883CF9F085386",
                         "r": "E31121E544D476DC3FA79B4DCB0A7252B6E80468BBF22843",
                         "s": "6E3F47F2327E36AD936E0F4BE245C05F264BA9300E9E7DD9"
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "curve": "P-192",
+                "hashAlg": "SHA-1",
+                "isMessageRandomized": true,
+                "tests": [
+                    {
+                        "tcId": 2,
+                        "message": "D38A81D04A06A8C4760AC15DB266B17B48B...",
+                        "randomValue": "1527E0FE37FD1162F5DD0D975E83C0D...",
+                        "randomValueLen": 1024
+                        "qx": "D1E896486D9D986A464D3469941F93FC65556E2CB...",
+                        "qy": "ADCB8D50375DC76907195B6AF6C06F...",
+                        "r": "6D9D986A464D3469941F93FC65556E2CB8AB5F113...",
+                        "s": "8E713EB6106EF0E19E241DB4B4831E06437E5C..."
                     }
                 ]
             }
@@ -946,13 +1054,20 @@
         "vsId": 1564,
         "testGroups": [
             {
-				"tgId": 1,
-				"tests": [
-					{
-						"tcId": 1,
-						"testPassed": false
-					}
-				]
+                "tgId": 1,
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "testPassed": false
+                    }
+                ],
+                "tgId": 2,
+                "tests" [
+                    {
+                        "tcId": 2,
+                        "testPassed": true
+                    }
+                ]
             }
         ]
     }
