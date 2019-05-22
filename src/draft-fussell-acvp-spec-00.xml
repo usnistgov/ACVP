@@ -2,6 +2,7 @@
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC3339 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml">
+<!ENTITY RFC3986 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml">
 <!ENTITY RFC5246 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml">
 <!ENTITY RFC7159 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7159.xml">
 <!ENTITY RFC7230 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7230.xml">
@@ -241,7 +242,6 @@
           purposes of internal organizational testing only MAY choose not to include some of those features.</t>
       </section>
     </section>
-
 
     <section title="Architecture">
         <t>A server/client/proxy model is used where the roles are defined as:</t>
@@ -1147,6 +1147,92 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
         </section>
       </section>
       
+      <section title="Query Parameters" anchor="query_parameters">
+        <t>Some of the resource listing operations allow for query parameters to be provided to filter out the returned
+        values. Each resource will list what properties and operations are available but the general format
+        of the query parameter string is consistent across all resources. The format allows for the specification of
+        complex filters with the concept of groups, where all elements in the same group MUST be AND'ed together and
+        different groups are OR'ed together. The URL including the parameter values MUST conform to
+          <xref target="RFC3986"/> and MUST use UTF-8 character encoding. </t>
+        <figure align="center">
+          <preamble>General format of a query parameter element.</preamble>
+          <artwork align="left"><![CDATA[
+<property>[<index>]=<operation>:<value>
+           ]]>              </artwork>
+        </figure>
+        <t>
+          <list>
+            <t>
+              <spanx style="strong">property</spanx> - is the property to be specified
+            </t>
+            <t>
+              <spanx style="strong">index</spanx> - is an arbitrary group index, elements with same group index are
+              AND'ed together and elements with different indices are OR'ed togther. <spanx style="verb">index</spanx>
+              MUST be between 0 and 99 inclusive.
+            </t>
+            <t>
+              <spanx style="strong">operation</spanx> - is an operation on a property and a value. Not all operations
+              require a value, and not all properties will permit every operation. Available operations are:
+              <list>
+                <t>
+                  <spanx style="strong">eq</spanx> - filter based on property equal to the value
+                </t>
+                <t>
+                  <spanx style="strong">ne</spanx> - filter based on the property not equal to the value
+                </t>
+                <t>
+                  <spanx style="strong">gt</spanx> - filter based on the property greater than the value
+                </t>
+                <t>
+                  <spanx style="strong">ge</spanx> - filter based on the property greater than or equal to the value
+                </t>
+                <t>
+                  <spanx style="strong">lt</spanx> - filter based on the property less than the value
+                </t>
+                <t>
+                  <spanx style="strong">le</spanx> - filter based on the property less than or equal to the value
+                </t>
+                <t>
+                  <spanx style="strong">contains</spanx> - filter based on the property containing the value
+                </t>
+                <t>
+                  <spanx style="strong">start</spanx> - filter based on the property starting with the value
+                </t>
+                <t>
+                  <spanx style="strong">end</spanx> - filter based on the property ending with the value
+                </t>
+              </list>
+            </t>
+            <t>
+              <spanx style="strong">value</spanx> - the value to filter on, it MAY be constrained based on the property
+            </t>
+          </list>
+        </t>
+        <figure align="center">
+          <preamble>Example 1</preamble>
+          <artwork align="left"><![CDATA[
+/resource?property1[0]=eq:foo&property2[0]=eq:foo
+&property1[1]=eq:test&property2[1]=ne:bar
+           ]]></artwork>
+        </figure>
+        <t>For the example above the results returned would include resources that have:
+          <spanx style="verb">property1</spanx> equal to <spanx style="verb">foo</spanx> and
+          <spanx style="verb">property2</spanx> equal to <spanx style="verb">foo</spanx> or resources that have
+          <spanx style="verb">property1</spanx> equal to <spanx style="verb">test</spanx> and
+          <spanx style="verb">property2</spanx> not equal to <spanx style="verb">bar</spanx>.
+        </t>
+        <figure align="center">
+          <preamble>Example 2 based on <xref target="vendors_get"/></preamble>
+          <artwork align="left"><![CDATA[
+/vendors?name[0]=contains:acme&name[1]=contains:test
+           ]]></artwork>
+        </figure>
+        <t>For the example above the vendor results returned would include resources that have a
+          <spanx style="verb">name</spanx> property value that
+          contains either <spanx style="verb">acme</spanx> or <spanx style="verb">test</spanx>.
+        </t>
+      </section>
+      
       <section title="Requests" anchor="requests">
         <t>Some resource operations make a request to modify or create data. To facilitate an out-of-band approval step,
           where data can be inspected to insure it meets the business requirements of the validation authority which
@@ -1293,6 +1379,22 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
           <t>Returns a paged listing of vendors. Each element in the <spanx style="verb">data</spanx> array is a
             <spanx style="verb">vendor object</spanx> as described in <xref target="vendor_get"/>. See also
             <xref target="paging_response"/> for a description of a paged response.</t>
+          <t>Available <xref target="query_parameters">Query Parameters</xref>:
+            <list>
+              <t><spanx style="strong">name</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">start</spanx>,
+                 <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">website</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">email</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">start</spanx>,
+                <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">phoneNumber</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+            </list>
+          </t>
         </section>
         <section anchor="vendors_post" title="Create a New Vendor">
           <t>
@@ -1542,6 +1644,23 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
           <t>Returns a paged listing of persons. Each element in the <spanx style="verb">data</spanx> array is a
             <spanx style="verb">person object</spanx> as described in <xref target="person_get"/>. See also
             <xref target="paging_response"/> for a description of a paged response.</t>
+          <t>Available <xref target="query_parameters">Query Parameters</xref>:
+            <list>
+              <t><spanx style="strong">fullName</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">start</spanx>,
+                <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">email</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">start</spanx>,
+                <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">phoneNumber</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">vendorId</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">ne</spanx>, <spanx style="verb">lt</spanx>, <spanx style="verb">le</spanx>,
+                <spanx style="verb">gt</spanx>, <spanx style="verb">ge</spanx>
+              </t>
+            </list>
+          </t>
         </section>
         <section anchor="persons_post" title="Create a New Person">
           <t>
@@ -1721,6 +1840,28 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
           <t>Returns a paged listing of modules. Each element in the <spanx style="verb">data</spanx> array is a
             <spanx style="verb">module object</spanx> as described in <xref target="module_get"/>. See also
             <xref target="paging_response"/> for a description of a paged response.</t>
+          <t>Available <xref target="query_parameters">Query Parameters</xref>:
+            <list>
+              <t><spanx style="strong">name</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">start</spanx>,
+                <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">version</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">website</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">type</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">ne</spanx>
+              </t>
+              <t><spanx style="strong">vendorId</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">ne</spanx>, <spanx style="verb">lt</spanx>, <spanx style="verb">le</spanx>,
+                <spanx style="verb">gt</spanx>, <spanx style="verb">ge</spanx>
+              </t>
+              <t><spanx style="strong">description</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+            </list>
+          </t>
         </section>
         <section anchor="modules_post" title="Register a new Module">
           <t>
@@ -1848,6 +1989,13 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
             <spanx style="verb">data</spanx> array is a <spanx style="verb">operational environment object</spanx> as
             described in <xref target="oe_get"/>. See also <xref target="paging_response"/> for a description of a paged
             response.
+          </t>
+          <t>Available <xref target="query_parameters">Query Parameters</xref>:
+            <list>
+              <t><spanx style="strong">name</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">start</spanx>,
+                <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+            </list>
           </t>
         </section>
         <section anchor="oes_post" title="Create a new Operational Environment">
@@ -1993,6 +2141,19 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
           <t>Returns a paged listing of available dependencies. Each element in the <spanx style="verb">data</spanx>
             array is a <spanx style="verb">dependency object</spanx> as described in <xref target="dependency_get"/>.
             See also <xref target="paging_response"/> for a description of a paged response.</t>
+          <t>Available <xref target="query_parameters">Query Parameters</xref>:
+            <list>
+              <t><spanx style="strong">name</spanx>: <spanx style="verb">eq</spanx>, <spanx style="verb">start</spanx>,
+                <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">type</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+              <t><spanx style="strong">description</spanx>: <spanx style="verb">eq</spanx>,
+                <spanx style="verb">start</spanx>, <spanx style="verb">end</spanx>, <spanx style="verb">contains</spanx>
+              </t>
+            </list>
+          </t>
         </section>
         <section anchor="dependencies_post" title="Register a new Dependency">
           <t>
@@ -3136,11 +3297,11 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
     <references title="Normative References">
       &RFC2119;
       &RFC3339;
+      &RFC3986;
       &RFC5246;
       &RFC7159;
       &RFC7230;
       &RFC7519;
-
       </references>
     <references title="Informative References">
       <reference anchor="acvp-iana" target="https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-vassilev-acvp-iana-00.txt">      
