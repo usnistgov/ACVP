@@ -85,7 +85,7 @@ Table of Contents
    6.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  14
      6.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  15
      6.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  16
-   7.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  18
+   7.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  17
    8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  19
    9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  20
    10. Security Considerations . . . . . . . . . . . . . . . . . . .  20
@@ -743,8 +743,8 @@ Internet-Draft                Sym Alg JSON                     June 2016
    |           | conformance SHALL generate     |           |          |
    |           | additional test groups,        |           |          |
    |           | denoted with a group level     |           |          |
-   |           | property of                    |           |          |
-   |           | "isMessageRandomized".         |           |          |
+   |           | property of `"conformance":    |           |          |
+   |           | "SP800-106"`.                  |           |          |
    +-----------+--------------------------------+-----------+----------+
 
                          Table 8: DSA Conformances
@@ -842,38 +842,35 @@ Fussell                 Expires December 3, 2016               [Page 15]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   +---------------------+------------------------+---------+----------+
-   | JSON Value          | Description            | JSON    | Optional |
-   |                     |                        | type    |          |
-   +---------------------+------------------------+---------+----------+
-   | l                   | Length in bits of      | value   | No       |
-   |                     | prime modulus p        |         |          |
-   | n                   | Length in bits of      | value   | No       |
-   |                     | prime divisor q        |         |          |
-   | p                   | Domain parameter P     | value   | Yes      |
-   | q                   | Domain parameter Q     | value   | Yes      |
-   | g                   | Domain parameter G     | value   | Yes      |
-   | x                   | Private key X          | value   | Yes      |
-   | y                   | Public key Y           | value   | Yes      |
-   | hashAlg             | The hash algorithm     | value   | No       |
-   |                     | used in the test group |         |          |
-   | pqMode              | The specific pq        | value   | No       |
-   |                     | generation mode used   |         |          |
-   |                     | in the test group      |         |          |
-   | gMode               | The specific g         | value   | No       |
-   |                     | generation mode used   |         |          |
-   |                     | in the test group      |         |          |
-   | isMessageRandomized | Signifies all test     | boolean | Yes      |
-   |                     | cases within the group |         |          |
-   |                     | should utilize random  |         |          |
-   |                     | message hashing as     |         |          |
-   |                     | described in           |         |          |
-   |                     | [SP.800-106].          |         |          |
-   | tests               | Array of individual    | array   | No       |
-   |                     | test vector JSON       |         |          |
-   |                     | objects, which are     |         |          |
-   |                     | defined in Section 6.2 |         |          |
-   +---------------------+------------------------+---------+----------+
+   +-------------+----------------------------+-------------+----------+
+   | JSON Value  | Description                | JSON type   | Optional |
+   +-------------+----------------------------+-------------+----------+
+   | l           | Length in bits of prime    | value       | No       |
+   |             | modulus p                  |             |          |
+   | n           | Length in bits of prime    | value       | No       |
+   |             | divisor q                  |             |          |
+   | p           | Domain parameter P         | value       | Yes      |
+   | q           | Domain parameter Q         | value       | Yes      |
+   | g           | Domain parameter G         | value       | Yes      |
+   | x           | Private key X              | value       | Yes      |
+   | y           | Public key Y               | value       | Yes      |
+   | hashAlg     | The hash algorithm used in | value       | No       |
+   |             | the test group             |             |          |
+   | pqMode      | The specific pq generation | value       | No       |
+   |             | mode used in the test      |             |          |
+   |             | group                      |             |          |
+   | gMode       | The specific g generation  | value       | No       |
+   |             | mode used in the test      |             |          |
+   |             | group                      |             |          |
+   | Conformance | Signifies all test cases   | "SP800-106" | Yes      |
+   |             | within the group should    |             |          |
+   |             | utilize random message     |             |          |
+   |             | hashing as described in    |             |          |
+   |             | [SP.800-106].              |             |          |
+   | tests       | Array of individual test   | array       | No       |
+   |             | vector JSON objects, which |             |          |
+   |             | are defined in Section 6.2 |             |          |
+   +-------------+----------------------------+-------------+----------+
 
                     Table 10: Vector Group JSON Object
 
@@ -890,6 +887,9 @@ Internet-Draft                Sym Alg JSON                     June 2016
    +----------------+-----------------------------+---------+----------+
    | tcId           | Numeric identifier for the  | value   | No       |
    |                | test case, unique across    |         |          |
+   |                | the entire vector set.      |         |          |
+   | p              | The prime modulus           | value   | Yes      |
+   | q              | The prime divisor of p - 1  | value   | Yes      |
 
 
 
@@ -898,9 +898,6 @@ Fussell                 Expires December 3, 2016               [Page 16]
 Internet-Draft                Sym Alg JSON                     June 2016
 
 
-   |                | the entire vector set.      |         |          |
-   | p              | The prime modulus           | value   | Yes      |
-   | q              | The prime divisor of p - 1  | value   | Yes      |
    | domainSeed     | The seed used to generate p | value   | Yes      |
    |                | and q in the probable       |         |          |
    |                | method                      |         |          |
@@ -942,9 +939,12 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
                       Table 11: Test Case JSON Object
 
+7.  Test Vector Responses
 
-
-
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
 
 
 
@@ -953,13 +953,6 @@ Fussell                 Expires December 3, 2016               [Page 17]
 
 Internet-Draft                Sym Alg JSON                     June 2016
 
-
-7.  Test Vector Responses
-
-   After the ACVP client downloads and processes a vector set, it must
-   send the response vectors back to the ACVP server.  The following
-   table describes the JSON object that represents a vector set
-   response.
 
    +-------------+---------------------------------------------+-------+
    | JSON Value  | Description                                 | JSON  |
@@ -977,6 +970,13 @@ Internet-Draft                Sym Alg JSON                     June 2016
 
    The following table describes the JSON object that represents a
    vector set response for DSA.
+
+
+
+
+
+
+
 
 
 
@@ -1989,7 +1989,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
                 "l": 2048,
                 "n": 224,
                 "sha": "SHA-1",
-                "isMessageRandomized": true,
+                "conformance": "SP800-106",
                 "tests": [
                     {
                         "tcId": 2,
@@ -2104,7 +2104,7 @@ Internet-Draft                Sym Alg JSON                     June 2016
             "q": "1F855467465A653D2245B7E31C910A18EF79...",
             "g": "F098ACF73BFC43B1B5E7BFB065FBBDDD6B8E...",
             "hashAlg": "SHA-1",
-            "isMessageRandomized": true,
+            "conformance": "SP800-106",
             "tests": [
               {
                 "tcId": 2,
