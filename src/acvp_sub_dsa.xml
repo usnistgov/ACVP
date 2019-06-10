@@ -160,6 +160,9 @@
                             The ACVP server SHALL allow for the testing of the validity of domain parameters.  Key pair generation testing SHALL be provided by
                             the ACVP server. Both Signature Generation and Validation testing mechanmisms SHALL be provided by the ACVP server.
                           </t>
+                          <t>
+                            SP800-106 - (3) Randomized Hashing and (4) Digital Signatures Using Randomized Hashing.  The IUT SHALL be provided or provide a random value that should be used to "randomize" a message prior to signing and/or verifying an original message.
+                          </t>
                         </list>
                     </t>
                 </section>
@@ -175,6 +178,9 @@
                             of ACVP server testing.  Though the ACVP server SHALL support a variety of parameter sizes/hash functions, the IUT's selection of these is out of scope of testing.
                             The ACVP server MAY provide testing for the validity of domain parameters, but testing SHALL NOT provide assurances the IUT has validated a set of domain parameters prior to their use.
                             Domain parameter and key pair management SHALL NOT be within scope of ACVP testing.
+                          </t>
+                          <t>
+                          SP800-106 - 3.3 The Random Value. DSA, ECDSA, and RSA have random values generated as per their signing process, this random value can be used as the input to the message randomization function, doing so however is out of scope of this testing.
                           </t>
                         </list>
                     </t>
@@ -255,6 +261,15 @@
                         <xref target="supported_modes" />
                     </c>
                     <c>No</c>
+                    <c>conformances</c>
+                    <c>Used to denote the conformances that can apply to specific modes of DSA.</c>
+                    <c>Array of strings</c>
+                    <c>See                                                                                     
+
+                        
+                        <xref target="supported_conformances" />
+                    </c>
+                    <c>Yes</c>
                 </texttable>
             </section>
             <section anchor="supported_modes" title="Supported DSA Modes Capabilities">
@@ -429,6 +444,19 @@
                 </section>
             </section>
         </section>
+        <section anchor="supported_conformances" title="Supported DSA Conformances">
+            <t>Conformances MAY be used to test additional features of certain algorithms.</t>
+            <texttable anchor="conformances_table" title="DSA Conformances">
+                            <ttcol align="left">String Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">Valid algorithm modes</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>SP800-106</c>
+                            <c>This conformance signifies the SigGen and/or SigVer modes support randomized message hashing as described in <xref target="SP.800-106"/>. Utilizing this conformance SHALL generate additional test groups, denoted with a group level property of `"conformance": "SP800-106"`.</c>
+                            <c>SigGen, SigVer</c>
+                            <c>Yes</c>
+                        </texttable>
+        </section>
         <section anchor="test_vectors" title="Test Vectors">
             <t>The ACVP server provides test vectors to the ACVP client, which are then processed and returned to the ACVP server for validation. A typical ACVP validation session would require multiple test vector sets to be downloaded and processed by the ACVP client. Each test vector set represents an individual DSA function. This section describes the JSON schema for a test vector set used with DSA algorithms.</t>
             <t>The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire vector set as well as individual test vectors to be processed by the ACVP client.The following table describes the JSON elements at the top level of the hierarchy. </t>
@@ -507,6 +535,10 @@
                     <c>The specific g generation mode used in the test group</c>
                     <c>value</c>
                     <c>No</c>
+                    <c>Conformance</c>
+                    <c>Signifies all test cases within the group should utilize random message hashing as described in <xref target="SP.800-106" />.</c>
+                    <c>"SP800-106"</c>
+                    <c>Yes</c>
                     <c>tests</c>
                     <c>Array of individual test vector JSON objects, which are defined in                                                                                             
               
@@ -592,6 +624,14 @@
                     <c>The message used to generate signature or verify signature</c>
                     <c>value</c>
                     <c>Yes</c>
+                    <c>randomValue</c>
+                    <c>The random value to be used as an input into the message randomization function as described in <xref target="SP.800-106" />.</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c>randomValueLen</c>
+                    <c>The random value's bit length.</c>
+                    <c>value</c>
+                    <c>Yes</c>
                 </texttable>
             </section>
         </section>
@@ -669,6 +709,14 @@
                 <c>The counter used to generate q in the provable method</c>
                 <c>value - integer</c>
                 <c>Yes</c>
+                <c>randomValue</c>
+                <c>The random value to be used as an input into the message randomization function as described in <xref target="SP.800-106" />.</c>
+                <c>value</c>
+                <c>Yes</c>
+                <c>randomValueLen</c>
+                <c>The random value's bit length.</c>
+                <c>value</c>
+                <c>Yes</c>
                 <c>testPassed</c>
                 <c>The pass or fail result of the verify</c>
                 <c>boolean</c>
@@ -721,6 +769,16 @@
                         <organization>NIST</organization>
                     </author>
                     <date month="July" year="2013"/>
+                </front>
+            </reference>
+            <reference anchor="SP.800-106"
+                target="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-106.pdf">
+                <front>
+                    <title>Randomized Hashing for Digital Signatures</title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="February" year="2009"/>
                 </front>
             </reference>
         </references>
@@ -971,6 +1029,9 @@
 					"SHA2-512/256"
 				]
 			}
+		],
+		"conformances": [
+			"SP800-106"
 		]
 	},
 	{
@@ -1038,6 +1099,9 @@
 					"SHA2-512/256"
 				]
 			}
+		],
+		"conformances": [
+			"SP800-106"
 		]
 	}
 ]
@@ -1422,6 +1486,19 @@
                         "message": "C1FEBB069145F6A9693A2EEAD3A4771743725113B173576429DFA1B95CD577C29ADAD1DBF82CCA583578DBB4EAB237BE10553C701A647492D9B4325C9E2C2245EF199D0A63876C7FE26C78260631185B3B40E57F1A66DC37E4346365ABADC5AD9FE1E6030E73FEF5D456D7F79C59C73D19DE0963D9C126D51DAB7E627D41D6B963147FCD6E323A45A3BF40403CFAE36397E0A6826629C21EAF553649B8A2B4159713F180BC5E1DC061708C9CE0D52A53F5370432566ECD55953C2C8CF29BB5305B2116674DD99A9B12FDF1347E585BDCE128E46ED31036AE7B3F5957FA30BD52A40BF43BB20C7CD9A5D8428D1D4895EF9427BDB0ED5A3C4F5CC874CAB2407455"
                     }
                 ]
+            },
+            {
+                "tgId": 2,
+                "l": 2048,
+                "n": 224,
+                "sha": "SHA-1",
+                "conformance": "SP800-106",
+                "tests": [
+                    {
+                        "tcId": 2,
+                        "message": "C1FEBB069145F6A9693A2EEAD3A4771743725113B173576429DFA1B95CD577C29ADAD1DBF82CCA583578DBB4EAB237BE10553C701A647492D9B4325C9E2C2245EF199D0A63876C7FE26C78260631185B3B40E57F1A66DC37E4346365ABADC5AD9FE1E6030E73FEF5D456D7F79C59C73D19DE0963D9C126D51DAB7E627D41D6B963147FCD6E323A45A3BF40403CFAE36397E0A6826629C21EAF553649B8A2B4159713F180BC5E1DC061708C9CE0D52A53F5370432566ECD55953C2C8CF29BB5305B2116674DD99A9B12FDF1347E585BDCE128E46ED31036AE7B3F5957FA30BD52A40BF43BB20C7CD9A5D8428D1D4895EF9427BDB0ED5A3C4F5CC874CAB2407455"
+                    }
+                ]
             }
         ]
     }
@@ -1433,28 +1510,38 @@
                 <figure>
                     <artwork>
                         <![CDATA[
-[
-    {
-        "acvVersion": <acvp-version>
+[{
+        "acvVersion": ""
     },
     {
         "vsId": 1564,
-        "testGroups": [
-        {
-          "tgId": 1,
-          "p": "C8DC6C77CC31ADAE68F3221D59C75538F6956517FF915B96939D0355D3AE7D00789EDDFF13C6707CFAC855EE79FC5A25F7243FF8D6FAD5E89CC799FB275ADB2A6F573FDF69FBF3C3C358C51E229B7799D78416F33F2F20420F35BDABB967435C78EFE843BADF4D93A65538B54723BBF1489D20482A295224CA870EE7F65BC7A17611221D58DB4B51D9C32A359D93032DD97942E8042EC4458D1E78B97D783D14243AEFDE455ED9AEC1925FE49E4B2A9B2160D710CCBEA6BC679E2A2A5307F5CD6B7C8E1078E83DF39A636ACE7E6EED18FBDC56ED89AC21B2ED133566D4696609E0AD0C95DC776893AB71AC9E223CE318CE26FBAE29B812075975F6B73DAF3529",
-          "q": "B1B7BCF2467F8CC46FCDD2A41327C2698D9E0A3F36682E17546EAE5B",
-          "g": "6C07130A6F6D05AAC9350936EE06B1303035FE460CEBF21DDA00CC08CD5E8A788D8C3F6B4B0A567A82DBF373CE36A40ADCF77D0CB6CA9AB93D1C0051E354AEB27BBC808A4950E91E2BFFFEF7427DBEA5E05BC9A3C003F6796C0A3EF3CF7D30378657A0966AE952BDC038645199F3C2FBBFD0B4E6E489E97D6DF8A9AD4356B34A3CD289DF9BA53F95A62E110B2BA84D668D7F72EA6CA471B6624F0F2E5CB54C9E96367CD4659BC64EC731B7F60CE0F08B58CFB29090DBDE6BDD7EC16689A9CC3913F3F009E03280342150C0899814532F471594C883B3941ADA81EB95274BB0B8900C492D92AD5686141DBB302DD2C2B4EEA8C2C7AD9B616DF0A520B9CCF7074F",
-          "y": "79143F63ECCC06B3D35C61DA2FB8ED359F8FBF014D699C3B6E150E60443BA461C256498F52262AD3850FECDA5F01F4702F5411BF25F0D9A4CF21F9B84B8FEF8C5E83563A1AE35C253D07011E5492106F46C7DF2624948E3662DAC129E5A094A6180F24480D3FFBD2F223156E68EBD6378ECBA010DF0CB6B3DD12045D8015E66160821AF5A12C8FE239AB331EBCDE6B906A40197769A74780700420C40428A81FBDEB94B9FE37183E9401167AFF6AEAE9968A6FBD11AFB3EB60ED076627CC2873EA2034BAEF2427C1BABF858D4E783B0FE3C51B39661EFBD9518F93A554E5E37428AFC62CF0C61A3B9248B56BBA0282E9BB7A8A6FB14D2CA4AAA9DC3245722525",
-          "tests": [
-            {
-              "tcId": 1,
-              "r": "4E7F70A92EC0E6871E2EA27585C0263E2AF539D5F1402A24E01FDB4B",
-              "s": "641A74C54A0B642DED9FE6EEA311299F4FC759CA98D6EC339A823314"
+        "testGroups": [{
+                "tgId": 1,
+                "p": "C8DC6C77CC31ADAE68F3221D59C75538F6956517FF915B96939D0355D3AE7D00789EDDFF13C6707CFAC855EE79FC5A25F7243FF8D6FAD5E89CC799FB275ADB2A6F573FDF69FBF3C3C358C51E229B7799D78416F33F2F20420F35BDABB967435C78EFE843BADF4D93A65538B54723BBF1489D20482A295224CA870EE7F65BC7A17611221D58DB4B51D9C32A359D93032DD97942E8042EC4458D1E78B97D783D14243AEFDE455ED9AEC1925FE49E4B2A9B2160D710CCBEA6BC679E2A2A5307F5CD6B7C8E1078E83DF39A636ACE7E6EED18FBDC56ED89AC21B2ED133566D4696609E0AD0C95DC776893AB71AC9E223CE318CE26FBAE29B812075975F6B73DAF3529",
+                "q": "B1B7BCF2467F8CC46FCDD2A41327C2698D9E0A3F36682E17546EAE5B",
+                "g": "6C07130A6F6D05AAC9350936EE06B1303035FE460CEBF21DDA00CC08CD5E8A788D8C3F6B4B0A567A82DBF373CE36A40ADCF77D0CB6CA9AB93D1C0051E354AEB27BBC808A4950E91E2BFFFEF7427DBEA5E05BC9A3C003F6796C0A3EF3CF7D30378657A0966AE952BDC038645199F3C2FBBFD0B4E6E489E97D6DF8A9AD4356B34A3CD289DF9BA53F95A62E110B2BA84D668D7F72EA6CA471B6624F0F2E5CB54C9E96367CD4659BC64EC731B7F60CE0F08B58CFB29090DBDE6BDD7EC16689A9CC3913F3F009E03280342150C0899814532F471594C883B3941ADA81EB95274BB0B8900C492D92AD5686141DBB302DD2C2B4EEA8C2C7AD9B616DF0A520B9CCF7074F",
+                "y": "79143F63ECCC06B3D35C61DA2FB8ED359F8FBF014D699C3B6E150E60443BA461C256498F52262AD3850FECDA5F01F4702F5411BF25F0D9A4CF21F9B84B8FEF8C5E83563A1AE35C253D07011E5492106F46C7DF2624948E3662DAC129E5A094A6180F24480D3FFBD2F223156E68EBD6378ECBA010DF0CB6B3DD12045D8015E66160821AF5A12C8FE239AB331EBCDE6B906A40197769A74780700420C40428A81FBDEB94B9FE37183E9401167AFF6AEAE9968A6FBD11AFB3EB60ED076627CC2873EA2034BAEF2427C1BABF858D4E783B0FE3C51B39661EFBD9518F93A554E5E37428AFC62CF0C61A3B9248B56BBA0282E9BB7A8A6FB14D2CA4AAA9DC3245722525",
+                "tests": [{
+                    "tcId": 1,
+                    "r": "4E7F70A92EC0E6871E2EA27585C0263E2AF539D5F1402A24E01FDB4B",
+                    "s": "641A74C54A0B642DED9FE6EEA311299F4FC759CA98D6EC339A823314"
+                }]
             },
-          ]
+            {
+                "tgId": 2,
+                "p": "77CC31ADAE68F3221D59C75538F6...",
+                "q": "82E17546E564816AFB54987C879A...",
+                "g": "B1303035FE460CEBF21DDA00CC08...",
+                "y": "D699C3B6E150E60443BA461C2564...",
+                "tests": [{
+                    "tcId": 2,
+                    "r": "4E7F70A92EC0E6871E2EA27585C0263E2AF539D5F1402A24E01FDB4B",
+                    "s": "641A74C54A0B642DED9FE6EEA311299F4FC759CA98D6EC339A823314",
+                    "randomValue": "23678643ACB7283497...",
+                    "randomValueLen": 1024
+                }]
+            }
         ]
-      }
     }
 ]
           ]]>
@@ -1493,6 +1580,27 @@
                 "s": "26BE6EFDCD2ED6946BFCFE2D396AB3A2E84B2FF8"
               },
             ]
+          },
+          {
+            "tgId": 2,
+            "l": 1024,
+            "n": 160,
+            "p": "66F108D370A2A9E87DBD49BC09A27017621A...",
+            "q": "1F855467465A653D2245B7E31C910A18EF79...",
+            "g": "F098ACF73BFC43B1B5E7BFB065FBBDDD6B8E...",
+            "hashAlg": "SHA-1",
+            "conformance": "SP800-106",
+            "tests": [
+              {
+                "tcId": 2,
+                "message": "A0F409909E31C2C23BB7A24B8103F11F...",
+                "randomValue": "DB0D25A72C8DEFA0F409909E31C2..."
+                "randomValueLen": 1024,
+                "y": "A3A284CB56F3A0EF37749B5EA4D2EC824ED5E7EAD481BE520B...",
+                "r": "15FE6F6DAEFD42CD5FA7444221CB545BB0CDB95DC9D76E0...",
+                "s": "B9AF193E6832934537B0B05D177BA8F7DA48D9DD84D27B8AFE9..."
+              },
+            ]
           }
         ]
     }
@@ -1516,6 +1624,10 @@
               "tests": [
                 {
                   "tcId": 1,
+                  "testPassed": true
+                },
+                {
+                  "tcId": 2,
                   "testPassed": true
                 }
               ]
