@@ -9,7 +9,7 @@ Expires: May 5, 2019
 
 
           ACVP Secure Hash Algorithm (SHA) JSON Specification
-                       draft-ietf-acvp-subsha-1.0
+                       draft-ietf-acvp-subsha-01
 
 Abstract
 
@@ -79,7 +79,7 @@ Table of Contents
      5.6.  Security Considerations . . . . . . . . . . . . . . . . .   9
    6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      6.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
-     6.2.  Informative References  . . . . . . . . . . . . . . . . .   9
+     6.2.  Informative References  . . . . . . . . . . . . . . . . .  10
    Appendix A.  Example Secure Hash Capabilities JSON Object . . . .  10
    Appendix B.  Example Test Vectors JSON Object . . . . . . . . . .  10
    Appendix C.  Example Test Results JSON Object . . . . . . . . . .  13
@@ -87,7 +87,7 @@ Table of Contents
 
 1.  Introduction
 
-   The Automated Cryptographic Validation Protocol (ACVP) defines a
+   The Automated Cryptographic Validation Protocol [ACVP] defines a
    mechanism to automatically verify the cryptographic implementation of
    a software or hardware cryptographic module.  The intention of the
    protocol is to minimize human involvement in the testing of
@@ -149,7 +149,7 @@ Internet-Draft                Sym Alg JSON                 November 2018
 
    o  "AFT" - Algorithm Functional Test.  These tests can be processed
       by the client using a normal 'hash' operation.  AFTs cause the
-      implementation under test to exercise nomral operations on a
+      implementation under test to exercise normal operations on a
       single block, multiple blocks, or partial blocks.  In all cases,
       random data is used.  The functional tests are designed to verify
       that the logical components of the hash function (block chunking,
@@ -176,7 +176,7 @@ Internet-Draft                Sym Alg JSON                 November 2018
 
 3.1.  Monte Carlo tests for SHA-1 and SHA-2
 
-   The MCTs start with an initial condition (SEED which is a single
+   The MCTs start with an initial condition (SEED, which is a single
    message) and perform a series of chained computations.
 
    The algorithm is shown in Figure 1.
@@ -184,12 +184,13 @@ Internet-Draft                Sym Alg JSON                 November 2018
                      SHA-1 and SHA-2 Monte Carlo Test
 
 
-   For j = 0 to 99
-   MD[0] = MD[1] = MD[2] = SEED
-           For i = 3 to 1003
-                   MSG[i] = MD[i-3] || MD[i-2] || MD[i-1]
-                   MD[i] = SHA(MSG[i])
-           Output MD[1002]
+   For i = 0 to 99
+     MD[0] = MD[1] = MD[2] = SEED
+     For j = 3 to 1002
+       MSG[j] = MD[j-3] || MD[j-2] || MD[j-1]
+       MD[j] = SHA(MSG[j])
+     SEED = MD[1002]
+     Output SEED
 
 
                                  Figure 1
@@ -220,7 +221,6 @@ Internet-Draft                Sym Alg JSON                 November 2018
 
 
 
-
 Celi                       Expires May 5, 2019                  [Page 4]
 
 Internet-Draft                Sym Alg JSON                 November 2018
@@ -241,7 +241,7 @@ Internet-Draft                Sym Alg JSON                 November 2018
    individual JSON object defined in this section.  The 'algorithms'
    value MUST be part of the 'capability_exchange' element of the ACVP
    JSON registration message.  See the ACVP Protocol Specification
-   Section XXX for details on the registration message.  Each hash
+   Section 11.15.2 for details on the registration message.  Each hash
    algorithm capability advertised SHALL be a self-contained JSON
    object.
 
@@ -312,7 +312,7 @@ Internet-Draft                Sym Alg JSON                 November 2018
 
 5.1.  Test Groups
 
-   Test vector sets MUST contain one or many test groups, each sharing
+   Test vector sets MUST contain one or more test groups, each sharing
    similar properties.  For instance, all test vectors that use the same
    testType would be grouped together.  The testGroups element at the
    top level of the test vector JSON object SHALL be the array of test
@@ -370,8 +370,8 @@ Internet-Draft                Sym Alg JSON                 November 2018
    +---------+-----------------------------------------------+---------+
    | tcId    | Numeric identifier for the test case, unique  | integer |
    |         | across the entire vector set.                 |         |
-   | len     | Length of the message or MCT seed             | integer |
-   | msg     | Value of the message or MCT seed in big-      | integer |
+   | len     | Length, bits, of the message or MCT seed      | integer |
+   | msg     | Value of the message or MCT seed in big-      | string  |
    |         | endian hex                                    |         |
    +---------+-----------------------------------------------+---------+
 
@@ -394,17 +394,16 @@ Celi                       Expires May 5, 2019                  [Page 7]
 Internet-Draft                Sym Alg JSON                 November 2018
 
 
-   +-------------+-----------------------------------------+-----------+
-   | JSON Value  | Description                             | JSON type |
-   +-------------+-----------------------------------------+-----------+
-   | acvVersion  | Protocol version identifier             | string    |
-   | vsId        | Unique numeric identifier for the       | integer   |
-   |             | vector set                              |           |
-   | testResults | Array of JSON objects that represent    | array of  |
-   |             | each test vector result, which uses the | testGroup |
-   |             | same JSON schema as defined in Section  | objects   |
-   |             | 5.2                                     |           |
-   +-------------+-----------------------------------------+-----------+
+   +------------+-------------------------------------+----------------+
+   | JSON Value | Description                         | JSON type      |
+   +------------+-------------------------------------+----------------+
+   | acvVersion | Protocol version identifier         | string         |
+   | vsId       | Unique numeric identifier for the   | integer        |
+   |            | vector set                          |                |
+   | testGroups | Array of JSON objects that          | array of       |
+   |            | represent the results of each test  | testGroup      |
+   |            | group.                              | objects        |
+   +------------+-------------------------------------+----------------+
 
                  Table 5: Vector Set Response JSON Object
 
@@ -445,24 +444,28 @@ Internet-Draft                Sym Alg JSON                 November 2018
 
 
 
+
 Celi                       Expires May 5, 2019                  [Page 8]
 
 Internet-Draft                Sym Alg JSON                 November 2018
 
 
-   +--------------+-------------------------------------+--------------+
-   | JSON Value   | Description                         | JSON type    |
-   +--------------+-------------------------------------+--------------+
-   | tcId         | Numeric identifier for the test     | integer      |
-   |              | case, unique across the entire      |              |
-   |              | vector set.                         |              |
-   | md           | The IUT's message digest response   | string (hex) |
-   |              | to an AFT test                      |              |
-   | resultsArray | Array of JSON objects that          | array of     |
-   |              | represent each iteration of an MCT. | objects      |
-   |              | Each iteration will contain the msg | containing   |
-   |              | and md                              | the md       |
-   +--------------+-------------------------------------+--------------+
+   +--------------+------------------------------------------+---------+
+   | JSON Value   | Description                              | JSON    |
+   |              |                                          | type    |
+   +--------------+------------------------------------------+---------+
+   | tcId         | Numeric identifier for the test case,    | integer |
+   |              | unique across the entire vector set.     |         |
+   | md           | The IUT's message digest response to an  | string  |
+   |              | AFT test, hex encoded. (Omitted for non- | (hex)   |
+   |              | AFT test cases.)                         |         |
+   | resultsArray | Array of JSON objects that represent     | array   |
+   |              | each iteration of an MCT. Each element   | of 100  |
+   |              | contains a single key, "md", whose value | objects |
+   |              | is the hex encoded output of that        |         |
+   |              | iteration. (Omitted for non-MCT test     |         |
+   |              | cases.)                                  |         |
+   +--------------+------------------------------------------+---------+
 
                   Table 7: Test Case Results JSON Object
 
@@ -493,10 +496,7 @@ Internet-Draft                Sym Alg JSON                 November 2018
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
 
-6.2.  Informative References
 
-   [FIPS-180-4]
-              NIST, "Secure Hash Standard (SHS)", August 2015.
 
 
 
@@ -506,8 +506,10 @@ Celi                       Expires May 5, 2019                  [Page 9]
 Internet-Draft                Sym Alg JSON                 November 2018
 
 
-   [SHAVS]    Lawrence E. Bassham III, LEB., "The Secure Hash Algorithm
-              Validation System (SHAVS)", 2014.
+6.2.  Informative References
+
+   [FIPS-180-4]
+              NIST, "Secure Hash Standard (SHS)", August 2015.
 
 Appendix A.  Example Secure Hash Capabilities JSON Object
 
@@ -529,8 +531,6 @@ Appendix B.  Example Test Vectors JSON Object
    message is represented as "80".  This complies with SHA1 and SHA2
    being big-endian by nature.  All hex strings associated with SHA1 and
    SHA2 will be big-endian.
-
-
 
 
 
@@ -618,29 +618,29 @@ Celi                       Expires May 5, 2019                 [Page 11]
 Internet-Draft                Sym Alg JSON                 November 2018
 
 
-[
-  { "acvVersion": <acvp-version> },
-  { "vsId": 1564,
-    "algorithm": "SHA2-256",
-    "revision": "1.0",
-    "testGroups": [
-    {
-      "testType": "AFT",
-      "tests": [
-      {
-        "tcId": 2170,
-        "len": 1304,
-        "msg": "7f65733c73c6d9b06838ca3fd3f0fed4c642c58bba59ed0c8b2ae618c4aa24611d3fc59f427574e0d6f38d1fb8ad8119855b7d5c5e2946a1ebb0685b9f258f903ed035e89dc07d04aabe5f10ab7f069ccb1e76a7d2c972fd34ba9dc44d68df51ebff0a400d0ebec3ea808a3a35ce5304a073fa959f9f39c96e2fce7855dddc4b2bb48ece19c8fdc6a02354c4dd0232fa0c424f4e4c1563ada1f943a23feb4d2706d707"
-      },
-      {
-        "tcId": 2171,
-        "len": 2096,
-        "msg": "e2c3b1a24fbc47a05acbc950e3a32baa968ea1e2610fb2322bc68ed9c395a1641601682ca6db8420371f0dc4cb1c287ad1d5dc019aa8213b0c2d3a339a61455e74041121fa3f2f94778a4c860ccdbec1eac55c8ec4aa937c850fb65e3e0996936293538a3531718482d42e9c8cfe13054826ca94c95e2f7efc33a96295d5bb8a4978d66e3ef97279c0c55d1035f752d153c0cd18900c1ec8da62bc48890cddcb927943d5fddf59fb99247eeaeeffa1aa735b0e2401fc87e28864971701f823dfa35f42c75a2b4f9075bb3c309e5f281a10be34bf047593556c01e1d7e4dfb64de6f17a4d3d247bc2bc503cec2f6011a892b2e8f281c16aa8f00143901c0abd9dc1f9946e8e13"
-        }],
-        "tgId": 1
-    }]
-  }
-]
+   [
+     { "acvVersion": <acvp-version> },
+     { "vsId": 1564,
+       "algorithm": "SHA2-256",
+       "revision": "1.0",
+       "testGroups": [
+       {
+         "testType": "AFT",
+         "tests": [
+         {
+           "tcId": 2170,
+           "len": 1304,
+           "msg": "7f65733c...706d707"
+         },
+         {
+           "tcId": 2171,
+           "len": 2096,
+           "msg": "e2c3b1a2...946e8e13"
+           }],
+           "tgId": 1
+       }]
+     }
+   ]
 
 
    The following is an example JSON object for secure hash Monte Carlo
@@ -680,46 +680,46 @@ Appendix C.  Example Test Results JSON Object
    sent from the crypto module to the ACVP server.
 
 
-[
-  { "acvVersion": <acvp-version> },
-  { "vsId": 1564,
-    "testResults": [
-    {
-      "tcId": 2170,
-      "md": "7115011d389f379798455039d5da962a077d1620d52d7e983af9b49e3c4283f3"
-    },
-    {
-      "tcId": 2171,
-      "md": "79820a5256eb1371cf8bc94fa17eaedc25aa5d28ae8706cbf77b9a6e3a79acd5"
-    }]
-  }
-]
+   [
+     { "acvVersion": <acvp-version> },
+     { "vsId": 1564,
+       "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+         {
+           "tcId": 2170,
+           "md": "7115011d...3c4283f3"
+         },
+         {
+           "tcId": 2171,
+           "md": "79820a52...3a79acd5"
+         }]
+       }
+     }
+   ]
 
 
    The following is a example JSON object for secure hash Monte Carlo
-   test results sent from the crypto module to the ACVP server.  Reduced
-   to 2 iterations for brevity.
+   test results sent from the crypto module to the ACVP server.
+   (Reduced to three iterations for brevity.)
 
 
-[
-  { "acvVersion": <acvp-version> },
-  { "vsId": 1564,
-    "testResults": [
-    {
-      "tcId": 10246,
-      "resultsArray": [
-      {
-        "md": "220b2bd187bd61affab14cdcfe76dce236c56a9072d55b4f6ac0b739e3c023f7"
-      },
-      {
-        "md": "5eec0361d25bfbc2468d70e2262783145523ffe627052585069413d30ff2caf9"
-      },
-      {
-        "md": "efbed7619701beda3eeb79946565cf33643b45783f38a4f8a855607bd4d23ce6"
-      }]
-    }]
-  }
-]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -728,6 +728,31 @@ Appendix C.  Example Test Results JSON Object
 Celi                       Expires May 5, 2019                 [Page 13]
 
 Internet-Draft                Sym Alg JSON                 November 2018
+
+
+   [
+     { "acvVersion": <acvp-version> },
+     { "vsId": 1564,
+       "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+         {
+           "tcId": 10246,
+           "resultsArray": [
+           {
+             "md": "220b2bd1...e3c023f7"
+           },
+           {
+             "md": "5eec0361...0ff2caf9"
+           },
+           {
+             "md": "efbed761...d4d23ce6"
+           }]
+         }
+       }]
+     }
+   ]
 
 
 Author's Address
@@ -739,31 +764,6 @@ Author's Address
    USA
 
    Email: christopher.celi@nist.gov
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
