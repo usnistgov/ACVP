@@ -160,7 +160,7 @@
                     </t>
                 </section>
 
-                <section anchor="requirements_not_covered_cmac" title="CMACRequirements Not Covered">
+                <section anchor="requirements_not_covered_cmac" title="CMAC Requirements Not Covered">
                     <t>
                     <list>
                         <t>SP 800-38b - 5.4 Sub-keys. While sub-keys are computed, as they are
@@ -173,6 +173,36 @@
                             The ACVP server will test a random sampling of valid MAC lengths as per
                             the IUT registration - this generally includes the minimum and maximum
                             mac length. </t>
+                    </list>
+                    </t>
+                </section>
+
+                <section anchor="requirements_covered_gmac" title="GMAC Requirements Covered">
+                    <t>
+                    <list>
+                        <t> SP 800-38d - 5.1 Block Cipher.  ACVP testing SHALL make use of the AES block cipher when testing GMAC. </t>
+                        <t> SP 800-38d - 5.2 Two Gcm Functions. ACVP testing MAY test both the generate and verify functions of GCM 
+                            (without making use of a payload) to help ensure a proper implementation. The ACVP and IUT MAY test the encrypt (generate) 
+                            and decrypt (verify) utilizing a key, iv/nonce, and aad as described in this document section.</t>
+                        <t> SP 800-38d - 6 Mathematical Components of GCM. GHASH and GCTR produce intermediate values and SHALL 
+                            be (indirectly) evaluated for correctness via the ACVP generated GMAC test vectors. </t>
+                        <t> SP 800-38d - 7 GCM Specification. When the IUT registers a direction capability of "encrypt", 
+                            the ACVP server MUST generate vectors for the GCM-AE function.  When the IUT registers a capability of "decrypt",
+                            the ACVP server MUST generate test vectors for the GCM-AD function.</t>
+
+                    </list>
+                    </t>
+                </section>
+
+                <section anchor="requirements_not_covered_gmac" title="GMAC Requirements Not Covered">
+                    <t>
+                    <list>
+                        <t> SP 800-38d - 5.2.1.1 Input Data. GMAC MUST NOT make use of a plaintext.</t>
+                        <t> SP 800-38d - 5.2.1.2 Output Data. GMAC MUST NOT make use of a ciphertext.</t>
+                        <t> SP 800-38d - 7 GCM Specification. The ACVP server MUST NOT make use of a plaintext or ciphertext 
+                        for the generation of test vectors for use in GMAC testing.</t>
+                        <t> SP 800-38d - 8 Uniqueness Requirement on IVs and Keys. Key establishment, IV construction, 
+                        or number of invocations for a specific key/iv SHALL NOT be tested under the scope of the ACVP testing.</t>
                     </list>
                     </t>
                 </section>
@@ -1955,6 +1985,508 @@
                 </section>
             </section>
         </section>
+        <section anchor="gmac" title="GMAC">
+        <section anchor="gmac_caps_reg" title="AES-GMAC Algorithm Capabilities Registration">
+                <t>Each algorithm capability advertised is a self-contained JSON object using the
+                    following values.</t>
+                <texttable anchor="gmac_caps_table"
+                    title="AES-GMAC Algorithm Capabilities JSON Values">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Valid Values</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>algorithm</c>
+                    <c>The MAC algorithm to be validated.</c>
+                    <c>value</c>
+                    <c>ACVP-AES-GMAC</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>revision</c>
+                    <c>The algorithm testing revision to use.</c>
+                    <c>value</c>
+                    <c>"1.0"</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>prereqVals</c>
+                    <c>prerequistie algorithm validations, See <xref target="prereq_algs"/> for
+                        examples </c>
+                    <c>array of prereqAlgVal objects</c>
+                    <c>See <xref target="prereq_algs"/>
+                    </c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>direction</c>
+                    <c>The GMAC direction(s) to test.</c>
+                    <c>array</c>
+                    <c>encrypt, decrypt</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>keyLen</c>
+                    <c>The keyLen supported</c>
+                    <c>value</c>
+                    <c>128, 192, 256</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>ivLen</c>
+                    <c>The IV lengths supported in bits. Min/max/increment and values must
+                        be mod 8.</c>
+                    <c>Domain</c>
+                    <c>8-1024</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>ivGen</c>
+                    <c>The IV generation method (from the perspective of the IUT).</c>
+                    <c>string</c>
+                    <c>internal, external</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>ivGenMode</c>
+                    <c>The IV generation mode for use when the IUT is internally generating IVs.</c>
+                    <c>string</c>
+                    <c>8.2.1, 8.2.2</c>
+                    <c>Yes</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>tagLen</c>
+                    <c>The supported mac/tag lengths.</c>
+                    <c>Domain</c>
+                    <c>32, 64, 96, 104, 112, 120, 128</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                </texttable>
+                <section anchor="gmac_app-reg-ex"
+                    title="Example AES-GMAC Capabilities JSON Object">
+                    <t>The following is an example JSON object advertising support for
+                        AES-GMAC.</t>
+                    <figure>
+                        <artwork>
+                            <![CDATA[
+{
+  "algorithm": "ACVP-AES-GMAC",
+  "revision": "1.0",
+  "direction": [
+    "encrypt",
+    "decrypt"
+  ],
+  "keyLen": [
+    128
+  ],
+  "ivLen": [
+    96,
+    120
+  ],
+  "ivGen": "external",
+  "aadLen": [
+    8,
+    120
+  ],
+  "tagLen": [
+    32,
+    128
+  ]
+}
+            ]]>
+                        </artwork>
+                    </figure>
+                </section>
+        </section>   
+<section anchor="gmac_test_vectors" title="AES-GMAC Test Vectors">
+                <t>The ACVP server provides test vectors to the ACVP client, which are then
+                    processed and returned to the ACVP server for validation. A typical ACVP
+                    validation session would require multiple test vector sets to be downloaded and
+                    processed by the ACVP client. Each test vector set represents an individual
+                    crypto algorithm, such as ACVP-AES-GMAC. This section
+                    describes the JSON schema for a test vector set used with the ACVP-AES-GMAC crypto
+                    algorithm.</t>
+                <t>The test vector set JSON schema is a multi-level hierarchy that contains meta
+                    data for the entire vector set as well as individual test vectors to be
+                    processed by the ACVP client. The following table describes the JSON elements at
+                    the top level of the hierarchy. </t>
+                <texttable anchor="gmac_vs_top_table" title="AES-GMAC Vector Set JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <c>acvVersion</c>
+                    <c>Protocol version identifier</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>vsId</c>
+                    <c>Unique numeric identifier for the vector set</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>algorithm</c>
+                    <c>The algorithm used for the test vectors.</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>revision</c>
+                    <c>The algorithm testing revision to use.</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>testGroups</c>
+                    <c>Array of test group JSON objects, which are defined in <xref
+                            target="gmac_tgjs"/>
+                    </c>
+                    <c>array</c>
+                </texttable>
+                <section title="AES-GMAC Test Groups JSON Schema" anchor="gmac_tgjs">
+                    <t>The testGroups element at the top level in the test vector JSON object is an
+                        array of test groups. Test vectors are grouped into similar test cases to
+                        reduce the amount of data transmitted in the vector set. For instance, all
+                        test vectors that use the same key size would be grouped together. The Test
+                        Group JSON object contains meta data that applies to all test vectors within
+                        the group. The following table describes the secure HMAC and CMAC JSON
+                        elements of the Test Group JSON object.</t>
+                    <texttable anchor="gmac_vs_tg_table" title="AES-GMAC Test Group JSON Object">
+                        <ttcol align="left">JSON Value</ttcol>
+                        <ttcol align="left">Description</ttcol>
+                        <ttcol align="left">JSON type</ttcol>
+                        <ttcol align="left">Optional</ttcol>
+                        <c>tgId</c>
+                        <c>Numeric identifier for the test group, unique across the entire vector
+                            set.</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>testType</c>
+                        <c>Test category type (AFT)</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>direction</c>
+                        <c>The direction of the tests - encrypt or decrypt</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>keyLen</c>
+                        <c>Length of key in bits to use</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>ivLen</c>
+                        <c>Length of IV in bits</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>ivGen</c>
+                        <c>IV Generation (internal or external)</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>ivGenMode</c>
+                        <c>The mode an internal IV has been generated using.</c>
+                        <c>value</c>
+                        <c>Yes</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>aadLen</c>
+                        <c>Length of AAD in bits</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>tagLen</c>
+                        <c>Length of tag/MAC in bits to generate/verify</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>tests</c>
+                        <c>Array of individual test vector JSON objects, which are defined in <xref
+                                target="gmac_tvjs"/>
+                        </c>
+                        <c>array</c>
+                        <c>No</c>
+                    </texttable>
+                </section>
+                <section title="AES-GMAC Test Case JSON Schema" anchor="gmac_tvjs">
+                    <t>Each test group contains an array of one or more test cases. Each test case
+                        is a JSON object that represents a single test vector to be processed by the
+                        ACVP client. The following table describes the JSON elements for each secure
+                        MAC test vector.</t>
+                    <texttable anchor="gmac_vs_tc_table2" title="AES-GMAC Test Case JSON Object">
+                        <ttcol align="left">JSON Value</ttcol>
+                        <ttcol align="left">Description</ttcol>
+                        <ttcol align="left">JSON type</ttcol>
+                        <ttcol align="left">Optional</ttcol>
+                        <c>tcId</c>
+                        <c>Numeric identifier for the test case, unique across the entire vector
+                            set.</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>key</c>
+                        <c>Encryption key to use AES</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>iv</c>
+                        <c>Value of the IV.</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>aad</c>
+                        <c>Value of the AAD.</c>
+                        <c>value</c>
+                        <c>No</c>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c/>
+                        <c>tag</c>
+                        <c>MAC/tag value, for validating on a decrypt operation.</c>
+                        <c>value</c>
+                        <c>Yes</c>
+                    </texttable>
+                </section>
+                <section anchor="gmac_test_vector_json"
+                    title="Example AES-GMAC Test Vector JSON Object">
+                    <t>The following is an example JSON test vector object for AES-GMAC.</t>
+                    <figure>
+                        <artwork>
+                            <![CDATA[
+{
+  "vsId": 0,
+  "algorithm": "ACVP-AES-GMAC",
+  "revision": "1.0",
+  "isSample": false,
+  "testGroups": [{
+      "tgId": 1,
+      "testType": "AFT",
+      "direction": "encrypt",
+      "keyLen": 128,
+      "ivLen": 96,
+      "ivGen": "external",
+      "aadLen": 0,
+      "tagLen": 32,
+      "tests": [{
+        "tcId": 1,
+        "key": "B1E9747F9E016F0376B1F379CD345B8A",
+        "aad": "",
+        "iv": "6294CEEDFCC3037A023100E8"
+      }]
+    },
+    {
+      "tgId": 2,
+      "testType": "AFT",
+      "direction": "decrypt",
+      "keyLen": 128,
+      "ivLen": 96,
+      "ivGen": "external",
+      "aadLen": 0,
+      "tagLen": 32,
+      "tests": [{
+        "tcId": 2,
+        "key": "CD345B8AE016F03765E9747F9B1F379A",
+        "aad": "",
+        "iv": "6207CEEDFA094CC3032310E8",
+        "tag": "AB1254CE"
+      }]
+    }
+  ]
+}
+            ]]>
+                        </artwork>
+                    </figure>
+                </section>
+            </section>
+            <section anchor="gmac_vector_responses" title="AES-GMAC Test Vector Responses">
+                <t>After the ACVP client downloads and processes a vector set, it must send the
+                    response vectors back to the ACVP server. The following table describes the JSON
+                    object that represents a vector set response.</t>
+                <texttable anchor="gmac_vr_top_table"
+                    title="AES-GMAC Vector Set Response JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <c>acvVersion</c>
+                    <c>Protocol version identifier</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>vsId</c>
+                    <c>Unique numeric identifier for the vector set</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>testGroups</c>
+                    <c>Array of JSON objects that represent each test vector group. See <xref
+                            target="gmac_vr_group_table"/>
+                    </c>
+                    <c>array</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                </texttable>
+                <t>The testGroups section is used to organize the ACVP client response in a similar
+                    manner to how it receives vectors. Several algorithms SHALL require the client
+                    to send back group level properties in their response. This structure helps
+                    accommodate that.</t>
+                <texttable anchor="gmac_vr_group_table"
+                    title="AES-GMAC Vector Set Group Response JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <c>tgId</c>
+                    <c>The test group Id</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>tests</c>
+                    <c>The tests associated to the group specified in tgId</c>
+                    <c>value</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                </texttable>
+                <t>Each test group contains an array of one or more test cases. Each test case is a
+                    JSON object that represents a single test vector to be processed by the ACVP
+                    client. The following table describes the JSON elements for each DRBG test
+                    vector.</t>
+                <texttable anchor="gmac_vs_tr_table"
+                    title="AES-GMAC Test Case Results JSON Object">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>tcId</c>
+                    <c>Numeric identifier for the test case, unique across the entire vector
+                        set.</c>
+                    <c>value</c>
+                    <c>No</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>tag</c>
+                    <c>value of the computed tag/MAC output</c>
+                    <c>value</c>
+                    <c>Yes</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c>testPassed</c>
+                    <c>The result of decrypt verify</c>
+                    <c>boolean</c>
+                    <c>Yes</c>
+                    <c/>
+                    <c/>
+                    <c/>
+                    <c/>
+                </texttable>
+                <section anchor="gmac_test_vector_response_json"
+                    title="Example AES-GMAC Test Vector Response JSON Object">
+                    <t>The following is an example JSON test vector response object for
+                        AES-GMAC.</t>
+                    <figure>
+                        <artwork>
+                            <![CDATA[
+{
+  "vsId": 1,
+  "algorithm": "ACVP-AES-GMAC",
+  "revision": "1.0",
+  "testGroups": [{
+      "tgId": 1,
+      "tests": [{
+        "tcId": 1,
+        "tag": "6FA27FDC"
+      }]
+    },
+    {
+      "tgId": 2,
+      "tests": [{
+        "tcId": 2,
+        "testPassed": true
+      }]
+    }
+  ]
+}
+            ]]>
+                        </artwork>
+                    </figure>
+                </section>
+            </section>        
+        </section>
         <section anchor="hmac_root" title="HMAC">
             <section anchor="hmac_caps_reg" title="HMAC Algorithm Capabilities Registration">
                 <t>Each algorithm capability advertised is a self-contained JSON object using the
@@ -2540,6 +3072,17 @@
                         <organization>NIST</organization>
                     </author>
                     <date year="2005"/>
+                </front>
+            </reference>
+            <reference anchor="SP-800-38D"
+                target="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf">
+                <front>
+                    <title>Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) 
+                        and GMAC</title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date year="2007"/>
                 </front>
             </reference>
             <reference anchor="FIPS-198-1"
