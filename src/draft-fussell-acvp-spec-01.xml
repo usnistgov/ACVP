@@ -34,7 +34,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-fussell-acvp-spec-00" ipr="trust200902">
+<rfc category="info" docName="draft-fussell-acvp-spec-01" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
     ipr values: trust200902, noModificationTrust200902, noDerivativesTrust200902,
        or pre5378Trust200902
@@ -703,14 +703,6 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
           <c/>
           <c/>
           <c/>
-          
-          <c>/large</c>
-          <c>
-            <xref target="largeSubmission">Provides a one-time URI for large data submissions.</xref> (Optional)
-          </c>
-          <c/>
-          <c/>
-          <c/>
         </texttable>
 
         <t> The resource path is appended to the path prefix to form the URI used with an HTTP
@@ -751,21 +743,12 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
         by the ACV server. Vector and vector response data will be JSON encoded.</t>
     </section>
    
-    <section title="Submission Size Considerations">
-    	<t>Some server implementations MAY require alternative handling for submission sizes that exceed
-    	  resource limitations of the normal workflow for a <spanx style="verb">POST</spanx> response. Server
-    	  implementations MUST indicate whether the server requires large submission handling and what the maxmimum value
-    	  for non-large submissions is within the <xref target="login">/login</xref> response. See <xref target="largeSubmission"/>
-    	</t>
-    </section>
     
     <section anchor="login" title="Login">
       <t>
         A login endpoint is mentioned throughout the document and although how to authenticate is left up to the server
         the following description is an example of the login endpoint to establish a session and obtain a
-        <xref target="jwtAuthFlows">JWT</xref>. See <xref target="largeSubmission"/> for more information on how to
-        handle data which exceeds the <spanx style="verb">sizeConstraint</spanx> in the event the value of
-        <spanx style="verb">largeEndpointRequired</spanx> is <spanx style="verb">true</spanx>.
+        <xref target="jwtAuthFlows">JWT</xref>. 
         <list>
           <t>
             <spanx style="strong">password</spanx> - <spanx style="verb">string</spanx>, a property for providing a
@@ -774,17 +757,6 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
           <t>
             <spanx style="strong">accessToken</spanx> - <spanx style="verb">string</spanx>, a JWT associated with the
             current user for which renewal of the expiration is desired
-          </t>
-          <t>
-            <spanx style="strong">largeEndpointRequired</spanx> - <spanx style="verb">boolean</spanx>, 
-            true if the server requires the large endpoint for submissions with a size that exceeds the value found in
-            <spanx style="strong">sizeConstraint</spanx>.
-          </t>
-          <t>
-            <spanx style="strong">sizeConstraint</spanx> - <spanx style="verb">number</spanx>, 
-            provides the maximum value, in bytes, of a submission not required to use the
-            <xref target="largeSubmission">large endpoint</xref> or -1 if
-            <spanx style="verb">largeEndpointRequired</spanx> is <spanx style="verb">false</spanx>.
           </t>
         </list>
       </t>
@@ -826,8 +798,6 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
   {"acvVersion": <acvp-version>},
     {
         "accessToken": "<jwt value>",
-        "largeEndpointRequired": false,
-        "sizeConstraint": -1
     }
 ]
            ]]>              </artwork>
@@ -1043,28 +1013,6 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
    |        |                                   |      |            |
    |        |receive vendor URL                 |      |  updated   |
    |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |  or new    |
-]]></artwork>
-       </figure>
-       <figure anchor="large_msgFlow">
-         <preamble>In the event a submission response exceeds server defined thresholds the following workflow will need
-           to be followed in order to submit the test result. See <xref target="largeSubmission"/> for more information.
-         </preamble>
-         <artwork align="left"><![CDATA[
-   +--------+-----------------------------------+------+------------+
-   | Client |                                   |Server|  Notes     |
-   +--------+-----------------------------------+------+------------+
-   |        |POST                               |      |            |
-   |        |/large                             |      |            |
-   |        |---------------------------------->|      |            |
-   |        |                                   |      |            |
-   |        |receive large submission URI       |      |            |
-   |        |and JWT access token               |      |            |
-   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
-   |        |                                   |      |            |
-   |        |POST                               |      |<uri>       |
-   |        |/<uri>                             |      |received    |
-   |        |---------------------------------->|      |from prior  |
-   |        |MUST use specific JWT              |      |step        |
 ]]></artwork>
        </figure>
       </section>
@@ -2977,66 +2925,6 @@ https://acvts.nist.gov/validation/acvp/v1/testSessions/1
       </section>
     </section>
     
-    <section anchor="largeSubmission" title="Large Submission">
-      <t>When clients have a response which exceeds the <spanx style="verb">sizeConstraint</spanx> in
-        <xref target="login"/>, this endpoint MUST be used to obtain a URI in order to submit the results. The URI MAY
-        be a one-time use URI and clients SHOULD only attempt to use this URI once regardless of success or failure in
-        submitting.  If resubmission is required clients MUST re-POST to the /large endpoint in order to obtain the URI
-        to use.
-      </t>
-      <t>The available properties for large submissions:
-        <list>
-          <t>
-            <spanx style="strong">submissionSize</spanx> - <spanx style="verb">number</spanx>, the maximum size in
-            bytes of the desired submission.
-          </t>
-          <t>
-            <spanx style="strong">vectorSetUrl</spanx> - <spanx style="verb">string</spanx>, an identifier of the vector
-            set that will be uploaded as a large submission.
-          </t>
-          <t>
-            <spanx style="strong">url</spanx> - <spanx style="verb">string</spanx>, a one-time use url value to use
-            for a large submission.
-          </t>
-          <t>
-            <spanx style="strong">accessToken</spanx> - <spanx style="verb">string</spanx>, an optional JWT, that if
-            provided, clients MUST use when accessing the <spanx style="verb">url</spanx>. If not provided, clients MUST
-            use their current <spanx style="verb">accessToken</spanx> when accessing the
-            <spanx style="verb">url</spanx>.
-          </t>
-        </list>
-      </t>
-      <section title="Request">
-        <t>
-          <spanx style="strong">POST /large</spanx>
-        </t>
-        <figure align="center">
-          <artwork align="left"><![CDATA[
-[
-  {"acvVersion": <acvp-version>},
-  {
-      "submissionSize": 5000000,
-      "vectorSetUrl" : "/acvp/v1/testSessions/1/vectorSets/10"
-  }
-]
-           ]]></artwork>
-        </figure>
-      </section>
-      <section title="Response">
-        <figure align="center">
-          <artwork align="left"><![CDATA[
-[
-  {"acvVersion": <acvp-version>},
-  {
-      "url": "https://acvts.authority.org:3954/large/QWERTY123",
-      "accessToken" : "<jwt token>"
-  }
-]
-           ]]>              </artwork>
-        </figure>        
-      </section>
-    </section>    
-
     <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
     <?rfc needLines="8" ?>
 
