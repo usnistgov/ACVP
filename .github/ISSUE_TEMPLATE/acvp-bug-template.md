@@ -4,6 +4,9 @@ about: Use this issue template when encountering an ACVP implementation server i
 
 ---
 
+**environment**
+The environment the issue was experienced (Demo or Prod)
+
 **testSessionId**
 The test session ID
 
