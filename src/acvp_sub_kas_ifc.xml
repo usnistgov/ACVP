@@ -1,0 +1,1390 @@
+<?xml version="1.0" encoding="US-ASCII" ?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+    <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes" ?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4" ?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes" ?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-ietf-acvp-subkasifc-1.0" ipr="trust200902">
+    <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+    <!-- ***** FRONT MATTER ***** -->
+    <front>
+        <!-- The abbreviated title is used in the page header - it is only necessary if the
+         full title is longer than 39 characters -->
+        <title abbrev="Sym Alg JSON">ACVP KAS IFC JSON Specification</title>
+        <!-- add 'role="editor"' below for the editors if appropriate -->
+        <!-- Another author who claims to be an editor -->
+        <author fullname="Russell Hammett" initials="R.H." role="editor" surname="Hammett">
+            <organization>HII-TSD</organization>
+            <address>
+                <postal>
+                    <street>302 Sentinel Dr Suite 300</street>
+                    <!-- Reorder these if your country does things differently -->
+                    <city>Annapolis Junction </city>
+                    <region>MD</region>
+                    <code>20701</code>
+                    <country>USA</country>
+                </postal>
+                <email>russell.hammett@hii-tsd.com</email>
+                <!-- uri and facsimile elements may also be added -->
+            </address>
+        </author>
+        <date month="October" year="2019" />
+        <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+         in the current day for you. If only the current year is specified, xml2rfc will fill
+	 in the current day and month for you. If the year is not the current one, it is
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+	 specify just the year. -->
+        <!-- Meta-data Declarations -->
+        <area>General</area>
+        <workgroup>TBD</workgroup>
+        <!-- WG name at the upperleft corner of the doc,
+         IETF is fine for individual submissions.
+	 If this element is not present, the default is "Network Working Group",
+         which is used by the RFC Editor as a nod to the history of the IETF. -->
+        <keyword>acvp</keyword>
+        <keyword>crypto</keyword>
+        <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+        <abstract>
+            <t>This document defines the JSON schema for using KAS IFC algorithms with the ACVP
+                specification.</t>
+        </abstract>
+    </front>
+    <middle>
+        <section title="Introduction">
+            <t>The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically
+                verify the cryptographic implementation of a software or hardware crypto module. The
+                ACVP specification defines how a crypto module communicates with an ACVP server,
+                including crypto capabilities negotiation, session management, authentication,
+                vector processing and more. The ACVP specification does not define algorithm
+                specific JSON constructs for performing the crypto validation. A series of ACVP
+                sub-specifications define the constructs for testing individual crypto algorithms.
+                Each sub-specification addresses a specific class of crypto algorithms. This
+                sub-specification defines the JSON constructs for testing KAS IFC algorithms using
+                ACVP.</t>
+            <section title="Requirements Language">
+                <t>
+                    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+                    "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+                    interpreted in
+                    <xref target="RFC2119">RFC 2119</xref>
+                    .
+                </t>
+            </section>
+        </section>
+
+        <section anchor="test_types" title="Test Types and Test Coverage">
+            <t>
+                The ACVP server performs a set of tests on the KAS protocol in order to assess the
+                correctness and robustness of the implementation. A typical ACVP validation session
+                SHALL require multiple tests to be performed for every supported permutation of KAS
+                capabilities. This section describes the design of the tests used to validate
+                implementations of KAS algorithms. There are two test types for KAS testing:
+                <list style="testtype">
+                    <t>"AFT" - Algorithm Function Test. In the AFT test mode, the IUT SHALL 
+                        act as a party in the Key Agreement with the ACVP server. The server SHALL
+                        generate and provide all necessary information for the IUT to perform a
+                        successful key agreement; both the server and IUT MAY act as party U/V, as
+                        well as recipient/provider to key confirmation.</t>
+                    <t>"VAL" - Validation test. In the VAL test mode, The ACVP server MUST generate a
+                        complete (from both party U and party V's perspectives) key agreement, and
+                        expects the IUT to be able to determine if that agreement is valid. Various
+                        types of errors MSUT be introduced in varying portions of the key agreement
+                        process (changed DKM, changed key, changed hash digest, etc), that the IUT 
+                        MUST be able to detect and report on.</t>
+                </list>
+            </t>
+            <section anchor="test_coverage" title="Test Coverage">
+                <t>
+                    The tests described in this document have the intention of ensuring an
+                    implementation is conformant to
+                    <xref target="SP800-56Br2" />
+                    .
+                </t>
+                <section anchor="requirements_covered_kas_ifc" title="KAS-IFC Requirements Covered">
+                    <t>
+                        <list>
+                            <t>SP 800-56Br2 - 5.1 Cryptographic Hash Functions. SHA1, SHA2, and SHA3 hash functions SHALL be available for the various pieces of KAS/KTS requiring use of a hash function.</t>
+                            <t>SP 800-56Br2 - 5.2 Message Authentication Code (MAC) Algorithms. AES-CMAC, HMAC, and KMAC algorithms SHALL be available for testing under KDFs and KC as the specification states.</t>
+                            <t>SP 800-56Br2 - 5.3 Random Bit Generators. Though random values are used, the testing of the construction of those random values SHALL NOT be in scope of ACVP testing.</t>
+                            <t>SP 800-56Br2 - 5.4 Nonces. Though nonces are used, the testing of the construction of those nonces SHALL NOT be in scope of ACVP testing.</t>
+                            <t>SP 800-56Br2 - 5.5 Key-Derivation Methods for Key-Establishment Schemes. The ACVP server SHALL make various KDFs available for testing.  The KDFs covered under ACVP server testing SHALL include the KDFs specified in SP800-56B, SP800-56C, SP800-108, and SP800-135 (where applicable).</t>
+                            <t>SP 800-56Br2 - 5.6 KeyConfirmation. The ACVP server SHALL support key confirmation for applicable KAS and KTS schemes.</t>
+                            <t>SP 800-56Br2 - 6.2 Criteria for RSA Key Pairs for Key Establishment. The ACVP server SHALL support the three key generation methods of "basic", "prime factor", and "CRT".</t>
+                            <t>SP 800-56Br2 - 6.3 RSA Key-Pair Generators.  The ACVP server SHALL utilize IUT provided RSA public keys, and generate key pairs to accomodate testing. The ACVP server SHALL support both fixed and random public exponents.</t>
+                            <t>SP 800-56Br2 - 7 Primitives and Operations. All primitives (save the previously mentioned RBG) SHALL be in the scope of the ACVP server testing.  There are several situations where errors MAY be injected into varying portions of inputs for these primitives, the IUT is expected to be able to detect these errors.</t>
+                            <t>SP 800-56Br2 - 8 Key-Agreement Schemes. The ACVP server SHALL support testing for all KAS schemes specified in the SP800-56b document.</t>
+                            <t>SP 800-56Br2 - 9 Key-Transport Schemes. The ACVP server SHALL support testing for all KTS schemes specified in the SP800-56b document.</t>
+                            <t>SP 800-56Br2 - 10 Implementation Validation. The ACVP server SHALL support the testing of the specification described in this section.</t>
+
+                            <t>SP 800-56Cr1 - 4 One-Step Key Derivation.  One-Step Key Derivation testing SHALL be supported by the ACVP server.  FixedInfo construction is covered within the ACVP specification, and can be tailored to the IUTs needs.  ASN.1 format of fixedInfo construction (currently) is NOT supported.</t>
+                            <t>SP 800-56Cr1 - 5 Two-Step Key Derivation.  Two-Step Key Derivation testing SHALL be supported by the ACVP server.  FixedInfo construction is covered within the ACVP specification, and can be tailored to the IUTs needs.  ASN.1 format of fixedInfo construction (currently) is NOT supported.</t>
+                            <t>SP 800-56Cr1 - 6 Application-Specific Key-Derivation Methods.  Several additional from SP800-135 KDFs SHALL be available for testing with the ACVP server.</t>
+
+                            <t>SP 800-108 - 4 Pseudorandom Function (PRF). All iterations of the KDF described in SP800-108 use a separate PRF.  All implementations of the PRF SHALL be available for testing through the ACVP server generated tests.</t>
+                            <t>SP 800-108 - 5 Key Derivation Functions (KDF). The three implementations of KDFs in SP800-108 SHALL be available for testing through the ACVP Server.</t>
+                        </list>
+                    </t>
+                </section>
+                <section anchor="requirements_not_covered_kas_ifc" title="KAS-IFC Requirements Not Covered">
+                    <t>
+                        <list>
+                            <t>SP 800-56Br2 - 5.3 Random Bit Generators. Though random values are used, the testing of the construction of those random values SHALL NOT be in scope of ACVP testing.</t>
+                            <t>SP 800-56Br2 - 5.4 Nonces. Though nonces are used, the testing of the construction of those nonces SHALL NOT be in scope of ACVP testing.</t>
+                            <t>SP 800-56Br2 - 5.5.2.1.2 The ASN.1 Format for FixedInfo.  The ACVP server (currently) SHALL NOT support the testing of this format of fixed info.</t>
+                            <t>SP 800-56Br2 - 6.1 (RSA Key Pairs) General Requirements. Testing for unauthorized modification of key information and other protections SHALL NOT be within scope of ACVP testing.</t>
+                            <t>SP 800-56Br2 - 6.3 RSA Key-Pair Generators.  The ACVP server SHALL utilize IUT provided RSA public keys, and generate key pairs to accomodate testing, though the key pair generation process itself's testing SHALL NOT be in scope of testing covered under this document.</t>
+                            <t>SP 800-56Br2 - 6.3 RSA Key-Pair Generators.  Though key pairs are used and generated for testing, the key pair generation process itself's testing SHALL NOT be in scope of testing covered under this document.</t>
+                            <t>SP 800-56Br2 - 6.4 Required Assurances.  Assurances of key pair validity SHALL NOT be within scope of testing under this document testing.</t>
+                            <t>SP 800-56Br2 - 7 Primitives and Operations. The RBG SHALL be used, but testing of the RBG's validity SHALL NOT be within the scope of testing.</t>
+                            <t>SP 800-56Br2 - 8 Key-Agreement Schemes. The ASN.1 format of FixedInfo SHALL NOT be in the scope of ACVP testing.</t>
+                            <t>SP 800-56Br2 - 10 Rationale for Selecting a Specific Scheme. There is no testing associated with the IUT's choice of selecting a specific scheme.</t>
+                            <t>SP 800-56Br2 - 11 Key Recovery.  Key Recovery SHALL NOT be within the scope of ACVP testing.</t>
+
+                            <t>SP 800-56Cr1 - 4 One-Step Key Derivation.  ASN.1 format of fixedInfo construction (currently) is NOT supported.</t>
+                            <t>SP 800-56Cr1 - 5 Two-Step Key Derivation.  ASN.1 format of fixedInfo construction (currently) is NOT supported.</t>
+                            <t>SP 800-56Cr1 - 7 Selecting Hash Functions and MAC Algorithms. The process that goes into the selection of Hash functions and MAC algorithms SHALL NOT be in scope of ACVP testing, though the ACVP server SHALL support all indicated Hash and MAC functions.</t>
+                            <t>SP 800-56Cr1 - 7 Selecting Hash Functions and MAC Algorithms. The process that goes into the selection of Hash functions and MAC algorithms SHALL NOT be in scope of ACVP testing, though the ACVP server SHALL support all indicated Hash and MAC functions.</t>
+                        </list>
+                    </t>
+                </section>
+            </section>
+        </section>
+
+        <section anchor="caps_reg" title="Capabilities Registration">
+            <t>ACVP REQUIRES crypto modules to register their capabilities. This allows the crypto
+                module to advertise support for specific algorithms, notifying the ACVP server which
+                algorithms need test vectors generated for the validation process. This section
+                describes the constructs for advertising support of KAS IFC algorithms to the ACVP
+                server.</t>
+            <t>The algorithm capabilities are advertised as JSON objects within the 'algorithms'
+                value of the ACVP registration message. The 'algorithms' value is an array, where
+                each array element is an individual JSON object defined in this section. The
+                'algorithms' value is part of the 'capability_exchange' element of the ACVP JSON
+                registration message. See the ACVP specification for details on the registration
+                message. Each KDF algorithm capability advertised is a self-contained JSON
+                object.</t>
+            <section anchor="prereq_algs" title="Required Prerequisite Algorithms for KAS IFC Validations">
+                <t>Some algorithm implementations rely on other cryptographic primitives. For
+                    example, IKEv2 uses an underlying SHA algorithm. Each of these underlying
+                    algorithm primitives must be validated, either separately or as part of the same
+                    submission. ACVP provides a mechanism for specifying the required
+                    prerequisites:</t>
+                <texttable anchor="rereqs_table" title="Required Prerequisite Algorithms JSON Values">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Valid Values</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>algorithm</c>
+                    <c>a prerequisite algorithm</c>
+                    <c>value</c>
+                    <c>CMAC, DRBG, ECDSA, HMAC, SHA, KMAC, IKEv1, IKEv2, TLSv1.0/1.1, TLSv1.1, RSA, RSADP</c>
+                    <c>No</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>valValue</c>
+                    <c>algorithm validation number</c>
+                    <c>value</c>
+                    <c>actual number or "same"</c>
+                    <c>No</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>prereqAlgVal</c>
+                    <c>prerequistie algorithm validation</c>
+                    <c>object with algorithm and valValue properties</c>
+                    <c>see above</c>
+                    <c>Yes</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                </texttable>
+            </section>
+            <section anchor="cap_ex" title="KAS IFC Algorithm Capabilities JSON Values">
+                <t>Each algorithm capability advertised is a self-contained JSON object using the
+                    following values.</t>
+                <texttable anchor="caps_table" title="KAS IFC Capabilities JSON Values">
+                    <ttcol align="left">JSON Value</ttcol>
+                    <ttcol align="left">Description</ttcol>
+                    <ttcol align="left">JSON type</ttcol>
+                    <ttcol align="left">Valid Values</ttcol>
+                    <ttcol align="left">Optional</ttcol>
+                    <c>algorithm</c>
+                    <c>The algorithm under test</c>
+                    <c>value</c>
+                    <c>KAS-IFC, KTS-IFC</c>
+                    <c>No</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>revision</c>
+                    <c>The algorithm testing revision to use.</c>
+                    <c>value</c>
+                    <c>"1.0"</c>
+                    <c>No</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>prereqVals</c>
+                    <c>Prerequisite algorithm validations</c>
+                    <c>array of prereqAlgVal objects</c>
+                    <c>
+                        See
+                        <xref target="prereq_algs" />
+                    </c>
+                    <c>No</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>function</c>
+                    <c>Type of function supported</c>
+                    <c>array</c>
+                    <c>
+                        See
+                        <xref target="supported_functions" />
+                    </c>
+                    <c>Yes</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>iutKeys</c>
+                    <c>The public keys to use on behalf of the IUT for AFT based tests. Public keys should be supplied for each modulo and private key generation mode supported.  The keys are required at registration so the ACVP server is capable of generating a "C" for delivery in the prompt file, encrypted with one of the IUTs public keys. There should be AT LEAST one iut key provided for each item from the cartesian product of: "keyGenerationMethod", "modulo".</c>
+                    <c>array of 'e', 'n', 'privateKeyFormat' values.</c>
+                    <c></c>
+                    <c>Not optional EXCEPT in cases of requesting a sample.</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>iutId</c>
+                    <c>The identifier of the IUT.</c>
+                    <c>hex</c>
+                    <c></c>
+                    <c>No</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c>scheme</c>
+                    <c>Array of supported key agreement schemes each having their own
+                        capabilities</c>
+                    <c>object</c>
+                    <c>
+                        See
+                        <xref target="supported_schemes" />
+                    </c>
+                    <c>No</c>
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                    <c />
+                </texttable>
+                <t>Note: Some optional values are required depending on the algorithm. Failure to
+                    provide these values will result in the ACVP server returning an error to the
+                    ACVP client during registration.</t>
+            </section>
+            <section anchor="supported_functions" title="Supported KAS IFC Functions">
+                <t>The following function types MAY be advertised by the ACVP compliant crypto
+                    module:</t>
+                <t>
+                    <list style="symbols">
+                        <t>keyPairGen - IUT can perform keypair generation.</t>
+                        <t>
+                            partialVal - IUT can perform partial public key validation (
+                            <xref target="SP800-56Br2" />
+                            section 6.4.2.2)
+                        </t>
+                    </list>
+                </t>
+            </section>
+            <section anchor="schemes" title="KAS IFC Schemes">
+                <t> All other scheme capabilities are advertised as a self-contained JSON object using
+                        the following values. Note that AT LEAST one valid scheme must be registered.</t>
+                <section anchor="supported_schemes" title="KAS IFC Scheme Capabilities JSON Values">
+                    <t>KAS Schemes</t>
+                    <t>
+                        <list style="symbols">
+                            <t>KAS1-basic - requires kdfMethods</t>
+                            <t>KAS1-Party_V-confirmation - requires kdfMethods, macMethods</t>
+                            <t>KAS2-basic - requires kdfMethods</t>
+                            <t>KAS2-bilateral-confirmation - requires kdfMethods, macMethods</t>
+                            <t>KAS2-Party_U-confirmation - requires kdfMethods, macMethods</t>
+                            <t>KAS2-Party_V-confirmation - requires kdfMethods, macMethods</t>
+                        </list>
+                    </t>
+                    <t>KTS Schemes</t>
+                    <t>
+                        <list style="symbols">
+                            <t>KTS-OAEP-basic - requires ktsMethod, macMethods</t>
+                            <t>KTS-OAEP-Party_V-confirmation - requires ktsMethod, macMethods</t>
+                        </list>
+                    </t>
+                    <texttable anchor="scheme_caps_table" title="KAS IFC Capabilities JSON Values">
+                        <ttcol align="left">JSON Value</ttcol>
+                        <ttcol align="left">Description</ttcol>
+                        <ttcol align="left">JSON type</ttcol>
+                        <ttcol align="left">Valid Values</ttcol>
+                        <ttcol align="left">Optional</ttcol>
+                        <c>kasRole</c>
+                        <c>Roles supported for key agreement</c>
+                        <c>array</c>
+                        <c>initiator and/or responder</c>
+                        <c>No</c>
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c>keyGenerationMethods</c>
+                        <c>The key generation methods this scheme supports</c>
+                        <c>object</c>
+                        <c>
+                            <xref target="keyGenerationMethods" />
+                        </c>
+                        <c>No</c>
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c>kdfMethods</c>
+                        <c>The KDF methods to use when testing KAS schemes.</c>
+                        <c>object</c>
+                        <c>
+                            <xref target="kdfMethods" />
+                        </c>
+                        <c>Not optional for KAS schemes.</c>
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c>ktsMethod</c>
+                        <c>The KTS method to use when testing KTS schemes.</c>
+                        <c>object</c>
+                        <c>
+                            <xref target="ktsMethod" />
+                        </c>
+                        <c>Not optional for KTS schemes.</c>
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c>macMethods</c>
+                        <c>The MAC methods to use when testing KAS or KTS schemes with key confirmation.</c>
+                        <c>object</c>
+                        <c>
+                            <xref target="macMethods" />
+                        </c>
+                        <c>Not optional for KAS/KTS schemes making use of key confirmation.</c>
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c>l</c>
+                        <c>The length of the key to derive (using a KDF) or transport (using a KTS scheme). This value should be large enough to accommodate the key length used for the mac algorithms in use for key confirmation, ideally the maximum value the IUT can support with their KAS/KTS implementation. Maximum value (for testing purposes) is 1024.</c>
+                        <c>integer</c>
+                        <c>128 minimum without KC, 136 minimum with KC, maximum 1024.</c>
+                        <c>No</c>
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                        <c />
+                    </texttable>
+
+                    <section anchor="keyGenerationMethods" title="Supported Key Generation Methods">
+                        <t>Note that AT LEAST one Key Generation Method is required. 
+                            The following MAY be advertised by the ACVP compliant crypto module:</t>
+                        <texttable anchor="keyGenerationMethods_table" title="Key Generation Options">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>rsakpg1-basic</c>
+                            <c>Private key basic format with a fixed exponent. A fixed public exponent is REQUIRED to be specified in the underlying object.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="keyGenerationMethodBase" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>rsakpg1-prime-factor</c>
+                            <c>Private key prime factor format with a fixed exponent. A fixed public exponent is REQUIRED to be specified in the underlying object.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="keyGenerationMethodBase" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>rsakpg1-crt</c>
+                            <c>Private key CRT format with a fixed exponent. A fixed public exponent is REQUIRED to be specified in the underlying object.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="keyGenerationMethodBase" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>rsakpg2-basic</c>
+                            <c>Private key basic format with a random exponent.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="keyGenerationMethodBase" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>rsakpg2-prime-factor</c>
+                            <c>Private key prime factor format with a random exponent.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="keyGenerationMethodBase" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>rsakpg2-crt</c>
+                            <c>Private key CRT format with a random exponent.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="keyGenerationMethodBase" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                        </texttable>
+                        <section anchor="keyGenerationMethodBase" title="KeyGenerationMethod Object Capabilities">
+                            <texttable anchor="keyGenerationMethodBase_table" title="Key Generation Object Options">
+                                <ttcol align="left">JSON Value</ttcol>
+                                <ttcol align="left">Description</ttcol>
+                                <ttcol align="left">JSON type</ttcol>
+                                <ttcol align="left">Valid Values</ttcol>
+                                <ttcol align="left">Optional</ttcol>
+                                <c>Modulo</c>
+                                <c>The modulo the IUT supports.</c>
+                                <c>array of integers</c>
+                                <c>2048, 3072, 4096, 5120, 6144, 7168, 8192</c>
+                                <c>No</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c>FixedPublicExponent</c>
+                                <c>The fixed public exponent in use for the KeyGenerationMethod.</c>
+                                <c>hex</c>
+                                <c>Odd number, gt 2^16, lt 2^256.</c>
+                                <c>Yes, required for fixed exponent key generation methods.</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                            </texttable>
+                        </section>
+                    </section>
+                    <section anchor="kdfMethods" title="Supported Kdf Methods">
+                        <t>Note that AT LEAST one KDF Method is required for KAS schemes. 
+                                The following MAY be advertised by the ACVP compliant crypto module:</t>
+                        <texttable anchor="kdfMethods_table" title="KDF Options">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>oneStepKdf</c>
+                            <c>Indicates the IUT will be testing key derivation using the SP800-56Cr1 OneStepKdf.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="oneStepKdf" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>twoStepKdf</c>
+                            <c>Indicates the IUT will be testing key derivation using the SP800-56Cr1 OneStepKdf.</c>
+                            <c>object</c>
+                            <c>
+                                <xref target="twoStepKdf" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                        </texttable>
+                        <section anchor="oneStepKdf" title="One Step KDF Capabilities">
+                            <texttable anchor="oneStepKdf_table" title="One Step KDF Options">
+                                <ttcol align="left">JSON Value</ttcol>
+                                <ttcol align="left">Description</ttcol>
+                                <ttcol align="left">JSON type</ttcol>
+                                <ttcol align="left">Valid Values</ttcol>
+                                <ttcol align="left">Optional</ttcol>
+                                <c>auxFunctions</c>
+                                <c>The auxiliary functions to use with the KDF.</c>
+                                <c>
+                                    array of
+                                    <xref target="auxFunction" />
+                                </c>
+                                <c>
+                                    See
+                                    <xref target="auxFunction" />
+                                </c>
+                                <c>No</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c>fixedInfoPattern</c>
+                                <c>The pattern used for fixedInfo construction.</c>
+                                <c>string</c>
+                                <c>
+                                    See
+                                    <xref target="fixedInfoPatternConstruction" />
+                                </c>
+                                <c>No</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c>encoding</c>
+                                <c>The encoding type to use with fixedInfo construction. Note concatenation is currently supported, ASN.1 support should be coming.</c>
+                                <c>array of string</c>
+                                <c>concatenation</c>
+                                <c>No</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                            </texttable>
+                            <section anchor="auxFunction" title="AuxFunction Capabilities">
+                                <texttable anchor="auxFunction_table" title="AuxFunction Options">
+                                    <ttcol align="left">JSON Value</ttcol>
+                                    <ttcol align="left">Description</ttcol>
+                                    <ttcol align="left">JSON type</ttcol>
+                                    <ttcol align="left">Valid Values</ttcol>
+                                    <ttcol align="left">Optional</ttcol>
+                                    <c>auxFunctionName</c>
+                                    <c>The auxiliary function to use.</c>
+                                    <c>string</c>
+                                    <c>SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512, KMAC-128, KMAC-256</c>
+                                    <c>No</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>macSaltMethods</c>
+                                    <c>How the salt is determined (default being all 00s, random being a random salt).</c>
+                                    <c>array of string</c>
+                                    <c>default, random</c>
+                                    <c>Not optional for mac based auxiliary functions.</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                </texttable>
+                            </section>
+                        </section>
+
+                        <section anchor="twoStepKdf" title="Two Step KDF Capabilities">
+                            <texttable anchor="twoStepKdf_table" title="Two Step KDF Options">
+                                <ttcol align="left">JSON Value</ttcol>
+                                <ttcol align="left">Description</ttcol>
+                                <ttcol align="left">JSON type</ttcol>
+                                <ttcol align="left">Valid Values</ttcol>
+                                <ttcol align="left">Optional</ttcol>
+                                <c>capabilities</c>
+                                <c>The capabilities supported for the Two step KDF.</c>
+                                <c>
+                                    array of
+                                    <xref target="twoStepCapabilities" />
+                                </c>
+                                <c>
+                                    See
+                                    <xref target="twoStepCapabilities" />
+                                </c>
+                                <c>No</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                            </texttable>
+                            <section anchor="twoStepCapabilities" title="TwoStepCapabilities Capabilities">
+                                <t>
+                                            Note this capabilities object is very similar to the capability object from SP800-108.
+                                        </t>
+                                <texttable anchor="twoStepKdfCapabilities_table" title="TwoStepCapabilities Options">
+                                    <ttcol align="left">JSON Value</ttcol>
+                                    <ttcol align="left">Description</ttcol>
+                                    <ttcol align="left">JSON type</ttcol>
+                                    <ttcol align="left">Valid Values</ttcol>
+                                    <ttcol align="left">Optional</ttcol>
+                                    <c>macSaltMethods</c>
+                                    <c>How the salt is determined (default being all 00s, random being a random salt).</c>
+                                    <c>array of string</c>
+                                    <c>default, random</c>
+                                    <c>Not optional for mac based auxiliary functions.</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>fixedInfoPattern</c>
+                                    <c>The pattern used for fixedInfo construction.</c>
+                                    <c>string</c>
+                                    <c>
+                                        See
+                                        <xref target="fixedInfoPatternConstruction" />
+                                    </c>
+                                    <c>No</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>encoding</c>
+                                    <c>The encoding type to use with fixedInfo construction. Note concatenation is currently supported, ASN.1 support should be coming.</c>
+                                    <c>array of string</c>
+                                    <c>concatenation</c>
+                                    <c>No</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>kdfMode</c>
+                                    <c>The strategy of running the KDF.</c>
+                                    <c>string</c>
+                                    <c>counter, feedback, double pipeline iteration</c>
+                                    <c>No</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>macModes</c>
+                                    <c>The macModes supported by the KDF.</c>
+                                    <c>array of string</c>
+                                    <c>CMAC-AES128, CMAC-AES192, CMAC-AES256, HMAC-SHA-1, HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512</c>
+                                    <c>No</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>fixedDataOrder</c>
+                                    <c>The counter locations supported by the KDF.</c>
+                                    <c>array of string</c>
+                                    <c>none, before fixed data, after fixed data, before iterator</c>
+                                    <c>Not optional for counter mode.</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>counterLength</c>
+                                    <c>The counter lengths supported for the KDF.</c>
+                                    <c>array of integer</c>
+                                    <c>8, 16, 24, 32</c>
+                                    <c>Not optional for counter mode.</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c>supportsEmptyIv</c>
+                                    <c>The KDF supports an empty IV (feedback mode).</c>
+                                    <c>boolean</c>
+                                    <c>true, false</c>
+                                    <c>No</c>
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                    <c />
+                                </texttable>
+                            </section>
+                        </section>
+                    </section>
+
+                    <section anchor="ktsMethod" title="Supported KTS Method">
+                        <t>Note that this method is REQUIRED when testing KTS schemes.</t>
+                        <texttable anchor="ktsMethod_table" title="KTS Method Options">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>hashAlgs</c>
+                            <c>The hash algorithms available to the IUT.</c>
+                            <c>array of string</c>
+                            <c>SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512</c>
+                            <c>No</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>supportsNullAssociatedData</c>
+                            <c>Does the IUT support a null associated data (fixedInfo)?</c>
+                            <c>boolean</c>
+                            <c>true, false</c>
+                            <c>No</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>associatedDataPattern</c>
+                            <c>The pattern used to construct the associated data</c>
+                            <c>string</c>
+                            <c>
+                                <xref target="fixedInfoPatternConstruction" />
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>encoding</c>
+                            <c>The encoding to use for associatedData construction</c>
+                            <c>string</c>
+                            <c>concatenation</c>
+                            <c>Not optional when using an associated data pattern.</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                        </texttable>
+                    </section>
+
+                    <section anchor="fixedInfoPatternConstruction" title="FixedInfoPatternConstruction">
+                        <t>IUTs SHALL be capable of specifying how the FixedInfo is constructed for the KAS/KTS negotiation.</t>
+                        <t>Pattern candidates:</t>
+                        <t>
+                            <list style="symbols">
+                                <t>
+                                    literal[123456789ABCDEF]
+                                    <list style="symbols">
+                                        <t>uses the specified hex within "[]". literal[123456789ABCDEF]
+                                                substitutes "123456789ABCDEF" in place of the field</t>
+                                    </list>
+                                </t>
+                                <t>
+                                    uPartyInfo
+                                    <list style="symbols">
+                                        <t>uPartyId { || dkmNonce } { || c }
+                                            </t>
+                                    </list>
+                                </t>
+                                <t>
+                                    vPartyInfo
+                                    <list style="symbols">
+                                        <t>vPartyId { || dkmNonce } { || c }</t>
+                                    </list>
+                                </t>
+                                <t>
+                                    context
+                                    <list style="symbols">
+                                        <t>Random value chosen by ACVP server to represent the context.</t>
+                                    </list>
+                                </t>
+                                <t>
+                                    algorithmId
+                                    <list style="symbols">
+                                        <t>Random value chosen by ACVP server to represent the algorithmId.</t>
+                                    </list>
+                                </t>
+                                <t>
+                                    label
+                                    <list style="symbols">
+                                        <t>Random value chosen by ACVP server to represent the label.</t>
+                                    </list>
+                                </t>
+                            </list>
+                        </t>
+                        <t>Example (Note that party U is the server in this case "434156536964", party V
+                                is the IUT "a1b2c3d4e5"):</t>
+                        <t>
+                            <list style="symbols">
+                                <t>"concatenation" :
+                                        "literal[123456789CAFECAFE]||uPartyInfo||vPartyInfo"</t>
+                            </list>
+                        </t>
+                        <t>Evaluated as:</t>
+                        <t>
+                            <list style="symbols">
+                                <t>"123456789CAFECAFE434156536964a1b2c3d4e5"</t>
+                            </list>
+                        </t>
+                    </section>
+
+                    <section anchor="macMethods" title="Supported MAC Methods">
+                        <t>Note that AT LEAST one mac method must be supplied when making use of Key Confirmation.</t>
+
+                        <texttable anchor="macMethod_table" title="MAC Method Options">
+                            <ttcol align="left">JSON Value</ttcol>
+                            <ttcol align="left">Description</ttcol>
+                            <ttcol align="left">JSON type</ttcol>
+                            <ttcol align="left">Valid Values</ttcol>
+                            <ttcol align="left">Optional</ttcol>
+                            <c>CMAC</c>
+                            <c>Utilize CMAC as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                . Note that the keyLen must be 128, 192, or 256 for this MAC.
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA2-224</c>
+                            <c>Utilize HMAC-SHA2-224 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA2-256</c>
+                            <c>Utilize HMAC-SHA2-256 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA2-384</c>
+                            <c>Utilize HMAC-SHA2-384 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA2-512</c>
+                            <c>Utilize HMAC-SHA2-512 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA2-512/224</c>
+                            <c>Utilize HMAC-SHA2-512/224 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA2-512/256</c>
+                            <c>Utilize HMAC-SHA2-512/256 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA3-224</c>
+                            <c>Utilize HMAC-SHA3-224 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA3-256</c>
+                            <c>Utilize HMAC-SHA3-256 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA3-384</c>
+                            <c>Utilize HMAC-SHA3-384 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>HMAC-SHA3-512</c>
+                            <c>Utilize HMAC-SHA3-512 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>KMAC-128</c>
+                            <c>Utilize KMAC-128 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c>KMAC-256</c>
+                            <c>Utilize KMAC-256 as the MAC algorithm.</c>
+                            <c>object</c>
+                            <c>
+                                See
+                                <xref target="macMethodsBase" />
+                                .
+                            </c>
+                            <c>Yes</c>
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                            <c />
+                        </texttable>
+
+                        <section anchor="macMethodsBase" title="Supported MAC Options">
+                            <texttable anchor="macMethodBase_table" title="MAC Method Base Options">
+                                <ttcol align="left">JSON Value</ttcol>
+                                <ttcol align="left">Description</ttcol>
+                                <ttcol align="left">JSON type</ttcol>
+                                <ttcol align="left">Valid Values</ttcol>
+                                <ttcol align="left">Optional</ttcol>
+                                <c>keyLen</c>
+                                <c>The amount of bits from the DKM to pass into the KeyConfirmation MAC function.</c>
+                                <c>integer</c>
+                                <c>128 - 512.  Note that the DKM is REQUIRED to have at least 8 bits available after subtracting the keyLen specified.</c>
+                                <c>No</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c>macLen</c>
+                                <c>The amount of to use as the tag from the MAC function.</c>
+                                <c>integer</c>
+                                <c>64 - 512</c>
+                                <c>No</c>
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+                                <c />
+
+                            </texttable>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section anchor="app-reg-kas-ex" title="Example KAS-IFC Registration">
+                <t>The following is a example JSON object advertising support for KAS IFC.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
+    
+{
+    "algorithm": "KAS-IFC",
+    "revision": "Sp800-56Br2",
+    "prereqVals": [{
+            "algorithm": "RSA",
+            "valValue": "123456"
+        },
+        {
+            "algorithm": "DRBG",
+            "valValue": "123456"
+        },
+        {
+            "algorithm": "SHA",
+            "valValue": "123456"
+        },
+        {
+            "algorithm": "CMAC",
+            "valValue": "123456"
+        },
+        {
+            "algorithm": "HMAC",
+            "valValue": "123456"
+        }
+    ],
+    "function": ["keyPairGen", "partialVal"],
+    "iutId": "CAFECAFE",
+    "iutKeys": [{
+            "n": "9B37A5BCB5F1BA84B267392E6360B36ECF6501F295DC8C931FC764C428E7B698FCCB6D0D7DFFA6CC43B4B365A553C532CC8610D750B110A3F143721BB1BA34A63EE121DD04FB205A9DC515F542DBE30C9D777A8C395EB915D55D8246F90A054DC8D5E622BE9ABABA09B69C64C95A49F2DDEFF29EB125B02093B3EB1C413C1F7B956CA8371963C76E0ECF781DB04F34474A38ADB013A4B434AD985958FE1144308AAC3FA8D86DFCE9FF0CEC114013A3E1EA8E1B90F7B4DA5A9EB9D09AFAA8FC8BCC5E8A406093A43A6083FB0E4C3274A6F687F20E08E14B05002FAF0E5097040C14BE57153AB832730909B4E9CA43CC6C2E2EC56793C790ACB432EAFC3273279F",
+            "e": "C1D553FD819E95",
+            "keyGenerationMethod": "rsakpg2-crt"
+        },
+        {
+            "n": "D2465AC86CA9B585F05767F5AEC6183AE1C44C6057EEBB5696DFF53D7F4EF5E8AB08F49DDFF36F36D40F2711FFB141DC00C5208D9EBAD9D8CA58E70AB25819CDC43AF9301EBD3986E15CD28D9094D841B44D8E3668A7E220817E5C27AFFDA3188ECDCA81BF261CC5911F0AA75708B549264B96A4908C209BC67A03E5D6BAE0461DAD7D87480A4D615F33B3F926B987FB4D5A860BE97F878378BD21713BB79CD0C379C63F20905AFF70437678720973726ACBC652BE3626B1D12DB45C6FE5C01802DB743A0786CD1CEA609B98C19C2F398BCA31B18C8CD336AC2C04730B58D0A215BBF336E5041AEFEFC55411BEF04F8C3FB73380B03DD61DE84F3876B7BDBCF1",
+            "e": "3E0EEC79E305",
+            "keyGenerationMethod": "rsakpg2-crt"
+        }
+    ],
+    "scheme": {
+        "kas1-Party_V-confirmation": {
+            "kasRole": [
+                "initiator",
+                "responder"
+            ],
+            "keyGenerationMethods": {
+                "rsakpg2-crt": {
+                    "modulo": [
+                        2048
+                    ]
+                }
+            },
+            "kdfMethods": {
+                "oneStepKdf": {
+                    "auxFunctions": [{
+                        "auxFunctionName": "KMAC-128",
+                        "macSaltMethods": [
+                            "default", "random"
+                        ]
+                    }],
+                    "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+                    "encoding": [
+                        "concatenation"
+                    ]
+                },
+                "twoStepKdf": {
+                    "capabilities": [{
+                        "macSaltMethods": [
+                            "random"
+                        ],
+                        "fixedInfoPattern": "l||label||uPartyInfo||vPartyInfo||context",
+                        "encoding": [
+                            "concatenation"
+                        ],
+                        "kdfMode": "feedback",
+                        "macMode": [
+                            "HMAC-SHA3-224"
+                        ],
+                        "supportedLengths": [
+                            512
+                        ],
+                        "fixedDataOrder": [
+                            "after fixed data"
+                        ],
+                        "counterLength": [
+                            32
+                        ],
+                        "supportsEmptyIv": false
+                    }]
+                }
+            },
+            "macMethods": {
+                "kmac-128": {
+                    "keyLen": 128,
+                    "macLen": 224
+                }
+            },
+            "l": 512
+        }
+    }
+}
+    
+                ]]>
+                    </artwork>
+                </figure>
+            </section>
+            <section anchor="app-reg-kts-ex" title="Example KTS-IFC Registration">
+                <t>The following is a example JSON object advertising support for KTS IFC.</t>
+                <figure>
+                    <artwork>
+                        <![CDATA[
+    
+                            {
+                                "algorithm": "KTS-IFC",
+                                "revision": "Sp800-56Br2",
+                                "prereqVals": [{
+                                        "algorithm": "RSA",
+                                        "valValue": "123456"
+                                    },
+                                    {
+                                        "algorithm": "DRBG",
+                                        "valValue": "123456"
+                                    },
+                                    {
+                                        "algorithm": "SHA",
+                                        "valValue": "123456"
+                                    },
+                                    {
+                                        "algorithm": "CMAC",
+                                        "valValue": "123456"
+                                    },
+                                    {
+                                        "algorithm": "HMAC",
+                                        "valValue": "123456"
+                                    }
+                                ],
+                                "function": ["keyPairGen", "partialVal"],
+                                "iutId": "CAFECAFE",
+                                "iutKeys": [{
+                                        "n": "9B37A5BCB5F1BA84B267392E6360B36ECF6501F295DC8C931FC764C428E7B698FCCB6D0D7DFFA6CC43B4B365A553C532CC8610D750B110A3F143721BB1BA34A63EE121DD04FB205A9DC515F542DBE30C9D777A8C395EB915D55D8246F90A054DC8D5E622BE9ABABA09B69C64C95A49F2DDEFF29EB125B02093B3EB1C413C1F7B956CA8371963C76E0ECF781DB04F34474A38ADB013A4B434AD985958FE1144308AAC3FA8D86DFCE9FF0CEC114013A3E1EA8E1B90F7B4DA5A9EB9D09AFAA8FC8BCC5E8A406093A43A6083FB0E4C3274A6F687F20E08E14B05002FAF0E5097040C14BE57153AB832730909B4E9CA43CC6C2E2EC56793C790ACB432EAFC3273279F",
+                                        "e": "C1D553FD819E95",
+                                        "keyGenerationMethod": "rsakpg2-basic"
+                                    },
+                                    {
+                                        "n": "D2465AC86CA9B585F05767F5AEC6183AE1C44C6057EEBB5696DFF53D7F4EF5E8AB08F49DDFF36F36D40F2711FFB141DC00C5208D9EBAD9D8CA58E70AB25819CDC43AF9301EBD3986E15CD28D9094D841B44D8E3668A7E220817E5C27AFFDA3188ECDCA81BF261CC5911F0AA75708B549264B96A4908C209BC67A03E5D6BAE0461DAD7D87480A4D615F33B3F926B987FB4D5A860BE97F878378BD21713BB79CD0C379C63F20905AFF70437678720973726ACBC652BE3626B1D12DB45C6FE5C01802DB743A0786CD1CEA609B98C19C2F398BCA31B18C8CD336AC2C04730B58D0A215BBF336E5041AEFEFC55411BEF04F8C3FB73380B03DD61DE84F3876B7BDBCF1",
+                                        "e": "3E0EEC79E305",
+                                        "keyGenerationMethod": "rsakpg2-basic"
+                                    }
+                                ],
+                                "scheme": {
+                                    "KTS-OAEP-Party_V-confirmation": {
+                                        "kasRole": [
+                                            "initiator",
+                                            "responder"
+                                        ],
+                                        "keyGenerationMethods": {
+                                            "rsakpg2-basic": {
+                                                "modulo": [
+                                                    2048
+                                                ]
+                                            }
+                                        },
+                                        "ktsMethod": {
+                                            "hashAlgs": [
+                                                "SHA2-224"
+                                            ],
+                                            "supportsNullAssociatedData": true,
+                                            "associatedDataPattern": "l||uPartyInfo||vPartyInfo",
+                                            "encoding": [
+                                                "concatenation"
+                                            ]
+                                        },
+                                        "macMethods": {
+                                            "kmac-128": {
+                                                "keyLen": 128,
+                                                "macLen": 224
+                                            }
+                                        },
+                                        "l": 512
+                                    }
+                                }
+                            }
+    
+                ]]>
+                    </artwork>
+                </figure>
+            </section>
+        </section>
+
+        <section anchor="generation_reqs_per_scheme"
+            title="Generation requirements per party per scheme">
+        </section>
+
+        <section anchor="test_vectors" title="Test Vectors">
+        </section>
+
+        <section anchor="vector_responses" title="Test Vector Responses">
+        </section>
+
+        <section anchor="Acknowledgements" title="Acknowledgements">
+            <t>TBD...</t>
+        </section>
+        <!-- Possibly a 'Contributors' section ... -->
+        <section anchor="IANA" title="IANA Considerations">
+            <t>This memo includes no request to IANA.</t>
+        </section>
+        <section anchor="Security" title="Security Considerations">
+            <t>Security considerations are addressed by the ACVP specification.</t>
+        </section>
+    </middle>
+    <!--  *****BACK MATTER ***** -->
+    <back>
+        <references title="Normative References">
+            <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.Rfc.2119.xml"?-->
+            &RFC2119;
+            <reference anchor="ACVP">
+                <!-- the following is the minimum to make xml2rfc happy -->
+                <front>
+                    <title>ACVP Specification</title>
+                    <author initials="authInitials" surname="authSurName">
+                        <organization>NIST</organization>
+                    </author>
+                    <date year="2016" />
+                </front>
+            </reference>
+            <reference anchor="SP800-56Br2" target="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Br2.pdf">
+                <front>
+                    <title>Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography</title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="March" year="2019" />
+                </front>
+            </reference>
+            <reference anchor="SP800-56Cr1" target="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Cr1.pdf">
+                <front>
+                    <title>Recommendation for Key-Derivation Methods in Key-Establishment Schemes</title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="April" year="2018" />
+                </front>
+            </reference>
+            <reference anchor="SP800-108" target="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-108.pdf">
+                <front>
+                    <title>Recommendation for Key Derivation Using Pseudorandom Functions </title>
+                    <author>
+                        <organization>NIST</organization>
+                    </author>
+                    <date month="October" year="2009" />
+                </front>
+            </reference>
+        </references>
+    </back>
+</rfc>
