@@ -11,6 +11,7 @@ All current information about ACVP may be found within this Github project. View
 * [Supported Algorithms](#supported-algorithms)
   * [Block Cipher Modes](#block-cipher-modes)
   * [Secure Hash](#secure-hash)
+  * [XOFs](#xofs)
   * [Message Authentication](#message-authentication)
   * [DRBG](#drbg)
   * [Digital Signature](#digital-signature)
@@ -72,7 +73,6 @@ The demo server allows validation of the following algorithms (a superset of the
 * [TDES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [TDES-OFBI](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 
-
 ### Secure Hash
 * [SHA-1](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
 * [SHA-224](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
@@ -87,6 +87,16 @@ The demo server allows validation of the following algorithms (a superset of the
 * [SHA3-512](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
 * [SHAKE-128](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
 * [SHAKE-256](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+
+### XOFs
+* [cSHAKE-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [cSHAKE-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [KMAC-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [KMAC-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [ParallelHash-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [ParallelHash-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [TupleHash-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [TupleHash-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
 
 ### Message Authentication
 * [AES-GMAC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
