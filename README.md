@@ -1,7 +1,26 @@
 # ACVP
-The Automated Cryptographic Validation Protocol (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
+The Automated Cryptographic [Validation Protocol](./artifacts/draft-fussell-acvp-spec-00.html) (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
 
 All current information about ACVP may be found within this Github project. View the documents at https://usnistgov.github.io/ACVP/.
+
+# Jump to
+* [Background](#background)
+* [Objective](#objective)
+* [Project Goals](#project-goals)
+* [Status](#status)
+* [Supported Algorithms](#supported-algorithms)
+  * [Block Cipher Modes](#block-cipher-modes)
+  * [Secure Hash](#secure-hash)
+  * [XOFs](#xofs)
+  * [Message Authentication](#message-authentication)
+  * [DRBG](#drbg)
+  * [Digital Signature](#digital-signature)
+  * [Key Agreement](#key-agreement)
+  * [KDFs](#kdfs)
+* [Accessing the demo server](#accessing-the-demo-server)
+* [Contribution guidelines](contribution-guidelines)
+* [Related projects](#related-projects)
+* [Licensing terms](#licensing-terms)
 
 # Background
 The rapid development of cryptographic technology over the last two decades and its adoption in many different technology domains has resulted in a sharp increase in the number and complexity of approved algorithms. The volume of cryptographic algorithm validations has outstripped the available human resources available to test, report, and validate results. The plethora of different algorithms has created a dire need for consistent requesting and reporting of test data and results. We also live in times of unprecedented levels of threats and exploits that require frequent product updates to fix defects and remove security vulnerabilities, which in turn requires much faster turnaround of validation updates than what the existing validation model allows. See the NIST [Automated Cryptographic Validation Testing project](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) for broader context and information. 
@@ -21,44 +40,159 @@ validation of standardized algorithm test evidence to facilitate the [modernizat
 The new automated testing scope is available starting on April 8, 2019. This testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
 
 # Status
-The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the protocol specification are available.
+The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) are available.
 
 The demo server allows validation of the following algorithms (a superset of the algorithms available through the CAVS tool). NOT ALL OF THE ALGORITHMS AVAILABLE ON THE DEMO SERVER ARE NIST-APPROVED ALGORITHMS. The prod server supports a subset of the listed algorithms.
 
-|Block Cipher Modes                                                                             | Secure Hash                                                                       |Message Authentication                                                                                 |DRBG                                                                                       |Digital Signature                                                                                      |Key Agreement                                                                                              |KDF's                                                                                                          |
-|------------------                                                                             |------------                                                                       |----------------------                                                                                 |----                                                                                       |-----------------                                                                                      |-------------                                                                                              |-----                                                                                                          |
-|[AES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHA-1](./artifacts/draft-celi-acvp-sha-00.txt)        [HTML](./artifacts/draft-celi-acvp-sha-00.html) |[AES-CCM](./artifacts/draft-celi-acvp-block-ciph-00.txt)       [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)          |[ctrDRBG-AES-128](./artifacts/acvp_sub_drbg.txt)   [HTML](./artifacts/acvp_sub_drbg.html)  |[RSA mode: keyGen](./artifacts/acvp_sub_rsa.txt)               [HTML](./artifacts/acvp_sub_rsa.html)   |[KAS ECC ephemeralUnified](./artifacts/acvp_sub_kas_ecc.txt)   [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[Counter KDF](./artifacts/acvp_sub_kdf108.txt)                     [HTML](./artifacts/acvp_sub_kdf108.html)    |
-|[AES-CFB1](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)       |[SHA-224](./artifacts/draft-celi-acvp-sha-00.txt)  [HTML](./artifacts/draft-celi-acvp-sha-00.html) |[CMAC-AES](./artifacts/acvp_sub_mac.txt)           [HTML](./artifacts/acvp_sub_mac.html)               |[ctrDRBG-AES-192](./artifacts/acvp_sub_drbg.txt)   [HTML](./artifacts/acvp_sub_drbg.html)  |[RSA mode: sigGen](./artifacts/acvp_sub_rsa.txt)               [HTML](./artifacts/acvp_sub_rsa.html)   |[KAS ECC fullMqv](./artifacts/acvp_sub_kas_ecc.txt)            [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[Feedback KDF](./artifacts/acvp_sub_kdf108.txt)                    [HTML](./artifacts/acvp_sub_kdf108.html)    |
-|[AES-CFB8](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)       |[SHA-256](./artifacts/draft-celi-acvp-sha-00.txt)  [HTML](./artifacts/draft-celi-acvp-sha-00.html) |[CMAC-TDES](./artifacts/acvp_sub_mac.txt)          [HTML](./artifacts/acvp_sub_mac.html)               |[ctrDRBG-AES-256](./artifacts/acvp_sub_drbg.txt)   [HTML](./artifacts/acvp_sub_drbg.html)  |[RSA mode: sigVer](./artifacts/acvp_sub_rsa.txt)               [HTML](./artifacts/acvp_sub_rsa.html)   |[KAS ECC fullUnified](./artifacts/acvp_sub_kas_ecc.txt)        [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[Double Pipeline Iterator KDF](./artifacts/acvp_sub_kdf108.txt)    [HTML](./artifacts/acvp_sub_kdf108.html)    |
-|[AES-CFB128](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) |[SHA-384](./artifacts/draft-celi-acvp-sha-00.txt)  [HTML](./artifacts/draft-celi-acvp-sha-00.html) |[HMAC-SHA-1](./artifacts/acvp_sub_mac.txt)         [HTML](./artifacts/acvp_sub_mac.html)               |[ctrDRBG-TDES](./artifacts/acvp_sub_drbg.txt)      [HTML](./artifacts/acvp_sub_drbg.html)  |[RSA mode: signatureComponent](./artifacts/acvp_sub_rsa.txt)   [HTML](./artifacts/acvp_sub_rsa.html)   |[KAS ECC onePassDh](./artifacts/acvp_sub_kas_ecc.txt)          [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[IKEv1](./artifacts/acvp_sub_kdf135_ikev1.txt)                         [HTML](./artifacts/acvp_sub_kdf135_ikev1.html)      |
-|[AES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHA-512](./artifacts/draft-celi-acvp-sha-00.txt)  [HTML](./artifacts/draft-celi-acvp-sha-00.html) |[HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |[HASH DRBG](./artifacts/acvp_sub_drbg.txt)         [HTML](./artifacts/acvp_sub_drbg.html)  |[RSA mode: decryptionComponent](./artifacts/acvp_sub_rsa.txt)  [HTML](./artifacts/acvp_sub_rsa.html)   |[KAS ECC onePassMqv](./artifacts/acvp_sub_kas_ecc.txt)         [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[IKEv2](./artifacts/acvp_sub_kdf135_ikev2.txt)                         [HTML](./artifacts/acvp_sub_kdf135_ikev2.html)      |
-|[AES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHA-512/224](./artifacts/draft-celi-acvp-sha-00.txt)[HTML](./artifacts/draft-celi-acvp-sha-00.html)   |[HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |[HMAC DRBG](./artifacts/acvp_sub_drbg.txt)         [HTML](./artifacts/acvp_sub_drbg.html)  |[RSA mode: legacySigVer](./artifacts/acvp_sub_rsa.txt)         [HTML](./artifacts/acvp_sub_rsa.html)   |[KAS ECC OnePassUnified](./artifacts/acvp_sub_kas_ecc.txt)     [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[SNMP](./artifacts/acvp_sub_kdf135_snmp.txt)                               [HTML](./artifacts/acvp_sub_kdf135_snmp.html)       |
-|[AES-GCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHA-512/256](./artifacts/draft-celi-acvp-sha-00.txt)[HTML](./artifacts/draft-celi-acvp-sha-00.html)   |[HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[ECDSA mode: sigGenComponent](./artifacts/acvp_sub_ecdsa.txt)  [HTML](./artifacts/acvp_sub_ecdsa.html) |[KAS ECC staticUnified](./artifacts/acvp_sub_kas_ecc.txt)      [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[SRTP](./artifacts/acvp_sub_kdf135_srtp.txt)                               [HTML](./artifacts/acvp_sub_kdf135_srtp.html)       |
-|[AES-GCM-SIV](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)    |[SHA3-224](./artifacts/draft-celi-acvp-sha3-00.txt)    [HTML](./artifacts/draft-celi-acvp-sha3-00.html)    |[HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[ECDSA mode: keyGen](./artifacts/acvp_sub_ecdsa.txt)           [HTML](./artifacts/acvp_sub_ecdsa.html) |[KAS ECC CDH-Component](./artifacts/acvp_sub_kas_ecc.txt)      [HTML](./artifacts/acvp_sub_kas_ecc.html)   |[SSH](./artifacts/acvp_sub_kdf135_ssh.txt)                             [HTML](./artifacts/acvp_sub_kdf135_ssh.html)        |
-|[AES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)     |[SHA3-256](./artifacts/draft-celi-acvp-sha3-00.txt)    [HTML](./artifacts/draft-celi-acvp-sha3-00.html)    |[HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt)  [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[ECDSA mode: keyVer](./artifacts/acvp_sub_ecdsa.txt)           [HTML](./artifacts/acvp_sub_ecdsa.html) |[KAS FFC dhHybrid1](./artifacts/acvp_sub_kas_ffc.txt)          [HTML](./artifacts/acvp_sub_kas_ffc.html)   |[TLS](./artifacts/acvp_sub_kdf135_tls.txt)                             [HTML](./artifacts/acvp_sub_kdf135_tls.html)        |
-|[AES-KWP](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHA3-384](./artifacts/draft-celi-acvp-sha3-00.txt)    [HTML](./artifacts/draft-celi-acvp-sha3-00.html)    |[HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt)  [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[ECDSA mode: sigGen](./artifacts/acvp_sub_ecdsa.txt)           [HTML](./artifacts/acvp_sub_ecdsa.html) |[KAS FFC mqv2](./artifacts/acvp_sub_kas_ffc.txt)               [HTML](./artifacts/acvp_sub_kas_ffc.html)   |[TPM](./artifacts/acvp_sub_kdf135_tpm.txt)                             [HTML](./artifacts/acvp_sub_kdf135_tpm.html)        |
-|[AES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHA3-512](./artifacts/draft-celi-acvp-sha3-00.txt)    [HTML](./artifacts/draft-celi-acvp-sha3-00.html)    |[HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[ECDSA mode: sigVer](./artifacts/acvp_sub_ecdsa.txt)           [HTML](./artifacts/acvp_sub_ecdsa.html) |[KAS FFC dhEphem](./artifacts/acvp_sub_kas_ffc.txt)            [HTML](./artifacts/acvp_sub_kas_ffc.html)   |[ANSX9.63](./artifacts/acvp_sub_kdf135_x963.txt)                           [HTML](./artifacts/acvp_sub_kdf135_x963.html)       |
-|[AES-XPN](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHAKE-128](./artifacts/draft-celi-acvp-sha3-00.txt)   [HTML](./artifacts/draft-celi-acvp-sha3-00.html)    |[HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[DSA mode: keyGen](./artifacts/acvp_sub_dsa.txt)               [HTML](./artifacts/acvp_sub_dsa.html)   |[KAS FFC dhHybridOneFlow](./artifacts/acvp_sub_kas_ffc.txt)    [HTML](./artifacts/acvp_sub_kas_ffc.html)   |[ANSX9.42](./artifacts/draft-celi-acvp-ans-x942.txt)                           [HTML](./artifacts/draft-celi-acvp-ans-x942.html)                                                                                                                      |
-|[AES-XTS](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |[SHAKE-256](./artifacts/draft-celi-acvp-sha3-00.txt)   [HTML](./artifacts/draft-celi-acvp-sha3-00.html)    |[HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[DSA mode: sigVer](./artifacts/acvp_sub_dsa.txt)               [HTML](./artifacts/acvp_sub_dsa.html)   |[KAS FFC mqv1](./artifacts/acvp_sub_kas_ffc.txt)               [HTML](./artifacts/acvp_sub_kas_ffc.html)   |[PBKDF](./artifacts/draft-celi-acvp-pbkdf.txt)                           [HTML](./artifacts/draft-celi-acvp-pbkdf.html)                                                                                                                     |
-|[TDES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)       |                                                                                   |[HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt)      [HTML](./artifacts/acvp_sub_mac.html)               |                                                                                           |[DSA mode: sigGen](./artifacts/acvp_sub_dsa.txt)               [HTML](./artifacts/acvp_sub_dsa.html)   |[KAS FFC dhOneFlow](./artifacts/acvp_sub_kas_ffc.txt)          [HTML](./artifacts/acvp_sub_kas_ffc.html)   |                                                                                                               |
-|[TDES-CBCI](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)  |                                                                                   |                                                                                                       |                                                                                           |[DSA mode: pqgGen](./artifacts/acvp_sub_dsa.txt)               [HTML](./artifacts/acvp_sub_dsa.html)   |[KAS FFC dhStatic](./artifacts/acvp_sub_kas_ffc.txt)           [HTML](./artifacts/acvp_sub_kas_ffc.html)   |                                                                                                               |
-|[TDES-CFBP1](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) |                                                                                   |                                                                                                       |                                                                                           |[DSA mode: pqgVer](./artifacts/acvp_sub_dsa.txt)               [HTML](./artifacts/acvp_sub_dsa.html)   |                                                                                                           |                                                                                                               |
-|[TDES-CFBP8](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) |                                                                                   |                                                                                                       |                                                                                           |                                                                                                       |                                                                                                           |                                                                                                               |
-|[TDES-CFBP64](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)    |                                                                                   |                                                                                                       |                                                                                           |                                                                                                       |                                                                                                           |                                                                                                               |
-|[TDES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)       |                                                                                   |                                                                                                       |                                                                                           |                                                                                                       |                                                                                                           |                                                                                                               |
-|[TDES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)       |                                                                                   |                                                                                                       |                                                                                           |                                                                                                       |                                                                                                           |                                                                                                               |
-|[TDES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)        |                                                                                   |                                                                                                       |                                                                                           |                                                                                                       |                                                                                                           |                                                                                                               |
-|[TDES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)   |                                                                                   |                                                                                                       |                                                                                           |                                                                                                       |                                                                                                           |                                                                                                               |
-|[TDES-OFBI](./artifacts/draft-celi-acvp-block-ciph-00.txt) [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)  |                                                                                   |                                                                                                       |                                                                                           |                                                                                                       |                                                                                                           |                                                                                                               |
+## Supported Algorithms
 
-The prod server supports all of the above except for the EdDSA variants, AES-FF3-1 and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
+### Block Cipher Modes
+* [AES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
+* [AES-CFB1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CFB8](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CFB128](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-GCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-GCM-SIV](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [AES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-KWP](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-XPN](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-XTS](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-FF1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [AES-FF3-1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [TDES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CBCI](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CFBP1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CFBP8](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CFBP64](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
+* [TDES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-OFBI](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+
+### Secure Hash
+* [SHA-1](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-224](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-256](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-384](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-512](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-512/224](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-512/256](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA3-224](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA3-256](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA3-384](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA3-512](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHAKE-128](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHAKE-256](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+
+### XOFs
+* [cSHAKE-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [cSHAKE-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [KMAC-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [KMAC-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [ParallelHash-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [ParallelHash-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [TupleHash-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [TupleHash-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+
+### Message Authentication
+* [AES-GMAC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [CMAC-AES](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [CMAC-TDES](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+
+### DRBG
+* [ctrDRBG-AES-128](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-AES-192](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-AES-256](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-TDES](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
+* [HASH DRBG](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
+* [HMAC DRBG](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
+
+### Digital Signature
+* [RSA mode: keyGen](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: sigGen](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: sigVer](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: signatureComponent](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: decryptionComponent](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: legacySigVer](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
+* [ECDSA mode: sigGenComponent](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [ECDSA mode: keyGen](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [ECDSA mode: keyVer](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [ECDSA mode: sigGen](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html) 
+* [ECDSA mode: sigVer](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [DSA mode: keyGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: sigVer](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: sigGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: pqgGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: pqgVer](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
+* [EDDSA mode: keyGen](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: keyVer](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: sigGen](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: sigVer](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+
+### Key Agreement
+* [KAS ECC ephemeralUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC fullMqv](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC fullUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC onePassDh](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC onePassMqv](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC OnePassUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC staticUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC CDH-Component](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS FFC dhHybrid1](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC mqv2](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html) 
+* [KAS FFC dhEphem](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC dhHybridOneFlow](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC mqv1](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC dhOneFlow](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC dhStatic](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS IFC KAS1-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS1-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-bilateral-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_U-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+
+### KDFs
+* [Counter KDF](./artifacts/acvp_sub_kdf108.txt) | [HTML](./artifacts/acvp_sub_kdf108.html)
+* [Feedback KDF](./artifacts/acvp_sub_kdf108.txt) | [HTML](./artifacts/acvp_sub_kdf108.html)
+* [Double Pipeline Iterator KDF](./artifacts/acvp_sub_kdf108.txt) | [HTML](./artifacts/acvp_sub_kdf108.html)
+* [IKEv1](./artifacts/acvp_sub_kdf135_ikev1.txt) | [HTML](./artifacts/acvp_sub_kdf135_ikev1.html)
+* [IKEv2](./artifacts/acvp_sub_kdf135_ikev2.txt) | [HTML](./artifacts/acvp_sub_kdf135_ikev2.html) 
+* [SNMP](./artifacts/acvp_sub_kdf135_snmp.txt) | [HTML](./artifacts/acvp_sub_kdf135_snmp.html)
+* [SRTP](./artifacts/acvp_sub_kdf135_srtp.txt) | [HTML](./artifacts/acvp_sub_kdf135_srtp.html)
+* [SSH](./artifacts/acvp_sub_kdf135_ssh.txt) | [HTML](./artifacts/acvp_sub_kdf135_ssh.html)
+* [TLS](./artifacts/acvp_sub_kdf135_tls.txt) | [HTML](./artifacts/acvp_sub_kdf135_tls.html)
+* [TPM](./artifacts/acvp_sub_kdf135_tpm.txt) | [HTML](./artifacts/acvp_sub_kdf135_tpm.html)
+* [ANSX9.63](./artifacts/acvp_sub_kdf135_x963.txt) | [HTML](./artifacts/acvp_sub_kdf135_x963.html)
+* [ANSX9.42](./artifacts/draft-celi-acvp-ans-x942.txt) | [HTML](./artifacts/draft-celi-acvp-ans-x942.html)
+* [PBKDF](./artifacts/draft-celi-acvp-pbkdf.txt) | [HTML](./artifacts/draft-celi-acvp-pbkdf.html)
+
+The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
 ## Current 1.0 Support
-Please check the protocol specification for details on how to access the available resources. 
+Please check the [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) for details on how to access the available resources. 
 
 # Accessing the demo server
 
-To access the demo server one needs a TLS credential **and** a one-time password (OTP). The protocol specification and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work. 
+To access the demo server one needs a TLS credential **and** a one-time password (OTP). The [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work. 
 
 To set expectations, since this is a demo system, it will be in a state of flux and any all data on the system is considered temporary and may be reset to accommodate development of the Automated Cryptographic Validation Protocol (ACVP) service. We will try to keep the demo service relatively stable, but we plan to update it as we continue to add new algorithms and capabilities.
 
@@ -87,7 +221,7 @@ Government purpose.
 
 Please be aware that starting in the week of March 12th, 2018, the second-factor authentication based on OTP and associated workflows have been turned-on - see details [here](https://github.com/usnistgov/ACVP/wiki#second-factor-authentication-and-authorization-schema-for-accessing-and-working-with-the-nist-automated-cryptographic-validation-services). 
 
-# Contribution guidelines:
+# Contribution guidelines
 
 If you want to contribute, please follow the simple rules below and send us pull requests. 
 
