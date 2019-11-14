@@ -1,5 +1,5 @@
 # ACVP
-The Automated Cryptographic Validation Protocol (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
+The Automated Cryptographic [Validation Protocol](./artifacts/draft-fussell-acvp-spec-00.html) (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
 
 All current information about ACVP may be found within this Github project. View the documents at https://usnistgov.github.io/ACVP/.
 
@@ -40,7 +40,7 @@ validation of standardized algorithm test evidence to facilitate the [modernizat
 The new automated testing scope is available starting on April 8, 2019. This testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
 
 # Status
-The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the protocol specification are available.
+The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) are available.
 
 The demo server allows validation of the following algorithms (a superset of the algorithms available through the CAVS tool). NOT ALL OF THE ALGORITHMS AVAILABLE ON THE DEMO SERVER ARE NIST-APPROVED ALGORITHMS. The prod server supports a subset of the listed algorithms.
 
@@ -188,11 +188,11 @@ The demo server allows validation of the following algorithms (a superset of the
 The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
 ## Current 1.0 Support
-Please check the protocol specification for details on how to access the available resources. 
+Please check the [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) for details on how to access the available resources. 
 
 # Accessing the demo server
 
-To access the demo server one needs a TLS credential **and** a one-time password (OTP). The protocol specification and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work. 
+To access the demo server one needs a TLS credential **and** a one-time password (OTP). The [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work. 
 
 To set expectations, since this is a demo system, it will be in a state of flux and any all data on the system is considered temporary and may be reset to accommodate development of the Automated Cryptographic Validation Protocol (ACVP) service. We will try to keep the demo service relatively stable, but we plan to update it as we continue to add new algorithms and capabilities.
 
