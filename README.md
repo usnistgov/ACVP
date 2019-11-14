@@ -1,5 +1,5 @@
 # ACVP
-The Automated Cryptographic [Validation Protocol](./artifacts/draft-fussell-acvp-spec-00.html) (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
+The [Automated Cryptographic Validation Protocol](./artifacts/draft-fussell-acvp-spec-00.html) (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
 
 All current information about ACVP may be found within this Github project. View the documents at https://usnistgov.github.io/ACVP/.
 
@@ -47,143 +47,143 @@ The demo server allows validation of the following algorithms (a superset of the
 ## Supported Algorithms
 
 ### Block Cipher Modes
-* [AES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
-* [AES-CFB1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CFB8](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CFB128](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-GCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-GCM-SIV](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
-* [AES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-KWP](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-XPN](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-XTS](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-FF1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
-* [AES-FF3-1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
-* [TDES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CBCI](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CFBP1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CFBP8](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CFBP64](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
-* [TDES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-OFBI](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
+* [AES-CFB1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CFB8](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CFB128](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-GCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-GCM-SIV](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [AES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-KWP](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-XPN](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-XTS](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-FF1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [AES-FF3-1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [TDES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CBCI](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CFBP1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CFBP8](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CFBP64](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
+* [TDES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [TDES-OFBI](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 
 ### Secure Hash
-* [SHA-1](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-224](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-256](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-384](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-512](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-512/224](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-512/256](./artifacts/draft-celi-acvp-sha-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA3-224](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHA3-256](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHA3-384](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHA3-512](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHAKE-128](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHAKE-256](./artifacts/draft-celi-acvp-sha3-00.txt) | [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA-1](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-224](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-256](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-384](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-512](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-512/224](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA-512/256](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
+* [SHA3-224](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA3-256](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA3-384](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA3-512](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHAKE-128](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHAKE-256](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
 
 ### XOFs
-* [cSHAKE-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [cSHAKE-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [KMAC-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [KMAC-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [ParallelHash-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [ParallelHash-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [TupleHash-128](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [TupleHash-256](./artifacts/draft-celi-acvp-xof-00.txt) | [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [cSHAKE-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [cSHAKE-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [KMAC-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [KMAC-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [ParallelHash-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [ParallelHash-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [TupleHash-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [TupleHash-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
 
 ### Message Authentication
-* [AES-GMAC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [CMAC-AES](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [CMAC-TDES](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt) | [HTML](./artifacts/acvp_sub_mac.html)
+* [AES-GMAC](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [CMAC-AES](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [CMAC-TDES](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
 
 ### DRBG
-* [ctrDRBG-AES-128](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
-* [ctrDRBG-AES-192](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
-* [ctrDRBG-AES-256](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
-* [ctrDRBG-TDES](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
-* [HASH DRBG](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
-* [HMAC DRBG](./artifacts/acvp_sub_drbg.txt) | [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-AES-128](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-AES-192](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-AES-256](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-TDES](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
+* [HASH DRBG](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
+* [HMAC DRBG](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
 
 ### Digital Signature
-* [RSA mode: keyGen](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: sigGen](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: sigVer](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: signatureComponent](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: decryptionComponent](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: legacySigVer](./artifacts/acvp_sub_rsa.txt) | [HTML](./artifacts/acvp_sub_rsa.html)
-* [ECDSA mode: sigGenComponent](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [ECDSA mode: keyGen](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [ECDSA mode: keyVer](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [ECDSA mode: sigGen](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html) 
-* [ECDSA mode: sigVer](./artifacts/acvp_sub_ecdsa.txt) | [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [DSA mode: keyGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: sigVer](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: sigGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: pqgGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: pqgVer](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
-* [EDDSA mode: keyGen](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
-* [EDDSA mode: keyVer](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
-* [EDDSA mode: sigGen](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
-* [EDDSA mode: sigVer](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [RSA mode: keyGen](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: sigGen](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: sigVer](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: signatureComponent](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: decryptionComponent](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
+* [RSA mode: legacySigVer](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
+* [ECDSA mode: sigGenComponent](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [ECDSA mode: keyGen](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [ECDSA mode: keyVer](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [ECDSA mode: sigGen](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html) 
+* [ECDSA mode: sigVer](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
+* [DSA mode: keyGen](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: sigVer](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: sigGen](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: pqgGen](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
+* [DSA mode: pqgVer](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
+* [EDDSA mode: keyGen](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: keyVer](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: sigGen](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: sigVer](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
 
 ### Key Agreement
-* [KAS ECC ephemeralUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC fullMqv](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC fullUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC onePassDh](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC onePassMqv](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC OnePassUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC staticUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC CDH-Component](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS FFC dhHybrid1](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC mqv2](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html) 
-* [KAS FFC dhEphem](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC dhHybridOneFlow](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC mqv1](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC dhOneFlow](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC dhStatic](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS IFC KAS1-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS1-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-bilateral-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-Party_U-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KTS IFC KTS-OAEP-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KTS IFC KTS-OAEP-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS ECC ephemeralUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC fullMqv](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC fullUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC onePassDh](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC onePassMqv](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC OnePassUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC staticUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS ECC CDH-Component](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
+* [KAS FFC dhHybrid1](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC mqv2](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html) 
+* [KAS FFC dhEphem](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC dhHybridOneFlow](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC mqv1](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC dhOneFlow](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS FFC dhStatic](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS IFC KAS1-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS1-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-bilateral-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_U-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
 
 ### KDFs
-* [Counter KDF](./artifacts/acvp_sub_kdf108.txt) | [HTML](./artifacts/acvp_sub_kdf108.html)
-* [Feedback KDF](./artifacts/acvp_sub_kdf108.txt) | [HTML](./artifacts/acvp_sub_kdf108.html)
-* [Double Pipeline Iterator KDF](./artifacts/acvp_sub_kdf108.txt) | [HTML](./artifacts/acvp_sub_kdf108.html)
-* [IKEv1](./artifacts/acvp_sub_kdf135_ikev1.txt) | [HTML](./artifacts/acvp_sub_kdf135_ikev1.html)
-* [IKEv2](./artifacts/acvp_sub_kdf135_ikev2.txt) | [HTML](./artifacts/acvp_sub_kdf135_ikev2.html) 
-* [SNMP](./artifacts/acvp_sub_kdf135_snmp.txt) | [HTML](./artifacts/acvp_sub_kdf135_snmp.html)
-* [SRTP](./artifacts/acvp_sub_kdf135_srtp.txt) | [HTML](./artifacts/acvp_sub_kdf135_srtp.html)
-* [SSH](./artifacts/acvp_sub_kdf135_ssh.txt) | [HTML](./artifacts/acvp_sub_kdf135_ssh.html)
-* [TLS](./artifacts/acvp_sub_kdf135_tls.txt) | [HTML](./artifacts/acvp_sub_kdf135_tls.html)
-* [TPM](./artifacts/acvp_sub_kdf135_tpm.txt) | [HTML](./artifacts/acvp_sub_kdf135_tpm.html)
-* [ANSX9.63](./artifacts/acvp_sub_kdf135_x963.txt) | [HTML](./artifacts/acvp_sub_kdf135_x963.html)
-* [ANSX9.42](./artifacts/draft-celi-acvp-ans-x942.txt) | [HTML](./artifacts/draft-celi-acvp-ans-x942.html)
-* [PBKDF](./artifacts/draft-celi-acvp-pbkdf.txt) | [HTML](./artifacts/draft-celi-acvp-pbkdf.html)
+* [Counter KDF](./artifacts/acvp_sub_kdf108.txt) - [HTML](./artifacts/acvp_sub_kdf108.html)
+* [Feedback KDF](./artifacts/acvp_sub_kdf108.txt) - [HTML](./artifacts/acvp_sub_kdf108.html)
+* [Double Pipeline Iterator KDF](./artifacts/acvp_sub_kdf108.txt) - [HTML](./artifacts/acvp_sub_kdf108.html)
+* [IKEv1](./artifacts/acvp_sub_kdf135_ikev1.txt) - [HTML](./artifacts/acvp_sub_kdf135_ikev1.html)
+* [IKEv2](./artifacts/acvp_sub_kdf135_ikev2.txt) - [HTML](./artifacts/acvp_sub_kdf135_ikev2.html) 
+* [SNMP](./artifacts/acvp_sub_kdf135_snmp.txt) - [HTML](./artifacts/acvp_sub_kdf135_snmp.html)
+* [SRTP](./artifacts/acvp_sub_kdf135_srtp.txt) - [HTML](./artifacts/acvp_sub_kdf135_srtp.html)
+* [SSH](./artifacts/acvp_sub_kdf135_ssh.txt) - [HTML](./artifacts/acvp_sub_kdf135_ssh.html)
+* [TLS](./artifacts/acvp_sub_kdf135_tls.txt) - [HTML](./artifacts/acvp_sub_kdf135_tls.html)
+* [TPM](./artifacts/acvp_sub_kdf135_tpm.txt) - [HTML](./artifacts/acvp_sub_kdf135_tpm.html)
+* [ANSX9.63](./artifacts/acvp_sub_kdf135_x963.txt) - [HTML](./artifacts/acvp_sub_kdf135_x963.html)
+* [ANSX9.42](./artifacts/draft-celi-acvp-ans-x942.txt) - [HTML](./artifacts/draft-celi-acvp-ans-x942.html)
+* [PBKDF](./artifacts/draft-celi-acvp-pbkdf.txt) - [HTML](./artifacts/draft-celi-acvp-pbkdf.html)
 
 The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
