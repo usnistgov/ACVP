@@ -53,12 +53,14 @@ The demo server allows validation of the following algorithms (a superset of the
 * [AES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-GCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-GCM-SIV](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-GCM-SIV](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
 * [AES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-KWP](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-XPN](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-XTS](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-FF1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [AES-FF3-1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
 * [TDES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [TDES-CBCI](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [TDES-CFBP1](./artifacts/draft-celi-acvp-block-ciph-00.txt) | [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
@@ -128,6 +130,10 @@ The demo server allows validation of the following algorithms (a superset of the
 * [DSA mode: sigGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
 * [DSA mode: pqgGen](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
 * [DSA mode: pqgVer](./artifacts/acvp_sub_dsa.txt) | [HTML](./artifacts/acvp_sub_dsa.html)
+* [EDDSA mode: keyGen](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: keyVer](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: sigGen](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [EDDSA mode: sigVer](./artifacts/acvp_sub_eddsa.txt) | [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
 
 ### Key Agreement
 * [KAS ECC ephemeralUnified](./artifacts/acvp_sub_kas_ecc.txt) | [HTML](./artifacts/acvp_sub_kas_ecc.html)
@@ -145,6 +151,14 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS FFC mqv1](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
 * [KAS FFC dhOneFlow](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
 * [KAS FFC dhStatic](./artifacts/acvp_sub_kas_ffc.txt) | [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS IFC KAS1-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS1-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-bilateral-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_U-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-basic](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) | [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
 
 ### KDFs
 * [Counter KDF](./artifacts/acvp_sub_kdf108.txt) | [HTML](./artifacts/acvp_sub_kdf108.html)
@@ -161,7 +175,7 @@ The demo server allows validation of the following algorithms (a superset of the
 * [ANSX9.42](./artifacts/draft-celi-acvp-ans-x942.txt) | [HTML](./artifacts/draft-celi-acvp-ans-x942.html)
 * [PBKDF](./artifacts/draft-celi-acvp-pbkdf.txt) | [HTML](./artifacts/draft-celi-acvp-pbkdf.html)
 
-The prod server supports all of the above except for the EdDSA variants, AES-FF3-1 and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
+The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
 ## Current 1.0 Support
 Please check the protocol specification for details on how to access the available resources. 
