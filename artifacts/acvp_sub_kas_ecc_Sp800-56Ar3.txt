@@ -1,0 +1,2464 @@
+
+
+
+
+TBD                                                      R. Hammett, Ed.
+Internet-Draft                                                   HII-TSD
+Intended status: Informational                          January 10, 2020
+Expires: July 13, 2020
+
+
+              ACVP KAS ECC Sp800-56Ar3 JSON Specification
+                 draft-ietf-acvp-subkasecc-sp800-56ar3
+
+Abstract
+
+   This document defines the JSON schema for using KAS ECC algorithms
+   with the ACVP specification.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on July 13, 2020.
+
+Copyright Notice
+
+   Copyright (c) 2020 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (https://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 1]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+   2.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   3
+     2.1.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   3
+       2.1.1.  KAS-ECC Requirements Covered  . . . . . . . . . . . .   3
+       2.1.2.  KAS-ECC Requirements Not Covered  . . . . . . . . . .   5
+   3.  Capabilities Registration . . . . . . . . . . . . . . . . . .   6
+     3.1.  Required Prerequisite Algorithms for KAS ECC Validations    6
+     3.2.  KAS ECC Algorithm Capabilities JSON Values  . . . . . . .   7
+     3.3.  Supported KAS ECC Functions . . . . . . . . . . . . . . .   9
+     3.4.  KAS ECC Schemes . . . . . . . . . . . . . . . . . . . . .   9
+       3.4.1.  KAS ECC Scheme Capabilities JSON Values . . . . . . .   9
+         3.4.1.1.  Supported Kdf Methods . . . . . . . . . . . . . .  11
+         3.4.1.2.  Supported KeyConfirmation Method  . . . . . . . .  16
+         3.4.1.3.  FixedInfoPatternConstruction  . . . . . . . . . .  16
+         3.4.1.4.  Supported MAC Methods . . . . . . . . . . . . . .  17
+     3.5.  Example KAS-ECC Registration  . . . . . . . . . . . . . .  19
+   4.  Generation requirements per party per scheme  . . . . . . . .  22
+   5.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  30
+     5.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  31
+       5.1.1.  KDF Configuration JSON Schema . . . . . . . . . . . .  33
+       5.1.2.  MAC Configuration JSON Schema . . . . . . . . . . . .  34
+     5.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  35
+       5.2.1.  KDF Parameter JSON Schema . . . . . . . . . . . . . .  37
+     5.3.  Example Test Vectors JSON Object KAS-ECC  . . . . . . . .  38
+   6.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  40
+     6.1.  Example Test Results KAS-ECC JSON Object  . . . . . . . .  43
+   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  43
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  43
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  44
+   10. Normative References  . . . . . . . . . . . . . . . . . . . .  44
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  44
+
+1.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 2]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   sub-specification defines the JSON constructs for testing KAS ECC
+   algorithms using ACVP.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted in RFC 2119 [RFC2119] .
+
+2.  Test Types and Test Coverage
+
+   The ACVP server performs a set of tests on the KAS protocol in order
+   to assess the correctness and robustness of the implementation.  A
+   typical ACVP validation session SHALL require multiple tests to be
+   performed for every supported permutation of KAS capabilities.  This
+   section describes the design of the tests used to validate
+   implementations of KAS algorithms.  There are two test types for KAS
+   testing:
+
+      "AFT" - Algorithm Function Test.  In the AFT test mode, the IUT
+      SHALL act as a party in the Key Agreement with the ACVP server.
+      The server SHALL generate and provide all necessary information
+      for the IUT to perform a successful key agreement; both the server
+      and IUT MAY act as party U/V, as well as recipient/provider to key
+      confirmation.
+
+      "VAL" - Validation test.  In the VAL test mode, The ACVP server
+      MUST generate a complete (from both party U and party V's
+      perspectives) key agreement, and expects the IUT to be able to
+      determine if that agreement is valid.  Various types of errors
+      MSUT be introduced in varying portions of the key agreement
+      process (changed DKM, changed key, changed hash digest, etc), that
+      the IUT MUST be able to detect and report on.
+
+2.1.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [SP800-56Ar3] .
+
+2.1.1.  KAS-ECC Requirements Covered
+
+      SP 800-56Ar3 - 5.1 Cryptographic Hash Functions.  SHA1, SHA2, and
+      SHA3 hash functions SHALL be available for the various pieces of
+      KAS requiring use of a hash function; such as approved MACs and
+      OneStep KDF.
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 3]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+      SP 800-56Ar3 - 5.2 Message Authentication Code (MAC) Algorithms.
+      AES-CMAC, HMAC, and KMAC algorithms SHALL be available for testing
+      under KDFs and KC as the specification states.
+
+      SP 800-56Ar3 - 5.3 Random Number Generation.  Though random values
+      are used, the testing of the construction of those random values
+      SHALL NOT be in scope of ACVP testing.
+
+      SP 800-56Ar3 - 5.4 Nonces.  Though nonces are used, the testing of
+      the construction of those nonces SHALL NOT be in scope of ACVP
+      testing.
+
+      SP 800-56Ar3 - 5.5 Domain Parameters.  Domain Parameters SHALL be
+      used in the testing of KAS as per the specification, though the
+      generation of those parameters is outside the scope of testing.
+
+      SP 800-56Ar3 - 5.6 Key-Pair Generation.  Each KAS scheme from one
+      or both parties utilizes a key pair for arriving at a shared
+      secret, and deriving a key.  Though a key pair(s) are utilized in
+      ACVP testing, the testing of the generation of said key pairs is
+      outside the scope of this testing.
+
+      SP 800-56Ar3 - 5.7 DLC Primitives.  Diffie Hellman and MQV SHALL
+      be tested under their respective KAS schemes.
+
+      SP 800-56Ar3 - 5.8 Key-Derivation Methods for Key-Establishment
+      Schemes.  The ACVP server SHALL make various KDFs available for
+      testing.  The KDFs covered under ACVP server testing SHALL include
+      the KDFs specified in SP800-56B, SP800-56C, SP800-108, and
+      SP800-135 (where applicable).
+
+      SP 800-56Ar3 - 5.9 KeyConfirmation.  The ACVP server SHALL support
+      key confirmation for applicable KAS and KTS schemes.
+
+      SP 800-56Ar3 - 6 Key Agreement Schemes. he ACVP server SHALL
+      support testing for all KAS schemes specified in the SP800-56Ar3
+      document.
+
+      SP 800-56Cr1 - 4 One-Step Key Derivation.  One-Step Key Derivation
+      testing SHALL be supported by the ACVP server.  FixedInfo
+      construction is covered within the ACVP specification, and can be
+      tailored to the IUTs needs.  ASN.1 format of fixedInfo
+      construction (currently) is NOT supported.
+
+      SP 800-56Cr1 - 5 Two-Step Key Derivation.  Two-Step Key Derivation
+      testing SHALL be supported by the ACVP server.  FixedInfo
+      construction is covered within the ACVP specification, and can be
+
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 4]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+      tailored to the IUTs needs.  ASN.1 format of fixedInfo
+      construction (currently) is NOT supported.
+
+      SP 800-108 - 4 Pseudorandom Function (PRF).  All iterations of the
+      KDF described in SP800-108 use a separate PRF.  All
+      implementations of the PRF SHALL be available for testing through
+      the ACVP server generated tests.
+
+      SP 800-108 - 5 Key Derivation Functions (KDF).  The three
+      implementations of KDFs in SP800-108 SHALL be available for
+      testing through the ACVP Server.
+
+2.1.2.  KAS-ECC Requirements Not Covered
+
+      SP 800-56Ar3 - 4.3 DLC-based Key-Transport Process.  KeyWrapping
+      is not incorporated into ACVP testing.
+
+      SP 800-56Ar3 - 5.3 Random Number Generation.  Though random values
+      are used, the testing of the construction of those random values
+      SHALL NOT be in scope of ACVP testing.
+
+      SP 800-56Ar3 - 5.4 Nonces.  Though nonces are used, the testing of
+      the construction of those nonces SHALL NOT be in scope of ACVP
+      testing.
+
+      SP 800-56Ar3 - 5.5 Domain Parameters.  Domain Parameters SHALL be
+      used in the testing of KAS as per the specification, though the
+      generation of those parameters is outside the scope of testing.
+
+      SP 800-56Ar3 - 5.6 Key-Pair Generation.  Each KAS scheme from one
+      or both parties utilizes a key pair for arriving at a shared
+      secret, and deriving a key.  Though a key pair(s) are utilized in
+      ACVP testing, the testing of the generation of said key pairs is
+      outside the scope of this testing.
+
+      SP 800-56Ar3 - 5.6.2 Required Assurances.  IUT assurance testing
+      is outside the scope of ACVP testing.
+
+      SP 800-56Ar3 - 5.6.2 Key Pair Management.  Testing the IUT's
+      management of Key Pairs is outside the scope of ACVP testing.
+
+      SP 800-56Ar3 - 5.8.1.2 The ASN.1 Format for FixedInfo.  The ACVP
+      server (currently) SHALL NOT support the testing of this format of
+      fixed info.
+
+      SP 800-56Ar3 - 7 Rationale for Selecting a Specific Scheme.  There
+      is no testing associated with the IUT's choice of selecting a
+      specific scheme.
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 5]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+      SP 800-56Ar3 - 8 Key Recovery.  Key Recovery SHALL NOT be within
+      the scope of ACVP testing.
+
+      SP 800-56Cr1 - 4 One-Step Key Derivation.  ASN.1 format of
+      fixedInfo construction (currently) is NOT supported.
+
+      SP 800-56Cr1 - 5 Two-Step Key Derivation.  ASN.1 format of
+      fixedInfo construction (currently) is NOT supported.
+
+      SP 800-56Cr1 - 7 Selecting Hash Functions and MAC Algorithms.  The
+      process that goes into the selection of Hash functions and MAC
+      algorithms SHALL NOT be in scope of ACVP testing, though the ACVP
+      server SHALL support all indicated Hash and MAC functions.
+
+      SP 800-56Cr1 - 7 Selecting Hash Functions and MAC Algorithms.  The
+      process that goes into the selection of Hash functions and MAC
+      algorithms SHALL NOT be in scope of ACVP testing, though the ACVP
+      server SHALL support all indicated Hash and MAC functions.
+
+3.  Capabilities Registration
+
+   ACVP REQUIRES crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of KAS ECC algorithms to the
+   ACVP server.
+
+   The algorithm capabilities are advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification for details on the
+   registration message.  Each KDF algorithm capability advertised is a
+   self-contained JSON object.
+
+3.1.  Required Prerequisite Algorithms for KAS ECC Validations
+
+   Some algorithm implementations rely on other cryptographic
+   primitives.  For example, IKEv2 uses an underlying SHA algorithm.
+   Each of these underlying algorithm primitives must be validated,
+   either separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 6]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +--------------+--------------+--------------+-----------+----------+
+   | JSON Value   | Description  | JSON type    | Valid     | Optional |
+   |              |              |              | Values    |          |
+   +--------------+--------------+--------------+-----------+----------+
+   | algorithm    | a            | value        | CMAC,     | No       |
+   |              | prerequisite |              | DRBG,     |          |
+   |              | algorithm    |              | ECDSA,    |          |
+   |              |              |              | HMAC,     |          |
+   |              |              |              | SHA, KMAC |          |
+   |              |              |              |           |          |
+   | valValue     | algorithm    | value        | actual    | No       |
+   |              | validation   |              | number or |          |
+   |              | number       |              | "same"    |          |
+   |              |              |              |           |          |
+   | prereqAlgVal | prerequistie | object with  | see above | Yes      |
+   |              | algorithm    | algorithm    |           |          |
+   |              | validation   | and valValue |           |          |
+   |              |              | properties   |           |          |
+   |              |              |              |           |          |
+   +--------------+--------------+--------------+-----------+----------+
+
+           Table 1: Required Prerequisite Algorithms JSON Values
+
+3.2.  KAS ECC Algorithm Capabilities JSON Values
+
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+   +-----------------------+----------+-----------+-----------+--------+
+   | JSON Value            | Descript | JSON type | Valid     | Option |
+   |                       | ion      |           | Values    | al     |
+   +-----------------------+----------+-----------+-----------+--------+
+   | algorithm             | The algo | value     | KAS-ECC   | No     |
+   |                       | rithm    |           |           |        |
+   |                       | under    |           |           |        |
+   |                       | test     |           |           |        |
+   |                       |          |           |           |        |
+   | revision              | The algo | value     | "Sp800-56 | No     |
+   |                       | rithm    |           | Ar3"      |        |
+   |                       | testing  |           |           |        |
+   |                       | revision |           |           |        |
+   |                       | to use.  |           |           |        |
+   |                       |          |           |           |        |
+   | prereqVals            | Prerequi | array of  | See Secti | No     |
+   |                       | site alg | prereqAlg | on 3.1    |        |
+   |                       | orithm v | Val       |           |        |
+   |                       | alidatio | objects   |           |        |
+   |                       | ns       |           |           |        |
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 7]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |                       |          |           |           |        |
+   | function              | Type of  | array     | See Secti | Yes    |
+   |                       | function |           | on 3.3    |        |
+   |                       | supporte |           |           |        |
+   |                       | d        |           |           |        |
+   |                       |          |           |           |        |
+   | iutId                 | The iden | hex       |           | No     |
+   |                       | tifier   |           |           |        |
+   |                       | of the   |           |           |        |
+   |                       | IUT.     |           |           |        |
+   |                       |          |           |           |        |
+   | scheme                | Array of | object    | See Secti | No     |
+   |                       | supporte |           | on 3.4.1  |        |
+   |                       | d key ag |           |           |        |
+   |                       | reement  |           |           |        |
+   |                       | schemes  |           |           |        |
+   |                       | each     |           |           |        |
+   |                       | having   |           |           |        |
+   |                       | their    |           |           |        |
+   |                       | own capa |           |           |        |
+   |                       | bilities |           |           |        |
+   |                       |          |           |           |        |
+   | domainParameterGenera | Array of | array     | P-192,    | No     |
+   | tionMethods           | IUT supp |           | P-224,    |        |
+   |                       | orted    |           | P-256,    |        |
+   |                       | domain p |           | P-384,    |        |
+   |                       | arameter |           | P-521,    |        |
+   |                       | generati |           | K-163,    |        |
+   |                       | on       |           | K-233,    |        |
+   |                       | methods. |           | K-283,    |        |
+   |                       |          |           | K-409,    |        |
+   |                       |          |           | K-571,    |        |
+   |                       |          |           | B-163,    |        |
+   |                       |          |           | B-233,    |        |
+   |                       |          |           | B-283,    |        |
+   |                       |          |           | B-409,    |        |
+   |                       |          |           | B-571     |        |
+   |                       |          |           |           |        |
+   +-----------------------+----------+-----------+-----------+--------+
+
+                 Table 2: KAS ECC Capabilities JSON Values
+
+   Note: Some optional values are required depending on the algorithm.
+   Failure to provide these values will result in the ACVP server
+   returning an error to the ACVP client during registration.
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 8]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+3.3.  Supported KAS ECC Functions
+
+   The following function types MAY be advertised by the ACVP compliant
+   crypto module:
+
+   o  keyPairGen - IUT can perform keypair generation.
+
+   o  partialVal - IUT can perform partial public key validation (
+      [SP800-56Ar3] section 5.6.2.3)
+
+   o  fullVal - IUT can perform full public key validation (
+      [SP800-56Ar3] section 5.6.2.3)
+
+3.4.  KAS ECC Schemes
+
+   All other scheme capabilities are advertised as a self-contained JSON
+   object using the following values.  Note that AT LEAST one valid
+   scheme must be registered.
+
+3.4.1.  KAS ECC Scheme Capabilities JSON Values
+
+   o  ephemeralUnified - keyConfirmation not supported
+
+   o  fullMqv
+
+   o  fullUnified
+
+   o  onePassDh - Can only provide unilateral key confirmation party V
+      to party U.
+
+   o  onePassMqv
+
+   o  onePassUnified
+
+   o  staticUnified
+
+   +--------------------+---------------+--------+----------+----------+
+   | JSON Value         | Description   | JSON   | Valid    | Optional |
+   |                    |               | type   | Values   |          |
+   +--------------------+---------------+--------+----------+----------+
+   | kasRole            | Roles         | array  | initiato | No       |
+   |                    | supported for |        | r and/or |          |
+   |                    | key agreement |        | responde |          |
+   |                    |               |        | r        |          |
+   |                    |               |        |          |          |
+   | kdfMethods         | The KDF       | object | Section  | No       |
+   |                    | methods to    |        | 3.4.1.1  |          |
+   |                    | use when      |        |          |          |
+
+
+
+Hammett                   Expires July 13, 2020                 [Page 9]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |                    | testing KAS   |        |          |          |
+   |                    | schemes.      |        |          |          |
+   |                    |               |        |          |          |
+   | keyConfirmationMet | The KeyConfir | object | Section  | Yes      |
+   | hod                | mation        |        | 3.4.1.2  |          |
+   |                    | capabilities  |        |          |          |
+   |                    | (when         |        |          |          |
+   |                    | supported)    |        |          |          |
+   |                    | for the       |        |          |          |
+   |                    | scheme.       |        |          |          |
+   |                    |               |        |          |          |
+   | l                  | The length of | intege | 128      | No       |
+   |                    | the key to    | r      | minimum  |          |
+   |                    | derive (using |        | without  |          |
+   |                    | a KDF) or     |        | KC, 136  |          |
+   |                    | transport     |        | minimum  |          |
+   |                    | (using a KTS  |        | with KC, |          |
+   |                    | scheme). This |        | maximum  |          |
+   |                    | value should  |        | 1024.    |          |
+   |                    | be large      |        |          |          |
+   |                    | enough to     |        |          |          |
+   |                    | accommodate   |        |          |          |
+   |                    | the key       |        |          |          |
+   |                    | length used   |        |          |          |
+   |                    | for the mac   |        |          |          |
+   |                    | algorithms in |        |          |          |
+   |                    | use for key   |        |          |          |
+   |                    | confirmation, |        |          |          |
+   |                    | ideally the   |        |          |          |
+   |                    | maximum value |        |          |          |
+   |                    | the IUT can   |        |          |          |
+   |                    | support with  |        |          |          |
+   |                    | their KAS/KTS |        |          |          |
+   |                    | implementatio |        |          |          |
+   |                    | n. Maximum    |        |          |          |
+   |                    | value (for    |        |          |          |
+   |                    | testing       |        |          |          |
+   |                    | purposes) is  |        |          |          |
+   |                    | 1024.         |        |          |          |
+   |                    |               |        |          |          |
+   +--------------------+---------------+--------+----------+----------+
+
+                 Table 3: KAS ECC Capabilities JSON Values
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 10]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+3.4.1.1.  Supported Kdf Methods
+
+   Note that AT LEAST one KDF Method is required for KAS schemes.  The
+   following MAY be advertised by the ACVP compliant crypto module:
+
+   +------------+----------------------+--------+-----------+----------+
+   | JSON Value | Description          | JSON   | Valid     | Optional |
+   |            |                      | type   | Values    |          |
+   +------------+----------------------+--------+-----------+----------+
+   | oneStepKdf | Indicates the IUT    | object | Section 3 | Yes      |
+   |            | will be testing key  |        | .4.1.1.1  |          |
+   |            | derivation using the |        |           |          |
+   |            | SP800-56Cr1          |        |           |          |
+   |            | OneStepKdf.          |        |           |          |
+   |            |                      |        |           |          |
+   | twoStepKdf | Indicates the IUT    | object | Section 3 | Yes      |
+   |            | will be testing key  |        | .4.1.1.2  |          |
+   |            | derivation using the |        |           |          |
+   |            | SP800-56Cr1          |        |           |          |
+   |            | OneStepKdf.          |        |           |          |
+   |            |                      |        |           |          |
+   +------------+----------------------+--------+-----------+----------+
+
+                           Table 4: KDF Options
+
+3.4.1.1.1.  One Step KDF Capabilities
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 11]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +---------------+-------------+------------+--------------+---------+
+   | JSON Value    | Description | JSON type  | Valid Values | Optiona |
+   |               |             |            |              | l       |
+   +---------------+-------------+------------+--------------+---------+
+   | auxFunctions  | The         | array of S | See Section  | No      |
+   |               | auxiliary   | ection 3.4 | 3.4.1.1.1.1  |         |
+   |               | functions   | .1.1.1.1   |              |         |
+   |               | to use with |            |              |         |
+   |               | the KDF.    |            |              |         |
+   |               |             |            |              |         |
+   | fixedInfoPatt | The pattern | string     | See Section  | No      |
+   | ern           | used for    |            | 3.4.1.3      |         |
+   |               | fixedInfo c |            |              |         |
+   |               | onstruction |            |              |         |
+   |               | .           |            |              |         |
+   |               |             |            |              |         |
+   | encoding      | The         | array of   | concatenatio | No      |
+   |               | encoding    | string     | n            |         |
+   |               | type to use |            |              |         |
+   |               | with        |            |              |         |
+   |               | fixedInfo c |            |              |         |
+   |               | onstruction |            |              |         |
+   |               | . Note conc |            |              |         |
+   |               | atenation   |            |              |         |
+   |               | is          |            |              |         |
+   |               | currently   |            |              |         |
+   |               | supported,  |            |              |         |
+   |               | ASN.1       |            |              |         |
+   |               | support     |            |              |         |
+   |               | should be   |            |              |         |
+   |               | coming.     |            |              |         |
+   |               |             |            |              |         |
+   +---------------+-------------+------------+--------------+---------+
+
+                       Table 5: One Step KDF Options
+
+3.4.1.1.1.1.  AuxFunction Capabilities
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 12]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +----------------+------------+--------+---------------+------------+
+   | JSON Value     | Descriptio | JSON   | Valid Values  | Optional   |
+   |                | n          | type   |               |            |
+   +----------------+------------+--------+---------------+------------+
+   | auxFunctionNam | The        | string | SHA2-224,     | No         |
+   | e              | auxiliary  |        | SHA2-256,     |            |
+   |                | function   |        | SHA2-384,     |            |
+   |                | to use.    |        | SHA2-512,     |            |
+   |                |            |        | SHA2-512/224, |            |
+   |                |            |        | SHA2-512/256, |            |
+   |                |            |        | SHA3-224,     |            |
+   |                |            |        | SHA3-256,     |            |
+   |                |            |        | SHA3-384,     |            |
+   |                |            |        | SHA3-512,     |            |
+   |                |            |        | KMAC-128,     |            |
+   |                |            |        | KMAC-256      |            |
+   |                |            |        |               |            |
+   | macSaltMethods | How the    | array  | default,      | Not        |
+   |                | salt is    | of     | random        | optional   |
+   |                | determined | string |               | for mac    |
+   |                | (default   |        |               | based      |
+   |                | being all  |        |               | auxiliary  |
+   |                | 00s,       |        |               | functions. |
+   |                | random     |        |               |            |
+   |                | being a    |        |               |            |
+   |                | random     |        |               |            |
+   |                | salt).     |        |               |            |
+   |                |            |        |               |            |
+   +----------------+------------+--------+---------------+------------+
+
+                       Table 6: AuxFunction Options
+
+3.4.1.1.2.  Two Step KDF Capabilities
+
+   +-------------+--------------+-------------+-------------+----------+
+   | JSON Value  | Description  | JSON type   | Valid       | Optional |
+   |             |              |             | Values      |          |
+   +-------------+--------------+-------------+-------------+----------+
+   | capabilitie | The          | array of Se | See Section | No       |
+   | s           | capabilities | ction 3.4.1 |  3.4.1.1.2. |          |
+   |             | supported    | .1.2.1      | 1           |          |
+   |             | for the Two  |             |             |          |
+   |             | step KDF.    |             |             |          |
+   |             |              |             |             |          |
+   +-------------+--------------+-------------+-------------+----------+
+
+                       Table 7: Two Step KDF Options
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 13]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+3.4.1.1.2.1.  TwoStepCapabilities Capabilities
+
+   Note this capabilities object is very similar to the capability
+   object from SP800-108.
+
+   +---------------+------------+--------+-----------------+-----------+
+   | JSON Value    | Descriptio | JSON   | Valid Values    | Optional  |
+   |               | n          | type   |                 |           |
+   +---------------+------------+--------+-----------------+-----------+
+   | macSaltMethod | How the    | array  | default, random | Not       |
+   | s             | salt is    | of     |                 | optional  |
+   |               | determined | string |                 | for mac   |
+   |               | (default   |        |                 | based     |
+   |               | being all  |        |                 | auxiliary |
+   |               | 00s,       |        |                 | functions |
+   |               | random     |        |                 | .         |
+   |               | being a    |        |                 |           |
+   |               | random     |        |                 |           |
+   |               | salt).     |        |                 |           |
+   |               |            |        |                 |           |
+   | fixedInfoPatt | The        | string | See             | No        |
+   | ern           | pattern    |        | Section 3.4.1.3 |           |
+   |               | used for   |        |                 |           |
+   |               | fixedInfo  |        |                 |           |
+   |               | constructi |        |                 |           |
+   |               | on.        |        |                 |           |
+   |               |            |        |                 |           |
+   | encoding      | The        | array  | concatenation   | No        |
+   |               | encoding   | of     |                 |           |
+   |               | type to    | string |                 |           |
+   |               | use with   |        |                 |           |
+   |               | fixedInfo  |        |                 |           |
+   |               | constructi |        |                 |           |
+   |               | on. Note c |        |                 |           |
+   |               | oncatenati |        |                 |           |
+   |               | on is      |        |                 |           |
+   |               | currently  |        |                 |           |
+   |               | supported, |        |                 |           |
+   |               | ASN.1      |        |                 |           |
+   |               | support    |        |                 |           |
+   |               | should be  |        |                 |           |
+   |               | coming.    |        |                 |           |
+   |               |            |        |                 |           |
+   | kdfMode       | The        | string | counter,        | No        |
+   |               | strategy   |        | feedback,       |           |
+   |               | of running |        | double pipeline |           |
+   |               | the KDF.   |        | iteration       |           |
+   |               |            |        |                 |           |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 14]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | macModes      | The        | array  | CMAC-AES128,    | No        |
+   |               | macModes   | of     | CMAC-AES192,    |           |
+   |               | supported  | string | CMAC-AES256,    |           |
+   |               | by the     |        | HMAC-SHA-1,     |           |
+   |               | KDF.       |        | HMAC-SHA2-224,  |           |
+   |               |            |        | HMAC-SHA2-256,  |           |
+   |               |            |        | HMAC-SHA2-384,  |           |
+   |               |            |        | HMAC-SHA2-512,  |           |
+   |               |            |        | HMAC-           |           |
+   |               |            |        | SHA2-512/224,   |           |
+   |               |            |        | HMAC-           |           |
+   |               |            |        | SHA2-512/256,   |           |
+   |               |            |        | HMAC-SHA3-224,  |           |
+   |               |            |        | HMAC-SHA3-256,  |           |
+   |               |            |        | HMAC-SHA3-384,  |           |
+   |               |            |        | HMAC-SHA3-512   |           |
+   |               |            |        |                 |           |
+   | fixedDataOrde | The        | array  | none, before    | No        |
+   | r             | counter    | of     | fixed data,     |           |
+   |               | locations  | string | after fixed     |           |
+   |               | supported  |        | data, before    |           |
+   |               | by the     |        | iterator        |           |
+   |               | KDF.       |        |                 |           |
+   |               |            |        |                 |           |
+   | counterLength | The        | array  | 8, 16, 24, 32   | Not       |
+   |               | counter    | of int |                 | optional  |
+   |               | lengths    | eger   |                 | for       |
+   |               | supported  |        |                 | counter   |
+   |               | for the    |        |                 | mode.     |
+   |               | KDF.       |        |                 |           |
+   |               |            |        |                 |           |
+   | supportedLeng | The        | Domain | Single range    | No        |
+   | ths           | supported  | .      | (or literal)    |           |
+   |               | derivation |        | expected.       |           |
+   |               | lengths.   |        | Registered      |           |
+   |               |            |        | value must      |           |
+   |               |            |        | support the L   |           |
+   |               |            |        | value provided. |           |
+   |               |            |        |                 |           |
+   | supportsEmpty | The KDF    | boolea | true, false     | No        |
+   | Iv            | supports   | n      |                 |           |
+   |               | an empty   |        |                 |           |
+   |               | IV         |        |                 |           |
+   |               | (feedback  |        |                 |           |
+   |               | mode).     |        |                 |           |
+   |               |            |        |                 |           |
+   | requiresEmpty | The KDF    | boolea | true, false     | Yes       |
+   | Iv            | requires   | n      |                 |           |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 15]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |               | an empty   |        |                 |           |
+   |               | IV         |        |                 |           |
+   |               | (feedback  |        |                 |           |
+   |               | mode).     |        |                 |           |
+   |               |            |        |                 |           |
+   +---------------+------------+--------+-----------------+-----------+
+
+                   Table 8: TwoStepCapabilities Options
+
+3.4.1.2.  Supported KeyConfirmation Method
+
+   +----------------------+------------+--------+------------+---------+
+   | JSON Value           | Descriptio | JSON   | Valid      | Optiona |
+   |                      | n          | type   | Values     | l       |
+   +----------------------+------------+--------+------------+---------+
+   | macMethods           | The MAC    | object | Section 3. | No      |
+   |                      | methods to |        | 4.1.4      |         |
+   |                      | use when   |        |            |         |
+   |                      | testing    |        |            |         |
+   |                      | KAS or KTS |        |            |         |
+   |                      | schemes    |        |            |         |
+   |                      | with key c |        |            |         |
+   |                      | onfirmatio |        |            |         |
+   |                      | n.         |        |            |         |
+   |                      |            |        |            |         |
+   | keyConfirmationDirec | The        | array  | unilateral | No      |
+   | tions                | directions |        | ,          |         |
+   |                      | in which   |        | bilateral  |         |
+   |                      | key confir |        |            |         |
+   |                      | mation is  |        |            |         |
+   |                      | supported. |        |            |         |
+   |                      |            |        |            |         |
+   | keyConfirmationRoles | The roles  | array  | provider,  | No      |
+   |                      | in which   |        | recipient  |         |
+   |                      | key confir |        |            |         |
+   |                      | mation is  |        |            |         |
+   |                      | supported. |        |            |         |
+   |                      |            |        |            |         |
+   +----------------------+------------+--------+------------+---------+
+
+         Table 9: KAS ECC KeyConfirmation Capabilities JSON Values
+
+3.4.1.3.  FixedInfoPatternConstruction
+
+   IUTs SHALL be capable of specifying how the FixedInfo is constructed
+   for the KAS/KTS negotiation.
+
+   Pattern candidates:
+
+
+
+Hammett                   Expires July 13, 2020                [Page 16]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   o  literal[123456789ABCDEF]
+
+      *  uses the specified hex within "[]". literal[123456789ABCDEF]
+         substitutes "123456789ABCDEF" in place of the field
+
+   o  uPartyInfo
+
+      *  uPartyId { || dkmNonce } { || c }
+
+   o  vPartyInfo
+
+      *  vPartyId { || dkmNonce } { || c }
+
+   o  context
+
+      *  Random value chosen by ACVP server to represent the context.
+
+   o  algorithmId
+
+      *  Random value chosen by ACVP server to represent the
+         algorithmId.
+
+   o  label
+
+      *  Random value chosen by ACVP server to represent the label.
+
+   Example (Note that party U is the server in this case "434156536964",
+   party V is the IUT "a1b2c3d4e5"):
+
+   o  "concatenation" :
+      "literal[123456789CAFECAFE]||uPartyInfo||vPartyInfo"
+
+   Evaluated as:
+
+   o  "123456789CAFECAFE434156536964a1b2c3d4e5"
+
+3.4.1.4.  Supported MAC Methods
+
+   Note that AT LEAST one mac method must be supplied when making use of
+   Key Confirmation.
+
+   +-----------------+-----------------+--------+-----------+----------+
+   | JSON Value      | Description     | JSON   | Valid     | Optional |
+   |                 |                 | type   | Values    |          |
+   +-----------------+-----------------+--------+-----------+----------+
+   | CMAC            | Utilize CMAC as | object | See Secti | Yes      |
+   |                 | the MAC         |        | on 3.4.1. |          |
+   |                 | algorithm.      |        | 4.1 .     |          |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 17]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |                 |                 |        | Note that |          |
+   |                 |                 |        | the       |          |
+   |                 |                 |        | keyLen    |          |
+   |                 |                 |        | must be   |          |
+   |                 |                 |        | 128, 192, |          |
+   |                 |                 |        | or 256    |          |
+   |                 |                 |        | for this  |          |
+   |                 |                 |        | MAC.      |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA2-224   | Utilize HMAC-   | object | See Secti | Yes      |
+   |                 | SHA2-224 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA2-256   | Utilize HMAC-   | object | See Secti | Yes      |
+   |                 | SHA2-256 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA2-384   | Utilize HMAC-   | object | See Secti | Yes      |
+   |                 | SHA2-384 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA2-512   | Utilize HMAC-   | object | See Secti | Yes      |
+   |                 | SHA2-512 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | HMAC-           | Utilize HMAC-   | object | See Secti | Yes      |
+   | SHA2-512/224    | SHA2-512/224 as |        | on 3.4.1. |          |
+   |                 | the MAC         |        | 4.1 .     |          |
+   |                 | algorithm.      |        |           |          |
+   |                 |                 |        |           |          |
+   | HMAC-           | Utilize HMAC-   | object | See Secti | Yes      |
+   | SHA2-512/256    | SHA2-512/256 as |        | on 3.4.1. |          |
+   |                 | the MAC         |        | 4.1 .     |          |
+   |                 | algorithm.      |        |           |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA3-224   | Utilize HMAC-   | object | See Secti | Yes      |
+   |                 | SHA3-224 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA3-256   | Utilize HMAC-   | object | See Secti | Yes      |
+   |                 | SHA3-256 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA3-384   | Utilize HMAC-   | object | See Secti | Yes      |
+   |                 | SHA3-384 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | HMAC-SHA3-512   | Utilize HMAC-   | object | See Secti | Yes      |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 18]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |                 | SHA3-512 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | KMAC-128        | Utilize         | object | See Secti | Yes      |
+   |                 | KMAC-128 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   | KMAC-256        | Utilize         | object | See Secti | Yes      |
+   |                 | KMAC-256 as the |        | on 3.4.1. |          |
+   |                 | MAC algorithm.  |        | 4.1 .     |          |
+   |                 |                 |        |           |          |
+   +-----------------+-----------------+--------+-----------+----------+
+
+                       Table 10: MAC Method Options
+
+3.4.1.4.1.  Supported MAC Options
+
+   +--------+-----------------+---------+-------------------+----------+
+   | JSON   | Description     | JSON    | Valid Values      | Optional |
+   | Value  |                 | type    |                   |          |
+   +--------+-----------------+---------+-------------------+----------+
+   | keyLen | The amount of   | integer | 128 - 512.  Note  | No       |
+   |        | bits from the   |         | that the DKM is   |          |
+   |        | DKM to pass     |         | REQUIRED to have  |          |
+   |        | into the        |         | at least 8 bits   |          |
+   |        | KeyConfirmation |         | available after   |          |
+   |        | MAC function.   |         | subtracting the   |          |
+   |        |                 |         | keyLen specified. |          |
+   |        |                 |         |                   |          |
+   | macLen | The amount of   | integer | 64 - 512          | No       |
+   |        | to use as the   |         |                   |          |
+   |        | tag from the    |         |                   |          |
+   |        | MAC function.   |         |                   |          |
+   |        |                 |         |                   |          |
+   +--------+-----------------+---------+-------------------+----------+
+
+                     Table 11: MAC Method Base Options
+
+3.5.  Example KAS-ECC Registration
+
+   The following is a example JSON object advertising support for KAS
+   ECC.
+
+
+{
+  "algorithm": "KAS-ECC",
+  "revision": "Sp800-56Ar3",
+  "prereqVals": [{
+
+
+
+Hammett                   Expires July 13, 2020                [Page 19]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+    "algorithm": "ECDSA",
+    "valValue": "123456"
+  },
+  {
+      "algorithm": "DRBG",
+      "valValue": "123456"
+  },
+  {
+      "algorithm": "SHA",
+      "valValue": "123456"
+  },
+  {
+      "algorithm": "KMAC",
+      "valValue": "123456"
+  },
+  {
+      "algorithm": "HMAC",
+      "valValue": "123456"
+  }
+  ],
+  "function": ["keyPairGen", "partialVal"],
+  "iutId": "123456ABCD",
+  "scheme": {
+    "ephemeralUnified": {
+      "kasRole": [
+        "initiator",
+        "responder"
+      ],
+      "kdfMethods": {
+        "oneStepKdf": {
+          "auxFunctions": [{
+            "auxFunctionName": "KMAC-128",
+            "macSaltMethods": [
+              "default"
+            ]
+          }],
+          "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+          "encoding": [
+            "concatenation"
+          ]
+        },
+        "twoStepKdf": {
+          "capabilities": [{
+            "macSaltMethods": [
+              "random"
+            ],
+            "fixedInfoPattern": "l||label||uPartyInfo||vPartyInfo||context",
+            "encoding": [
+
+
+
+Hammett                   Expires July 13, 2020                [Page 20]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+              "concatenation"
+            ],
+            "kdfMode": "feedback",
+            "macMode": [
+              "HMAC-SHA3-224"
+            ],
+            "supportedLengths": [
+              512
+            ],
+            "fixedDataOrder": [
+              "after fixed data"
+            ],
+            "counterLength": [
+              32
+            ],
+            "requiresEmptyIv": false,
+            "supportsEmptyIv": false
+          }]
+        }
+      },
+      "l": 512
+    },
+    "onePassDh": {
+      "kasRole": [
+        "initiator",
+        "responder"
+      ],
+      "kdfMethods": {
+        "oneStepKdf": {
+          "auxFunctions": [{
+            "auxFunctionName": "KMAC-128",
+            "macSaltMethods": [
+              "default"
+            ]
+          }],
+          "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+          "encoding": [
+            "concatenation"
+          ]
+        },
+        "twoStepKdf": {
+          "capabilities": [{
+            "macSaltMethods": [
+              "random"
+            ],
+            "fixedInfoPattern": "l||label||uPartyInfo||vPartyInfo||context",
+            "encoding": [
+              "concatenation"
+
+
+
+Hammett                   Expires July 13, 2020                [Page 21]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+            ],
+            "kdfMode": "feedback",
+            "macMode": [
+              "HMAC-SHA3-224"
+            ],
+            "supportedLengths": [
+              512
+            ],
+            "fixedDataOrder": [
+              "after fixed data"
+            ],
+            "counterLength": [
+              32
+            ],
+            "requiresEmptyIv": false,
+            "supportsEmptyIv": false
+          }]
+        }
+      },
+      "keyConfirmationMethod": {
+        "macMethods": {
+          "KMAC-128": {
+            "keyLen": 128,
+            "macLen": 128
+          }
+        },
+        "keyConfirmationDirections": [
+          "unilateral"
+        ],
+        "keyConfirmationRoles": [
+          "provider",
+          "recipient"
+        ]
+      },
+      "l": 512
+    }
+  },
+  "domainParameterGenerationMethods": [
+    "P-192"
+  ]
+}
+
+
+4.  Generation requirements per party per scheme
+
+   The various schemes of KAS all have their own requirements as to keys
+   and nonces per scheme, per party.  The below table demonstrates those
+   generation requirements:
+
+
+
+Hammett                   Expires July 13, 2020                [Page 22]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +------+-----+------+-------+---------+-------+-------+-------+-----+
+   | Sche | Kas | KasR | KeyCo | KeyConf | Stati | Ephem | Ephem | Dkm |
+   | me   | Mod | ole  | nfirm | irmatio | cKeyP | eralK | eralN | Non |
+   |      | e   |      | ation | nDirect | air   | eyPai | once  | ce  |
+   |      |     |      | Role  | ion     |       | r     |       |     |
+   +------+-----+------+-------+---------+-------+-------+-------+-----+
+   | DhHy | NoK | Init | None  | None    | True  | True  | False | Fal |
+   | brid | dfN | iato |       |         |       |       |       | se  |
+   | 1    | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | NoK | Resp | None  | None    | True  | True  | False | Fal |
+   | brid | dfN | onde |       |         |       |       |       | se  |
+   | 1    | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | None  | None    | True  | True  | False | Fal |
+   | brid | NoK | iato |       |         |       |       |       | se  |
+   | 1    | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | None  | None    | True  | True  | False | Fal |
+   | brid | NoK | onde |       |         |       |       |       | se  |
+   | 1    | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Provi | Unilate | True  | True  | False | Fal |
+   | brid | Kc  | iato | der   | ral     |       |       |       | se  |
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Provi | Bilater | True  | True  | False | Fal |
+   | brid | Kc  | iato | der   | al      |       |       |       | se  |
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Recip | Unilate | True  | True  | False | Fal |
+   | brid | Kc  | iato | ient  | ral     |       |       |       | se  |
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Recip | Bilater | True  | True  | False | Fal |
+   | brid | Kc  | iato | ient  | al      |       |       |       | se  |
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Provi | Unilate | True  | True  | False | Fal |
+   | brid | Kc  | onde | der   | ral     |       |       |       | se  |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 23]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Provi | Bilater | True  | True  | False | Fal |
+   | brid | Kc  | onde | der   | al      |       |       |       | se  |
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Recip | Unilate | True  | True  | False | Fal |
+   | brid | Kc  | onde | ient  | ral     |       |       |       | se  |
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Recip | Bilater | True  | True  | False | Fal |
+   | brid | Kc  | onde | ient  | al      |       |       |       | se  |
+   | 1    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | NoK | Init | None  | None    | True  | True  | False | Fal |
+   |      | dfN | iato |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | NoK | Resp | None  | None    | True  | True  | False | Fal |
+   |      | dfN | onde |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Init | None  | None    | True  | True  | False | Fal |
+   |      | NoK | iato |       |         |       |       |       | se  |
+   |      | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Resp | None  | None    | True  | True  | False | Fal |
+   |      | NoK | onde |       |         |       |       |       | se  |
+   |      | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Init | Provi | Unilate | True  | True  | False | Fal |
+   |      | Kc  | iato | der   | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Init | Provi | Bilater | True  | True  | False | Fal |
+   |      | Kc  | iato | der   | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 24]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | Mqv2 | Kdf | Init | Recip | Unilate | True  | True  | False | Fal |
+   |      | Kc  | iato | ient  | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Init | Recip | Bilater | True  | True  | False | Fal |
+   |      | Kc  | iato | ient  | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Resp | Provi | Unilate | True  | True  | False | Fal |
+   |      | Kc  | onde | der   | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Resp | Provi | Bilater | True  | True  | False | Fal |
+   |      | Kc  | onde | der   | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Resp | Recip | Unilate | True  | True  | False | Fal |
+   |      | Kc  | onde | ient  | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv2 | Kdf | Resp | Recip | Bilater | True  | True  | False | Fal |
+   |      | Kc  | onde | ient  | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhEp | NoK | Init | None  | None    | False | True  | False | Fal |
+   | hem  | dfN | iato |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhEp | NoK | Resp | None  | None    | False | True  | False | Fal |
+   | hem  | dfN | onde |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhEp | Kdf | Init | None  | None    | False | True  | False | Fal |
+   | hem  | NoK | iato |       |         |       |       |       | se  |
+   |      | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhEp | Kdf | Resp | None  | None    | False | True  | False | Fal |
+   | hem  | NoK | onde |       |         |       |       |       | se  |
+   |      | c   | rPar |       |         |       |       |       |     |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 25]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | NoK | Init | None  | None    | True  | True  | False | Fal |
+   | brid | dfN | iato |       |         |       |       |       | se  |
+   | OneF | oKc | rPar |       |         |       |       |       |     |
+   | low  |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | NoK | Resp | None  | None    | True  | False | False | Fal |
+   | brid | dfN | onde |       |         |       |       |       | se  |
+   | OneF | oKc | rPar |       |         |       |       |       |     |
+   | low  |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | None  | None    | True  | True  | False | Fal |
+   | brid | NoK | iato |       |         |       |       |       | se  |
+   | OneF | c   | rPar |       |         |       |       |       |     |
+   | low  |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | None  | None    | True  | False | False | Fal |
+   | brid | NoK | onde |       |         |       |       |       | se  |
+   | OneF | c   | rPar |       |         |       |       |       |     |
+   | low  |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Provi | Unilate | True  | True  | False | Fal |
+   | brid | Kc  | iato | der   | ral     |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Provi | Bilater | True  | True  | False | Fal |
+   | brid | Kc  | iato | der   | al      |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Recip | Unilate | True  | True  | False | Fal |
+   | brid | Kc  | iato | ient  | ral     |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Init | Recip | Bilater | True  | True  | False | Fal |
+   | brid | Kc  | iato | ient  | al      |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Provi | Unilate | True  | False | False | Fal |
+   | brid | Kc  | onde | der   | ral     |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Provi | Bilater | True  | False | True  | Fal |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 26]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | brid | Kc  | onde | der   | al      |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Recip | Unilate | True  | False | True  | Fal |
+   | brid | Kc  | onde | ient  | ral     |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhHy | Kdf | Resp | Recip | Bilater | True  | False | True  | Fal |
+   | brid | Kc  | onde | ient  | al      |       |       |       | se  |
+   | OneF |     | rPar |       |         |       |       |       |     |
+   | low  |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | NoK | Init | None  | None    | True  | True  | False | Fal |
+   |      | dfN | iato |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | NoK | Resp | None  | None    | True  | False | False | Fal |
+   |      | dfN | onde |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Init | None  | None    | True  | True  | False | Fal |
+   |      | NoK | iato |       |         |       |       |       | se  |
+   |      | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Resp | None  | None    | True  | False | False | Fal |
+   |      | NoK | onde |       |         |       |       |       | se  |
+   |      | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Init | Provi | Unilate | True  | True  | False | Fal |
+   |      | Kc  | iato | der   | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Init | Provi | Bilater | True  | True  | False | Fal |
+   |      | Kc  | iato | der   | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Init | Recip | Unilate | True  | True  | False | Fal |
+   |      | Kc  | iato | ient  | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 27]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Init | Recip | Bilater | True  | True  | False | Fal |
+   |      | Kc  | iato | ient  | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Resp | Provi | Unilate | True  | False | False | Fal |
+   |      | Kc  | onde | der   | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Resp | Provi | Bilater | True  | False | True  | Fal |
+   |      | Kc  | onde | der   | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Resp | Recip | Unilate | True  | False | True  | Fal |
+   |      | Kc  | onde | ient  | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | Mqv1 | Kdf | Resp | Recip | Bilater | True  | False | True  | Fal |
+   |      | Kc  | onde | ient  | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhOn | NoK | Init | None  | None    | False | True  | False | Fal |
+   | eFlo | dfN | iato |       |         |       |       |       | se  |
+   | w    | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhOn | NoK | Resp | None  | None    | True  | False | False | Fal |
+   | eFlo | dfN | onde |       |         |       |       |       | se  |
+   | w    | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhOn | Kdf | Init | None  | None    | False | True  | False | Fal |
+   | eFlo | NoK | iato |       |         |       |       |       | se  |
+   | w    | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhOn | Kdf | Resp | None  | None    | True  | False | False | Fal |
+   | eFlo | NoK | onde |       |         |       |       |       | se  |
+   | w    | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhOn | Kdf | Init | Recip | Unilate | False | True  | False | Fal |
+   | eFlo | Kc  | iato | ient  | ral     |       |       |       | se  |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 28]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | w    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhOn | Kdf | Resp | Provi | Unilate | True  | False | False | Fal |
+   | eFlo | Kc  | onde | der   | ral     |       |       |       | se  |
+   | w    |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | NoK | Init | None  | None    | True  | False | False | Fal |
+   | atic | dfN | iato |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | NoK | Resp | None  | None    | True  | False | False | Fal |
+   | atic | dfN | onde |       |         |       |       |       | se  |
+   |      | oKc | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Init | None  | None    | True  | False | False | Tru |
+   | atic | NoK | iato |       |         |       |       |       | e   |
+   |      | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Resp | None  | None    | True  | False | False | Fal |
+   | atic | NoK | onde |       |         |       |       |       | se  |
+   |      | c   | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Init | Provi | Unilate | True  | False | False | Tru |
+   | atic | Kc  | iato | der   | ral     |       |       |       | e   |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Init | Provi | Bilater | True  | False | False | Tru |
+   | atic | Kc  | iato | der   | al      |       |       |       | e   |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Init | Recip | Unilate | True  | False | False | Tru |
+   | atic | Kc  | iato | ient  | ral     |       |       |       | e   |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Init | Recip | Bilater | True  | False | False | Tru |
+   | atic | Kc  | iato | ient  | al      |       |       |       | e   |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyU  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 29]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | DhSt | Kdf | Resp | Provi | Unilate | True  | False | False | Fal |
+   | atic | Kc  | onde | der   | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Resp | Provi | Bilater | True  | False | True  | Fal |
+   | atic | Kc  | onde | der   | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Resp | Recip | Unilate | True  | False | True  | Fal |
+   | atic | Kc  | onde | ient  | ral     |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   | DhSt | Kdf | Resp | Recip | Bilater | True  | False | True  | Fal |
+   | atic | Kc  | onde | ient  | al      |       |       |       | se  |
+   |      |     | rPar |       |         |       |       |       |     |
+   |      |     | tyV  |       |         |       |       |       |     |
+   |      |     |      |       |         |       |       |       |     |
+   +------+-----+------+-------+---------+-------+-------+-------+-----+
+
+              Table 12: Required Party Generation Obligations
+
+5.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual KAS ECC function.  This section
+   describes the JSON schema for a test vector set used with KAS ECC
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 30]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +------------+---------------------------------------------+--------+
+   | JSON Value | Description                                 | JSON   |
+   |            |                                             | type   |
+   +------------+---------------------------------------------+--------+
+   | acvVersion | Protocol version identifier                 | value  |
+   |            |                                             |        |
+   | vsId       | Unique numeric identifier for the vector    | value  |
+   |            | set                                         |        |
+   |            |                                             |        |
+   | algorithm  | KAS-ECC                                     | value  |
+   |            |                                             |        |
+   | revision   | The algorithm testing revision to use.      | value  |
+   |            |                                             |        |
+   | testGroups | Array of test group JSON objects, which are | array  |
+   |            | defined in Section 5.1                      |        |
+   +------------+---------------------------------------------+--------+
+
+                     Table 13: Vector Set JSON Object
+
+5.1.  Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The test group for KAS/KTS ECC is as follows:
+
+   +--------------------------+----------------+--------+--------------+
+   | JSON Value               | Description    | JSON   | Optional     |
+   |                          |                | type   |              |
+   +--------------------------+----------------+--------+--------------+
+   | tgId                     | Numeric        | value  | No           |
+   |                          | identifier for |        |              |
+   |                          | the test       |        |              |
+   |                          | group, unique  |        |              |
+   |                          | across the     |        |              |
+   |                          | entire vector  |        |              |
+   |                          | set.           |        |              |
+   |                          |                |        |              |
+   | testType                 | The type of    | value  | No           |
+   |                          | test for the   |        |              |
+   |                          | group (AFT or  |        |              |
+   |                          | VAL).          |        |              |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 31]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   |                          |                |        |              |
+   | scheme                   | The scheme in  | value  | No           |
+   |                          | use for the    |        |              |
+   |                          | group. See     |        |              |
+   |                          | Section 3.4.1  |        |              |
+   |                          | for possible   |        |              |
+   |                          | values         |        |              |
+   |                          |                |        |              |
+   | kasRole                  | The group role | value  | No           |
+   |                          | from the       |        |              |
+   |                          | perspective of |        |              |
+   |                          | the IUT.       |        |              |
+   |                          |                |        |              |
+   | l                        | The length of  | value  | No           |
+   |                          | key to derive/ |        |              |
+   |                          | transport.     |        |              |
+   |                          |                |        |              |
+   | iutId                    | The Iut's      | value  | No           |
+   |                          | identifier.    |        |              |
+   |                          |                |        |              |
+   | serverId                 | The ACVP       | value  | No           |
+   |                          | server's       |        |              |
+   |                          | identifier.    |        |              |
+   |                          |                |        |              |
+   | kdfConfiguration         | The KDF        | Object | No.          |
+   |                          | configuration  | , See  |              |
+   |                          | for the group. | Sectio |              |
+   |                          |                | n 5.1. |              |
+   |                          |                | 1      |              |
+   |                          |                |        |              |
+   | macConfiguration         | The MAC        | Object | Not optional |
+   |                          | configuration  | , See  | for schemes  |
+   |                          | for the group. | Sectio | using key co |
+   |                          |                | n 5.1. | nfirmation.  |
+   |                          |                | 2      |              |
+   |                          |                |        |              |
+   | keyConfirmationDirection | The key        | value  | Yes          |
+   |                          | confirmation   |        |              |
+   |                          | direction.     |        |              |
+   |                          |                |        |              |
+   | keyConfirmationRole      | The key        | value  | Yes          |
+   |                          | confirmation   |        |              |
+   |                          | role.          |        |              |
+   |                          |                |        |              |
+   | domainParameterGeneratio | The domain     | value  | No           |
+   | nMode                    | parameter type |        |              |
+   |                          | used.          |        |              |
+   |                          |                |        |              |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 32]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | tests                    | The tests for  | Array  | No.          |
+   |                          | the group.     | of Obj |              |
+   |                          |                | ect,   |              |
+   |                          |                | See Se |              |
+   |                          |                | ction  |              |
+   |                          |                | 5.2    |              |
+   |                          |                |        |              |
+   +--------------------------+----------------+--------+--------------+
+
+                    Table 14: Vector Group JSON Object
+
+5.1.1.  KDF Configuration JSON Schema
+
+   Describes the KDF configuration for use under the test group
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 33]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +-------------------+-----------------+----------------+------------+
+   | JSON Value        | Description     | JSON type      | Optional   |
+   +-------------------+-----------------+----------------+------------+
+   | kdfType           | The type of KDF | value -        | No         |
+   |                   | to use for the  | oneStep,       |            |
+   |                   | group.          | twoStep        |            |
+   |                   |                 |                |            |
+   | saltMethod        | The strategy    | value -        | No         |
+   |                   | used for        | default (all   |            |
+   |                   | salting.        | 00s), random   |            |
+   |                   |                 |                |            |
+   | fixedInfoPattern  | The pattern     | value - see Se | No         |
+   |                   | used for        | ction 3.4.1.3  |            |
+   |                   | constructing    |                |            |
+   |                   | the fixedInfo.  |                |            |
+   |                   |                 |                |            |
+   | fixedInfoEncoding | The encoding    | value - see Se | No         |
+   |                   | type used when  | ction 3.4.1.3  |            |
+   |                   | constructing    |                |            |
+   |                   | the fixedInfo.  |                |            |
+   |                   |                 |                |            |
+   | auxFunction       | The auxiliary   | value - see Se | Not        |
+   |                   | function used   | ction 3.4.1.1. | optional   |
+   |                   | in the KDF.     | 1.1            | for        |
+   |                   |                 |                | OneStepKdf |
+   |                   |                 |                |            |
+   | macMode           | The mac         | value - see    | Not        |
+   |                   | function used   | macModes under | optional   |
+   |                   | in the KDF.     | Section 3.4.1. | for        |
+   |                   |                 | 1.2.1          | TwoStepKdf |
+   |                   |                 |                |            |
+   | counterLocation   | The counter     | value          | Yes        |
+   |                   | location.       |                |            |
+   |                   |                 |                |            |
+   | counterLen        | The counter     | value          | Yes        |
+   |                   | length.         |                |            |
+   |                   |                 |                |            |
+   | ivLen             | The iv length.  | value          | Yes        |
+   |                   |                 |                |            |
+   +-------------------+-----------------+----------------+------------+
+
+                  Table 15: KdfConfiguration JSON Object
+
+5.1.2.  MAC Configuration JSON Schema
+
+   Describes the key confirmation MAC configuration for use under the
+   test group
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 34]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +---------+---------------+------------------------------+----------+
+   | JSON    | Description   | JSON type                    | Optional |
+   | Value   |               |                              |          |
+   +---------+---------------+------------------------------+----------+
+   | macType | The macType   | value - HMAC-SHA2-224, HMAC- | No       |
+   |         | used in key   | SHA2-256, HMAC-SHA2-384,     |          |
+   |         | confirmation. | HMAC-SHA2-512, HMAC-         |          |
+   |         |               | SHA2-512/224, HMAC-          |          |
+   |         |               | SHA2-512/256, HMAC-SHA3-224, |          |
+   |         |               | HMAC-SHA3-256, HMAC-         |          |
+   |         |               | SHA3-384, HMAC-SHA3-512,     |          |
+   |         |               | CMAC, KMAC-128, KMAC-256     |          |
+   |         |               |                              |          |
+   | keyLen  | The number of | value                        | No       |
+   |         | bits to take  |                              |          |
+   |         | from the DKM  |                              |          |
+   |         | to use for as |                              |          |
+   |         | the mac key   |                              |          |
+   |         | in key        |                              |          |
+   |         | confirmation. |                              |          |
+   |         |               |                              |          |
+   | macLen  | The number of | value                        | No       |
+   |         | bits to use   |                              |          |
+   |         | for the MAC   |                              |          |
+   |         | tag.          |                              |          |
+   |         |               |                              |          |
+   +---------+---------------+------------------------------+----------+
+
+                  Table 16: MacConfiguration JSON Object
+
+5.2.  Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each KAS/KTS ECC test vector.
+
+   +---------------------------+------------------+---------+----------+
+   | JSON Value                | Description      | JSON    | Optional |
+   |                           |                  | type    |          |
+   +---------------------------+------------------+---------+----------+
+   | tcId                      | Numeric          | value   | No       |
+   |                           | identifier for   |         |          |
+   |                           | the test case,   |         |          |
+   |                           | unique across    |         |          |
+   |                           | the entire       |         |          |
+   |                           | vector set.      |         |          |
+   |                           |                  |         |          |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 35]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | ephemeralPublicKeyIutX    | The IUT's        | value   | Yes      |
+   |                           | ephemeral public |         |          |
+   |                           | key X value.     |         |          |
+   |                           |                  |         |          |
+   | ephemeralPublicKeyIutY    | The IUT's        | value   | Yes      |
+   |                           | ephemeral public |         |          |
+   |                           | key Y value.     |         |          |
+   |                           |                  |         |          |
+   | staticPublicKeyIutX       | The IUT's static | value   | Yes      |
+   |                           | public key X     |         |          |
+   |                           | value.           |         |          |
+   |                           |                  |         |          |
+   | staticPublicKeyIutY       | The IUT's static | value   | Yes      |
+   |                           | public key Y     |         |          |
+   |                           | value.           |         |          |
+   |                           |                  |         |          |
+   | ephemeralPublicKeyServerX | The Server's     | value   | Yes      |
+   |                           | ephemeral public |         |          |
+   |                           | key X value.     |         |          |
+   |                           |                  |         |          |
+   | ephemeralPublicKeyServerY | The Server's     | value   | Yes      |
+   |                           | ephemeral public |         |          |
+   |                           | key Y value.     |         |          |
+   |                           |                  |         |          |
+   | staticPublicKeyServerX    | The Server's     | value   | Yes      |
+   |                           | static public    |         |          |
+   |                           | key X value.     |         |          |
+   |                           |                  |         |          |
+   | staticPublicKeyServerY    | The Server's     | value   | Yes      |
+   |                           | static public    |         |          |
+   |                           | key Y value.     |         |          |
+   |                           |                  |         |          |
+   | dkmNonceIut               | The IUT's nonce  | value   | Yes      |
+   |                           | used in static   |         |          |
+   |                           | schemes for Key  |         |          |
+   |                           | Confirmation.    |         |          |
+   |                           |                  |         |          |
+   | ephemeralNonceIut         | The IUT's        | value   | Yes      |
+   |                           | ephemeral nonce  |         |          |
+   |                           | used in some     |         |          |
+   |                           | schemes.         |         |          |
+   |                           |                  |         |          |
+   | dkmNonceServer            | The Server's     | value   | Yes      |
+   |                           | nonce used in    |         |          |
+   |                           | static schemes   |         |          |
+   |                           | for Key          |         |          |
+   |                           | Confirmation.    |         |          |
+   |                           |                  |         |          |
+
+
+
+Hammett                   Expires July 13, 2020                [Page 36]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   | ephemeralNonceServer      | The Server's     | value   | Yes      |
+   |                           | ephemeral nonce  |         |          |
+   |                           | used in some     |         |          |
+   |                           | schemes.         |         |          |
+   |                           |                  |         |          |
+   | staticPrivateKeyIut       | The IUT's static | value   | Yes      |
+   |                           | private key.     |         |          |
+   |                           |                  |         |          |
+   | ephemeralPrivateKeyIut    | The IUT's        | value   | Yes      |
+   |                           | ephemeral        |         |          |
+   |                           | private key.     |         |          |
+   |                           |                  |         |          |
+   | kdfParameter              | The KDF          | value   | Yes      |
+   |                           | parameters for   | see Sec |          |
+   |                           | this test case.  | tion 5. |          |
+   |                           |                  | 2.1     |          |
+   |                           |                  |         |          |
+   | dkm                       | The derived      | value   | Yes      |
+   |                           | keying material. |         |          |
+   |                           |                  |         |          |
+   | tag                       | The tag          | value   | Yes      |
+   |                           | generated as a   |         |          |
+   |                           | part of key      |         |          |
+   |                           | confirmation     |         |          |
+   |                           | (from the IUT    |         |          |
+   |                           | perspective).    |         |          |
+   |                           |                  |         |          |
+   +---------------------------+------------------+---------+----------+
+
+                      Table 17: Test Case JSON Object
+
+5.2.1.  KDF Parameter JSON Schema
+
+   KDF specific options used for the test case.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 37]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +-------------+----------------------------------+-------+----------+
+   | JSON Value  | Description                      | JSON  | Optional |
+   |             |                                  | type  |          |
+   +-------------+----------------------------------+-------+----------+
+   | kdfType     | The type of KDF utilized.        | value | No       |
+   |             |                                  |       |          |
+   | salt        | The salt used for the test case. | value | Yes      |
+   |             |                                  |       |          |
+   | iv          | The iv used for the test case.   | value | Yes      |
+   |             |                                  |       |          |
+   | algorithmId | The random "algorithmId" used    | value | Yes      |
+   |             | for the test case when           |       |          |
+   |             | applicable to the fixedInfo      |       |          |
+   |             | pattern.                         |       |          |
+   |             |                                  |       |          |
+   | context     | The random "context" used for    | value | Yes      |
+   |             | the test case when applicable to |       |          |
+   |             | the fixedInfo pattern.           |       |          |
+   |             |                                  |       |          |
+   | label       | The random "label" used for the  | value | Yes      |
+   |             | test case when applicable to the |       |          |
+   |             | fixedInfo pattern.               |       |          |
+   |             |                                  |       |          |
+   +-------------+----------------------------------+-------+----------+
+
+                    Table 18: KDF Parameter JSON Object
+
+5.3.  Example Test Vectors JSON Object KAS-ECC
+
+   The following is a example JSON object for KAS-ECC test vectors sent
+   from the ACVP server to the crypto module.
+
+
+{
+  "vsId": 0,
+  "algorithm": "KAS-ECC",
+  "revision": "Sp800-56Ar3",
+  "testGroups": [{
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [{
+        "staticPublicServerX": "B7A4DDA5DC3A317647B39F39E05390A88F12F53861C24635",
+        "staticPublicServerY": "CA2776BF6A0F35B727F3057340E89A1600915B81BB2E87B7",
+        "tcId": 1,
+        "ephemeralNonceServer": "44588073AACC3CFD6C9A5E2A0973B6BDDFC35F67EEA96FD0B070DF05F24A4B381F05CE9ACC67739B157CF8EE7459A64E",
+        "kdfParameter": {
+          "kdfType": "oneStep",
+          "salt": "00000000000000000000000000000000",
+
+
+
+Hammett                   Expires July 13, 2020                [Page 38]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+          "algorithmId": "A51CF275ABE573209CBC606A934352FE"
+        }
+      }],
+      "domainParameterGenerationMode": "P-192",
+      "scheme": "staticUnified",
+      "kasRole": "initiator",
+      "l": 512,
+      "iutId": "123456ABCD",
+      "serverId": "434156536964",
+      "kdfConfiguration": {
+        "kdfType": "oneStep",
+        "saltMethod": "default",
+        "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+        "fixedInfoEncoding": "concatenation",
+        "auxFunction": "KMAC-128"
+      },
+      "macConfiguration": {
+        "macType": "KMAC-128",
+        "keyLen": 128,
+        "macLen": 128
+      },
+      "keyConfirmationDirection": "unilateral",
+      "keyConfirmationRole": "provider"
+    },
+    {
+      "tgId": 2,
+      "testType": "VAL",
+      "tests": [{
+        "staticPublicServerX": "87F6D507656EBC3D4D655FD4C0F13BE0F98D5B7472A3B247",
+        "staticPublicServerY": "CFBC8EE38F4EF2DF1B97BF410ABCF4968F1115E7B80E34C6",
+        "staticPrivateIut": "F43B6F08F570D469ED31CF920516114B1B5E3C3C7BDD6B14",
+        "staticPublicIutX": "7573E06C6BACA56D5AFD08A1A014776BDDA7F4593645A07D",
+        "staticPublicIutY": "93D0C1CDC5C23BD045AD6258448436A55E3C310B4333F551",
+        "tcId": 21,
+        "ephemeralNonceServer": "6F4C587D3CEF0B1D0D5B359B18FFB8B72C879EB3997E768826552082D56931D965E7F315FD7254C434871FA1E160873F",
+        "dkmNonceIut": "AB5CCC3B75AA1FB85D28D5D53126B362AAABA3C51D427B6D138BEFD7EE636E1BC239FB45630BF6D7F0E80B59835916B9",
+        "kdfParameter": {
+          "kdfType": "oneStep",
+          "salt": "00000000000000000000000000000000",
+          "algorithmId": "342BCBC9DE15458BCA294BD16FFA10A7"
+        },
+        "dkm": "B9FDC93EA0B6A7906C6DB8EC17475B3073A8AD1C24CB1287AB8A6AEA46CABA4FDFD7B0CB77F74CDCF3DFF8DCC41560CF",
+        "tag": "3279D63C9192B7FEF71F6735921B3B46"
+      }],
+      "domainParameterGenerationMode": "P-192",
+      "scheme": "staticUnified",
+      "kasRole": "initiator",
+      "l": 512,
+
+
+
+Hammett                   Expires July 13, 2020                [Page 39]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+      "iutId": "123456ABCD",
+      "serverId": "434156536964",
+      "kdfConfiguration": {
+        "kdfType": "oneStep",
+        "saltMethod": "default",
+        "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+        "fixedInfoEncoding": "concatenation",
+        "auxFunction": "KMAC-128"
+      },
+      "macConfiguration": {
+        "macType": "KMAC-128",
+        "keyLen": 128,
+        "macLen": 128
+      },
+      "keyConfirmationDirection": "unilateral",
+      "keyConfirmationRole": "provider"
+    }
+  ]
+}
+
+
+6.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+   +------------+-----------------------------------+-------+----------+
+   | JSON Value | Description                       | JSON  | Optional |
+   |            |                                   | type  |          |
+   +------------+-----------------------------------+-------+----------+
+   | acvVersion | Protocol version identifier       | value | No       |
+   |            |                                   |       |          |
+   | vsId       | Unique numeric identifier for the | value | No       |
+   |            | vector set                        |       |          |
+   |            |                                   |       |          |
+   | testGroups | Array of JSON objects that        | array | No       |
+   |            | represent each test vector group. |       |          |
+   |            | See Table 20                      |       |          |
+   |            |                                   |       |          |
+   +------------+-----------------------------------+-------+----------+
+
+                 Table 19: Vector Set Response JSON Object
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 40]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+   +--------+---------------------------------------+-------+----------+
+   | JSON   | Description                           | JSON  | Optional |
+   | Value  |                                       | type  |          |
+   +--------+---------------------------------------+-------+----------+
+   | tgId   | The test group Id                     | value | No       |
+   |        |                                       |       |          |
+   | tests  | Array of JSON objects that represent  | array | No       |
+   |        | each test vector group. See Table 21  |       |          |
+   |        |                                       |       |          |
+   +--------+---------------------------------------+-------+----------+
+
+              Table 20: Vector Set Group Response JSON Object
+
+   The testCase section is used to organize the ACVP client response in
+   a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 41]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+   +------------------------+---------------------+---------+----------+
+   | JSON Value             | Description         | JSON    | Optional |
+   |                        |                     | type    |          |
+   +------------------------+---------------------+---------+----------+
+   | tcId                   | The test case Id    | value   | No       |
+   |                        |                     |         |          |
+   | testPassed             | Used in VAL test    | boolean | Yes      |
+   |                        | types, should the   |         |          |
+   |                        | KAS/KTS negotiation |         |          |
+   |                        | have succeeded?     |         |          |
+   |                        |                     |         |          |
+   | ephemeralPublicKeyIutX | The IUT's ephemeral | value   | Yes      |
+   |                        | public key X value. |         |          |
+   |                        |                     |         |          |
+   | ephemeralPublicKeyIutY | The IUT's ephemeral | value   | Yes      |
+   |                        | public key X value. |         |          |
+   |                        |                     |         |          |
+   | staticPublicKeyIutX    | The IUT's static    | value   | Yes      |
+   |                        | public key X value. |         |          |
+   |                        |                     |         |          |
+   | staticPublicKeyIutY    | The IUT's static    | value   | Yes      |
+   |                        | public key X value. |         |          |
+   |                        |                     |         |          |
+   | dkmNonceIut            | The IUT's nonce     | value   | Yes      |
+   |                        | used in static      |         |          |
+   |                        | schemes for Key     |         |          |
+   |                        | Confirmation.       |         |          |
+   |                        |                     |         |          |
+   | ephemeralNonceIut      | The IUT's ephemeral | value   | Yes      |
+   |                        | nonce used in some  |         |          |
+   |                        | schemes.            |         |          |
+   |                        |                     |         |          |
+   | dkm                    | The derived keying  | value   | Yes      |
+   |                        | material.           |         |          |
+   |                        |                     |         |          |
+   | tag                    | The tag generated   | value   | Yes      |
+   |                        | as a part of key    |         |          |
+   |                        | confirmation (from  |         |          |
+   |                        | the IUT             |         |          |
+   |                        | perspective).       |         |          |
+   |                        |                     |         |          |
+   +------------------------+---------------------+---------+----------+
+
+              Table 21: Vector Set Group Response JSON Object
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 42]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+6.1.  Example Test Results KAS-ECC JSON Object
+
+   The following is a example JSON object for KAS-ECC test results sent
+   from the crypto module to the ACVP server.
+
+
+    [{
+            "acvVersion": <acvp-version>
+        },
+        {
+          "vsId": 0,
+          "algorithm": "KAS-ECC",
+          "revision": "Sp800-56Ar3",
+          "testGroups": [{
+              "tgId": 1,
+              "tests": [{
+                "staticPublicIutX": "ED9CF3FE1B79D014F7FF60DFDBFC19457C4F3EBEB0BB10B5",
+                "staticPublicIutY": "5CA8819BC0D39E67AE9AB4747DC563ADA1AE1E9DBA12C272",
+                "tcId": 1,
+                "dkmNonceIut": "215D9AB3A371B395802FD0FCD97815EDFC468DC631735BAEEA0F18498EFC3B52BBABD2B953DE7B64EF20D899093B031D",
+                "dkm": "56505307C7F11F4640C96D863FA3634120F2B2CAB262AE29B1CD26252BC1537E84DF3EB75C1E240983B599B30690F9B0",
+                "tag": "CE39683069F0DA7624F72086FB4B2B8E"
+              }]
+            },
+            {
+              "tgId": 3,
+              "tests": [{
+                "tcId": 21,
+                "testPassed": true
+              }]
+            }
+          ]
+        }
+    ]
+
+
+7.  Acknowledgements
+
+   TBD...
+
+8.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 43]
+
+Internet-Draft                Sym Alg JSON                  January 2020
+
+
+9.  Security Considerations
+
+   Security considerations are addressed by the ACVP specification.
+
+10.  Normative References
+
+   [ACVP]     authSurName, authInitials., "ACVP Specification", 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [SP800-108]
+              NIST, "Recommendation for Key Derivation Using
+              Pseudorandom Functions", October 2009,
+              <https://nvlpubs.nist.gov/nistpubs/Legacy/SP/
+              nistspecialpublication800-108.pdf>.
+
+   [SP800-56Ar3]
+              NIST, "Recommendation for Pair-Wise Key-Establishment
+              Schemes Using Discrete Logarithm Cryptography", April
+              2018,
+              <https://nvlpubs.nist.gov/nistpubs/SpecialPublications/
+              NIST.SP.800-56Ar3.pdf>.
+
+   [SP800-56Cr1]
+              NIST, "Recommendation for Key-Derivation Methods in Key-
+              Establishment Schemes", April 2018,
+              <https://nvlpubs.nist.gov/nistpubs/SpecialPublications/
+              NIST.SP.800-56Cr1.pdf>.
+
+Author's Address
+
+   Russell Hammett (editor)
+   HII-TSD
+   302 Sentinel Dr Suite 300
+   Annapolis Junction , MD  20701
+   USA
+
+   Email: russell.hammett@hii-tsd.com
+
+
+
+
+
+
+
+
+
+
+Hammett                   Expires July 13, 2020                [Page 44]
