@@ -17,6 +17,7 @@ All current information about ACVP may be found within this Github project. View
   * [Digital Signature](#digital-signature)
   * [Key Agreement](#key-agreement)
   * [KDFs](#kdfs)
+  * [SafePrimes](#safe-primes)
 * [Accessing the demo server](#accessing-the-demo-server)
 * [Contribution guidelines](contribution-guidelines)
 * [Related projects](#related-projects)
@@ -161,6 +162,21 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS FFC mqv1](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
 * [KAS FFC dhOneFlow](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
 * [KAS FFC dhStatic](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
+* [KAS ECC ephemeralUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS ECC fullMqv Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS ECC fullUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS ECC onePassDh Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS ECC onePassMqv Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS ECC OnePassUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS ECC staticUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS ECC CDH-Component Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
+* [KAS FFC dhHybrid1 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
+* [KAS FFC mqv2 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html)  - DEMO only
+* [KAS FFC dhEphem Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
+* [KAS FFC dhHybridOneFlow Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
+* [KAS FFC mqv1 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
+* [KAS FFC dhOneFlow Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
+* [KAS FFC dhStatic Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
 * [KAS IFC KAS1-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
 * [KAS IFC KAS1-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
 * [KAS IFC KAS2-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
@@ -184,6 +200,10 @@ The demo server allows validation of the following algorithms (a superset of the
 * [ANSX9.63](./artifacts/acvp_sub_kdf135_x963.txt) - [HTML](./artifacts/acvp_sub_kdf135_x963.html)
 * [ANSX9.42](./artifacts/draft-celi-acvp-ans-x942.txt) - [HTML](./artifacts/draft-celi-acvp-ans-x942.html)
 * [PBKDF](./artifacts/draft-celi-acvp-pbkdf.txt) - [HTML](./artifacts/draft-celi-acvp-pbkdf.html)
+
+### Safe Primes
+* [SafePrimes KeyGen](./artifacts/acvp_sub_safePrimes.txt) - [HTML](./artifacts/acvp_sub_safePrimes.html) - DEMO only
+* [SafePrimes KeyVer](./artifacts/acvp_sub_safePrimes.txt) - [HTML](./artifacts/acvp_sub_safePrimes.html) - DEMO only
 
 The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
