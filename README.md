@@ -60,7 +60,7 @@ The demo server allows validation of the following algorithms (a superset of the
 * [AES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-XPN](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-XTS](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-FF1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
+* [AES-FF1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [AES-FF3-1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
 * [TDES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
 * [TDES-CBCI](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
