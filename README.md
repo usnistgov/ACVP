@@ -169,7 +169,6 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS ECC onePassMqv Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
 * [KAS ECC OnePassUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
 * [KAS ECC staticUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS ECC CDH-Component Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
 * [KAS FFC dhHybrid1 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
 * [KAS FFC mqv2 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html)  - DEMO only
 * [KAS FFC dhEphem Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
