@@ -184,6 +184,20 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS IFC KAS2-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
+* [KAS SSC ECC ephemeralUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
+* [KAS SSC ECC fullMqv Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
+* [KAS SSC ECC fullUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
+* [KAS SSC ECC onePassDh Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
+* [KAS SSC ECC onePassMqv Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
+* [KAS SSC ECC OnePassUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
+* [KAS SSC ECC staticUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
+* [KAS SSC FFC dhHybrid1 Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
+* [KAS SSC FFC mqv2 Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html)  - DEMO only
+* [KAS SSC FFC dhEphem Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
+* [KAS SSC FFC dhHybridOneFlow Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
+* [KAS SSC FFC mqv1 Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
+* [KAS SSC FFC dhOneFlow Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
+* [KAS SSC FFC dhStatic Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
 
 ### KDFs
 * [Counter KDF](./artifacts/acvp_sub_kdf108.txt) - [HTML](./artifacts/acvp_sub_kdf108.html)
