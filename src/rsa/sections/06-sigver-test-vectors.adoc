@@ -1,0 +1,112 @@
+
+[[rsa_sigver_tgjs]]
+=== RSA SigVer Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the RSA / SigVer / * JSON elements of the Test Group JSON object
+
+.RSA SigVer Test Group JSON Objects
+|===
+| JSON Values | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| modulo | RSA modulus size | integer
+| hashAlg | The hash algorithm | string
+| sigType | Type of signature used in the group | string
+| saltLen | The salt length for the group in bytes | integer
+| conformance | Signifies all test cases within the group should utilize random message hashing as described in <<SP800-106>> | string
+| maskFunction | The mask function used for PSS signature scheme | string
+| n | Public modulus value n for the group | hex
+| e | Public exponent value e for the group | hex
+| maskFunction | The mask function used | string
+| testType | Describes the operation the client should perform on the tests data | string
+| tests | Array of individual test cases, see <<rsa_sigver_tvjs>> | array
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' (see <<testtypes>>) the group is addressing.
+
+NOTE: The 'maskFunction' property will only be present for RSA / SigVer / FIPS186-5 inside of test groups for the 'sigType' "pss".
+
+=== Test Cases for sigVer FIPS186-5, FIPS186-4, and FIPS186-2
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each {spec-algorithm} test vector.
+
+.RSA SigVer Test Case JSON Objects
+|===
+| JSON Values | Description | JSON Type
+
+| tcId | Test case idenfitier | integer
+| message | The message to be signed | hex
+| signature | The signature of the message | hex
+| randomValue | The random value to be used as an input into the message randomization function as described in <<SP800-106>> | hex
+| randomValueLen | The random value's bit length | integer
+|===
+
+Here is an abbreviated yet fully constructed example of the prompt for RSA / SigVer / 1.0. The only difference in the structure between RSA / SigVer / 1.0 and RSA / SigVer / FIPS186-5 is the inclusion of the 'maskFunction' property in the 'testGroup' for RSA / SigVer / FIPS186-5.
+
+[source, json]
+----
+[
+  {
+    "acvVersion": "<acvp-version>"
+  },
+  {
+    "vsId": 1173,
+    "algorithm": "RSA",
+    "mode": "sigVer",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "sigType": "ansx9.31",
+        "hashAlg": "SHA2-256",
+        "testType": "AFT",
+        "modulo": 2048,
+        "e": "166f67",
+        "n": "944ded6daaf602e17...",
+        "tests": [
+          {
+            "tcId": 1174,
+            "message": "ff17e5e...",
+            "signature": "299f1..."
+          }
+        ]
+      },
+      {
+        "tgId": 4,
+        "sigType": "pkcs1v1.5",
+        "modulo": 3072,
+        "hashAlg": "SHA2-256",
+        "testType": "AFT",
+        "e": "ac6db1",
+        "n": "9bbb099e1ec285594...",
+        "tests": [
+          {
+            "tcId": 1177,
+            "message": "921961e...",
+            "signature": "55362..."
+          }
+        ]
+      },
+      {
+        "tgId": 12,
+        "sigType": "pss",
+        "modulo": 3072,
+        "hashAlg": "SHA2-512",
+        "testType": "AFT",
+        "e": "fe3079",
+        "n": "ce4924ff470fb99d...",
+        "conformance": "SP800-106",
+        "tests": [
+          {
+            "tcId": 11179,
+            "message": "e49f585...",
+            "randomValue": "ab6a9b8b6a75ba76ab76a76b...",
+            "randomValueLen": 1024,
+            "signature": "4e85f..."
+          }
+        ]
+      }
+    ]
+  }
+]
+----

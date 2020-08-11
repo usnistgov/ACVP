@@ -1,0 +1,105 @@
+[[dsa_sigver_test_vectors]]
+=== DSA sigVer Test Vectors
+
+[[dsa_sigver_tgjs]]
+==== DSA sigVer Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.
+
+The test group for DSA / sigVer / * is as follows:
+
+[[dsa_sigver_vs_tg_table]]
+.DSA SigVer Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | The test group identifier | integer
+| testType | The test operation performed | string
+| l | Length in bits of prime modulus p | integer
+| n | Length in bits of prime divisor q | integer
+| p | Domain parameter P | hex
+| q | Domain parameter Q | hex
+| g | Domain parameter G | hex
+| hashAlg | The hash algorithm used in the test group | string
+| conformance | Signifies all test cases within the group should utilize random message hashing as described in <SP800-106>>. | string
+| tests | Array of individual test vector JSON objects, which are defined in <<dsa_sigver_tvjs>> | array
+|===
+
+[[dsa_sigver_tvjs]]
+==== DSA sigVer Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each DSA / sigVer / 1.0 test vector.
+
+[[dsa_sigver_vs_tc_table]]
+.DSA SigVer Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| message | The message used to generate signature or verify signature | hex
+| randomValue | The random value to be used as an input into the message randomization function as described in <SP800-106>>. | hex
+| randomValueLen | The random value's bit length. | integer
+| r | The signature component R | hex
+| s | The signature component S | hex
+| y | The public key component Y | hex
+|===
+
+NOTE: The 'randomValue' and 'randomValueLen' properties are only present if the 'conformance' property of the group is set to "SP800-106".
+
+The following is an example JSON object sent from the server to the client for DSA / sigVer / 1.0.
+
+[source, json]
+----
+[
+    {
+        "acvVersion": <acvp-version>
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "DSA",
+        "mode": "sigVer",
+        "revision": "1.0",
+        "testGroups": [
+          {
+            "tgId": 1,
+            "l": 1024,
+            "n": 160,
+            "p": "A48828B4A4E149C2D1FC66F108D370A2A9E87...",
+            "q": "D3C53E62338D4231E42FA9683175C404FBF52...",
+            "g": "7BDDD6B8E9B4667397B278F98F446C418EF1A...",
+            "hashAlg": "SHA-1",
+            "tests": [
+              {
+                "tcId": 1,
+                "message": "1A128C1A61091CE52A8B89D69A3...",
+                "y": "A3A2F1AFC3091204B7D7ED3617A80E0FD...",
+                "r": "C390851DE10669399308D9F401B0286AA...",
+                "s": "26BE6EFDCD2ED6946BFCFE2D396AB3A2E..."
+              },
+            ]
+          },
+          {
+            "tgId": 2,
+            "l": 1024,
+            "n": 160,
+            "p": "66F108D370A2A9E87DBD49BC09A27017621A...",
+            "q": "1F855467465A653D2245B7E31C910A18EF79...",
+            "g": "F098ACF73BFC43B1B5E7BFB065FBBDDD6B8E...",
+            "hashAlg": "SHA-1",
+            "conformance": "SP800-106",
+            "tests": [
+              {
+                "tcId": 2,
+                "message": "A0F409909E31C2C23BB7A24B8103F11F...",
+                "randomValue": "DB0D25A72C8DEFA0F409909E31C2..."
+                "randomValueLen": 1024,
+                "y": "A3A284CB56F3A0EF37749B5EA4D2EC824ED5E7EAD481BE520B...",
+                "r": "15FE6F6DAEFD42CD5FA7444221CB545BB0CDB95DC9D76E0...",
+                "s": "B9AF193E6832934537B0B05D177BA8F7DA48D9DD84D27B8AFE9..."
+              },
+            ]
+          }
+        ]
+    }
+]
+----

@@ -1,0 +1,80 @@
+[[tgjs]]
+=== Test Groups
+
+The testGroups element at the top level in the test vector JSON object is an array of test  groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+.Test Group JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| testType | Test operations to be performed | string
+| hashAlg | The SHA type used for the test vectors | string
+| nInitLength | Length of initiator nonce in bits | hex
+| nRespLength | Length of responder nonce in bits | hex
+| derivedKeyingMaterialLength | Derived Key Matrerial length expected in bits | integer
+| dhLength | Diffie Hellman shared secret length in bits | integer
+| tests | Array of individual test cases | array
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' (see <<testtypes>>) the group is addressing.
+
+=== Test Cases
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each {spec-algorithm} test vector.
+
+.Test Case JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tcId | Test case idenfitier | integer
+| nInit | Value of the initiator nonce | hex
+| nResp | Value of the responder nonce | hex
+| gir | Diffie-Hellman shared secret | hex
+| girNew | New Diffie-Hellman shared secret | hex
+| spiInit | security parameter indice of the initiator | hex
+| spiResp | security parameter indice of the responder | hex
+|===
+
+Here is an abbreviated yet fully constructed example of the prompt.
+
+[source, json]
+----
+{
+  "vsId": 1,
+  "algorithm": "kdf-components",
+  "mode": "IKEv2",
+  "revision": "1.0",
+  "testGroups": [
+    {
+      "tgId": 1,
+      "hashAlg": "SHA-1",
+      "dhLength": 224,
+      "nInitLength": 64,
+      "nRespLength": 2048,
+      "derivedKeyingMaterialLength": 16384,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 1,
+          "nInit": "258A2A59B5A960A3",
+          "nResp": "1BC7543704848EF6...",
+          "gir": "9528B0F97999E1C7FE...",
+          "girNew": "EC54C9B02FFAFEC...",
+          "spiInit": "52D5397B0061602B",
+          "spiResp": "E45E291943E3E5ED"
+        },
+        {
+          "tcId": 2,
+          "nInit": "9986940729199F59",
+          "nResp": "479E9DC203FFE874...",
+          "gir": "4380C15BC19F4872EF...",
+          "girNew": "57D5AFAE6D80C15...",
+          "spiInit": "C383DF2C6F9072BF",
+          "spiResp": "5A7026194D4ACF79"
+        }
+      ]
+    }
+  ]
+}
+----

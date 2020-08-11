@@ -1,0 +1,185 @@
+[[rsa_keygen_response]]
+=== RSA KeyGen Test Group Responses
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each RSA / KeyGen / * test vector.
+
+The following table describes the JSON elements for the response to a RSA / KeyGen / * test vector.
+
+[[rsa_keygen_vs_tr_table]]
+.RSA Test Case Results JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| e | the public exponent | hex
+| testPassed | the verdict on the prime generation testing for the supplied pRand/qRand combination, see <<FIPS186-4>>, Appendix B.3.3. | boolean
+| seed | the seed used in prime generation according to <<FIPS186-4>>, Appendix B.3.2, B.3.4, or B.3.5 | hex
+| bitlens| the length of p1, p2, q1, and q2 for prime generation according to <<FIPS186-4>>, Appendix B.3.2, B.3.4, B.3.5 or the length of xP1, xP2, xQ1, and xQ2 for B.3.6 | array of integers
+| xP1 | the prime factor p1 for Primes with Conditions - see <<FIPS186-4>>, Appendix B.3.3, B.3.4, or B.3.5, if applicable | hex
+| xP2 | the prime factor p2 for Primes with Conditions - see <<FIPS186-4>>, Appendix B.3.3, B.3.4, or B.3.5, if applicable | hex
+| xP | the random number used in Step 3 of the algorithm in <<FIPS186-4>>, Appendix C.9 to generate the prime P, if applicable | hex
+| p | the private prime factor p | hex
+| xQ1 | the prime factor q1 for Primes with Conditions - see <<FIPS186-4>>, Appendix B.3.3, B.3.4, or B.3.5, if applicable | hex
+| xQ2 | the prime factor q2 for Primes with Conditions - see <<FIPS186-4>>, Appendix B.3.3, B.3.4, or B.3.5, if applicable | hex
+| xQ | the random number used in Step 3 of the algorithm in <<FIPS186-4>>, Appendix C.9 to generate the prime Q, if applicable | hex
+| q | the private prime factor q | hex
+| n | the modulus | hex
+| d | the private exponent d | hex
+| dmp1 | the private exponent d modulo (p - 1) used in a Chinese Remainder Theorem private key | hex
+| dmq1 | the private exponent d modulo (q - 1) used in a Chinese Remainder Theorem private key | hex
+| iqmp | the multiplicative inverse of q modulo p used in a Chinese Remainder Theorem private key | hex
+|===
+
+NOTE: If the 'keyFormat' of the test group is 'standard', then the client *SHALL* not include the 'dmp1', 'dmq1' and 'iqmp' properties. Those properties *SHALL* only be included if the 'keyFormat' is set to 'crt' for the Chinese Remainder Theorem.
+
+NOTE: The 'testPassed' property is only valid for 'KAT' test type groups.
+
+NOTE: If the 'infoGeneratedByServer' test group property is true, then the only response from the client *SHALL* be the values that directly correspond to the key when appropriate, 'p', 'q', 'n', and 'd' (or 'dmp1', 'dmq1', 'iqmp').
+
+NOTE: The 'e' property *SHALL* only be included when the 'infoGeneratedByServer' is false and the 'pubExpMode' is "random".
+
+Use the following applicability grid to determine which properties should be present based on the 'randPQ' test group property. The 'randPQ' property values for RSA / KeyGen / 1.0 are based on the section numbers in Appendix B in <<FIPS186-4>>. For RSA / KeyGen / FIPS186-5, the property values are based on the true names of the generation methods. The RSA / KeyGen / FIPS186-5 names will be listed in the grid. This grid only applies to 'AFT' test types.
+
+.RSA Test Case Applicability Grid For AFT Responses
+|===
+| JSON Value | Provable | Probable | Provable Primes With Conditions | Provable Primes With Probable Conditions | Probable Primes With Conditions
+
+| p | yes | yes | yes | yes | yes
+| q | yes | yes | yes | yes | yes
+| e | yes | yes | yes | yes | yes
+| n | yes | yes | yes | yes | yes
+| d | yes | yes | yes | yes | yes
+| seed | yes | no | yes | yes | no
+| xP | no | no | no | yes | yes
+| xP1 | no | no | no | no | yes
+| xP2 | no | no | no | no | yes
+| xQ | no | no | no | yes | yes
+| xQ1 | no | no | no | no | yes
+| xQ2 | no | no | no | no | yes
+| bitlens | no | no | yes | yes | yes
+|===
+
+NOTE: If the 'crt' key format is used for the group, substitute 'd' with the appropriate values from <<rsa_keygen_vs_tr_table>>.
+
+The following is an example of an RSA / KeyGen / * response. Test group 1 uses the provable prime (B.3.2) generation method. Test group 2 uses the provable prime with conditions (B.3.4) generation method. Test group 3 uses the provable prime with probable conditions (B.3.5) generation method. Test group 4 uses the probable prime with conditions (B.3.6) generation method. Test group 5 is for the 'KAT' test type for probable prime (B.3.3) generation method. Test group 6 uses the probable prime (B.3.3) generation method. In this example, 'infoGeneratedByServer' is set to true.
+
+
+[source, json]
+----
+[
+  {
+    "acvVersion": "<acvp-version>"
+  },
+  {
+    "vsId": 1133,
+    "algorithm": "RSA",
+    "mode": "keyGen",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "tests": [
+          {
+            "tcId": 1,
+            "seed": "5B174CA16001BE8...",
+            "n": "8099A2B6C63B2CB2A0...",
+            "e": "07D196B84395",
+            "p": "B5A06A623B5C7EC4A0...",
+            "q": "B5428D256885A767B4...",
+            "d": "0A6D3A7F37453EF9EB..."
+          }
+        ]
+      },
+      {
+        "tgId": 2,
+        "tests": [
+          {
+            "tcId": 1111,
+            "e": "10000021",
+            "seed": "af152e46b479af8...",
+            "bitlens": [
+              312,
+              145,
+              144,
+              338
+            ],
+            "p": "e2ab16d3026db341223...",
+            "q": "d13c3209bbc1bfa27c9...",
+            "n": "b942fa09a727ab488f8...",
+            "d": "6b56ee657ebf6a54b35..."
+          }
+        ]
+      },
+      {
+        "tgId": 3,
+        "tests": [
+          {
+            "tcId": 1115,
+            "e": "10000021",
+            "seed": "e664bc8c8e09ca23...",
+            "bitlens": [
+              232,
+              220,
+              336,
+              141
+            ],
+            "xP": "e7b2b10bb6c975ef79...",
+            "p": "e7b2b10bb6c975ef794...",
+            "xQ": "c3ce8bfcb6fb40bdaf...",
+            "q": "c3ce8bfcb6fb40bdafd...",
+            "n": "b1380d59234c9f63e63...",
+            "d": "bec8baec7da0634211e..."
+          }
+        ]
+      },
+      {
+        "tgId": 4,
+        "tests": [
+          {
+            "tcId": 1135,
+            "e": "10000021",
+            "bitlens": [
+              224,
+              195,
+              352,
+              142
+            ],
+            "xP1": "57c9a2986fc7e69e83...",
+            "xP2": "7254d6c998a84230ff...",
+            "xP": "c32cccd930ab2c107b3...",
+            "p": "c32cccd930ab2c107b3f...",
+            "xQ1": "7468d10e69a14b00ec...",
+            "xQ2": "20b8c2bae262b13e91...",
+            "xQ": "fa97b510539a102879a...",
+            "q": "fa97b510539a102879a7...",
+            "n": "bf0d69840d0236aa74ea...",
+            "d": "166bed3734b922f07446..."
+          }
+        ]
+      },
+      {
+        "tgId": 5,
+        "tests": [
+          {
+            "tcId": 1119,
+            "testPassed": true
+          }
+        ]
+      },
+      {
+        "tgId": 6,
+        "tests": [
+          {
+            "tcId": 1129,
+            "e": "df28ab",
+            "p": "e021757c777288dac...",
+            "q": "ed1571a9e0cd4a425...",
+            "n": "cf91c0065d8e5797f...",
+            "d": "1f5201b880a206cb1..."
+          }
+        ]
+      }
+    ]
+  }
+]
+----

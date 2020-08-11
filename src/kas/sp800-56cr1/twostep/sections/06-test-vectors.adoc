@@ -1,0 +1,388 @@
+[[tgjs]]
+=== Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test	groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped	together. The Test Group JSON object contains meta data that applies to all test vectors within	the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+.Test Group Properties
+|===
+| JSON Values | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| testType | Describes the operation the client should perform on the tests data | string
+| tests | Array of individual test cases | See <<testCase>>
+| kdfConfiguration | Describes the Kdf configuration values used for the group | See <<kdfconfig>>
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' the group is addressing.
+
+[#kdfconfig]
+==== KDF Configuration JSON Schema
+
+Describes the KDF configuration for use under the test group.
+
+.KdfConfiguration JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| kdfType| The type of KDF to use for the group. | value - twostep
+| satMethod|  The strategy used for salting. | value - default (all 00s), random
+| fixedInfoPattern| The pattern used for constructing the fixedInfo. | value - See <<fixedinfopatcon>>.
+| fixedInfoEncoding| The pattern used for constructing the fixedInfo. | value - See <<fixedinfopatcon>>.
+| macMode| The MAC function used in the KDF.| value 
+| counterLocation| The counter location. | value
+| counterLen| The counter length. | value
+| ivLen| The iv length. | value
+|===
+
+[[testCase]]
+=== Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each KAS/KTS ECC test vector.
+
+.Test Case JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set.
+| kdfParameter | Object representing inputs into the KDF | See <<kdfParameter>>.
+| fixedInfoPartyU | Fixed information specific to party U | See <<fixedInfo>>.
+| fixedInfoPartyV | Fixed information specific to party V | See <<fixedInfo>>.
+
+|===
+
+[[kdfParameter]]
+==== KDF Parameter JSON Schema
+
+KDF specific options used for the test case.
+
+.KDF Parameter JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| kdfType | The type of KDF utilized. | value
+| salt | The salt used for the test case. | value
+| iv | The iv used for the test case. | value
+| algorithmId | The random "algorithID" used for the test case when applicable to the fixedInfo pattern. | value
+| context | The random "context" used for the test case when applicable to the fixedInfo pattern. | value
+| label | The random "label" used for the test case when applicable to the fixedInfo pattern. | value
+| z | shared secret z value to be used for the test case. | value
+|===
+
+[[fixedInfo]]
+==== FixedInfo PartyU/V JSON Schema
+
+Fixed information that is included for party U/V for fixed info construction
+
+.Fixed Info JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| partyId | The party identifier | value
+| ephemeralData | Ephemeral data (randomly) included as a part of the parties fixed info construction | value
+|===
+
+[[app-vs-ex]]
+=== Example Test Vectors JSON
+
+The following is a example JSON object for KAS-FFC test vectors sent from the ACVP server to the crypto module.
+
+.Vector Set JSON Example
+[source,json]
+---- 
+{
+  "vsId": 0,
+  "algorithm": "KAS-KDF",
+  "mode": "TwoStep",
+  "revision": "Sp800-56Cr1",
+  "isSample": true,
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 1,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "0ADFBF33C04265B205163B6CDE97BB1B29FE1821B56E7022A74E4054ADC52AC3F339219C6B4C9B158EE95ED440AB1769FFFC33220B28F62C7B2A805B57F39C63",
+            "z": "576F1B40A4A640C72DD070C5D80380558D1A642DEEAA8F1978428ADE63D7DA4553780E25103F97E493F2626AB9F67CAA626A1F461BD08266942B7F3C8BD3BA90",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "3A29BC54ADE2C0AD617FFD70112445F87E15B21D67156E10CCBC07D0ECF8649163738EFEEFFAC01488875B8AE14F229CFC6C34EF641D04C928AB4F6DF74834BC",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "806604B8DA9F7E391F8307486CD67D0A"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "20FE389DE49E9CA909D48E9F0BA5BAB2",
+            "ephemeralData": "02A918E3A64B8BC17907569DAA75BEC4DA331303460127A86C6CCEF2B62164BAA1459C3AE46A9E6302EE6A4BCA608E2726DAC275F6D1479EE4FC4E45AE8DAFE3"
+          }
+        },
+        {
+          "tcId": 2,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "BE4FEA6C28C7F6D571B0EC89CAB2E586053CDE9208CA409D164F03FD58938CFB47E63C3BE589DD512A6F659ECD60AD9EA784213DD81F7AFB8BCFF506192044D6",
+            "z": "025E3E3EF6B67354DE9778F793214A7A9CC8C0DD87DA70E27F7C47E63F9E33B89AB20AB6339FFBD8F827C19FE7AA144B89537EB0731A030D1571DEF28E6C7CA0",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "375FA1A86CD4CD1A7833F88BE886545D6ED652BC3F6B173B5A768B01BA740BF1B3AA263B078321DC0FBD1B8A565E84A17398669A5D2F4A5E9AA92B8EB0DCD894",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "181AA0E72E042B9803A213DF7CBB8051",
+            "ephemeralData": "C933CCD623CBC35246E713BD690F1C5FEA12722F281EE07BDE3219F2843BC29E58B4F76873CCFB1DA866BC4C045C36D711A440859073EAC09C40A21EE96CB903"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "AA783D9D6B897E04BE1F2004C3F21A35",
+            "ephemeralData": "4B5F015CE5974ED4FB992A634A47BEDA77F470EFEE10E7667FEAE1E7B8F53A204B15A97B893E6551FD3FE64F8014F255ADAE070F4E2F31F4DB8B9A4BE84B13E1"
+          }
+        },
+        {
+          "tcId": 3,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "3040A6C24E8CDA5E53DDF7C42335FA82383FC3B1F2C95E3D335D9720BD3AB251DF07712EF3824ECDB00C7267B30552225FE5B5889765A2A16F9A459D5A8A6BC5",
+            "z": "653DFF10216BDC7C6817F78FAE59FF15400061951EEB9AF309819AE7A2904829C29127688FC1A1A40F62F9CE886A1A3B01D729B59278168DA58ED2C210ECDE61",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "E680F9C99500ED6AB6F40D35783F81DC44AAD381F12EAABB5ABD697C2C57981D97710E0A465EE6D5591BE43C33714A0F0AFE1AA90976D2F48A3F277BD546859A",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "427A430E34956099A11A34996C68B585",
+            "ephemeralData": "CE4FCE03CD168399D90D499BA988D7A16738730F0E713B3783A297D3858F7F28623959E2622F15B7E5E0A793F9DF99855CF3F9602E0A2628313132E2CE697980"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "44D5D13558C15CF6EE886E69E005A8EC"
+          }
+        },
+        {
+          "tcId": 4,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "F9916CA1F2B351D833AD84391A48DC3753D21E156C32F961F26897376A3ED5AB18689B99B3CF1BFE55EDF56AA1ADEFEF5022395346B1D9942B20710DB2A6C629",
+            "z": "BAF85001AAF675464043635BEC546B935A6542DCF401B3744ED1E633F912827A925869FD0DC1DA9392042ACD10D53A9BEBE260BB63F8FC23F55EC38589084A6B",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "10743126EF5675BA21A5D4F025A8D21157703C447D93EFC47F5853827CFC3967F55076E3E6910B2726DE4E53BC7C7C49E03F81C3703FBB875818B8FA7E9B9970",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "50B610281A9C8768B5B7E84E39E866A4"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "BB234C26EFBEB3D13F17366B14917967",
+            "ephemeralData": "42D9BB758F33884617A1554CB1F149FE7CB9164F62E775DDCF5B48F640C0E15E783A41C5F9357CF9D12F38A566D69A35A5BF361728C7D4849FB4AA0B2C5A764F"
+          }
+        },
+        {
+          "tcId": 5,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "956E5333A9A29004CB4C3CAC3750FACCB46106900B7E7CDA166D6DCB7BE8A2679F195203C4DDD8E34EF6E90D52E39465A15E2C42CDC537E87218118186DEFAB4",
+            "z": "6F3EDA174C2DD8C611D126300C6AB0D61D6AEB804D527C87801BDE3AD3F6AD2C8B7E4976633AB154A92AD79105695EBC996514D1A8E40EB8B53D51FD8181F1E9",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "632C996B274A3C313C93645B0B32C5D21960BCC4DF105924E970C19F6BEDE80E86E3C4CA3B771D552AF3E10109F82876DDBDEA6A9077CC27F7D5E244A066251E",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "6929DD85147EE842DE5F921E247B598F"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "3DAC69CEB1620DE4DB065A71DEC68C1C",
+            "ephemeralData": "555F54BEC5FCF9269F53C55E6EC8EEB324581E5D12A75274481D01FA0320A1D6D17E742CFD85394975FF1E90784EFA06C3AEE88CBCA848C98C5144FF456F26BD"
+          }
+        }
+      ],
+      "kdfConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 512,
+        "saltMethod": "random",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+        "fixedInfoEncoding": "concatenation",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      }
+    },
+    {
+      "tgId": 33,
+      "testType": "VAL",
+      "tests": [
+        {
+          "tcId": 161,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "A12858E5715B0A82E684B2D4433768BD56FD2FB701AB7367B0095DEBB1511FB467AEDBE9E70DFEBC4E5375574B8597717CB2D8CB6D560A7D1240F36F1758D65C",
+            "z": "366F5863F9B2F6F56FCEDD44D1CF1585C83D7CFBC146C0B8A5835D05F9F4BF1225ECB140BD6BB30CA3DF9B27336CFF4DFB3293B480AB6CE8B016CEACBF9AD50A",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "F611B1D01C10B85CF2FDA62E2E70CE73301D9FCEFFB523D6BDCE5176C8A50A4A0ECA9702E02F6A9B01926AA4812AB7018C9652C9E4E4D58E13910087ACB9EF5C",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "8FA71E55677BC77BEFF5399FF56E8580"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "505F428AAB0F0385F035E11AE22A38A2",
+            "ephemeralData": "649B3A141042D4D2DBBB0A40820688C02B6C8AD363C50209ED792E8131DC45171B85F144E636190539A46553451FC083234ED71966617D55E0204B29470E7641"
+          },
+          "dkm": "ABD671702D3E4F6040DD4EF8CE7F93C048071AA2A4857E9D90DF14EADA758E5CCB702A14039EA0BDE758F688097661FEFC2FB71350CB4205C74F0326807C7E3B"
+        },
+        {
+          "tcId": 162,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "45A57043BECD4048EE868278CF78907DB3C3D6B2740E4C36FFD6CE98775D7966AA80DB17ACFD9DD2D47B85736E43E10F0724A9672BD57321BC1C405C9F14C473",
+            "z": "E8257C5D497449D2BA04D3FB79A0BD15FAA76511DD726E80211A8EC6830EBB64CAAEA785704C3AC68FCE36A1BBF738A06D2530E7B6F5758FABECAA833AD8A1F1",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "F33F177DDBFAE1F942E21D41FAE4D01E4177604A34C43721D068D6108781C9A7C5BC1701572E6FF3E331B163872E49D9FC2106762638440B406FAC4BEDC52AF3",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "2ED2A1A8514BB3302CB0C0501C325C0B"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "BA287A7504EDEAE60FE82BC1A974E793",
+            "ephemeralData": "A68EF3B1402B3A2A8E1C075302196DCB9DC99F240061F2BD5FE8B1AA77C9E2962239BA28C3D66A0D4A3049A9B2D5775C97214C1D6FC42A60B6B687AA38845BD8"
+          },
+          "dkm": "E24017258025637EB0175E0916B5C8152AE22185269096B7AD03A21EFB3DFB8AF863A2D574F5F8C91B5B7E59A51F534AB2F93A8FEF15F37A9CDF1B4BBF6DEBAC"
+        },
+        {
+          "tcId": 163,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "4F08A21287BA7AD996B25B9BEED8D734A09E2A958050B6FCE024C6F302B4652C129834785ADF840B9A6BF83E83C8937AB8342FA059E29E8480FCF10BC515448F",
+            "z": "4FA641D15099935020D57449CF2DFE5D9430BCD85BBB1EF4367F474FA699AD7CC6FAC9DCA26D1F0D46DCF9FC3302392F88FDC42A378E211882E33E6FA6DA2D1A",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "D1A84B095C875B585BF3677DD4A0D875EFEE2AD3B37F2412032563FDC57A00AD5ACD9D0B78281EB3D177AA5CA1253EE6E104EAA78787E76FB4C4317A3A2CCF05",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "516D813DDD3ECBBAE738572A7DBBC827",
+            "ephemeralData": "95E1D0001556173E6F3C505D4DD0658B668B397C01B2A4B44AFCB3C9FCF8604826CFE3F7367D1445C50669B30010346C78B3652FAEBB5578D8077D2A9BDD44D8"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "0C4804B70E4CC537B9AFB66CCE659586",
+            "ephemeralData": "D2F7F4316DFADBD61CCD3761899A4B697B515CFDF8E2AA6DCC03834F25EA8C4ACE39B72D03971517B6D4FABCD4E77B1CC3E34AE65CB1BD8924F8C9821291AA16"
+          },
+          "dkm": "48B0E4139CAF7818490A0FED0AA83509B1E665EA84D6748CC7E03FFB7B4F693D71B9A2B4DAA43F4D9DBA957B437282B9E92325DEBDDD52DEFBD9D2E29594839D"
+        },
+        {
+          "tcId": 164,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "0FA2DB567054A3FD5B4C80F7BC3EB7FDFFEB2DE24A7E15B9825AAC7965CEF61A725D5EA530C7F9239EED953D2086E36FDEE9953A361BB06E470B1D697741EAF1",
+            "z": "AD5B5575642BF653381470A00D261602A5444C19EFFDFB7965AE9A70911C9611C35DE20B8F0C467EBE359E88F9EE0E2E847F886CA39BB89067E482ABA9B488D7",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "9D6A8E1B559B812DB1F0B4A88D625EE75943241AF3347C527937A61139F76E73DE2CEA58D66872A9997BA01FED32C80DF5BBA31727660388C26584C7441BA852",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "31A445A08D8089609314ED6CD691D75B",
+            "ephemeralData": "4BF9B00CA328F2792D937663B051ED5B9916249AAF8854F0B40AF266C70E63F9510D9787F016AC920214396EBB41944F9F24EF496F793EE381A02350BBF48D67"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "6E6764B019CA8D8A5D395DE0E6752830",
+            "ephemeralData": "6357D8183753E697C365BFF5E672BF8AE52394C50FFF15F23AD3045F1A900DBA8B147D79ABD526F3B4FEB930AE727E3D5A40A766C9734DE0D083EE5D469A957C"
+          },
+          "dkm": "647A0008C671EE83B17A32887ABA2DFD190C33AAE20537599A048171A8B6B760F6674E18E5E465F0104CFBB1DBDB1CADCAE9EA57CCF29241D62D558DFDD8F826"
+        },
+        {
+          "tcId": 165,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "DF6847F01DF268B26A95870776389BE7E74F3E0E58E4EBB169CF9C6CF0B3071096CA8722FCD33BF455C4ADAC94A44A1E95ACB7E3851A0B668A44C359E6BD7617",
+            "z": "E16F10272E509C404C4669428313CE083196F8CD49FAB74E64EFDD972D0933DE4DAF2809DD952873A13775816EE2F8A79CE3C3579813E80979EDBC56C43D77C2",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+            "fixedInputEncoding": "concatenation",
+            "iv": "C8D7247CBB6AEBF5EE90E13203303B2145A1D5A5CBFBB6722CE373C98A1604836A79B2AA043E4871898E534E8615ECECB6466CC9C0E23B7A8228BB03DB748441",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "7AD3ED7BC9207D09C904B6B924B9C639",
+            "ephemeralData": "EA712C47B0CA7183EB1F3BCBDD6282E240473D09C9FD3644BA0DCD343AC49CD6C852D17C48C47A4AC95178723F071018473E3DC18CFBECBCED750B2B143AD563"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "0CC0877A3BFB4C024B12037825B6339A",
+            "ephemeralData": "68995A7D9A588A87BC1184EA586876E3D9A5484F4C9FA81B36247B77C6C37DBDB1FB70E3407FDA166FDFC72287D62F12C517735D03C3B7D97D9AFC756FFA6683"
+          },
+          "dkm": "0A3A1C08B55A60DA29E84FB82A54FA386008B07F74F192E179E99ED509E6AEB6580BA7B6E8D3DAC7E0E0A93D1F25F8F9F95297CA65F36D44A38C586EB7CF9F0C"
+        }
+      ],
+      "kdfConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 512,
+        "saltMethod": "random",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+        "fixedInfoEncoding": "concatenation",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      }
+    }
+  ]
+}
+----

@@ -1,0 +1,146 @@
+[[dsa_pqgver_test_vectors]]
+=== DSA pqgVer Test Vectors
+
+[[dsa_pqgver_tgjs]]
+==== DSA pqgVer Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.
+
+The test group for DSA / pqgVer / * is as follows:
+
+[[dsa_pqgver_vs_tg_table]]
+.DSA PQGVer Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | The test group identifier | integer
+| testType | The test operation performed | string
+| l | Length in bits of prime modulus p | integer
+| n | Length in bits of prime divisor q | integer
+| pqMode | The specific pq generation mode used in the test group | string
+| gMode | The specific g generation mode used in the test group | string
+| hashAlg | The hash algorithm used in the test group | string
+| tests | Array of individual test vector JSON objects, which are defined in <<dsa_pqgver_tvjs>> | array
+|===
+
+[[dsa_pqgver_tvjs]]
+==== DSA pqgVer Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each DSA / pqgVer / 1.0 test vector.
+
+[[dsa_pqgver_vs_tc_table]]
+.DSA PQGVer Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| p | The prime modulus | hex
+| q | The prime divisor of p - 1 | hex
+| domainSeed | The seed used to generate p and q in the probable method | hex
+| counter | The counter used to generate p and q in the probable method | integer
+| pSeed | The seed used to generate p in the provable method | hex
+| qSeed | The seed used to generate q in the provable method | hex
+| pCounter | The counter used to generate p in the provable method | integer
+| qCounter | The counter used to generate q in the provable method | integer
+| g | The generator | hex
+| h | The index value provided to the g generator in the unverifiable method | hex
+| index | The index value provided to the g generator in the canonical method | hex
+|===
+
+NOTE: For groups verifying a p and q value using the "probable" method, only the 'tcId', 'p', 'q', 'domainSeed' and 'counter' properties will be present.
+
+NOTE: For groups verifying a p and q value using the "provable" method, only the 'tcId', 'p', 'q', 'pCounter', 'qCounter', 'pSeed' and 'qSeed' properties will be present.
+
+NOTE: For groups verifying a g value using the "unverifiable" method, only the 'tcId', 'p', 'q', 'g', 'h', and 'domainSeed' properties will be present.
+
+NOTE: For groups verifying a g value using the "canonical" method, only the 'tcId', 'p', 'q', 'g', and 'index' properties will be present.
+
+The following is an example JSON object sent from the server to the client for DSA / pqgVer / 1.0.
+
+[source, json]
+----
+[
+    {
+        "acvVersion": <acvp-version>
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "DSA",
+        "mode": "pqgVer",
+        "revision": "1.0",
+        "testGroups": [
+          {
+            "tgId": 1,
+            "l": 1024,
+            "n": 160,
+            "hashAlg": "SHA-1",
+            "testType": "GDT",
+            "pqMode": "probable",
+            "tests": [
+              {
+                "tcId": 1,
+                "p": "9D9269AC94DB5003355...",
+                "q": "C5C97FD66D441234E78...",
+                "domainSeed": "259947680F...",
+                "counter": 309
+              },
+            ]
+          },
+          {
+            "tgId": 2,
+            "l": 1024,
+            "n": 160,
+            "hashAlg": "SHA-1",
+            "testType": "GDT",
+            "pqMode": "provable",
+            "tests": [
+              {
+                "tcId": 36,
+                "p": "4BDC98F8302E24CEDCE...",
+                "q": "A00C3FEAF8F56910DA5...",
+                "pCounter": 1874,
+                "qCounter": 115,
+                "pSeed": "C4967615C4E1391...",
+                "qSeed": "C4967615C4E1391..."
+              },
+            ]
+          },
+          {
+            "tgId": 3,
+            "l": 1024,
+            "n": 160,
+            "hashAlg": "SHA-1",
+            "testType": "GDT",
+            "gMode": "unverifiable",
+            "tests": [
+              {
+                "tcId": 211,
+                "p": "A1648B0F29F5D38DA507...",
+                "q": "9BCF7E1625844A88EABB...",
+                "g": "0FB0987B157E12F15D78...",
+                "h": "02",
+                "domainSeed": "D9F63E102A9..."
+              },
+            ]
+          },
+          {
+            "tgId": 4,
+            "l": 1024,
+            "n": 160,
+            "hashAlg": "SHA-1",
+            "testType": "GDT",
+            "gMode": "canonical",
+            "tests": [
+              {
+                "tcId": 246,
+                "p": "9A1B46A4498962D12FDE...",
+                "q": "B70E07662CADF2A41914...",
+                "g": "45659A0B48B5B581E5CA...",
+                "index": "45"
+              },
+            ]
+          }
+        ]
+    }
+]
+----

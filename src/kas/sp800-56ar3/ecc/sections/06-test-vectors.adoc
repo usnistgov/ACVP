@@ -1,0 +1,207 @@
+[[tgjs]]
+=== Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors
+that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.
+
+The test group for KAS/KTS ECC is as follows:
+
+[[vs_tg_table5]]
+.Vector Group JSON Object
+|===
+| JSON Value| Description| JSON Type| Optional
+
+| tgId| Numeric identifier for the test group, unique across the entire vector set. | value| No
+| testType|  The type of test for the group (AFT or VAL). | value| No
+| scheme| The scheme in use for the group. See <<supported_schemes>> for possible values. | value| No
+
+| kasRole| The group role from the perspective of the IUT.| value| No
+| l| The length of key to derive/transport.| value| No
+| iutId| The Iut's identifier.| value| No
+| serverId| The ACVP server's identifier.| value| No
+| kdfConfiguration| The KDF configuration for the group.| Object, See <<kdfconfig>>| No
+| macConfiguration| The MAC configuration for the group.| Object, See <<macconfig>>| Not optional for schemes using key confirmation.
+| keyConfirmationDirection| The key confirmation direction. | value| Yes
+| keyConfirmationRole| The key confirmation role. | value| Yes
+| domainParameterGenerationMode| The domain parameter type used. | value| No
+| tests| The tests for the group.| Array of objects, See <<tvjs>>.| No
+|===
+
+[[kdfconfig]]
+==== KDF Configuration JSON Schema
+
+Describes the KDF configuration for use under the test group.
+
+.KdfConfiguration JSON Object
+|===
+| JSON Value| Description| JSON Type| Optional
+
+| kdfType| The type of KDF to use for the group. | value - onestep, twostep| No
+| satMethod|  The strategy used for salting. | value - default (all 00s), random| No
+| fixedInfoPattern| The pattern used for constructing the fixedInfo. | value - See <<fixedinfopatcon>>.| No
+| fixedInfoEncoding| The pattern used for constructing the fixedInfo. | value - See <<fixedinfopatcon>>.| No
+| auxFunction| The auxiliary function used in the KDF.| value - See <<auxfunc>>. | Not optional for OneStepKdf.
+| macMode| The MAC function used in the KDF.| value - See <<twostepcapcap>>. | Not optional for TwoStepKdf.
+| counterLocation| The counter location. | value | Yes
+| counterLen| The counter length. | value | Yes
+| ivLen| The iv length. | value | Yes
+|===
+
+[[macconfig]]
+==== MAC Configuration JSON Schema
+
+Describes the key confirmation MAC configuration for use under the test group.
+
+.MacConfiguration JSON Object
+|===
+| JSON Value| Description| JSON Type| Optional
+
+| macType| The macType used in key confirmation. | value - HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512, CMAC, KMAC-128, KMAC-256 | No
+| keyLen| The number of bits to take from the DKM to use for the mac key in key confirmation. | value | No
+| macLen| The number of bits to use for the MAC tag. | value | No
+|===
+
+[[tvjs]]
+=== Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each KAS/KTS ECC test vector.
+
+[[vs_tc_table5]]
+
+.Test Case JSON Object
+|===
+| JSON Value| Description| JSON Type| Optional
+
+| tcId| Numeric identifier for the test case, unique across the entire vector set.| value| No
+| ephemeralPublicKeyIutX| The IUT's ephemeral public key X value. | value| Yes
+| ephemeralPublicKeyIutY| The IUT's ephemeral public key Y value. | value| Yes
+| staticPublicKeyIutX| The IUT's static public key X value. | value| Yes
+| staticPublicKeyIutY| The IUT's static public key Y value. | value| Yes
+| ephemeralPublicKeyServerX| The Server's ephemeral public key X value. | value| Yes
+| ephemeralPublicKeyServerY| The Server's ephemeral public key Y value. | value| Yes
+| staticPublicKeyServerX| The Server's static public key X value. | value| Yes
+| staticPublicKeyServerY| The Server's static public key Y value. | value| Yes
+| dkmNonceIut| The IUT's nonce used in static schemes for Key Confirmation. | value| Yes
+| ephemeralNonceIut| The IUT's ephemeral nonce used in some schemes. | value| Yes
+| dkmNonceServer| The Server's nonce used in static schemes for Key Confirmation. | value| Yes
+| ephemeralNonceServer| The Server's ephemeral nonce used in some schemes. | value| Yes
+| staticPrivateKeyIut| The IUT's static private key. | value| Yes
+| ephemeralPrivateKeyIut| The IUT's ephemeral private key. | value| Yes
+| kdfParameter| The KDF parameters for this test case. | value - See <<kdfparms>>. | Yes
+| dkm| The derived keying material. | value| Yes
+| tag| The tag generated as a part of key conformation (from the IUT perspective). | value| Yes
+|===
+
+[[kdfparms]]
+==== KDF Parameter JSON Schema
+
+KDF specific options used for the test case.
+
+.KDF Parameter JSON Object
+|===
+| JSON Value| Description| JSON Type| Optional
+
+| kdfType| The type of KDF utilized.| value| No
+| salt| The salt used for the test case. | value| Yes
+| iv| The iv used for the test case. | value| Yes
+| algorithmId| The random "algorithID" used for the test case when applicable to the fixedInfo pattern. | value| Yes
+| context| The random "context" used for the test case when applicable to the fixedInfo pattern. | value| Yes
+| label| The random "label" used for the test case when applicable to the fixedInfo pattern. | value| Yes
+|===
+
+
+[[app-vs-ex]]
+=== Example Test Vectors JSON Object KAS-FFC
+
+The following is a example JSON object for KAS-FFC test vectors sent from the ACVP server to the crypto module.
+
+[source,json]
+---- 
+{
+  "vsId": 0,
+  "algorithm": "KAS-ECC",
+  "revision": "Sp800-56Ar3",
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [
+        {
+          "staticPublicServerX": "B7A4DDA5DC3A317647B39F39E05390A88F12F53861C24635",
+          "staticPublicServerY": "CA2776BF6A0F35B727F3057340E89A1600915B81BB2E87B7",
+          "tcId": 1,
+          "ephemeralNonceServer": "44588073AACC3CFD6C9A5E2A0973B6BDDFC35F67EEA96FD0B070DF05F24A4B381F05CE9ACC67739B157CF8EE7459A64E",
+          "kdfParameter": {
+            "kdfType": "oneStep",
+            "salt": "00000000000000000000000000000000",
+            "algorithmId": "A51CF275ABE573209CBC606A934352FE"
+          }
+        }
+      ],
+      "domainParameterGenerationMode": "P-192",
+      "scheme": "staticUnified",
+      "kasRole": "initiator",
+      "l": 512,
+      "iutId": "123456ABCD",
+      "serverId": "434156536964",
+      "kdfConfiguration": {
+        "kdfType": "oneStep",
+        "saltMethod": "default",
+        "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+        "fixedInfoEncoding": "concatenation",
+        "auxFunction": "KMAC-128"
+      },
+      "macConfiguration": {
+        "macType": "KMAC-128",
+        "keyLen": 128,
+        "macLen": 128
+      },
+      "keyConfirmationDirection": "unilateral",
+      "keyConfirmationRole": "provider"
+    },
+    {
+      "tgId": 2,
+      "testType": "VAL",
+      "tests": [
+        {
+          "staticPublicServerX": "87F6D507656EBC3D4D655FD4C0F13BE0F98D5B7472A3B247",
+          "staticPublicServerY": "CFBC8EE38F4EF2DF1B97BF410ABCF4968F1115E7B80E34C6",
+          "staticPrivateIut": "F43B6F08F570D469ED31CF920516114B1B5E3C3C7BDD6B14",
+          "staticPublicIutX": "7573E06C6BACA56D5AFD08A1A014776BDDA7F4593645A07D",
+          "staticPublicIutY": "93D0C1CDC5C23BD045AD6258448436A55E3C310B4333F551",
+          "tcId": 21,
+          "ephemeralNonceServer": "6F4C587D3CEF0B1D0D5B359B18FFB8B72C879EB3997E768826552082D56931D965E7F315FD7254C434871FA1E160873F",
+          "dkmNonceIut": "AB5CCC3B75AA1FB85D28D5D53126B362AAABA3C51D427B6D138BEFD7EE636E1BC239FB45630BF6D7F0E80B59835916B9",
+          "kdfParameter": {
+            "kdfType": "oneStep",
+            "salt": "00000000000000000000000000000000",
+            "algorithmId": "342BCBC9DE15458BCA294BD16FFA10A7"
+          },
+          "dkm": "B9FDC93EA0B6A7906C6DB8EC17475B3073A8AD1C24CB1287AB8A6AEA46CABA4FDFD7B0CB77F74CDCF3DFF8DCC41560CF",
+          "tag": "3279D63C9192B7FEF71F6735921B3B46"
+        }
+      ],
+      "domainParameterGenerationMode": "P-192",
+      "scheme": "staticUnified",
+      "kasRole": "initiator",
+      "l": 512,
+      "iutId": "123456ABCD",
+      "serverId": "434156536964",
+      "kdfConfiguration": {
+        "kdfType": "oneStep",
+        "saltMethod": "default",
+        "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+        "fixedInfoEncoding": "concatenation",
+        "auxFunction": "KMAC-128"
+      },
+      "macConfiguration": {
+        "macType": "KMAC-128",
+        "keyLen": 128,
+        "macLen": 128
+      },
+      "keyConfirmationDirection": "unilateral",
+      "keyConfirmationRole": "provider"
+    }
+  ]
+}
+----

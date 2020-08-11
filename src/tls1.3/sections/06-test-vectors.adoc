@@ -1,0 +1,66 @@
+
+[[tgjs]]
+=== Test Groups
+
+The testGroups element at the top level in the test vector JSON object is an array of test  groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+.Test Group JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| testType | Test operations to be performed | string
+| hmacAlg | SHA version used | string
+| runningMode | The key exchange mode used | string
+| tests | Array of individual test cases | array
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' (see <<testtypes>>) the group is addressing.
+
+=== Test Cases
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each {spec-algorithm} test vector.
+
+.Test Case JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tcId | Test case identifier | integer
+| psk | Random pre-shared key, included for PSK and PSK-DHE running modes. | hex
+| dhe | Random Diffie-Hellman shared secret, included for DHE and PSK-DHE running modes. | hex
+| serverHelloRandom | Server hello random value | hex
+| clientHelloRandom | Client hello random value | hex
+| serverFinishedRandom | Server finished random value | hex
+| clientFinishedRandom | Client finished random value | hex
+|===
+
+Note that when the PSK or DHE are not included in the test case, it is assumed they are the digest size of the group's hash set to zero.  As an example, for a test group using SHA2-256, with a running mode of "DHE", the "PSK" would be represented by a BitString of 256 bits or 32 bytes, all being "0".
+
+Here is an abbreviated yet fully constructed example of the prompt.
+
+[align=left,alt=,type=]
+[source, json]
+----
+{
+    "vsId": 1,
+    "algorithm": "kdf-components",
+    "mode": "tls",
+    "revision": "1.0",
+    "testGroups": [
+        {
+            "tgId": 1,
+            "hmacAlg": "SHA-1",
+            "runningMode": "PSK-DHE",
+            "tests": [{
+                "tcId": 1,
+                "psk": "8E80670FE8DC70BCB9AADAE8DE89D7796374D8E6931794CF12F99383E1256CC477E5",
+                "dhe": "8E80670FE8DC70BCB9AADAE8DE89D7796374D8E6931794CF12F99383E1256CC477E5",
+                "helloClientRandom": "8913680310B713246CC1E98F0704D51FD9612B083ED34BA0369ECB61D6213F70ABAE",
+                "helloServerRandom": "46E129DCC9A8163C91E30AEC0A5157EB17AF9D85E35C990AE15FBC1B57302F1A1080",
+                "finishedClientRandom": "9924F6C6247AAEA59586E36D17AEFE679264AA6592E106331F4FC3A32CE2DCAAF356",
+                "finishedServerRandom": "47E13D592B48F4864D55C6853F68B97A723268A087BE45DC0425D44095668953BD53"
+            }]
+        }
+    ]
+}
+----

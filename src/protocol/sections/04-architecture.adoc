@@ -1,0 +1,93 @@
+
+== Architecture
+
+A server/client/proxy model is used where the roles are defined as:
+
+* ACV Client - Communicates with the ACV server using Java Script Object Notation (JSON <<RFC7159>>) and collects the test vectors and returns the test results using product specific methods.
+* ACV Server - Sends JSON formatted messaging and test data to the ACV client and processes test responses.
+* ACV Proxy - Resides between the ACV server and ACV client to proxy the connection for the client. This is particularly useful when the client does not support TLS, key management or have signature capabilities and they are required by the server. An example architecture is provided in Figure 3.
+* Device Under Test - Contains the crypto module under test which can include various algorithms and functions that encrypt/decrypt, generate keys, signatures, perform verifications and DRBG functions. May also contain the ACVP client.
+* Cryptographic Module API - This is the interface, manual or otherwise, to the crypto module. This interface is environment specific and will vary depending on the crypto module and may not be limited to real-time operation.
+
+=== Server/Client Architecture(realtime)
+
+[[xml_figure1a]]
+[align=center,alt=,type=]
+....
+                           +----------------------------------------+
+                           |                    +-----------------+ |
++----------+               | Entropy ---------->| DRBG----Encrypt | |
+| ACV      |               |                    |         Auth    | |
+| Server   |<=============>| +--------+         |                 | |
++----------+               | | ACV    |<------->| PKI-----Key Est | |
+                           | | Client |    ^    |         Sign    | |
+                           | +--------+    |    |                 | |
+                           |            Crypto  | Crypto Module   | |
+                           |            Module  +-----------------+ |
+                           |           Realtime                     |
+                           |              API                       |
+                           |                                        |
+                           |        Device Under Test (DUT)         |
+                           +----------------------------------------+
+
+....
+
+=== Server/Client Architecture(not realtime)
+
+[[xml_figure1b]]
+[align=center,alt=,type=]
+....
+                     +------------+
+                     |            |             +-----------------+
++----------+         |            |  Entropy -->| DRBG----Encrypt |
+| ACV      |         |            |             |         Auth    |
+| Server   |<=======>| +--------+ |             |                 |
++----------+         | | ACV    | |             | PKI-----Key Est |
+                     | | Client | | <==========>|         Sign    |
+                     | +--------+ |       ^     |                 |
+                     |            |       |     | Crypto Module   |
+                     +------------+       |     |                 |
+                                          |     +-----------------+
+                                   Manual/Non-Realtime
+                                    Vector Exchange
+
+....
+
+=== Server/Proxy Architecture
+
+[[xml_figure2]]
+[align=center,alt=,type=]
+....
+                +--------------------------------------------------+
+                |                      +-------------------------+ |
++----------+    |    +---------+       |                         | |
+| ACV      |    |    | ACV     |       |                         | |
+| Server   |<=======>| Proxy   |<=====>| +--------+   +--------+ | |
++----------+    |    +---------+       | | ACV    |<->| Crypto | | |
+                |                      | | Client |   | Module | | |
+                |                      | +--------+   +--------+ | |
+                |                      |                         | |
+                |                      |      DUT                | |
+                |                      +-------------------------+ |
+                | Vendor/Customer Premise                          |
+                +--------------------------------------------------+
+
+....
+
+=== Terminology
+
+The following terms are consistently used throughout this document and *SHOULD* be used throughout its
+extensions:
+
+* Test Session - The largest structure of an instance of ACVP. Often generated from a single registration, it will contain many Test Vector Sets for the algorithms defined in the registration.
+* Test Vector Set - The set of tests and data corresponding to an individual algorithm from within a registration. Uniquely identified throughout an instance of ACVP by the vsId. Contains many Test Groups.
+* Test Group - The set of tests that share common properties within a Test Vector Set.
+Uniquely identified within the Test Vector Set by the tgId. Contains many Test Cases.
+* Test Case - The smallest unit of the tests that represents an individual testable operation as defined by the parent Test Group. Uniquely identified throughout the Test Vector Set by the tcId.
+* Registration - The JSON from the client to the server that describes the algorithms and capabilities for which the client is seeking test cases and a validation. A Registration can submit capabilities for multiple algorithms. Each algorithm will be broken into individual Test Vector Sets.
+* Request - The JSON sent from the server to the client defining a single Test Vector Set to use as inputs for testing. Exactly one request will exist for each Test Vector Set.
+* Response - The JSON from the client providing the desired cryptographic output for each of the Test Cases defined in the corresponding Request file. These are linked via the Test Vector Set vsId. As exactly one request exists for each vsId, one response will exist for each request.
+* Disposition - The JSON from the server after the Response is submitted by the client detailing the correctness of the Test Cases. A "passed" disposition indicates that the particular algorithm in the Test Vector Set is ready for validation.
+* OE - Operational Environment - The specific hardware and/or software the client's cryptographic implementation uses to run.
+* Realtime - For the purposes of this document realtime is defined as the client receiving a vector set and immediately performing the tests and returning the results to the server. In general, this is a case where the ACVP client and crypto module reside in the same box and directly communicate with each other. Non-realtime would refer to the case where the client may gather vector sets from the server and through
+some means introduce them to the crypto module gather the results and send them back to the server.  In general, this is a case where the device hosting the crypto module cannot communicate directly with the ACVP client.

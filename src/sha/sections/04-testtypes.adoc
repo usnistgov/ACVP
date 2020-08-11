@@ -1,0 +1,38 @@
+
+[#testtypes]
+== Test Types and Test Coverage
+
+This section describes the design of the tests used to validate implementations of SHA-1 and SHA-2.
+
+=== Test Types
+
+There are two types of tests for SHA-1 and SHA-2: functional tests and Monte Carlo tests. Each has a specific value to be used in the testType field. The testType field definitions are:
+
+* "AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'hash' operation.  AFTs cause the implementation under test to exercise nomral operations on a single block, multiple blocks, or partial blocks. In all cases,random data is used. The functional tests are designed to verify that the logical components of the hash function (block chunking, block padding etc.) are operating correctly.
+
+* "MCT" - Monte Carlo Test. These tests exercise the implementation under test under stenuous circumstances. The implementation under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect potential memory leaks over time, and problems in allocation of resources, addressing variables, error handling, and generally improper behavior in response to random inputs. Each MCT processes 100 pseudorandom tests. Each algorithm and mode SHOULD have at least one MCT group. See <<MC_test>> for implementation details.
+
+[[MC_test]]
+=== Monte Carlo tests for SHA-1 and SHA-2
+
+The MCTs start with an initial condition (SEED which is a single message) and perform a series of chained computations.
+
+The algorithm is shown in <<xml_figureMCT>>.
+
+[[xml_figureMCT]]
+.SHA-1 and SHA-2 Monte Carlo Test
+
+[align=center,alt=,type=]
+
+....
+
+For j = 0 to 99
+MD[0] = MD[1] = MD[2] = SEED
+	For i = 3 to 1003
+		MSG[i] = MD[i-3] || MD[i-2] || MD[i-1]
+		MD[i] = SHA(MSG[i])
+	Output MD[1002]
+
+....
+
+

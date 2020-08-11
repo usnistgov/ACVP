@@ -1,0 +1,122 @@
+[[dsa_pqggen_test_vectors]]
+=== DSA pqgGen Test Vectors
+
+[[dsa_pqggen_tgjs]]
+==== DSA pqgGen Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.
+
+The test group for DSA / pqgGen / * is as follows:
+
+[[dsa_pqggen_vs_tg_table]]
+.DSA PQGGen Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | The test group identifier | integer
+| testType | The test operation performed | string
+| l | Length in bits of prime modulus p | integer
+| n | Length in bits of prime divisor q | integer
+| pqMode | The specific pq generation mode used in the test group | string
+| gMode | The specific g generation mode used in the test group | string
+| hashAlg | The hash algorithm used in the test group | string
+| tests | Array of individual test vector JSON objects, which are defined in <<dsa_pqggen_tvjs>> | array
+|===
+
+[[dsa_pqggen_tvjs]]
+==== DSA pqgGen Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each DSA / pqgGen / 1.0 test vector.
+
+[[dsa_pqggen_vs_tc_table]]
+.DSA PQGGen Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| p | The prime modulus | hex
+| q | The prime divisor of p - 1 | hex
+| domainSeed | The seed used to generate p and q in the probable method | hex
+| index | The index value provided to the g generator in the canonical method | hex
+|===
+
+NOTE: For groups generating a p and q value, only the 'tcId' property will be present. It is the client's responsibility to generate a valid p and q pair with the specified properties using the specified generation method from <<FIPS186-4>>.
+
+NOTE: For groups generating a g value, using the "unverifiable" method, only the 'tcId', 'p' and 'q' will be provided. For groups generating a g value using the "canonical" method, an additional 'domainSeed' and 'index' will be provided. For more information about these generation methods see Appendix A in <<FIPS186-4>>.
+
+The following is an example JSON object sent from the server to the client for DSA / pqgGen / 1.0.
+
+[source, json]
+----
+[
+    {
+        "acvVersion": <acvp-version>
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "DSA",
+        "mode": "pqgGen",
+        "revision": "1.0",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "l": 2048,
+                "n": 224,
+                "hashAlg": "SHA2-224",
+                "pqMode": "probable",
+                "testType": "GDT",
+                "tests": [
+                    {
+                        "tcId": 1,
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "l": 2048,
+                "n": 224,
+                "hashAlg": "SHA2-384",
+                "pqMode": "provable",
+                "testType": "GDT",
+                "tests": [
+                    {
+                        "tcId": 2,
+                    }
+                ]
+            },
+            {
+                "tgId": 3,
+                "l": 2048,
+                "n": 224,
+                "hashAlg": "SHA2-224",
+                "testType": "GDT",
+                "gMode": "unverifiable",
+                "tests": [
+                    {
+                      "tcId": 3,
+                      "p": "B9D5DEC1F8541708F...",
+                      "q": "9F3FCC1DA20ACCD5C..."
+                    }
+                ]
+            },
+            {
+                "tgId": 4,
+                "l": 2048,
+                "n": 224,
+                "hashAlg": "SHA2-224",
+                "testType": "GDT",
+                "gMode": "canonical",
+                "tests": [
+                    {
+                      "tcId": 4,
+                      "p": "CACDDA5F26C38B7EF...",
+                      "q": "A4D538BAE42A35316...",
+                      "domainSeed": "E8A171F4...",
+                      "index": "AD"
+                    }
+                ]
+            }
+        ]
+    }
+]
+----

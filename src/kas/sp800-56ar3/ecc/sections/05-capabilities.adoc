@@ -1,0 +1,477 @@
+
+[[prereq_algs]]
+=== Prerequisite Algorithms
+
+Some algorithm implementations rely on other cryptographic primitives. For example, IKEv2 uses an underlying SHA algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same 	submission. ACVP provides a mechanism for specifying the required prerequisites:
+
+[[rereqs_table]]
+
+.Prerequisite Algorithms JSON Values
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| algorithm| a prerequisite algorithm| value| CMAC, DRBG, ECDSA, HMAC, KMAC, SHA, SP800-108| No
+| valValue| algorithm validation number| value| actual number or "same"| No
+| prereqAlgVal| prerequistie algorithm validation| object with algorithm and valValue properties| see above| Yes
+|===
+
+[[cap_ex]]
+=== Algorithm Capabilities JSON Values
+
+Each algorithm capability advertised is a self-contained JSON object using the following values.
+
+[[caps_table]]
+
+.Capabilities JSON Values
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| algorithm| The algorithm under test| value| KAS-ECC| No
+| revision| The algorithm testing revision to use.| value| "Sp800-56Ar3"| No
+| prereqVals| Prerequisite algorithm validations| array of prereqAlgVal objects| See <<prereq_algs>>| No
+| function| Type of function supported| array| See <<supported_functions>>| Yes
+| iutId| The identifier of the IUT.| hex|  | No 
+| scheme| Array of supported key agreement schemes each having their own capabilities| object| See <<supported_schemes>>| No
+| domainParameterGen| Array of IUT supported domain paameter generation methods. | array | P-192, P-224, P-256, P-384, P-521, K-163, K-233, K-283, K-409, K-571, B-163, B-233, B-283, B-409, B-571| No
+|===
+
+Note: Some optional values are *REQUIRED* depending on the algorithm. Failure to provide these values will result in the ACVP server returning an error to the ACVP client during registration.
+
+[[supported_functions]]
+=== Supported KAS ECC Functions
+
+The following function types *MAY* be advertised by the ACVP compliant crypto module:
+
+* keyPairGen - IUT can perform keypair generation.
+
+* partialVal - IUT can perform partial public key validation ([SP800-56Ar3] section 5.6.2.3).
+
+* fullVal - IUT can perform full public key validation (
+<<SP800-56Ar3>> section 5.6.2.3).
+
+[[schemes]]
+=== KAS ECC Schemes
+
+All other scheme capabilities are advertised as a self-contained JSON object using the following values.  Note that AT LEAST one valid scheme must be registered.
+   
+[[supported_schemes]]
+==== KAS ECC Scheme Capabilities JSON Values
+
+* ephemeralUnified - keyConfirmation not supported.
+* fullMqv
+* fullUnified
+* onePassDh - Can only provide unilateral key confirmation party V to party U.
+* onePassMqv
+* onePassUnified
+* staticUnified
+
+[[scheme_caps_table]]
+.Capabilities JSON Values
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| kasRole| Roles supported for key agreement| array| initiator and/or responder| No
+| kdfMethods| The KDF methods to use when testing KAS schemes. | object| <<kdfmethods>>| No
+| keyConfirmationMethod| The KeyCnfirmation capabilities (when supported) for the scheme.| object| <<keyconfirmmethod>>| Yes
+| l| The length of the key to derive (using a KDF) or transport (using a KTS scheme).  This value should be large enough to accommodate the key length used for the mac algorithms in use for key confirmation, ideally the maximum value the IUT can support with their KAS/KTS implementation.  Maximum value (for testing purposes) is 1024.| integer| 128 minimum without KC, 136 minimum with KC, maximum 1024.| No
+|===
+
+[[kdfmethods]]
+===== Supported Kdf Methods
+
+Note that AT LEAST one KDF Method is required for KAS schemes.  The following *MAY* be advertised by the ACVP compliant crypto module:
+
+.KDF Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| oneStepKdf| Indicates the IUT will be testing key derivation using the SP800-56Cr1 OneStepKdf.| object| <<onestepkdf>>| Yes
+| twoStepKdf| Indicates the IUT will be testing key derivation using the SP800-56Cr1 TwoStepKdf. | object| <<twostepkdf>>| Yes
+|===
+
+[[onestepkdf]]
+====== One Step KDF Capabilities
+
+.One Step KDF Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| auxFunctions| The auxiliary functions to use with the KDF.| array of <<auxfunc>>| See <<auxfunc>>| No
+| fixedInfoPattern| The pattern used for fixedInfo construction. | string| See <<twostepkdf>>| No
+| encoding| The encoding type to use with fixedInfo construction.  Note concatenation is currently supported.  ASN.1 should be coming. | array of string| concatenation| No
+|===
+
+[[auxfunc]]
+.AuxFunction Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| auxFunctionName| The auxiliary function to use.| string| SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512, KMAC-128, KMAC-256 | No
+| macSaltMethods| How the salt is determined (default being all 00s, random being a random salt). | array of string| default, random| Not optional for mac based auxiliary functions.
+|===
+
+[[twostepkdf]]
+====== Two Step KDF Capabilities
+
+.Two Step KDF Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| capabilities| The capabilities supported for the Two Step KDF.| array of <<twostepcapcap>>| See <<twostepcapcap>>| No
+|===
+
+Note this capabilities object is very similar to the capability object from SP800-108.
+
+[[twostepcapcap]]
+.TwoStepCapabilities Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| macSaltMethod| How the salt is determined (default being all 00s, random being a random salt). | array of string| default, random| Not optional for mac based auxiliary functions.
+| fixedInfoPattern| The pattern used for fixedInfo construction. | string| See <<fixedinfopatcon>> | No
+| encoding| The encoding type to use with fixedInfo construction.  Note concatenation is currently supported.  ASN.1 should be coming. | array of string| concatenation| No
+| kdfMode| The strategy for running the KDF. | string| counter, fedback, double pipeline iteration| No
+| macMode| The macMode supported by the KDF. | array of string| CMAC-AES128, CMAC-AES192, CMAC-AES256, HMAC-SHA-1, HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512| No
+| fixedDataOrder| The counter locations supported by the KDF. | array of string| none, before fixed data, after fixed data, before iterator| No
+| counterLength| The counter lengths supported for the KDF. | array of integer| 8, 16, 24, 32| Not optional for counter mode.
+| supportedLengths| The supported derivation lengths. | domain| Single range (of literal) expected.  Registered value must support the L value provided.| No
+| supportsEmptyIv| The KDF supports an empty IV (feedback mode). | boolean| true, false| No
+| requiresEmptyIv| The KDF requires an empty IV (feedback mode). | boolean| true, false| Yes
+|===
+
+[[keyconfirmmethod]]
+===== Supported KeyConfirmation Method
+
+.KAS ECC KeyConfirmation Capabilities JSON Values
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| macMethods| The MAC methods to use when testing KAS or KTS schemes with key confirmation.| object| <<supmacmet>>| No
+| keyConfirmationDirections| The directions in which key confirmation is supported.| array| unilateral, bilateral| No
+| keyConfirmationRoles| The roles in which key confirmation is supported.| array| provider, recipient| No
+|===
+
+[[fixedinfopatcon]]
+===== FixedInfoPatternConstruction
+
+IUTs *SHALL* be capable of specifying how the FixedInfo is constructed for the KAS/KTS negotiation.
+
+Pattern candidates:
+
+* literal[0123456789ABCDEF]
+
+  ** uses the specified hex within "[]". literal[0123456789ABCDEF]
+substitutes "0123456789ABCDEF" in place of the field
+
+* uPartyInfo
+
+  ** uPartyId { || ephemeralKey } { || ephemeralNonce } { || dkmNonce } { || c }
+    *** "optional" items such as ephemeralKey *MUST* be included when available for ACVP testing.
+
+* vPartyInfo
+
+  ** vPartyId { || ephemeralKey } { || ephemeralNonce } { || dkmNonce } { || c }
+    *** "optional" items such as ephemeralKey *MUST* be included when available for ACVP testing.
+
+* context
+
+  ** Random value chosen by ACVP server to represent the context.
+
+* algorithmId
+
+  ** Random value chosen by ACVP server to represent the
+algorithmId.
+
+* label
+
+  ** Random value chosen by ACVP server to represent the label.
+
+Example (Note that party U is the server in this case "434156536964", party V is the IUT "a1b2c3d4e5"):
+
+* "concatenation" : "literal[123456789CAFECAFE]||uPartyInfo||vPartyInfo"
+
+Evaluated as:
+
+* "123456789CAFECAFE434156536964a1b2c3d4e5"
+
+[[supmacmet]]
+===== Supported MAC Methods
+
+Note that AT LEAST one mac method must be supplied when making use of Key Confirmation.
+
+.MAC Method Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| CMAC| Utilizes CMAC as the MAC algorithm. | object| See <<supmacopt>>.  Note that the keyLen must be 128, 192, or 256 for this MAC.| Yes
+| HMAC-SHA2-224| Utilizes HMAC-SHA2-224 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-256| Utilizes HMAC-SHA2-256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-384| Utilizes HMAC-SHA2-384 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-512| Utilizes HMAC-SHA2-512 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-512/224| Utilizes HMAC-SHA2-512/224 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-512/256| Utilizes HMAC-SHA2-512/256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-224| Utilizes HMAC-SHA3-224 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-256| Utilizes HMAC-SHA3-256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-384| Utilizes HMAC-SHA3-384 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-512| Utilizes HMAC-SHA3-512 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| KMAC-128| Utilizes KMAC-128 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| KMAC-256| Utilizes KMAC-256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+|===
+
+[[supmacopt]]
+====== Supported MAC Options
+
+.MAC Method Base Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| keyLen| The amount of bits from the DKM to pass into the KeyConfirmation MAC function.| integer| 128 - 512.  Note that the DKM is *REQUIRED* to have at least 8 bits available after subtracting the keyLen specified.| No
+| macLen| The amount of bits to use as the tag from the MAC function.| integer| 64 - 512. | No
+|===
+
+[[app-reg-ex]]
+=== Example KAS-ECC Registration
+
+The following is a example JSON object advertising support for KAS ECC.
+
+[align=left,alt=,type=]
+[source,json]
+----
+{
+  "algorithm": "KAS-ECC",
+  "revision": "Sp800-56Ar3",
+  "prereqVals": [
+    {
+      "algorithm": "ECDSA",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "DRBG",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "SHA",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "KMAC",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "HMAC",
+      "valValue": "123456"
+    }
+  ],
+  "function": [
+    "keyPairGen",
+    "partialVal"
+  ],
+  "iutId": "123456ABCD",
+  "scheme": {
+    "ephemeralUnified": {
+      "kasRole": [
+        "initiator",
+        "responder"
+      ],
+      "kdfMethods": {
+        "oneStepKdf": {
+          "auxFunctions": [
+            {
+              "auxFunctionName": "KMAC-128",
+              "macSaltMethods": [
+                "default"
+              ]
+            }
+          ],
+          "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+          "encoding": [
+            "concatenation"
+          ]
+        },
+        "twoStepKdf": {
+          "capabilities": [
+            {
+              "macSaltMethods": [
+                "random"
+              ],
+              "fixedInfoPattern": "l||label||uPartyInfo||vPartyInfo||context",
+              "encoding": [
+                "concatenation"
+              ],
+              "kdfMode": "feedback",
+              "macMode": [
+                "HMAC-SHA3-224"
+              ],
+              "supportedLengths": [
+                512
+              ],
+              "fixedDataOrder": [
+                "after fixed data"
+              ],
+              "counterLength": [
+                32
+              ],
+              "requiresEmptyIv": false,
+              "supportsEmptyIv": false
+            }
+          ]
+        }
+      },
+      "l": 512
+    },
+    "onePassDh": {
+      "kasRole": [
+        "initiator",
+        "responder"
+      ],
+      "kdfMethods": {
+        "oneStepKdf": {
+          "auxFunctions": [
+            {
+              "auxFunctionName": "KMAC-128",
+              "macSaltMethods": [
+                "default"
+              ]
+            }
+          ],
+          "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+          "encoding": [
+            "concatenation"
+          ]
+        },
+        "twoStepKdf": {
+          "capabilities": [
+            {
+              "macSaltMethods": [
+                "random"
+              ],
+              "fixedInfoPattern": "l||label||uPartyInfo||vPartyInfo||context",
+              "encoding": [
+                "concatenation"
+              ],
+              "kdfMode": "feedback",
+              "macMode": [
+                "HMAC-SHA3-224"
+              ],
+              "supportedLengths": [
+                512
+              ],
+              "fixedDataOrder": [
+                "after fixed data"
+              ],
+              "counterLength": [
+                32
+              ],
+              "requiresEmptyIv": false,
+              "supportsEmptyIv": false
+            }
+          ]
+        }
+      },
+      "keyConfirmationMethod": {
+        "macMethods": {
+          "KMAC-128": {
+            "keyLen": 128,
+            "macLen": 128
+          }
+        },
+        "keyConfirmationDirections": [
+          "unilateral"
+        ],
+        "keyConfirmationRoles": [
+          "provider",
+          "recipient"
+        ]
+      },
+      "l": 512
+    }
+  },
+  "domainParameterGenerationMethods": [
+    "P-192"
+  ]
+}    
+----
+
+[[generation_reqs_per_scheme]]
+== Generation Requirements per Party per Scheme
+
+The various schemes of KAS all have their own requirements as to keys and nonces per scheme, per party. The below table demonstrates those generation requirements:
+
+[[scheme_generation_requirements]]
+
+.Required Party Generation Obligations
+|===
+| Scheme| KasMode| KasRole| KeyConfirmationRole| KeyConfirmationDirection| StaticKeyPair| EphemeralKeyPair| EphemeralNonce| DkmNonce
+
+| DhHybrid1| NoKdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| DhHybrid1| NoKdfNoKc| ResponderPartyV| None| None| True| True| False| False
+| DhHybrid1| KdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| DhHybrid1| KdfNoKc| ResponderPartyV| None| None| True| True| False| False
+| DhHybrid1| KdfKc| InitiatorPartyU| Provider| Unilateral| True| True| False| False
+| DhHybrid1| KdfKc| InitiatorPartyU| Provider| Bilateral| True| True| False| False
+| DhHybrid1| KdfKc| InitiatorPartyU| Recipient| Unilateral| True| True| False| False
+| DhHybrid1| KdfKc| InitiatorPartyU| Recipient| Bilateral| True| True| False| False
+| DhHybrid1| KdfKc| ResponderPartyV| Provider| Unilateral| True| True| False| False
+| DhHybrid1| KdfKc| ResponderPartyV| Provider| Bilateral| True| True| False| False
+| DhHybrid1| KdfKc| ResponderPartyV| Recipient| Unilateral| True| True| False| False
+| DhHybrid1| KdfKc| ResponderPartyV| Recipient| Bilateral| True| True| False| False
+| Mqv2| NoKdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| Mqv2| NoKdfNoKc| ResponderPartyV| None| None| True| True| False| False
+| Mqv2| KdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| Mqv2| KdfNoKc| ResponderPartyV| None| None| True| True| False| False
+| Mqv2| KdfKc| InitiatorPartyU| Provider| Unilateral| True| True| False| False
+| Mqv2| KdfKc| InitiatorPartyU| Provider| Bilateral| True| True| False| False
+| Mqv2| KdfKc| InitiatorPartyU| Recipient| Unilateral| True| True| False| False
+| Mqv2| KdfKc| InitiatorPartyU| Recipient| Bilateral| True| True| False| False
+| Mqv2| KdfKc| ResponderPartyV| Provider| Unilateral| True| True| False| False
+| Mqv2| KdfKc| ResponderPartyV| Provider| Bilateral| True| True| False| False
+| Mqv2| KdfKc| ResponderPartyV| Recipient| Unilateral| True| True| False| False
+| Mqv2| KdfKc| ResponderPartyV| Recipient| Bilateral| True| True| False| False
+| DhEphem| NoKdfNoKc| InitiatorPartyU| None| None| False| True| False| False
+| DhEphem| NoKdfNoKc| ResponderPartyV| None| None| False| True| False| False
+| DhEphem| KdfNoKc| InitiatorPartyU| None| None| False| True| False| False
+| DhEphem| KdfNoKc| ResponderPartyV| None| None| False| True| False| False
+| DhHybridOneFlow| NoKdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| DhHybridOneFlow| NoKdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| DhHybridOneFlow| KdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| DhHybridOneFlow| KdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| DhHybridOneFlow| KdfKc| InitiatorPartyU| Provider| Unilateral| True| True| False| False
+| DhHybridOneFlow| KdfKc| InitiatorPartyU| Provider| Bilateral| True| True| False| False
+| DhHybridOneFlow| KdfKc| InitiatorPartyU| Recipient| Unilateral| True| True| False| False
+| DhHybridOneFlow| KdfKc| InitiatorPartyU| Recipient| Bilateral| True| True| False| False
+| DhHybridOneFlow| KdfKc| ResponderPartyV| Provider| Unilateral| True| False| False| False
+| DhHybridOneFlow| KdfKc| ResponderPartyV| Provider| Bilateral| True| False| True| False
+| DhHybridOneFlow| KdfKc| ResponderPartyV| Recipient| Unilateral| True| False| True| False
+| DhHybridOneFlow| KdfKc| ResponderPartyV| Recipient| Bilateral| True| False| True| False
+| Mqv1| NoKdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| Mqv1| NoKdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| Mqv1| KdfNoKc| InitiatorPartyU| None| None| True| True| False| False
+| Mqv1| KdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| Mqv1| KdfKc| InitiatorPartyU| Provider| Unilateral| True| True| False| False
+| Mqv1| KdfKc| InitiatorPartyU| Provider| Bilateral| True| True| False| False
+| Mqv1| KdfKc| InitiatorPartyU| Recipient| Unilateral| True| True| False| False
+| Mqv1| KdfKc| InitiatorPartyU| Recipient| Bilateral| True| True| False| False
+| Mqv1| KdfKc| ResponderPartyV| Provider| Unilateral| True| False| False| False
+| Mqv1| KdfKc| ResponderPartyV| Provider| Bilateral| True| False| True| False
+| Mqv1| KdfKc| ResponderPartyV| Recipient| Unilateral| True| False| True| False
+| Mqv1| KdfKc| ResponderPartyV| Recipient| Bilateral| True| False| True| False
+| DhOneFlow| NoKdfNoKc| InitiatorPartyU| None| None| False| True| False| False
+| DhOneFlow| NoKdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| DhOneFlow| KdfNoKc| InitiatorPartyU| None| None| False| True| False| False
+| DhOneFlow| KdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| DhOneFlow| KdfKc| InitiatorPartyU| Recipient| Unilateral| False| True| False| False
+| DhOneFlow| KdfKc| ResponderPartyV| Provider| Unilateral| True| False| False| False
+| DhStatic| NoKdfNoKc| InitiatorPartyU| None| None| True| False| False| False
+| DhStatic| NoKdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| DhStatic| KdfNoKc| InitiatorPartyU| None| None| True| False| False| True
+| DhStatic| KdfNoKc| ResponderPartyV| None| None| True| False| False| False
+| DhStatic| KdfKc| InitiatorPartyU| Provider| Unilateral| True| False| False| True
+| DhStatic| KdfKc| InitiatorPartyU| Provider| Bilateral| True| False| False| True
+| DhStatic| KdfKc| InitiatorPartyU| Recipient| Unilateral| True| False| False| True
+| DhStatic| KdfKc| InitiatorPartyU| Recipient| Bilateral| True| False| False| True
+| DhStatic| KdfKc| ResponderPartyV| Provider| Unilateral| True| False| False| False
+| DhStatic| KdfKc| ResponderPartyV| Provider| Bilateral| True| False| True| False
+| DhStatic| KdfKc| ResponderPartyV| Recipient| Unilateral| True| False| True| False
+| DhStatic| KdfKc| ResponderPartyV| Recipient| Bilateral| True| False| True| False
+|===
+

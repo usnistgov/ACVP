@@ -1,10 +1,11 @@
 # ACVP
-The [Automated Cryptographic Validation Protocol](./artifacts/draft-fussell-acvp-spec-00.html) (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
+The [Automated Cryptographic Validation Protocol](./draft-fussell-acvp-spec.html) (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
 
 All current information about ACVP may be found within this Github project. View the documents at https://usnistgov.github.io/ACVP/.
 
 # Jump to
 * [Background](#background)
+* [How to use Metanorma](#how-to-use-metanorma)
 * [Objective](#objective)
 * [Project Goals](#project-goals)
 * [Status](#status)
@@ -29,7 +30,46 @@ The rapid development of cryptographic technology over the last two decades and 
 Requirements documents for the existing Cryptrographic Algorithm Validation Program (CAVP) and the 17CAV scope can be found at https://www.nist.gov/national-voluntary-laboratory-accreditation-program-nvlap/requirements-documents-5. The requirements documents for the ACVP scope will likely be found on the same page once they have been finalized and published.
  
 General information about CAVP can be found at https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program with the CAVP management manual found at https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/CAVPMM.pdf and the FAQ at https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/CAVPFAQ.pdf.
- 
+
+# How to use Metanorma
+
+Metanorma is a library for writing standards. It can compile `.adoc` files into multiple common standards formats including the IETF's RFC format. 
+
+Use the instructions here to set up Metanorma: https://www.metanorma.com/author/topics/install/
+
+To compile an individual file, to make sure your gem versions are up to date run
+
+```
+gem install metanorma-cli
+```
+
+From there run 
+
+```
+metanorma compile -t ietf -x html file.adoc
+```
+
+You can switch between `-x html` and `-x txt` for different RFC output formats. 
+
+Or you can use the `Makefile` which is available. 
+
+To build all documents, html and txt
+
+```
+make all
+```
+
+To build a specific file
+
+```
+make specific-file.html
+```
+
+To remove all xml, txt, html, err produces files,
+
+```
+make clean
+```
 
 # Objective
 The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST cryptographic validation programs ([CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#)) for accelerated test data generation and requisition, reporting of test results, and validation of NIST-approved cryptographic algorithms (see FIPS 140-2 [Annex A](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf), [Annex C](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexc.pdf) and [Annex D](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexd.pdf)).
@@ -38,194 +78,196 @@ The objective of this project is to define a protocol allowing independent imple
 The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and 
 validation of standardized algorithm test evidence to facilitate the [modernization](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) of [CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program).
 
-The new automated testing scope is available starting on April 8, 2019. This testing scope will eventually replace the existing Cryptographic Algorithm Validation Testing (17CAV) scope. To allow for a smooth transition <b> both scopes will be available for no less than six months, but the legacy 17CAV scope will be retired after no more than one year and may be retired earlier depending on the speed of the transition and scope of testing improvements ACVP implements relative to the legacy 17CAV scope </b>.
-
 # Status
-The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) are available.
+The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the [protocol specification](./draft-fussell-acvp-spec.html) are available.
 
 The demo server allows validation of the following algorithms (a superset of the algorithms available through the CAVS tool). NOT ALL OF THE ALGORITHMS AVAILABLE ON THE DEMO SERVER ARE NIST-APPROVED ALGORITHMS. The prod server supports a subset of the listed algorithms.
 
 ## Supported Algorithms
 
 ### Block Cipher Modes
-* [AES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
-* [AES-CFB1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CFB8](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CFB128](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-GCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-GCM-SIV](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
-* [AES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-KWP](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-XPN](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-XTS](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-FF1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-FF3-1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) - DEMO only
-* [TDES-CBC](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CBCI](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CFBP1](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CFBP8](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CFBP64](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-CTR](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html) 
-* [TDES-ECB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-KW](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-OFB](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [TDES-OFBI](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
+* [AES-CBC](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html) 
+* [AES-CFB1](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-CFB8](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-CFB128](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-CTR](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-ECB](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-GCM](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-GCM-SIV](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html) - DEMO only
+* [AES-KW](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-KWP](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-OFB](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-XPN](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-XTS](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-FF1](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-FF3-1](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html) - DEMO only
+* [TDES-CBC](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-CBCI](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-CFBP1](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-CFBP8](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-CFBP64](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-CTR](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html) 
+* [TDES-ECB](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-KW](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-OFB](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [TDES-OFBI](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
 
 ### Secure Hash
-* [SHA-1](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-224](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-256](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-384](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-512](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-512/224](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA-512/256](./artifacts/draft-celi-acvp-sha-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha-00.html)
-* [SHA3-224](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHA3-256](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHA3-384](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHA3-512](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHAKE-128](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
-* [SHAKE-256](./artifacts/draft-celi-acvp-sha3-00.txt) - [HTML](./artifacts/draft-celi-acvp-sha3-00.html)
+* [SHA-1](./draft-celi-acvp-sha.txt) - [HTML](./draft-celi-acvp-sha.html)
+* [SHA-224](./draft-celi-acvp-sha.txt) - [HTML](./draft-celi-acvp-sha.html)
+* [SHA-256](./draft-celi-acvp-sha.txt) - [HTML](./draft-celi-acvp-sha.html)
+* [SHA-384](./draft-celi-acvp-sha.txt) - [HTML](./draft-celi-acvp-sha.html)
+* [SHA-512](./draft-celi-acvp-sha.txt) - [HTML](./draft-celi-acvp-sha.html)
+* [SHA-512/224](./draft-celi-acvp-sha.txt) - [HTML](./draft-celi-acvp-sha.html)
+* [SHA-512/256](./draft-celi-acvp-sha.txt) - [HTML](./draft-celi-acvp-sha.html)
+* [SHA3-224](./draft-celi-acvp-sha3.txt) - [HTML](./draft-celi-acvp-sha3.html)
+* [SHA3-256](./draft-celi-acvp-sha3.txt) - [HTML](./draft-celi-acvp-sha3.html)
+* [SHA3-384](./draft-celi-acvp-sha3.txt) - [HTML](./draft-celi-acvp-sha3.html)
+* [SHA3-512](./draft-celi-acvp-sha3.txt) - [HTML](./draft-celi-acvp-sha3.html)
+* [SHAKE-128](./draft-celi-acvp-sha3.txt) - [HTML](./draft-celi-acvp-sha3.html)
+* [SHAKE-256](./draft-celi-acvp-sha3.txt) - [HTML](./draft-celi-acvp-sha3.html)
 
 ### XOFs
-* [cSHAKE-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [cSHAKE-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [KMAC-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [KMAC-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [ParallelHash-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [ParallelHash-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [TupleHash-128](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
-* [TupleHash-256](./artifacts/draft-celi-acvp-xof-00.txt) - [HTML](./artifacts/draft-celi-acvp-xof-00.html)
+* [cSHAKE-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [cSHAKE-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [KMAC-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [KMAC-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [ParallelHash-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [ParallelHash-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [TupleHash-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [TupleHash-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
 
 ### Message Authentication
-* [AES-GMAC](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [AES-CCM](./artifacts/draft-celi-acvp-block-ciph-00.txt) - [HTML](./artifacts/draft-celi-acvp-block-ciph-00.html)
-* [CMAC-AES](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [CMAC-TDES](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA-1](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-224](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-256](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-384](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-512](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-512/224](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA2-512/256](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-224](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-256](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-384](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
-* [HMAC-SHA3-512](./artifacts/acvp_sub_mac.txt) - [HTML](./artifacts/acvp_sub_mac.html)
+* [AES-GMAC](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [AES-CCM](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
+* [CMAC-AES](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [CMAC-TDES](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA-1](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA2-224](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA2-256](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA2-384](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA2-512](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA2-512/224](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA2-512/256](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA3-224](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA3-256](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA3-384](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
+* [HMAC-SHA3-512](./draft-fussell-acvp-mac.txt) - [HTML](./draft-fussell-acvp-mac.html)
 
 ### DRBG
-* [ctrDRBG-AES-128](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
-* [ctrDRBG-AES-192](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
-* [ctrDRBG-AES-256](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
-* [ctrDRBG-TDES](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
-* [HASH DRBG](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
-* [HMAC DRBG](./artifacts/acvp_sub_drbg.txt) - [HTML](./artifacts/acvp_sub_drbg.html)
+* [ctrDRBG-AES-128](./draft-vassilev-acvp-drbg.txt) - [HTML](./draft-vassilev-acvp-drbg.html)
+* [ctrDRBG-AES-192](./draft-vassilev-acvp-drbg.txt) - [HTML](./draft-vassilev-acvp-drbg.html)
+* [ctrDRBG-AES-256](./draft-vassilev-acvp-drbg.txt) - [HTML](./draft-vassilev-acvp-drbg.html)
+* [ctrDRBG-TDES](./draft-vassilev-acvp-drbg.txt) - [HTML](./draft-vassilev-acvp-drbg.html)
+* [HASH DRBG](./draft-vassilev-acvp-drbg.txt) - [HTML](./draft-vassilev-acvp-drbg.html)
+* [HMAC DRBG](./draft-vassilev-acvp-drbg.txt) - [HTML](./draft-vassilev-acvp-drbg.html)
 
 ### Digital Signature
-* [RSA mode: keyGen](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: sigGen](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: sigVer](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: signatureComponent](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: decryptionComponent](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
-* [RSA mode: legacySigVer](./artifacts/acvp_sub_rsa.txt) - [HTML](./artifacts/acvp_sub_rsa.html)
-* [ECDSA mode: sigGenComponent](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [ECDSA mode: keyGen](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [ECDSA mode: keyVer](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [ECDSA mode: sigGen](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html) 
-* [ECDSA mode: sigVer](./artifacts/acvp_sub_ecdsa.txt) - [HTML](./artifacts/acvp_sub_ecdsa.html)
-* [DSA mode: keyGen](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: sigVer](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: sigGen](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: pqgGen](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
-* [DSA mode: pqgVer](./artifacts/acvp_sub_dsa.txt) - [HTML](./artifacts/acvp_sub_dsa.html)
-* [EDDSA mode: keyGen](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
-* [EDDSA mode: keyVer](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
-* [EDDSA mode: sigGen](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
-* [EDDSA mode: sigVer](./artifacts/acvp_sub_eddsa.txt) - [HTML](./artifacts/acvp_sub_eddsa.html) - DEMO only
+* [RSA mode: keyGen](./draft-celi-acvp-rsa.txt) - [HTML](./draft-celi-acvp-rsa.html)
+* [RSA mode: sigGen](./draft-celi-acvp-rsa.txt) - [HTML](./draft-celi-acvp-rsa.html)
+* [RSA mode: sigVer](./draft-celi-acvp-rsa.txt) - [HTML](./draft-celi-acvp-rsa.html)
+* [RSA mode: signatureComponent](./draft-celi-acvp-rsa.txt) - [HTML](./draft-celi-acvp-rsa.html)
+* [RSA mode: decryptionComponent](./draft-celi-acvp-rsa.txt) - [HTML](./draft-celi-acvp-rsa.html)
+* [RSA mode: legacySigVer](./draft-celi-acvp-rsa.txt) - [HTML](./draft-celi-acvp-rsa.html)
+* [ECDSA mode: sigGenComponent](./draft-fussell-acvp-ecdsa.txt) - [HTML](./draft-fussell-acvp-ecdsa.html)
+* [ECDSA mode: keyGen](./draft-fussell-acvp-ecdsa.txt) - [HTML](./draft-fussell-acvp-ecdsa.html)
+* [ECDSA mode: keyVer](./draft-fussell-acvp-ecdsa.txt) - [HTML](./draft-fussell-acvp-ecdsa.html)
+* [ECDSA mode: sigGen](./draft-fussell-acvp-ecdsa.txt) - [HTML](./draft-fussell-acvp-ecdsa.html) 
+* [ECDSA mode: sigVer](./draft-fussell-acvp-ecdsa.txt) - [HTML](./draft-fussell-acvp-ecdsa.html)
+* [DSA mode: keyGen](./draft-fussell-acvp-dsa.txt) - [HTML](./draft-fussell-acvp-dsa.html)
+* [DSA mode: sigVer](./draft-fussell-acvp-dsa.txt) - [HTML](./draft-fussell-acvp-dsa.html)
+* [DSA mode: sigGen](./draft-fussell-acvp-dsa.txt) - [HTML](./draft-fussell-acvp-dsa.html)
+* [DSA mode: pqgGen](./draft-fussell-acvp-dsa.txt) - [HTML](./draft-fussell-acvp-dsa.html)
+* [DSA mode: pqgVer](./draft-fussell-acvp-dsa.txt) - [HTML](./draft-fussell-acvp-dsa.html)
+* [EDDSA mode: keyGen](./draft-celi-acvp-eddsa.txt) - [HTML](./draft-celi-acvp-eddsa.html) - DEMO only
+* [EDDSA mode: keyVer](./draft-celi-acvp-eddsa.txt) - [HTML](./draft-celi-acvp-eddsa.html) - DEMO only
+* [EDDSA mode: sigGen](./draft-celi-acvp-eddsa.txt) - [HTML](./draft-celi-acvp-eddsa.html) - DEMO only
+* [EDDSA mode: sigVer](./draft-celi-acvp-eddsa.txt) - [HTML](./draft-celi-acvp-eddsa.html) - DEMO only
 
 ### Key Agreement
-* [KAS ECC ephemeralUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC fullMqv](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC fullUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC onePassDh](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC onePassMqv](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC OnePassUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC staticUnified](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS ECC CDH-Component](./artifacts/acvp_sub_kas_ecc.txt) - [HTML](./artifacts/acvp_sub_kas_ecc.html)
-* [KAS FFC dhHybrid1](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC mqv2](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html) 
-* [KAS FFC dhEphem](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC dhHybridOneFlow](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC mqv1](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC dhOneFlow](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS FFC dhStatic](./artifacts/acvp_sub_kas_ffc.txt) - [HTML](./artifacts/acvp_sub_kas_ffc.html)
-* [KAS ECC ephemeralUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS ECC fullMqv Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS ECC fullUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS ECC onePassDh Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS ECC onePassMqv Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS ECC OnePassUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS ECC staticUnified Sp800-56Ar3](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ecc_Sp800-56Ar3.html) - DEMO only
-* [KAS FFC dhHybrid1 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
-* [KAS FFC mqv2 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html)  - DEMO only
-* [KAS FFC dhEphem Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
-* [KAS FFC dhHybridOneFlow Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
-* [KAS FFC mqv1 Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
-* [KAS FFC dhOneFlow Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
-* [KAS FFC dhStatic Sp800-56Ar3](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.txt) - [HTML](./artifacts/acvp_sub_kas_ffc_Sp800-56Ar3.html) - DEMO only
-* [KAS IFC KAS1-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS1-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-bilateral-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-Party_U-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS IFC KAS2-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KTS IFC KTS-OAEP-basic](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KTS IFC KTS-OAEP-Party_V-confirmation](./artifacts/acvp_sub_kas_ifc.txt) - [HTML](./artifacts/acvp_sub_kas_ifc.html) - DEMO only
-* [KAS SSC ECC ephemeralUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
-* [KAS SSC ECC fullMqv Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
-* [KAS SSC ECC fullUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
-* [KAS SSC ECC onePassDh Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
-* [KAS SSC ECC onePassMqv Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
-* [KAS SSC ECC OnePassUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
-* [KAS SSC ECC staticUnified Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ecc.rfc.html) - DEMO only
-* [KAS SSC FFC dhHybrid1 Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
-* [KAS SSC FFC mqv2 Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html)  - DEMO only
-* [KAS SSC FFC dhEphem Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
-* [KAS SSC FFC dhHybridOneFlow Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
-* [KAS SSC FFC mqv1 Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
-* [KAS SSC FFC dhOneFlow Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
-* [KAS SSC FFC dhStatic Sp800-56Ar3](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.txt) - [HTML](./artifacts/draft-gold-acvp-sub-kas-ssc-ffc.rfc.html) - DEMO only
+* [KAS ECC ephemeralUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC fullMqv](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC fullUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC onePassDh](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC onePassMqv](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC OnePassUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC staticUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC CDH-Component](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS FFC dhHybrid1](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC mqv2](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html) 
+* [KAS FFC dhEphem](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC dhHybridOneFlow](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC mqv1](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC dhOneFlow](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC dhStatic](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
+* [KAS ECC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
+* [KAS ECC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
+* [KAS ECC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
+* [KAS ECC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
+* [KAS ECC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
+* [KAS ECC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
+* [KAS FFC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
+* [KAS FFC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)  - DEMO only
+* [KAS FFC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
+* [KAS FFC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
+* [KAS FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
+* [KAS FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
+* [KAS FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
+* [KAS IFC KAS1-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS IFC KAS1-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS IFC KAS2-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS IFC KAS2-bilateral-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_U-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS IFC KAS2-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KTS IFC KTS-OAEP-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS KDF OneStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-onestep.html) - DEMO only
+* [KAS KDF TwoStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-twostep.html) - DEMO only
+* [KAS SSC ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
+* [KAS SSC ECC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
+* [KAS SSC ECC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
+* [KAS SSC ECC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
+* [KAS SSC ECC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
+* [KAS SSC ECC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
+* [KAS SSC ECC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
+* [KAS SSC FFC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
+* [KAS SSC FFC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)  - DEMO only
+* [KAS SSC FFC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
+* [KAS SSC FFC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
+* [KAS SSC FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
+* [KAS SSC FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
+* [KAS SSC FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
 
 ### KDFs
-* [Counter KDF](./artifacts/acvp_sub_kdf108.txt) - [HTML](./artifacts/acvp_sub_kdf108.html)
-* [Feedback KDF](./artifacts/acvp_sub_kdf108.txt) - [HTML](./artifacts/acvp_sub_kdf108.html)
-* [Double Pipeline Iterator KDF](./artifacts/acvp_sub_kdf108.txt) - [HTML](./artifacts/acvp_sub_kdf108.html)
-* [IKEv1](./artifacts/acvp_sub_kdf135_ikev1.txt) - [HTML](./artifacts/acvp_sub_kdf135_ikev1.html)
-* [IKEv2](./artifacts/acvp_sub_kdf135_ikev2.txt) - [HTML](./artifacts/acvp_sub_kdf135_ikev2.html) 
-* [SNMP](./artifacts/acvp_sub_kdf135_snmp.txt) - [HTML](./artifacts/acvp_sub_kdf135_snmp.html)
-* [SRTP](./artifacts/acvp_sub_kdf135_srtp.txt) - [HTML](./artifacts/acvp_sub_kdf135_srtp.html)
-* [SSH](./artifacts/acvp_sub_kdf135_ssh.txt) - [HTML](./artifacts/acvp_sub_kdf135_ssh.html)
-* [TLS](./artifacts/acvp_sub_kdf135_tls.txt) - [HTML](./artifacts/acvp_sub_kdf135_tls.html)
-* [TPM](./artifacts/acvp_sub_kdf135_tpm.txt) - [HTML](./artifacts/acvp_sub_kdf135_tpm.html)
-* [ANSX9.63](./artifacts/acvp_sub_kdf135_x963.txt) - [HTML](./artifacts/acvp_sub_kdf135_x963.html)
-* [ANSX9.42](./artifacts/draft-celi-acvp-ans-x942.txt) - [HTML](./artifacts/draft-celi-acvp-ans-x942.html)
-* [PBKDF](./artifacts/draft-celi-acvp-pbkdf.txt) - [HTML](./artifacts/draft-celi-acvp-pbkdf.html)
+<<<<<<< HEAD
+* [Counter KDF](./draft-celi-acvp-kbkdf.txt) - [HTML](./draft-celi-acvp-kbkdf.html)
+* [Feedback KDF](./draft-celi-acvp-kbkdf.txt) - [HTML](./draft-celi-acvp-kbkdf.html)
+* [Double Pipeline Iterator KDF](./draft-celi-acvp-kbkdf.txt) - [HTML](./draft-celi-acvp-kbkdf.html)
+* [IKEv1](./draft-celi-acvp-kdf-ikev1.txt) - [HTML](./draft-celi-acvp-kdf-ikev1.html)
+* [IKEv2](./draft-celi-acvp-kdf-ikev2.txt) - [HTML](./draft-celi-acvp-kdf-ikev2.html) 
+* [SNMP](./draft-celi-acvp-kdf-snmp.txt) - [HTML](./draft-celi-acvp-kdf-snmp.html)
+* [SRTP](./draft-celi-acvp-kdf-srtp.txt) - [HTML](./draft-celi-acvp-kdf-srtp.html)
+* [SSH](./draft-celi-acvp-kdf-ssh.txt) - [HTML](./draft-celi-acvp-kdf-ssh.html)
+* [TLS](./draft-celi-acvp-kdf-tls.txt) - [HTML](./draft-celi-acvp-kdf-tls.html)
+* [TLS v1.3](./draft-hammett-acvp-kdf-tls-v1.3.txt) - [HTML](./draft-hammett-acvp-kdf-tls-v1.3.html)
+* [TPM](./draft-celi-acvp-kdf-tpm.txt) - [HTML](./draft-celi-acvp-kdf-tpm.html)
+* [ANSX9.63](./draft-celi-acvp-kdf-ansi-x963.txt) - [HTML](./draft-celi-acvp-kdf-ansi-x963.html)
+* [ANSX9.42](./draft-celi-acvp-kdf-ansi-x942.txt) - [HTML](./draft-celi-acvp-kdf-ansi-x942.html)
+* [PBKDF](./draft-celi-acvp-pbkdf.txt) - [HTML](./draft-celi-acvp-pbkdf.html)
 
 ### Safe Primes
-* [SafePrimes KeyGen](./artifacts/acvp_sub_safePrimes.txt) - [HTML](./artifacts/acvp_sub_safePrimes.html) - DEMO only
-* [SafePrimes KeyVer](./artifacts/acvp_sub_safePrimes.txt) - [HTML](./artifacts/acvp_sub_safePrimes.html) - DEMO only
+* [SafePrimes KeyGen](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html) - DEMO only
+* [SafePrimes KeyVer](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html) - DEMO only
 
 The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
 ## Current 1.0 Support
-Please check the [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) for details on how to access the available resources. 
+Please check the [protocol specification](./draft-fussell-acvp-spec.html) for details on how to access the available resources. 
 
 # Accessing the demo server
 
-To access the demo server one needs a TLS credential **and** a one-time password (OTP). The [protocol specification](./artifacts/draft-fussell-acvp-spec-00.html) and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work. 
+To access the demo server one needs a TLS credential **and** a one-time password (OTP). The [protocol specification](./draft-fussell-acvp-spec.html) and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work. 
 
 To set expectations, since this is a demo system, it will be in a state of flux and any all data on the system is considered temporary and may be reset to accommodate development of the Automated Cryptographic Validation Protocol (ACVP) service. We will try to keep the demo service relatively stable, but we plan to update it as we continue to add new algorithms and capabilities.
 
@@ -237,30 +279,22 @@ You are expected to protect the key pair from unauthorized use and to notify NIS
 
 ```
 “***WARNING***WARNING***WARNING
-You are accessing a U.S. Government information system, which includes: 1) this computer, 
-2) this computer network, 3) all computers connected to this network, and 4) all devices 
-and storage media attached to this network or to a computer on this network. You understand 
-and consent to the following: you may access this information system for authorized use 
-only; you have no reasonable expectation of privacy regarding any communication of data 
-transiting or stored on this information system; at any time and for any lawful Government 
-purpose, the Government may monitor, intercept, and search and seize any communication or 
-data transiting or stored on this information system; and any communications or data 
-transiting or stored on this information system may be disclosed or used for any lawful 
-Government purpose.
+You are accessing a U.S. Government information system, which includes: 1) this computer, 2) this computer network, 3) all computers connected to this network, and 4) all devices and storage media attached to this network or to a computer on this network. You understand and consent to the following: you may access this information system for authorized use only; you have no reasonable expectation of privacy regarding any communication of data transiting or stored on this information system; at any time and for any lawful Government purpose, the Government may monitor, intercept, and search and seize any communication or data transiting or stored on this information system; and any communications or data transiting or stored on this information system may be disclosed or used for any lawful Government purpose.
 ***WARNING***WARNING***WARNING”
 ```
 
 ## Configuring and using One-Time-Passwords (OTP)
 
-Please be aware that starting in the week of March 12th, 2018, the second-factor authentication based on OTP and associated workflows have been turned-on - see details [here](https://github.com/usnistgov/ACVP/wiki#second-factor-authentication-and-authorization-schema-for-accessing-and-working-with-the-nist-automated-cryptographic-validation-services). 
+TOTP has been configured on all servers. See details [here](https://github.com/usnistgov/ACVP/wiki#second-factor-authentication-and-authorization-schema-for-accessing-and-working-with-the-nist-automated-cryptographic-validation-services). 
 
 # Contribution guidelines
 
 If you want to contribute, please follow the simple rules below and send us pull requests. 
 
-  - Updates to specs, JSON, etc should take place within the `./src/*.xml` files.
-  - Feel free to run `WindowsGenerateAllArtifacts.bat` (Windows) or `Makefile` (non-Windows) to ensure valid HTML and TXT files can be generated from the changes.
-  - Create a Pull Request with the updated XML files. TravisCI will verify the XML can compile with `xml2rfc` and upload the artifacts to the `gh-pages` branch to be reflected on https://usnistgov.github.io/ACVP/
+- See [Metanorma](#how-to-use-metanorma) for installation instructions
+- Documents are templated out and organized into folders, find and edit the appropriate document and build the HTML or TXT file to ensure the changes are correct
+- Create a Pull Request with the updated ADOC files. GitHub Actions will verify the files can compile. 
+- Once approved, GitHub Actions will rebuild the `gh-pages` branch to be reflected on https://usnistgov.github.io/ACVP
 
 If you would like to talk to our developers, you may want to send email to our mailing list algotest@list.nist.gov. You may also report bugs or request new tests.
 
@@ -276,27 +310,12 @@ If you would like to talk to our developers, you may want to send email to our m
 
 # Licensing terms
 
-This data was developed by employees of the National Institute of Standards and Technology (NIST), an agency of the Federal Government, in collaboration with 
-third-party contributers. Pursuant to title 17 United States Code Section 105, works of NIST employees are not subject to copyright protection in the 
-United States and are considered to be in the public domain. The data is provided by NIST as a public service and is expressly provided "AS IS." 
-NIST MAKES NO WARRANTY OF ANY KIND, EXPRESS, IMPLIED OR STATUTORY, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTY OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT AND DATA ACCURACY. 
-NIST does not warrant or make any representations regarding the use of the data or the results thereof, including but not limited to the correctness, 
-accuracy, reliability or usefulness of the data. NIST SHALL NOT BE LIABLE AND YOU HEREBY RELEASE NIST FROM LIABILITY FOR ANY INDIRECT, CONSEQUENTIAL, SPECIAL, 
-OR INCIDENTAL DAMAGES (INCLUDING DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, AND THE LIKE), 
-WHETHER ARISING IN TORT, CONTRACT, OR OTHERWISE, ARISING FROM OR RELATING TO THE DATA (OR THE USE OF OR INABILITY TO USE THIS DATA), EVEN IF 
-NIST HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+This data was developed by employees of the National Institute of Standards and Technology (NIST), an agency of the Federal Government, in collaboration with third-party contributers. Pursuant to title 17 United States Code Section 105, works of NIST employees are not subject to copyright protection in the United States and are considered to be in the public domain. The data is provided by NIST as a public service and is expressly provided "AS IS." NIST MAKES NO WARRANTY OF ANY KIND, EXPRESS, IMPLIED OR STATUTORY, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT AND DATA ACCURACY. NIST does not warrant or make any representations regarding the use of the data or the results thereof, including but not limited to the correctness, accuracy, reliability or usefulness of the data. NIST SHALL NOT BE LIABLE AND YOU HEREBY RELEASE NIST FROM LIABILITY FOR ANY INDIRECT, CONSEQUENTIAL, SPECIAL, OR INCIDENTAL DAMAGES (INCLUDING DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, AND THE LIKE), WHETHER ARISING IN TORT, CONTRACT, OR OTHERWISE, ARISING FROM OR RELATING TO THE DATA (OR THE USE OF OR INABILITY TO USE THIS DATA), EVEN IF NIST HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-To the extent that NIST may hold copyright in countries other than the United States, you are hereby granted the non-exclusive irrevocable and 
-unconditional right to print, publish, prepare derivative works and distribute the NIST data, in any medium, or authorize others to do so on your behalf, 
-on a royalty-free basis throughout the world.
+To the extent that NIST may hold copyright in countries other than the United States, you are hereby granted the non-exclusive irrevocable and unconditional right to print, publish, prepare derivative works and distribute the NIST data, in any medium, or authorize others to do so on your behalf, on a royalty-free basis throughout the world.
 
-You may improve, modify, and create derivative works of the data or any portion of the data, and you may copy and distribute such modifications or works. 
-Modified works should carry a notice stating that you changed the data and should note the date and nature of any such change. 
-Please explicitly acknowledge the National Institute of Standards and Technology as the source of the data: Data citation recommendations are provided below.
-Permission to use this data is contingent upon your acceptance of the terms of this agreement and upon your providing appropriate acknowledgments of 
-NIST's creation of the data.
+You may improve, modify, and create derivative works of the data or any portion of the data, and you may copy and distribute such modifications or works. Modified works should carry a notice stating that you changed the data and should note the date and nature of any such change. Please explicitly acknowledge the National Institute of Standards and Technology as the source of the data: Data citation recommendations are provided below. Permission to use this data is contingent upon your acceptance of the terms of this agreement and upon your providing appropriate acknowledgments of NIST's creation of the data.
 
-  - Citation format:
+## Citation format
 
-    - Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date). 
+Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date). 

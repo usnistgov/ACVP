@@ -1,0 +1,100 @@
+
+== Custom Specification Objects
+
+[[dateType]]
+=== Date
+
+A date type is a time `string` formatted according to the rules of <<RFC3339>>; all date/times must use UTC time denoted by 'Z' suffix with no local timezone adjustment. Example is `2018-06-01T20:10:33Z`
+
+=== BitString
+
+Bitstrings are used to communicate a string of bits between the ACVP server and IUT.
+
+==== Endianness
+
+BitStrings *SHALL* be considered in big endian order, unless otherwise specified by the algorithm.
+
+The hex string "FA" (assuming all bits are considered) *SHALL* represent the bits
+11111010 (in MSb) or the value 250.
+
+==== Hex to Bitstring Parsing
+
+"valueLen" will be used as the example, but it can apply to any bit length registration/vector set/etc parameters.
+
+When a "value" is provided along with a "valueLen", the "valueLen" *MUST* be considered when parsing the hex string represented in "value", *EXCEPT* in empty bitstring cases, which *MUST* be represented as an empty string "". Parsing Hex strings into Bit strings is especially important for algorithms such as the SHA variations that may only include a portion of bits from the provided hex string. When only a portion of bits from a Hex string are considered, bits for use in the bitstring *SHALL* be taken from the most significant bits, meaning the lesser significant bits are the bits that are dropped.
+
+===== Hex string parsing examples
+
+*  valueLen: 8, value: "FA", *SHALL* be parsed as the bits 11111010, or the value 250.
+*  valueLen: 7, value: "FA", *SHALL* be parsed as the bits 1111101, or the value 125.
+*  valueLen: 5, value: "FA", *SHALL* be parsed as the bits 11111, or the value 31.
+*  valueLen: 3, value: "FA", *SHALL* be parsed as the bits 111, or the value 7.
+*  valueLen: 0, value: "", *SHALL* be interpreted as an empty bit string.
+
+=== Range
+
+The Range object can be used to convey a range of values. It contains its own set of properties made up of "min", "max", and "increment".
+
+==== Range JSON examples
+
+A range object specifying a minimum of 0, a maximum of 8, with an increment of 1. This
+range object includes the values 1, 2, 3, 4, 5, 6, 7, and 8.
+
+[align=center,alt=,type=]
+....
+
+{"myRange": {
+    "min": 1,
+    "max": 8,
+    "increment": 1
+}}
+....
+
+A range object specifying a minimum of 0, a maximum of 8, with an increment of 2. This range object includes the values 0, 2, 4, 6, and 8.
+
+[align=center,alt=,type=]
+....
+
+{"myRange": {
+    "min": 0,
+    "max": 8,
+    "increment": 2
+}}
+....
+
+=== Domain
+
+The Domain object can be used to specify a set of values similar to Range, albeit with more control. A domain can be made up of an array of objects, where those objects can be literal values, and/or Range objects.
+
+==== Domain JSON examples
+
+Several sample domain objects that state 0, 8, 16, 32, 96, 128, 192, and 256 are valid values.
+
+[align=center,alt=,type=]
+....
+
+{"myDomain": [
+    {
+        "min": 0,
+        "max": 16,
+        "increment": 8
+    },
+    32,
+    96,
+    {
+        "min": 128,
+        "max": 256,
+        "increment": 64
+    }
+]}
+....
+
+[align=center,alt=,type=]
+....
+
+{"myDomain": [ 0, 8, 16,  32, 96,  128, 192, 256 ]}
+....
+
+==== Additional Domain Information
+
+Because the Domain is an array of objects consisting of (potentially) both literals and ranges, algorithms that use an array of integers can be used interchangably with the Domain object.

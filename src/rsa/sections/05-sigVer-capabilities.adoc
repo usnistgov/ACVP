@@ -1,0 +1,198 @@
+[[rsa_sigver_capabilities]]
+=== RSA SigVer Mode Capabilities
+
+The RSA / SigVer / * mode capabilities are advertised as JSON objects within the array of 'capabilities' as part of the 'capability_exchange' element of the ACVP JSON registration message. See the ACVP specification for details on the registration message.
+
+Each RSA / SigVer / * mode capability is advertised as a self-contained JSON object consisting of the algorithm, mode, and capabilities array. The capabilities array may contain multiple elements, each pertaining to a sigType that is supported by the client for the RSA mode being advertised.
+
+The following table defines the capabilities that may be advertised by the ACVP compliant crypto modules.
+
+[[legacySigVerRSAMod]]
+==== RSA SigVer FIPS186-2 Capabilities Table
+
+The following RSA / SigVer / FIPS186-2 capabilities *MAY* be advertised by the ACVP compliant crypto module:
+
+[[rsa_sigver_fips186-2_capabilities]]
+.Supported RSA SigVer FIPS186-2 Capabilities
+|===
+| JSON value | Description | JSON type | Valid values
+
+| sigType | supported RSA signature types  - see <<FIPS186-4>>, Section 5 | string | one of {"ansx9.31", "pkcs1v1.5", "pss"}
+| properties | RSA signature verification parameters  - see <<FIPS186-4>>, Section 5 | array | modulo, hashAlg, and saltLen (when sigType is "pss")
+| modulo | supported RSA modulo for signature verification - see <<FIPS186-4>>, Section 5 | integer | any one of the supported modulo sizes {1024, 1536, 2048, 3072, 4096}
+| hashPair | supported hash algorithms and optional salt length for signature verification for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | an array of objects containing a hashAlg and an optional saltLen
+| hashAlg | supported hash algorithms for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512"}
+| saltLen | supported salt lengths for PSS signature verification - see <<FIPS186-4>>, Section 5.5 | integer | See the note below
+|===
+
+NOTE: The 'saltLen' property for each hash algorithm *SHALL* only be present of the 'sigType' is "pss". The values allowed in PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included except for when 1024 is the modulo size. In this case, the maximum 'saltLen' for SHA2-512 is 62 bytes.
+
+For an example of the registration for RSA / SigVer / FIPS186-2, see the following example for RSA / SigVer / FIPS186-4. The formats are identical even though the individual allowed values might change.
+
+[[SigVerFIPS186-4RSAMod]]
+==== RSA SigVer FIPS186-4 Capabilities Table
+
+The following RSA / SigVer / FIPS186-4 capabilities *MAY* be advertised by the ACVP compliant crypto module:
+
+[[rsa_sigver_fips186-4_capabilities]]
+.Supported RSA SigVer FIPS186-4 Capabilities
+|===
+| JSON value | Description | JSON type | Valid values
+
+| sigType | supported RSA signature types  - see <<FIPS186-4>>, Section 5 | string | one of {"ansx9.31", "pkcs1v1.5", "pss"}
+| properties | RSA signature verification parameters  - see <<FIPS186-4>>, Section 5 | array | modulo, hashAlg, and saltLen (when sigType is "pss")
+| modulo | supported RSA modulo for signature verification - see <<FIPS186-4>>, Section 5 | integer | any one of the supported modulo sizes {1024, 2048, 3072, 4096}
+| hashPair | supported hash algorithms and optional salt length for signature verification for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | an array of objects containing a hashAlg and an optional saltLen
+| hashAlg | supported hash algorithms for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512"}
+| saltLen | supported salt lengths for PSS signature verification - see <<FIPS186-4>>, Section 5.5 | integer | See the note below
+|===
+
+NOTE: The 'saltLen' property for each hash algorithm *SHALL* only be present of the 'sigType' is "pss". The values allowed in PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included except for when 1024 is the modulo size. In this case, the maximum 'saltLen' for SHA2-512 is 62 bytes.
+
+The following is an example of the RSA / SigVer / FIPS186-4 registration
+
+[source, json]
+----
+{
+  "algorithm": "RSA",
+  "mode": "sigVer",
+  "revision": "FIPS186-4",
+  "prereqVals": [
+    {
+      "algorithm": "DRBG",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "DRBG",
+      "valValue": "654321"
+    },
+    {
+      "algorithm": "SHA",
+      "valValue": "7890"
+    }
+  ],
+  "pubExpMode": "random",
+  "conformances": [
+    "SP800-106"
+  ],
+  "capabilities": [
+    {
+      "sigType": "ansx9.31",
+      "properties": [
+        {
+          "modulo": 2048,
+          "hashPair": [
+            {
+              "hashAlg": "SHA2-512"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sigType": "pkcs1v1.5",
+      "properties": [
+        {
+          "modulo": 4096,
+          "hashPair": [
+            {
+              "hashAlg": "SHA2-224"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sigType": "pss",
+      "properties": [
+        {
+          "modulo": 3072,
+          "hashPair": [
+            {
+              "hashAlg": "SHA2-224",
+              "saltLen": 28
+            }
+            {
+              "hashAlg": "SHA2-512",
+              "saltLen": 64
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+----
+
+[[SigVerFIPS186-5RSAMod]]
+==== RSA SigVer FIPS186-5 Capabilities Table
+
+The following RSA / SigVer / FIPS186-5 capabilities *MAY* be advertised by the ACVP compliant crypto module:
+
+[[rsa_sigver_fips186-5_capabilities]]
+.Supported RSA SigVer FIPS186-5 Capabilities
+|===
+| JSON value | Description | JSON type | Valid values
+
+| sigType | supported RSA signature types  - see <<FIPS186-5>>, Section 5 | string | one of {"pkcs1v1.5", "pss"}
+| properties | RSA signature verification parameters  - see <<FIPS186-5>>, Section 5 | array | modulo, hashAlg, and saltLen (when sigType is "pss")
+| modulo | supported RSA modulo for signature verification - see <<FIPS186-5>>, Section 5 | integer | any one of the supported modulo sizes {2048, 3072, 4096}
+| maskFunction | the mask function used, only valid for PSS | array | any subset of {"mgf1", "shake-128", "shake-256"}
+| hashPair | supported hash algorithms and optional salt length for signature verification for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | an array of objects containing a hashAlg and an optional saltLen
+| hashAlg | supported hash algorithms for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512"}
+| saltLen | supported salt lengths for PSS signature verification - see <<FIPS186-5>>, Section 5.5 | integer | See the note below
+|===
+
+NOTE: The 'saltLen' property for each hash algorithm *SHALL* only be present of the 'sigType' is "pss". The values allowed in PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.
+
+See the following abbreviated example for a PSS registration for RSA / SigVer / FIPS186-5
+
+[source, json]
+----
+{
+  "algorithm": "RSA",
+  "mode": "sigVer",
+  "revision": "FIPS186-5",
+  "prereqVals": [
+    {
+      "algorithm": "DRBG",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "DRBG",
+      "valValue": "654321"
+    },
+    {
+      "algorithm": "SHA",
+      "valValue": "7890"
+    }
+  ],
+  "pubExpMode": "random",
+  "conformances": [
+    "SP800-106"
+  ],
+  "capabilities": [
+    {
+      "sigType": "pss",
+      "properties": [
+        {
+          "modulo": 3072,
+          "maskFunction": [
+            "SHAKE-128", "MGF1"
+          ]
+          "hashPair": [
+            {
+              "hashAlg": "SHA2-224",
+              "saltLen": 28
+            }
+            {
+              "hashAlg": "SHA2-512",
+              "saltLen": 64
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+----

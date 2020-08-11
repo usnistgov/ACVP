@@ -1,0 +1,596 @@
+
+[#testtypes]
+== Test Types and Test Coverage
+
+This section describes the design of the tests used to validate implementations of block cipher algorithms.
+
+=== Test Types
+
+There are three types of tests for block ciphers: functional tests, Monte Carlo tests and counter tests. Each has a specific value to be used in the testType field. The testType field definitions are:
+
+* "AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'encrypt' or 'decrypt' operation. AFTs cause the implementation under test to exercise normal operations on a single block, multiple blocks, or (where applicable) partial blocks. In some cases random data is used, in others, static, predetermined tests are provided. The functional tests of the block cipher are designed to verify that the logical components of the cipher (GFSbox, KeySbox, block chaining etc.) are operating correctly.
+
+* "MCT" - Monte Carlo Test. These tests exercise the implementation under test under strenuous circumstances. The implementation under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect potential memory leaks over time, and problems in allocation of resources, addressing variables, error handling and generally improper behavior in response to random inputs. Each MCT processes 100 pseudorandom tests. Not every algorithm and mode combination has an MCT.
+See <<MC_test>> for implementation details.
+
+* "CTR" - Counter Mode Test. Counter tests are specifically for counter modes (AES-CTR and TDES-CTR) and require an implementation under test to exercise their counter mechanism. The server will send a long message to the client for encryption or decryption and back-compute the IVs used by the implementation under test. These IVs are then verified for uniqueness and an increasing (or decreasing) nature. The client processes these tests as normal AFTs. The different mode is highlighted here to signify the difference on the server side for processing.
+
+[[MC_test]]
+==== Monte Carlo tests for block ciphers
+
+The MCTs start with an initial condition (plaintext/ciphertext, key, and optional, or maybe multiple IVs) and perform a series of chained computations. For modes that use an IV, the IV is used in the beginning of each pseudorandom process. The IV is implicitly advanced according to the block cipher mode in use. There are separate rounds of MCT for encryption and decryption. Because some block cipher modes rely on an IV and perform calculations differently from other modes, there are specific definitions of MCT for many of the block cipher modes.
+
+NOTE: For all the following, the pseudocode for decryption can be obtained by replacing all PT's with CT's and all CT's with PT's. As well, replace the encrypt operation with the corresponding decrypt operation.
+
+[[AES-ECB-MCT]]
+===== AES Monte Carlo Test - ECB mode
+
+The initial condition for the test is the tuple (KEY, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCTECB>>.
+
+[[xml_figureMCTECB]]
+.AES-ECB Monte Carlo Test
+[source, code]
+----
+Key[0] = KEY
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output PT[0]
+    For j = 0 to 999
+        CT[j] = AES_ECB_ENCRYPT(Key[i], PT[j])
+        PT[j+1] = CT[j]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    PT[0] = CT[j]
+----
+
+[[AES-CBC-MCT]]
+===== AES Monte Carlo Test - CBC mode
+
+The initial condition for the test is the tuple (KEY, IV, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCTCBC>>.
+
+[[xml_figureMCTCBC]]
+.AES-CBC Monte Carlo Test
+[source, code]
+----
+Key[0] = KEY
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CBC_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = IV[i]
+        Else
+            CT[j] = AES_CBC_ENCRYPT(Key[i], PT[j])
+            PT[j+1] = CT[j-1]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    IV[i+1] = CT[j]
+    PT[0] = CT[j-1]
+----
+
+[[AES-CBC-CS-MCT]]
+===== AES Monte Carlo Test - CBC-CS* mode
+
+The initial condition for the test is the tuple (KEY, IV, PT) set to some values. An initial payload length is chosen based on the payloadLen values the IUT registers with.
+
+The algorithm is shown in <<xml_figureMCTCBCCS>>.
+
+[[xml_figureMCTCBCCS]]
+.AES-CBC-CS* Monte Carlo Test
+[source, code]
+----
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CBC_CS_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = IV[i] || MSB(CT, PT.length - IV.length)
+        Else
+            CT[j] = AES_CBC_CS_ENCRYPT(Key[i], PT[j])
+            PT[j+1] = CT[j-1]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    IV[i+1] = MSB(CT[j], IV.length)
+    PT[0] = CT[j-1]
+----
+
+[[AES-OFB-MCT]]
+===== AES Monte Carlo Test - OFB mode
+
+The initial condition for the test is the tuple (KEY, IV, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCTOFB>>.
+
+[[xml_figureMCTOFB]]
+.AES-OFB Monte Carlo Test
+[source, code]
+----
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_OFB_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = IV[i]
+        Else
+            CT[j] = AES_OFB_ENCRYPT(Key[i], PT[j])
+            PT[j+1] = CT[j-1]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    IV[i+1] = CT[j]
+    PT[0] = CT[j-1]
+----
+
+[[AES-CFB1-MCT]]
+===== AES Monte Carlo Test - CFB1 mode
+
+The initial condition for the test is the tuple (KEY, IV, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCTCFB1>>.
+
+[[xml_figureMCTCFB1]]
+.AES-CFB1 Monte Carlo Test
+[source, code]
+----
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CFB1_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = BitJ(IV[i])
+        Else
+            CT[j] = AES_CFB1_ENCRYPT(Key[i], PT[j])
+            If ( j<128 )
+                PT[j+1] = BitJ(IV[i])
+            Else
+                PT[j+1] = CT[j-128]
+    Output CT[j]
+    If ( keylen = 128 )
+        Key[i+1] = Key[i] xor (CT[j-127] || CT[j-126] || ... || CT[j])
+    If ( keylen = 192 )
+        Key[i+1] = Key[i] xor (CT[j-191] || CT[j-190] || ... || CT[j])
+    If ( keylen = 256 )
+        Key[i+1] = Key[i] xor (CT[j-255] || CT[j-254] || ... || CT[j])
+    IV[i+1] = (CT[j-127] || CT[j-126] || ... || CT[j])
+    PT[0] = CT[j-128]
+----
+
+[[AES-CFB8-MCT]]
+===== AES Monte Carlo Test - CFB8 mode
+
+The initial condition for the test is the tuple (KEY, IV, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCTCFB8>>.
+
+[[xml_figureMCTCFB8]]
+.AES-CFB8 Monte Carlo Test
+[source, code]
+----
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CFB8_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = ByteJ(IV[i])
+        Else
+            CT[j] = AES_CFB8_ENCRYPT(Key[i], PT[j])
+            If ( j<16 )
+                PT[j+1] = ByteJ(IV[i])
+            Else
+                PT[j+1] = CT[j-16]
+    Output CT[j]
+    If ( keylen = 128 )
+        Key[i+1] = Key[i] xor (CT[j-15] || CT[j-14] || ... || CT[j])
+    If ( keylen = 192 )
+        Key[i+1] = Key[i] xor (CT[j-23] || CT[j-22] || ... || CT[j])
+    If ( keylen = 256 )
+        Key[i+1] = Key[i] xor (CT[j-31] || CT[j-30] || ... || CT[j])
+    IV[i+1] = (CT[j-15] || CT[j-14] || ... || CT[j])
+    PT[0] = CT[j-16]
+----
+
+[[AES-CFB128-MCT]]
+===== AES Monte Carlo Test - CFB128 mode
+
+The initial condition for the test is the tuple (KEY, IV, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCTCFB128>>.
+
+[[xml_figureMCTCFB128]]
+.AES-CFB128 Monte Carlo Test
+[source, code]
+----
+Key[0] = Key
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 99
+    Output Key[i]
+    Output IV[i]
+    Output PT[0]
+    For j = 0 to 999
+        If ( j=0 )
+            CT[j] = AES_CFB128_ENCRYPT(Key[i], IV[i], PT[j])
+            PT[j+1] = IV[i]
+        Else
+            CT[j] = AES_CFB128_ENCRYPT(Key[i], PT[j])
+            PT[j+1] = CT[j-1]
+    Output CT[j]
+    AES_KEY_SHUFFLE(Key, CT)
+    IV[i+1] = CT[j]
+    PT[0] = CT[j-1]
+----
+
+[[AES_KEY_SHUFFLE]]
+===== AES Monte Carlo Key Shuffle
+
+Most AES MCTs use a shared key shuffle routine. The algorithm is shown in <<xml_figureAESKEY>>.
+
+The initial condition for the routine is a tuple (KEY, CT) set to some values. This pseudocode is specifically for encryption. For decryption, swap all instances of CT with PT.
+
+[[xml_figureAESKEY]]
+.AES Encrypt Key Shuffle Routine
+[source, code]
+----
+If ( keylen = 128 )
+    Key[i+1] = Key[i] xor MSB(CT[j], 128)
+If ( keylen = 192 )
+    Key[i+1] = Key[i] xor (last 64-bits of CT[j-1] || MSB(CT[j], 128))
+If ( keylen = 256 )
+    Key[i+1] = Key[i] xor (MSB(CT[j-1], 128) || MSB(CT[j], 128))
+----
+
+[[TDES-ECB-MCT]]
+===== TDES Monte Carlo Test - ECB mode
+
+The initial condition for the test is the tuple (KEY1, KEY2, KEY3, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCT_TDES_ECB>>.
+
+[[xml_figureMCT_TDES_ECB]]
+.TDES-ECB Monte Carlo Test
+[source, code]
+----
+Key1[0] = KEY1
+Key2[0] = KEY2
+Key3[0] = KEY3
+PT[0] = PT
+For i = 0 to 399
+    Output Key1[i]
+    Output Key2[i]
+    Output Key3[i]
+    Output PT[0]
+    For j = 0 to 9999
+        CT[j] = TDES_ECB_ENCRYPT(Key1[i], Key2[i], Key3[i], PT[j])
+        PT[j+1] = CT[i]
+    Output CT[j]
+    Key1[i+1] = Key1[i] xor CT[j]
+    Key2[i+1] = Key2[i] xor CT[j-1]
+    If ( keyingOption = 1 )
+        Key3[i+1] = Key3[i] xor CT[j-2]
+    Else
+        Key3[i+1] = Key1[i+1]
+    PT[0] = CT[j-1]
+----
+
+[[TDES-CBC-MCT]]
+===== TDES Monte Carlo Test - CBC mode
+
+The initial condition for the test is the tuple (KEY1, KEY2, KEY3, IV, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCT_TDES_CBC>>.
+
+[[xml_figureMCT_TDES_CBC]]
+.TDES-CBC Monte Carlo Test
+[source, code]
+----
+Key1[0] = KEY1
+Key2[0] = KEY2
+Key3[0] = KEY3
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 399
+    Output Key1[i]
+    Output Key2[i]
+    Output Key3[i]
+    Output IV[0]
+    Output PT[0]
+    For j = 0 to 9999
+        CT[j] = TDES_CBC_ENCRYPT(Key1[i], Key2[i], Key3[i], PT[j], IV[j])
+        If ( j = 0 )
+            PT[j+1] = IV[0]
+        Else
+            PT[j+1] = CT[j-1]
+        IV[j+1] = CT[j]
+    Output CT[j]
+    Key1[i+1] = Key1[i] xor CT[j]
+    Key2[i+1] = Key2[i] xor CT[j-1]
+    If ( keyingOption = 1 )
+        Key3[i+1] = Key3[i] xor CT[j-2]
+    Else
+        Key3[i+1] = Key1[i+1]
+    PT[0] = CT[j-1]
+    IV[0] = CT[j]
+----
+
+[[TDES-CBC-I-MCT]]
+===== TDES Monte Carlo Test - CBC-I mode
+
+The initial condition for the test is the tuple (KEY1, KEY2, KEY3, IV1, IV2, IV3, PT1, PT2, PT3) set to some values.
+
+The algorithm is shown in <<xml_figureMCT_TDES_CBC-I>>.
+
+[[xml_figureMCT_TDES_CBC-I]]
+.TDES-CBC-I Monte Carlo Test
+[source, code]
+----
+Key1[0] = KEY1
+Key2[0] = KEY2
+Key3[0] = KEY3
+IV1[0] = IV1
+IV2[0] = IV2
+IV3[0] = IV3
+PT1[0] = PT1
+PT2[0] = PT2
+PT3[0] = PT3
+For i = 0 to 399
+    Output Key1[i], Key2[i], Key3[i]
+    Output IV1[0], IV2[0], IV3[0]
+    Output PT1[0], PT2[0], PT3[0]
+    For j = 0 to 9999
+        CT[j] = TDES_CBC_I_ENCRYPT(Key1[i], Key2[i], Key3[i], PT1[j], PT2[j], PT3[j], IV1[j], IV2[j], IV3[j])
+        If ( j = 0 )
+            PT1[j+1] = IV1[0]
+            PT2[j+1] = IV2[0]
+            PT3[j+1] = IV3[0]
+        Else
+            PT1[j+1] = CT1[j-1]
+            PT2[j+1] = CT2[j-1]
+            PT3[j+1] = CT3[j-1]
+        IV1[j+1] = CT1[j]
+        IV2[j+1] = CT2[j]
+        IV3[j+1] = CT3[j]
+    Output CT1[j], CT2[j], CT3[j]
+    Key1[i+1] = Key1[i] xor CT[j]
+    Key2[i+1] = Key2[i] xor CT[j-1]
+    If ( keyingOption = 1 )
+        Key3[i+1] = Key3[i] xor CT[j-2]
+    Else
+        Key3[i+1] = Key1[i+1]
+    PT1[0] = CT1[j-1]
+    PT2[0] = CT2[j-1]
+    PT3[0] = CT3[j-1]
+    IV1[0] = CT1[j]
+    IV2[0] = CT2[j]
+    IV3[0] = CT3[j]
+----
+
+[[TDES-CFB-MCT]]
+===== TDES Monte Carlo Test - CFB1, CFB8, CFB64 modes
+
+The initial condition for the test is the tuple (KEY1, KEY2, KEY3, IV, PT) set to some values. PT and CT are k-bit where k is the feedback size, for example CFB1 has a feedback size of 1-bit.
+
+The algorithm is shown in <<xml_figureMCT_TDES_CFB>>.
+
+[[xml_figureMCT_TDES_CFB]]
+.TDES-CFB Monte Carlo Test
+[source, code]
+----
+Key1[0] = KEY1
+Key2[0] = KEY2
+Key3[0] = KEY3
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 399
+    Output Key1[i]
+    Output Key2[i]
+    Output Key3[i]
+    Output IV[0]
+    Output PT[0]
+    For j = 0 to 9999
+        CT[j] = TDES_CFB_ENCRYPT(Key1[i], Key2[i], Key3[i], PT[j], IV[j])
+        PT[j+1] = LeftMost_K_Bits(IV[j])
+        IV[j+1] = RightMost_64-K_Bits(IV[j]) || CT[j]
+    Output CT[j]
+    C = LeftMost_192_Bits(CT[j] || CT[j-1] || ... || CT[0])
+    Key1[i+1] = Key1[i] xor bits 129-192 of C
+    Key2[i+1] = Key2[i] xor bits 65-128 of C
+    If ( keyingOption = 1 )
+        Key3[i+1] = Key3[i] xor bits 1-64 of C
+    Else
+        Key3[i+1] = Key1[i+1]
+    PT[0] = LeftMost_K_Bits(IV[j])
+    IV[0] = RightMost_64-K_Bits(IV[j]) || CT[j]
+----
+
+[[TDES-CFB-P-MCT]]
+===== TDES Monte Carlo Test - CFB1-P, CFB8-P, CFB64-P modes
+
+The initial condition for the test is the tuple (KEY1, KEY2, KEY3, IV1, IV2, IV3, PT) set to some values. PT and CT are k-bit where k is the feedback size, for example CFB8-P has a feedback size of 8-bits.
+
+The algorithm is shown in <<xml_figureMCT_TDES_CFB-P>>.
+
+[[xml_figureMCT_TDES_CFB-P]]
+.TDES-CFB-P Monte Carlo Test
+[source, code]
+----
+Key1[0] = KEY1
+Key2[0] = KEY2
+Key3[0] = KEY3
+IV1[0] = IV1
+IV2[0] = IV2
+IV3[0] = IV3
+PT[0] = PT
+For i = 0 to 399
+    Output Key1[i], Key2[i], Key3[i]
+    Output IV1[0]
+    Output PT[0]
+    For j = 0 to 9999
+        CT[j] = TDES_CFB_P_ENCRYPT(Key1[i], Key2[i], Key3[i], PT[j], IV1[j], IV2[j], IV3[j])
+        PT[j+1] = LeftMost_K_Bits(IV1[j])
+    Output CT[j]
+    C = LeftMost_192_Bits(CT[j] || CT[j-1] || ... || CT[0])
+    Key1[i+1] = Key1[i] xor bits 129-192 of C
+    Key2[i+1] = Key2[i] xor bits 65-128 of C
+    If ( keyingOption = 1 )
+        Key3[i+1] = Key3[i] xor bits 1-64 of C
+    Else
+        Key3[i+1] = Key1[i+1]
+    PT[0] = LeftMost_K_Bits(IV1[j])
+    IV1[0] = RightMost_64-K_Bits(IV[j]) || CT[j]
+    IV2[0] = IV1[0] + "5555555555555555" mod 2^64
+    IV3[0] = IV1[0] + "AAAAAAAAAAAAAAAA" mod 2^64
+----
+
+[[TDES-OFB-MCT]]
+==== TDES Monte Carlo Test - OFB mode
+
+The initial condition for the test is the tuple (KEY1, KEY2, KEY3, IV, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCT_TDES_OFB>>.
+
+[[xml_figureMCT_TDES_OFB]]
+.TDES-OFB Monte Carlo Test
+[source, code]
+----
+Key1[0] = KEY1
+Key2[0] = KEY2
+Key3[0] = KEY3
+IV[0] = IV
+PT[0] = PT
+For i = 0 to 399
+    Output Key1[i]
+    Output Key2[i]
+    Output Key3[i]
+    Output IV[0]
+    Output PT[0]
+    For j = 0 to 9999
+        CT[j] = TDES_OFB_ENCRYPT(Key1[i], Key2[i], Key3[i], PT[j], IV[j])
+        PT[j+1] = IV[j]
+    Output CT[j]
+    Key1[i+1] = Key1[i] xor CT[j]
+    Key2[i+1] = Key2[i] xor CT[j-1]
+    If ( keyingOption = 1 )
+        Key3[i+1] = Key3[i] xor CT[j-2]
+    Else
+        Key3[i+1] = Key1[i+1]
+    PT[0] = PT[0] xor IV[j]
+    IV[0] = CT[j]
+----
+
+[[TDES-OFB-I-MCT]]
+===== TDES Monte Carlo Test - OFB-I mode
+
+The initial condition for the test is the tuple (KEY1, KEY2, KEY3, IV1, IV2, IV3, PT) set to some values.
+
+The algorithm is shown in <<xml_figureMCT_TDES_OFB-I>>.
+
+[[xml_figureMCT_TDES_OFB-I]]
+.TDES-OFB-I Monte Carlo Test
+[source, code]
+----
+Key1[0] = KEY1
+Key2[0] = KEY2
+Key3[0] = KEY3
+IV1[0] = IV1
+IV2[0] = IV2
+IV3[0] = IV3
+PT[0] = PT
+For i = 0 to 399
+    Output Key1[i], Key2[i], Key3[i]
+    Output IV1[0], IV2[0], IV3[0]
+    Output PT[0]
+    For j = 0 to 9999
+        CT[j] = TDES_OFB-I_ENCRYPT(Key1[i], Key2[i], Key3[i], PT[j], IV[j])
+        PT[j+1] = IV[j]
+    Output CT[j]
+    Key1[i+1] = Key1[i] xor CT[j]
+    Key2[i+1] = Key2[i] xor CT[j-1]
+    If ( keyingOption = 1 )
+        Key3[i+1] = Key3[i] xor CT[j-2]
+    Else
+        Key3[i+1] = Key1[i+1]
+    PT[0] = PT[0] xor IV1[j]
+    IV1[0] = CT[j]
+    IV2[0] = IV1[0] + "5555555555555555" mod 2^64
+    IV3[0] = IV1[0] + "AAAAAAAAAAAAAAAA" mod 2^64
+----
+
+=== Test Coverage
+
+The tests described in this document have the intention of ensuring an implementation is conformant to <<FIPS-197>> and <<SP800-38A>>.
+
+[[aes-coverage]]
+==== AES Requirements Covered
+
+In <<SP800-38A>>, both Section 5 and Section 6 which describe general modes of operation for block ciphers are tested. In <<FIPS-197>>, Section 4 outlines the AES engine and necessary functions to perform simple encrypt an decrypt operations. All AES tests perform such operations and thus rely heavily on this section. Section 5 specifically outlines the algorithm for AES and thus all AES tests rely heavily on this section as well. All of <<SP800-38A-Add>> requirements are covered. In <<AES-XTS>>, the IEEE outlines the encrypt and decrypt operations for AES-XTS.
+
+[[aes-not-coverage]]
+==== AES Requirements Not Covered
+
+Some requirements in the outlined specifications are not easily tested. Often they are not ideal for black-box testing such as the ACVP. In <<SP800-38A>>, Appendix A outlines padding for when the data being encrypted does not evenly fill the blocks. In these tests, all data, unless otherwise specified, is assumed to be a multiple of the block length. All exceptions to those cases are when stream ciphers specifically are being tested. In Section 5.3, IV generation which is required for all modes of AES and TDES outside of ECB, is not tested.  Appendix D outlines how errors are to be handled. As some symmetric ciphers aren't authenticated, ACVP does not include tests that change random bits in payload, IV, key or results, as these results can be successfully encrypted/decrypted, but errors aren't necessarily detectable.
+
+In <<FIPS-197>>, Section 5.3 defines the inverse cipher for AES. This is not tested in the CBC, CFB (all), OFB or CTR modes.
+
+In <<SP800-38E>>, the AES-XTS algorithm is restricted to 2\^20 AES blocks (128-bits each) per key. Due to the size of the data, ACVP does not test the proper usage of a key over such large amounts of data.
+
+[[tdes-coverage]]
+==== TDES Requirements Covered
+
+In <<SP800-67r2>>, Section 3 outlines the use for TDES with keying option 1 (three distinct keys) and decryption only for keying option 2 (K1 == K3 != K2). Depending on the cipher mode, both the forward and inverse cipher are tested. The known answer tests address these requirements.
+
+[[tdes-not-coverage]]
+==== TDES Requirements Not Covered
+
+In <<SP800-67r2>>, Section 3.3 outlines requirements for keys for proper usage of TDES. These requirements are not tested by ACVP. All keys used in the tests are randomly or staticly generated by the server. There are no checks for key equality or potentially weak keys. Section 3.3.2 outlines specific keys which are to be avoided. ACVP does not expect a client to be able to detect these keys.
+
+[[aead-coverage]]
+==== AEAD Requirements Covered
+
+In <<SP800-38D>>, Section 7 outlines the encrypt and decrypt operations for AES-GCM. This and all prerequisites to these operations  (such as GHASH) are tested as AES-GCM encrypt and decrypt operations.
+
+In <<SP800-38C>>, Section 6 outlines the encrypt and decrypt operations for AES-CCM. This and all prerequisites to these operations (such as CBC-MAC) are tested as AES-CCM encrypt and decrypt operations. In <<AES-GCM-SIV>>, the draft outlines the encrypt and decrypt operations for AES-GCM-SIV.
+
+[[aead-not-coverage]]
+==== AEAD Requirements Not Covered
+
+In <<SP800-38D>>, Section 8 outlines uniqueness requirements on IVs and keys for AES-GCM. This is considered out of bounds for the algorithm testing done by the ACVP and will not be tested.
+
+[[kw-coverage]]
+==== KeyWrap Requirements Covered
+
+In <<SP800-38F>> Section 5.2 defines the authenticated encryption and authenticated decryption operations for all three key-wrap algorithms.  As well, the padding for key-wrap with padding is defined. Algorithm Functional Tests provide assurance of these requirements for encrypt operations. For decrypt operations, there is a possibility to reject the ciphertext due to improper wrapping. This is also assured by the Algorithm Functional Tests.
+
+Sections 6 and 7 outline the specific ciphers in both encrypt and decrypt directions. All facsets of these processes are tested with random data via the Algorithm Functional Tests.
+
+[[kw-not-coverage]]
+==== KeyWrap Requirements Not Covered
+
+In <<SP800-38F>> Section 5.3 defines the length requirements allowed by an optimal implementation. The upper bounds are unreasonably large to test in a web-based model and thus an artificial maximum is selected for the payloadLen property (corresponding to both plaintext and ciphertext). The Algorithm Functional Tests SHOULD utilize both the minimum and maximum values provided in the client's registration optimally with other values.

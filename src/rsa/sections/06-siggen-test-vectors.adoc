@@ -1,0 +1,98 @@
+
+[[rsa_siggen_tgjs]]
+=== RSA SigGen Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the RSA / SigGen / * JSON elements of the Test Group JSON object
+
+.RSA SigGen Test Group JSON Objects
+|===
+| JSON Values | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| modulo | RSA modulus size | integer
+| hashAlg | The hash algorithm | string
+| sigType | Type of signature used in the group | string
+| saltLen | The salt length for the group in bytes | integer
+| conformance | Signifies all test cases within the group should utilize random message hashing as described in <<SP800-106>> | string
+| maskFunction | The mask function used for PSS signature scheme | string
+| testType | Describes the operation the client should perform on the tests data | string
+| tests | Array of individual test cases, see <<rsa_siggen_tvjs>> | array
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' (see <<testtypes>>) the group is addressing.
+
+NOTE: The 'maskFunction' property will only be present for RSA / SigGen / FIPS186-5 inside of test groups for the 'sigType' "pss".
+
+[[rsa_siggen_tvjs]]
+=== RSA SigGen Test Cases JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each RSA / SigGen / * test vector.
+
+.RSA SigGen Test Case JSON Objects
+|===
+| JSON Values | Description | JSON Type
+
+| tcId | Test case idenfitier | integer
+| message | The message to be signed | hex
+| saltLen | The length of the salt in bytes | integer
+| randomValue | The random value to be used as an input into the message randomization function as described in <<SP800-106>> | hex
+| randomValueLen | The random value's bit length | integer
+|===
+
+NOTE: The 'saltLen' property will only be present in test groups for the 'sigType' "pss".
+
+Here is an abbreviated yet fully constructed example of the prompt for RSA / SigGen / 1.0. The only difference in the structure between RSA / SigGen / 1.0 and RSA / SigGen / FIPS186-5 is the inclusion of the 'maskFunction' property in the 'testGroup' for RSA / SigGen / FIPS186-5.
+
+[source, json]
+----
+[
+  {
+    "acvVersion": " <acvp-version>"
+  },
+  {
+    "vsId": 1163,
+    "algorithm": "RSA",
+    "mode": "sigGen",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "sigType": "ansx9.31",
+        "hashAlg": "SHA2-256",
+        "modulo": 2048,
+        "tests": [
+          {
+            "tcId": 1165,
+            "message": "f648ffc4ed748..."
+          }
+        ]
+      }
+      {
+        "tgId": 3,
+        "sigType": "pkcs1v1.5",
+        "hashAlg": "SHA2-256",
+        "modulo": 2048,
+        "tests": [
+          {
+            "tcId": 1167,
+            "message": "5af283b1b76ab..."
+          }
+        ]
+      }
+      {
+        "tgId": 5,
+        "sigType": "pss",
+        "hashAlg": "SHA2-256",
+        "modulo": 2048,
+        "tests": [
+          {
+            "tcId": 1169,
+            "saltLen": 20,
+            "message": "dfc22604b95d1..."
+          }
+        ]
+      }
+    ]
+  }
+]
+----

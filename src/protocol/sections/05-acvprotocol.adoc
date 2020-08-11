@@ -1,0 +1,90 @@
+== ACV Protocol
+
+The ACV protocol will utilize existing mechanisms for transport coordinated with JSON formatted messaging.
+
+[[xml_figure3]]
+.Protocol Layering
+[align=center,alt=,type=]
+
+....
+
++-----------------------------------------------+
+| JSON Formatted ACVP request/response messages |
++-----------------------------------------------+
+| HTTP[S] message transfer and signaling        |
++-----------------------------------------------+
+| TLS for transport security(recommended)       |
++-----------------------------------------------+
+| TCP for transport                             |
+|_______________________________________________|
+
+....
+
+[[uriComposition]]
+=== HTTP URI Hierarchy
+
+[[uriDiagram]]
+[align=center,alt=,type=]
+....
+        +-------------+------------------+-------------------------+
+           server          path prefix          resource
+        +-------------+------------------+-------------------------+
+https://acvts.nist.gov/validation/acvp/v1/testSessions/1
+        +-------------+----------+----+--+-------------------------+
+                         context  API   |
+                                     version
+
+
+....
+
+Note that deployments utilizing ACV Proxy server *MAY* use a different protocol, e.g., HTTP, custom server, context and port number to interact with the DUT.
+
+[[uriResources]]
+=== HTTP URI Resources
+
+In the table below, any parts of a resource path enclosed in curly braces, { or }, are replaced by an instance of what is described in the braces. For example {testSessionId} could be replaced with 1.
+
+An empty cell for a resource and HTTP Method combination denotes that the server returns an HTTP Status 405 code _Method not allowed (405)_.
+
+[[uri_table]]
+[cols="<,<,<,<,<"]
+.Resources and their Available Operations
+|===
+| Resource | GET (read) | POST (create) | PUT (update) | DELETE
+
+| /requests | <<requests_get>> | | |
+| /requests/{requestId} | <<request_get>> | | |
+| /vendors | <<vendors_get>> | <<vendors_post>> | |
+| /vendors/{vendorId} | <<vendor_get>> | | <<vendor_put>> | <<vendor_delete>>
+| /vendors/{vendorId}/addresses | <<addresses_get>> | | |
+| /vendors/{vendorId}/addresses/{addressId} | <<address_get>> | | |
+| /vendors/{vendorId}/contacts | <<contacts_get>> | | |
+| /persons | <<persons_get>> | <<persons_post>> | |
+| /persons/{personId} | <<person_get>> | | <<person_put>> | <<person_delete>>
+| /oes| <<oes_get>> | <<oes_post>> | |
+| /oes/{oeId} | <<oe_get>> | | <<oe_put>> | <<oe_delete>>
+| /modules | <<modules_get>> | <<modules_post>> | |
+| /modules/{moduleId} | <<module_get>> | | <<module_put>> | <<module_delete>>
+| /dependencies | <<dependencies_get>> | <<dependencies_post>> | |
+| /dependencies/properties | <<dependencies_properties_get>> | | |
+| /dependencies/{dependencyId} | <<dependency_get>> | | <<dependency_put>> | <<dependency_delete>>
+| /algorithms | <<algorithms_get>> | | |
+| /algorithms/{algorithmId} | <<algorithm_get>> (Optional) | | |
+| /testSessions | <<testSessions_get>> (Optional) | <<testSessions_post>> | |
+| /testSessions/{testSessionId} | <<testSession_get>> (Optional) | | <<testSession_put>> | <<testSession_delete>>
+| /testSessions/{testSessionId}/results | <<testSession_results_get>> | | |
+| /testSessions/{testSessionId}/vectorSets | <<vectorSets_get>> | | |
+| /testSessions/{testSessionId}/vectorSets/{vectorSetId} | <<vectorSet_get>> | | | <<vectorSet_delete>>
+| /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results | <<vectorSet_results_get>> | <<vectorSet_results_post>> | <<vectorSet_results_put>> |
+| /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected | <<vectorSet_expected_get>> (Optional) | | |
+| /large | <<largeSubmission>> (Optional)
+|===
+
+The resource path is appended to the path prefix to form the URI used with an HTTP Method to perform the desired ACVP operation. For example to create a new test session using the "/testSessions" resource is "/acvp/v1/testSessions" (assuming an empty context).  To create a new Test Session, the ACVP client would use the following HTTP request-line:
+
+POST /acvp/v1/testSessions HTTP/1.1
+
+Likewise, to request a specific vector set from the server the ACVP client would use the
+following request-line:
+
+GET /acvp/v1/testSessions/1/vectorSets/1 HTTP/1.1

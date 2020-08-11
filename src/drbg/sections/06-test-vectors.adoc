@@ -1,0 +1,141 @@
+[[tgjs]]
+=== Test Groups
+
+The testGroups element at the top level in the test vector JSON object is an array of test	groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped	together. The Test Group JSON object contains meta data that applies to all test vectors within	the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+[[prompt_group_table]]
+.Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | Test group identifier | integer
+| mode | The mode of the DRBG, see <<supported>> | string
+| derFunc | Use derivation function or not | boolean
+| predResistance | Use prediction resistance | boolean
+| reSeed | Use reseeding | boolean
+| entropyInputLen | Entropy length | integer
+| nonceLen | Nonce length; set to 0 if not used/supported. See also notes after <<capabilities-table>> above | integer
+| persoStringLen | Personalization string length; set to 0 if not used/supported. See also notes after <<capabilities-table>> above | integer
+| additonalInputLen | Additional input length; set to 0 if not used/supported. See also notes after <<capabilities-table>> above | integer
+| returnedBitsLen | returned bits length | integer
+| tests | Array of individual test cases | array
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' (see <<testtypes>>) the group is addressing.
+
+NOTE: 11 According to SP 800-90A <<SP800-90A>>, a DRBG implementation has two separate controls for determining the correct test procedure for handling addtional entropy and other data in providing prediction resistance assurances. Depending on the capabilities advertised by the predResistanceEnabled and reseedImplemented flags ACVP generates test data according to the following test scenarios:
+
+[[tests_table]]
+.Generated Test Data per Scenario
+|===
+| Prediction Resistance Assurance Options | Test Procedure
+
+| "predResistanceEnabled" : true; "reseedImplemented": true |
+| | Instantiate DRBG
+| | Generate but don't output
+| | Generate output
+| | Uninstantiate
+| "predResistanceEnabled" : false; "reseedImplemented" : true |
+| | Instantiate DRBG
+| | Reseed
+| | Generate but don't output
+| | Generate output
+| | Uninstantiate
+| "predResistanceEnabled" : true/false; "reseedImplemented": false |
+| | Instantiate DRBG
+| | Generate but don't output
+| | Generate output
+| | Uninstantiate
+|===
+
+=== Test Cases
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each {spec-algorithm} test vector.
+
+[[cases_table]]
+.Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Test case idenfitier | integer
+| entropyInput | Entropy value | hex
+| nonce | Value of the nonce | hex
+| persoString | value of the personlization string | hex
+| otherInput | array of additonal input/entropy input value pairs for testing. See <<other_input_table>> | array
+|===
+
+Each test group contains an array of one or more tests. Each test object contains an otherInput object, which is an array of objects, each with the intendedUse property indicating if the particular test data is to be used for reSeed or generate - see <<tests_table>>. Each test vector is a JSON object that represents a single test case to be processed by the ACVP client.  The following table describes the JSON elements for each DRBG predcition resistance test vector.
+
+[[other_input_table]]
+.DRBG Predictive Resistance JSON Elements
+|===
+| JSON Value | Description | JSON type
+
+| additionalInput | value of the additional input string to use in predition resistance tests | hex
+| entropyInput | value of the entropy input to use in prediction resistance tests | hex
+| intendedUse | "reSeed", "generate" | string
+|===
+
+Here is an abbreviated yet fully constructed example of the prompt
+
+[source, json]
+----
+{
+  "vsId": 1,
+  "algorithm": "ctrDRBG",
+  "revision": "1.0",
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "derFunc": true,
+      "reSeed": true,
+      "predResistance": true,
+      "entropyInputLen": 256,
+      "nonceLen": 256,
+      "persoStringLen": 256,
+      "additionalInputLen": 256,
+      "returnedBitsLen": 512,
+      "mode": "AES-128",
+      "tests": [
+        {
+          "tcId": 1,
+          "entropyInput": "E9EDA8BF1E6155BDF11AD74E2702004C20B39...",
+          "nonce": "D77D611F0665CBFD7E00D5E5118629F5F40996B764F0...",
+          "persoString": "E9ADEA726418EF002C03DC2196296D4B273AB6...",
+          "otherInput": [
+            {
+              "intendedUse": "generate",
+              "additionalInput": "52F47C6A1B12C202D309D062C3EE09...",
+              "entropyInput": "C30F4C916B90A79B5764DC6FA950B3F34..."
+            },
+            {
+              "intendedUse": "generate",
+              "additionalInput": "4FFDE712D249A99006F46D7070D5CA...",
+              "entropyInput": "8A4724F1514C480DE1604C5D870CFA464..."
+            }
+          ]
+        },
+        {
+          "tcId": 2,
+          "entropyInput": "DC1B4E9B1782A9E701CB2A74EDBDF483462E9...",
+          "nonce": "A5B7D117BDE77D46A65DBD0EBA085C4376C7B72F164E...",
+          "persoString": "D7FC54DD4E759C8D3FCE61463ED40BE130D2B4...",
+          "otherInput": [
+            {
+              "intendedUse": "generate",
+              "additionalInput": "28EFD5114D06D1A065863C50BDD2DE...",
+              "entropyInput": "F5C9DF132A4C066C5D0AFEE79FBC7EB07..."
+            },
+            {
+              "intendedUse": "generate",
+              "additionalInput": "D1AACBAE8BA37208161CBA9042BB92...",
+              "entropyInput": "5C6D2F80696D1691FCA40B0C3444CE927..."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+----

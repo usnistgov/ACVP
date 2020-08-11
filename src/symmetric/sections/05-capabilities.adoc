@@ -1,0 +1,132 @@
+
+[[prereq_algs]]
+=== Required Prerequisite Algorithms for Block Cipher Validations
+
+Some block cipher algorithm implementations rely on other cryptographic primitives. For example, AES-CCM uses an underlying AES-ECB algorithm. Each of these underlying algorithm primitives *MUST* be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:
+
+[cols="<,<,<,<"]
+[[prereqs_table]]
+.Required Prerequisite Algorithms JSON Values
+
+|===
+| JSON Value| Description| JSON type| Example Values
+
+| algorithm| a prerequisite algorithm| string| AES, DRBG, TDES
+| valValue| algorithm validation number| string| actual number or "same" to refer to the same submission
+| prereqAlgVal| prerequisite algorithm validation| object| exactly one algorithm property and one valValue property
+|===
+
+[[cap_ex]]
+=== Block Cipher Algorithm Capabilities JSON Values
+
+Each algorithm capability advertised is a self-contained JSON object and *SHALL* use the following values when appropriate:
+
+[cols="<,<,<"]
+[[caps_table]]
+.Block Cipher Algorithm Capabilities JSON Values
+
+|===
+| JSON Value| Description| JSON type
+
+| algorithm| The block cipher algorithm and mode to be validated.| string
+| revision| The version of the testing methodology the IUT is requesting to validate against.| string
+| conformances| The additional conformance for the algorithm for a specific use-case | array of string
+| prereqVals| Prerequisite algorithm validations| array of prereqAlgVal objects described in <<prereqs_table>>
+| direction| The IUT processing direction| array of strings
+| keyLen| The supported key lengths in bits| array of integers
+| payloadLen| The supported plain and cipher text lengths in bits. This varies depending on the algorithm type, for additional details see
+<<property_grid_auth>> and <<property_grid_misc>>| domain
+| ivLen| The supported IV/Nonce lengths in bits, see <<property_grid_auth>>| domain
+| ivGen| IV generation method for AES-GCM/AES-XPN algorithms| string
+| ivGenMode| IV generation mode for AES-GCM/AES-XPN algorithms| string
+| saltGen| Salt generation method for AES-XPN mode only| string
+| aadLen| The supported AAD lengths in bits for AEAD algorithms| domain
+| tagLen| The supported Tag lengths in bits for AEAD algorithms, see <<property_grid_auth>>| domain
+| kwCipher| The cipher as defined in SP800-38F for key wrap mode| array of strings
+| tweakMode| The format of tweak value input for AES-XTS. Hex refers to the tweakValue being a literal hex string. Number refers to the tweakValue being an integer number represented as a hex string.| array of strings
+| keyingOption| The Keying Option used in TDES.  Keying option 1 (1) is 3 distinct keys (K1, K2, K3).  Keying Option 2 (2) is 2 distinct keys only suitable for decrypt (K1, K2, K1). | array of integers
+| overflowCounter| Indicates if the implementation can handle a counter exceeding the maximum value| boolean
+| incrementalCounter| Indicates if the implementation increments the counter (versus decrementing the counter)| boolean
+|===
+
+NOTE: The 'conformances' property is only valid for algorithms listed in <<conformances>>. The valid values in the array are also listed in that section. The array is always optional.
+
+NOTE: Some optional values are required depending on the algorithm. For example, AES-GCM requires ivLen, ivGen, ivGenMode, aadLen and tagLen. Failure to provide these values will result in the ACVP server returning an error to the ACVP client during registration.
+
+The following grid outlines which properties are *REQUIRED*, as well as all the possible values a server *MAY* support for each standard block cipher algorithm:
+
+[cols="<,<,<,<,<"]
+[[property_grid]]
+.Standard Block Cipher Algorithm Capabilities Applicability Grid
+
+|===
+| algorithm| revision| direction| keyLen| keyingOption
+
+| AES-ECB| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]|
+| AES-CBC| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]|
+| AES-OFB| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]|
+| AES-CFB1| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]|
+| AES-CFB8| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]|
+| AES-CFB128| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]|
+| TDES-ECB| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CBC| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CBCI| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CFB1| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CFB8| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CFB64| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CFBP1| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CFBP8| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-CFBP64| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-OFB| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+| TDES-OFBI| "1.0"| ["encrypt", "decrypt"]| | [1, 2] Note: 2 is only available for decrypt operations
+|===
+
+NOTE: keyingOption 2 *SHALL* only available for decrypt operations.
+
+The following grid outlines which properties are *REQUIRED*, as well as the possible values a server *MAY* support for each authenticated block cipher algorithm:
+
+[cols="<,<,<,<,<,<"]
+[[property_grid_auth]]
+.Key-Wrap Block Cipher Algorithm Capabilities Applicability Grid
+
+|===
+| algorithm| revision| direction| keyLen| kwCipher| keyingOption
+
+| AES-KW| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| ["cipher", "inverse"]|
+| AES-KWP| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| ["cipher", "inverse"]|
+| TDES-KW| "1.0"| ["encrypt", "decrypt"]| | ["cipher", "inverse"]| [1, 2] Note: 2 is only available for decrypt operations
+|===
+
+The following grid outlines which properties are *REQUIRED*, as well as the possible values a server *MAY* support for each key-wrap block cipher algorithm:
+
+[cols="<,<,<,<,<,<,<,<,<,<,<"]
+[[property_grid_kw]]
+.Authenticated Block Cipher Algorithm Capabilities Applicability Grid
+
+|===
+| algorithm| revision| direction| keyLen| payloadLen| ivLen| ivGen| ivGenMode| saltGen| aadLen| tagLen
+
+| AES-GCM| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 0, "Max": 65536, "Inc": any}| {"Min": 8, "Max": 1024, "Inc": any}| ["internal", "external"]| ["8.2.1", "8.2.2"]| | {"Min": 0, "Max": 65536, "Inc": any}| {[32, 64, 96, 104, 112, 120, 128]}
+| AES-GCM-SIV| "1.0"| ["encrypt", "decrypt"]| [128, 256]| {"Min": 0, "Max": 65536, "Inc": 8}| | | | | {"Min": 0, "Max": 65536, "Inc": 8}|
+| AES-XPN| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 0, "Max": 65536, "Inc": any}| | ["internal", "external"]| ["8.2.1", "8.2.2"]| ["internal", "external"]| {"Min": 1, "Max": 65536, "Inc": any}| {[32, 64, 96, 104, 112, 120, 128]}
+| AES-CCM| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 0, "Max": 256, "Inc": 8}| {"Min": 56, "Max": 104, "Inc": 8}| | | | {"Min": 0, "Max": 524288, "Inc": any}| {[32, 64, 96, 104, 112, 120, 128]}
+|===
+
+The following grid outlines which properties are *REQUIRED*, as well as the possible values a server *MAY* support for each miscellaneous block cipher algorithm:
+
+[cols="<,<,<,<,<,<,<,<,<"]
+[[property_grid_misc]]
+.Miscellaneous Block Cipher Algorithm Capabilities Applicability Grid
+
+|===
+| algorithm| revision| direction| keyLen| payloadLen| tweakMode| keyingOption| overflowCounter| incrementalCounter
+
+| AES-CBC-CS1| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | |
+| AES-CBC-CS2| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | |
+| AES-CBC-CS3| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | |
+| AES-CTR| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 1, "Max": 128, "Inc": any}| | | true, false| true, false
+| AES-XTS| "1.0"| ["encrypt", "decrypt"]| [128, 256]| {"Min": 128, "Max": 65536, "Inc": 128}| ["hex", "number"]| | |
+| TDES-CTR| "1.0"| ["encrypt", "decrypt"]| | {"Min": 1, "Max": 64, "Inc": any}| | [1, 2] Note: 2 is only available for decrypt operations| true, false| true, false
+|===
+
+NOTE: keyingOption 2 *SHALL* only available for decrypt operations.

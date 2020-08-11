@@ -1,0 +1,108 @@
+[#properties]
+=== Property Registration
+
+The {spec-algorithm} mode capabilities are advertised as JSON objects within a root "algorithm" object.
+
+A registration *SHALL* use these properties:
+
+.Registration Properties
+|===
+| JSON Property | Description | JSON Type | Valid Values
+
+| algorithm | Name of the algorithm to be validated | string | "KAS-SSC-ECC"
+| revision | ACVP Test version | string | "SP800-56Ar3"
+| prereqVals | Prerequisites of the algorithm | object | See <<prerequisites>>
+| scheme | Array of schemes supported | array of objects | See <<scheme>>
+| domainParameterGenerationMethods | Array of strings representing the supported means of generating domain parameters | array of strings | See <<domainParameterGenerationMethods>>
+| scheme | Array of schemes supported | dictionary | See <<scheme>>
+| hashFunctionZ | Optional hash function to apply to the shared secret `z` in instances where the IUT is unable to return the `z` in the clear. | string | See <<hashFunctionZ>>
+|===
+
+[#scheme]
+==== Schemes
+
+Schemes *MUST* be registered as a dictionary (key/value pairs) where the key is a valid <<schemeId>>, and the value is a <<schemeObject>>.
+
+[#schemeId]
+===== Scheme Identifier
+
+* ephemeralUnified
+* onePassMqv
+* fullUnified
+* fullMqv
+* onePassUnified
+* onePassDh
+* staticUnified
+
+[#schemeObject]
+===== Scheme Object
+
+The scheme object is made up of the following properties:
+
+.Scheme Properties
+|===
+| JSON Property | Description | JSON Type | Valid Values
+| kasRole | The roles the IUT can support for the scheme | array of string | "initiator", "responder" |
+|===
+
+[#domainParameterGenerationMethods]
+==== Domain Parameter Generation Methods
+
+* P-224
+* P-256
+* P-384
+* P-521
+* K-233
+* K-283
+* K-409
+* K-571
+* B-233
+* B-283
+* B-409
+* B-571
+
+[#hashFunctionZ]
+==== Hash Function Z
+
+An optional hash function that should be applied to `z` from both the ACVP server and IUT for comparison purposes.  The provided `hashFunctionZ`'s security strength MUST be at least as strong as the greatest security strength domain parameter selected from <<domainParameterGenerationMethods>>
+
+The following hash functions *MAY* be advertised by an ACVP compliant server:
+
+* SHA2-224
+* SHA2-256
+* SHA2-384
+* SHA2-512
+* SHA2-512/224
+* SHA2-512/256
+* SHA3-224
+* SHA3-256
+* SHA3-384
+* SHA3-512
+
+=== Registration Example
+
+.Registration JSON Example
+[source,json]
+----
+{
+  "algorithm": "KAS-ECC-SSC",
+  "revision": "Sp800-56Ar3",
+  "scheme": {
+    "fullMqv": {
+      "kasRole": [
+        "initiator",
+        "responder"
+      ]
+    },
+    "staticUnified": {
+      "kasRole": [
+        "initiator"
+      ]
+    }
+  },
+  "domainParameterGenerationMethods": [
+    "K-233"
+  ],
+  "hashFunctionZ": "SHA3-512"
+}
+----

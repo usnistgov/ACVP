@@ -1,0 +1,116 @@
+[[tgjs]]
+=== Test Groups
+
+The testGroups element at the top level in the test vector JSON object is an array of test	groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped	together. The Test Group JSON object contains meta data that applies to all test vectors within	the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+.Test Group Properties
+|===
+| JSON Values | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| testType | Describes the operation the client should perform on the tests data | string
+| domainParameterGenerationMode | The curve in use for key generation for the test group | string
+| scheme | KAS scheme under test | string
+| kasRole | The IUT role under test | string
+| hashFunctionZ | The hash function applied to `z` (optional) | string
+| tests | Array of individual test cases | See <<testCase>>
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' the group is addressing.
+
+[[testCase]]
+=== Test Cases
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each {spec-algorithm} test vector.
+
+.Test Case Properties
+|===
+| JSON Values | Description | JSON Type
+
+| tcId | Test case identifier | integer
+| staticPublicServerX | The server static public key X. Optional depending on scheme and test type. | hex
+| staticPublicServerY | The server static public key Y. Optional depending on scheme and test type. | hex
+| ephemeralPublicServerX | The server ephemeral public key X. Optional depending on scheme and test type. | hex
+| ephemeralPublicServerY | The server ephemeral public key Y. Optional depending on scheme and test type. | hex
+| staticPrivateIut | The IUT static private key. Optional depending on scheme and test type. | hex
+| staticPublicIutX | The IUT static public key X. Optional depending on scheme and test type. | hex
+| staticPublicIutY | The IUT static public key Y. Optional depending on scheme and test type. | hex
+| ephemeralPrivateIut | The IUT ephemeral private key. Optional depending on scheme and test type. | hex
+| ephemeralPublicIutX | The IUT ephemeral public key X. Optional depending on scheme and test type. | hex
+| ephemeralPublicIutY | The IUT ephemeral public key Y. Optional depending on scheme and test type. | hex
+| z | The computed shared secret.  Included for VAL tests when registered without a `hashFunctionZ` | hex
+| hashZ | The hashed computed shared secret.  Included for VAL tests when registered with a `hashFunctionZ` | hex
+|===
+
+Here is an abbreviated yet fully constructed example of the prompt
+
+.Vector Set JSON Example
+[source,json]
+----
+{
+  "vsId": 1,
+  "algorithm": "KAS-SSC-ECC",
+  "revision": "SP800-56Ar3",
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [
+        {
+          "staticPublicServerX": "009DDB6E0B7488CA9B1C7E90C9EA6415055C2FC692DB320ABCD6247974A6",
+          "staticPublicServerY": "003FF7BFDCD30EF76728DE7B788096A099013831EE19362B3E7839D9AFC1",
+          "ephemeralPublicServerX": "011A0F740FFCBDD59453181575D3E90948876330F6AB53C9F1D879E5401E",
+          "ephemeralPublicServerY": "00A2EF391F38BF071B63900DF1E046A6CABE8AFEEA8EF2D5A2C6FAECB420",
+          "tcId": 1
+        },
+        {
+          "staticPublicServerX": "0066EAAC997E1E4AB6DA167BB1D4AC7EDE71A3E31CFDF0246747AE4AD310",
+          "staticPublicServerY": "01C099445608C29300F1C0B7B9D1246C3BD53239C893AF196635EE9CADC8",
+          "ephemeralPublicServerX": "006E2F044F0BB01A82F25437014322C39943378AC17B67DF5FC03ED8EB8A",
+          "ephemeralPublicServerY": "018265FC80EE45EBE0E4703C94C9E3E88AB12313F19E095F872CCA3D9454",
+          "tcId": 2
+        }
+      ],
+      "domainParameterGenerationMode": "K-233",
+      "scheme": "fullMqv",
+      "kasRole": "initiator"
+    },
+    {
+      "tgId": 2,
+      "testType": "VAL",
+      "tests": [
+        {
+          "staticPublicServerX": "00099EA32CEF0B847A89359CE0ECA6CD90BCBEFB2E4760FE57C5D33E8AE4",
+          "staticPublicServerY": "009736F48E1C165C86398B343CA5E0C4140B1D9A193770504D11DD04D6A6",
+          "ephemeralPublicServerX": "00898BC3D22EA3CFF21185557EBEED8741807E4E26796D6C7AC3BAEAA727",
+          "ephemeralPublicServerY": "00DE13014770A4E8E2189AD7759BE40158CB88F24C01EF6A93C1AEB69AC0",
+          "staticPrivateIut": "002432C57C2FA1BAAD45E0904A26590794EF5607EB2801CF16A50BC37268",
+          "staticPublicIutX": "004E3F12349A545F9B7BD5C80C1D02AAF86C59DDA60E7F9365969ED7D3F5",
+          "staticPublicIutY": "00F2217558C507B02976293D804BAE9D90AE3AEB29740A7526F03B7E3A7A",
+          "ephemeralPrivateIut": "0052448C1E027D3C54A0EF78A2E5AE5147F03EBAFF16CFC62D997B299984",
+          "ephemeralPublicIutX": "0000C875EC6B96E960DA28CCA013FD66281F0646DB75042F523AA08B4804",
+          "ephemeralPublicIutY": "0088FCD24C2A9DCCFB45A5DBEF59761E9D35B14CFE4AB8D19817A1DEE768",
+          "tcId": 6,
+          "z": "006DE2AF8A3C44EC58FE36CF89BDD64EA8009029DC9B96D46441159D2166"
+        },
+        {
+          "staticPublicServerX": "01DBD694E146FF567AE27722F9A0D28484A6C73E946136DEE0D53BFA1398",
+          "staticPublicServerY": "01EFDBA338166C752858881ADA717B3F3459F65F4D5A8DE1542ED48BD090",
+          "ephemeralPublicServerX": "019A288B9BC2424EF2930B093E17BE2E427DB45D571DB25EA307BF5FB042",
+          "ephemeralPublicServerY": "019683B12459C385BAC1819AA13778C253CA85BF56825F0EF3E1B8C891CC",
+          "staticPrivateIut": "000441DC0EB9061313A3501E346DFBB1E914DA4407388DF54193B0542098",
+          "staticPublicIutX": "005F489ECBD43EBF3D02A6514DA99B1DCFDED0E42633405C0D5671920571",
+          "staticPublicIutY": "00E75125D3DE971B8DC7CF9D57300E959372616B24131BCBC0EE680CA9AF",
+          "ephemeralPrivateIut": "0010938CC688C9036923838EB607A468ADB81A6A8D5544DA3A7BF1774D33",
+          "ephemeralPublicIutX": "0151C3AFF22BA9390947FD8C59EC1A77879A1491B369B226961747B50475",
+          "ephemeralPublicIutY": "00DD94325FDF311D9056512FB15A5E4AAEAC278E90533698AF9D7A8F4144",
+          "tcId": 7,
+          "z": "017236827F9EB5498DF3151627AE2F5D6835056F669D6D448EA219AE8E2A"
+        }
+      ],
+      "domainParameterGenerationMode": "K-233",
+      "scheme": "fullMqv",
+      "kasRole": "initiator"
+    }]
+}
+----

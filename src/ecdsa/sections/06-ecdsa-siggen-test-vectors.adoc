@@ -1,0 +1,81 @@
+[[ecdsa_siggen_test_vectors]]
+=== ECDSA SigGen Test Vectors
+
+[[ecdsa_siggen_tgjs]]
+==== ECDSA SigGen Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure hash JSON elements of the Test Group JSON object.
+
+The test group for ECDSA / SigGen / * is as follows:
+
+[[ecdsa_siggen_vs_tg_table]]
+.ECDSA SigGen Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| testType | The test operation performed | string
+| curve | The curve type used for the test vectors | string
+| hashAlg | SHA version used | string
+| conformance | Signifies all test cases within the group should utilize random message hashing as described in <<SP800-106>> | string
+| tests | Array of individual test vector JSON objects, which are defined in <<ecdsa_siggen_tvjs>> | array
+|===
+
+[[ecdsa_siggen_tvjs]]
+==== ECDSA SigGen Test Groups JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each ECDSA test vector.
+
+[[ecdsa_siggen_vs_tc_table]]
+.ECDSA SigGen Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| message | The message used to generate signature or verify signature | hex
+| randomValue| The random value to be used as an input into the message randomization function as described in <<SP800-106>> | hex
+| randomValueLen| The random value's bit length | integer
+|===
+
+NOTE: The 'randomValue' and 'randomValueLen' will only be present if the 'conformance' "SP800-106" is present in the group.
+
+The following is an example JSON object sent from the server to the client for ECDSA / SigGen. While the example will specify a revision, the format is identical for both revisions available.
+
+[source, json]
+----
+[
+    {
+        "acvVersion": <acvp-version>
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "ECDSA",
+        "mode": "SigGen",
+        "revision": "1.0",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "curve": "P-224",
+                "hashAlg": "SHA2-224",
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "message": "AB6F57713A3BD323B4AFDCFBE202EE0..."
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "curve": "P-224",
+                "hashAlg": "SHA2-224",
+                "conformance": "SP800-106",
+                "tests": [
+                    {
+                        "tcId": 2,
+                        "message": "23B4AFDCFBE202EE00A9CF5C787D19FD90..."
+                    }
+                ]
+            }
+        ]
+    }
+]
+----

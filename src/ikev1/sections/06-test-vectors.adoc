@@ -1,0 +1,140 @@
+[[tgjs]]
+=== Test Groups
+
+The testGroups element at the top level in the test vector JSON object is an array of test  groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+.Test Group JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| testType | Test operations to be performed | string
+| authenticationMethod | The method used for the test vectors. See <<registration>> for possible values | string
+| dhLength | Diffie-Hellman shared secret length in bits | integer
+| hashAlg | The SHA value used | string
+| nInitLength | Length of initiator nonce in bits | integer
+| nRespLength | Length of responder nonce in bits | integer
+| preSharedKeyLength | Pre-shared key length in bits | integer
+| tests | Array of individual test cases | array
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' (see <<testtypes>>) the group is addressing.
+
+The 'preSharedKeyLength' *SHALL* only be present when the 'authenticationMethod' is "psk".
+
+=== Test Cases
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each {spec-algorithm} test vector.
+
+.Test Case JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tcId | Test case idenfitier | integer
+| ckyInit | Initiator's cookie | hex
+| ckyResp | Responder's cookie | hex
+| nInit | Value of the initiator nonce | hex
+| nResp | Value of the responder nonce | hex
+| gxy | Diffie-Hellman shared secret | hex
+| preSharedKey | Value of the pre-shared key | hex
+|===
+
+The 'preSharedKey' *SHALL* only be present when the 'authenticationMethod' is "psk".
+
+Here is an abbreviated yet fully constructed example of the prompt with all possible 'authenticationMethod' values.
+
+[source, json]
+----
+{
+  "vsId": 1,
+  "algorithm": "kdf-components",
+  "mode": "IKEv1",
+  "revision": "1.0",
+  "testGroups": [
+    {
+      "tgId": 1,
+      "hashAlg": "SHA-1",
+      "authenticationMethod": "dsa",
+      "dhLength": 6660,
+      "nInitLength": 2048,
+      "nRespLength": 2048,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 1,
+          "ckyInit": "F16761897EFB81E5",
+          "ckyResp": "4F3BA0B9C946172D",
+          "nInit": "6F85B4C66C71791...",
+          "nResp": "EAE7F83DBD83C18...",
+          "gxy": "9BA5CEDAE8B3FD641..."
+        },
+        {
+          "tcId": 2,
+          "ckyInit": "0CE83D37791E6EFD",
+          "ckyResp": "8FA2F406395E8110",
+          "nInit": "739D1D7AB9D1878...",
+          "nResp": "BF3450BFCF442D1...",
+          "gxy": "8810324F9E3405F23..."
+        }
+      ]
+    },
+    {
+      "tgId": 2,
+      "hashAlg": "SHA-1",
+      "authenticationMethod": "psk",
+      "dhLength": 8192,
+      "nInitLength": 989,
+      "nRespLength": 64,
+      "preSharedKeyLength": 8,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 3,
+          "ckyInit": "AF501BE6A9CFDA3D",
+          "ckyResp": "5D493412A02AC0B0",
+          "nInit": "8C4F7093000AEC0...",
+          "nResp": "049FBB8AD5DC5D20",
+          "gxy": "A0DE670D5D668E930...",
+          "preSharedKey": "C1"
+        },
+        {
+          "tcId": 4,
+          "ckyInit": "0186060C1B45404E",
+          "ckyResp": "205F3A38BFC363E1",
+          "nInit": "B22CC4105FA8947...",
+          "nResp": "3CCC6D447E8BC305",
+          "gxy": "A281621748E344135...",
+          "preSharedKey": "01"
+        }
+      ]
+    },
+    {
+      "tgId": 3,
+      "hashAlg": "SHA-1",
+      "authenticationMethod": "pke",
+      "dhLength": 2165,
+      "nInitLength": 142,
+      "nRespLength": 64,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 5,
+          "ckyInit": "D4B54A5C60ACD6A7",
+          "ckyResp": "CA7528CD8DD8B254",
+          "nInit": "D36A36DD6C69210...",
+          "nResp": "AB4A4695F4866699",
+          "gxy": "F04CDFA8A03E74481..."
+        },
+        {
+          "tcId": 6,
+          "ckyInit": "14CA6041304FE168",
+          "ckyResp": "71D6F8110638EB79",
+          "nInit": "230F3C54635B3E8...",
+          "nResp": "0C5A851874EE4131",
+          "gxy": "ACFF1F744BB3D2415..."
+        }
+      ]
+    }
+  ]
+}
+----

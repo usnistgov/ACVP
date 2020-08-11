@@ -1,0 +1,154 @@
+
+[#testtypes]
+== Test Types and Test Coverage
+
+This section describes the design of the tests used to validate {spec-algorithm} implementations.
+
+=== Test Types
+
+This section describes the design of the tests used to validate implementations of XOFs. There are three types of tests for these algorithms: Algorithm Functional Tests (AFT), Monte Carlo Tests (MCT) and MAC Verification Tests (MVT). Each has a specific value to be used in the testType field. The testType field definitions are:
+
+* "AFT" - Algorithm Functional Tests. These tests can be processed by the client using a normal 'encrypt' or 'decrypt' operation. AFTs cause the implementation under test to exercise normal operations on a single block, multiple blocks, or (where applicable) partial blocks. In some cases random data is used, in others, static, predetermined tests are provided.
+
+* "MCT" - Monte Carlo Tests. These tests exercise the implementation under test under strenuous circumstances. The implementation under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect potential memory leaks over time, and problems in allocation of resources, addressing variables, error handling and generally improper behavior in response to random inputs. Each MCT processes 100 pseudorandom tests. Not every algorithm and mode combination has an MCT. See <<MC_test>> for implementation details.
+
+* "MVT" - MAC Verification Tests.  XXX
+
+[[MC_test]]
+=== Monte Carlo tests for XOFs
+
+[[cSHAKE-MCT]]
+==== cSHAKE Monte Carlo Test
+
+[source, code]
+----
+INPUT: The initial Msg of 128 bits long
+
+BitsToString(bits) {
+  string = "";
+  foreach byte in bits {
+      string = string + ASCII((byte % 26) + 65);
+  }
+}
+
+Initial Outputlen = (floor(maxoutlen/8) )*8
+Initial FunctionName = ""
+Initial Customization = ""
+
+MCT(Msg, Outputlen, FunctionName, Customization)
+{
+  Output0 = Msg;
+  for (j=0; j<100; j++) {
+      for (i=1; i<1001; i++) {
+          M[i] = 128 leftmost bits of Output[i-1];
+          Output[i] = CSHAKE(M[i],Outputlen,FunctionName,Customization);
+          If (i == 1000){
+              Outputlen[j] = Outputlen;
+          }
+          Rightmost_Output_bits = rightmost 16 bits of Output[i];
+          Leftmost_Output_bits = leftmost 16 bits of Output[i];
+          Range = (maxoutbytes – minoutbytes + 1);
+          Outputlen = minoutbytes + (Rightmost_Output_bits mod Range);
+          Customization = BitsToString(M[i] || Rightmost_Output_bits);
+      }
+      Output[j] = Output[1000];
+      OUTPUT: Outputlen[j], Output[j]
+  }
+}
+----
+
+[[ParallelHash-MCT]]
+==== ParallelHash Monte Carlo Test
+
+[source, code]
+----
+INPUT: The initial Msg of 128 bits long
+
+BitsToString(bits) {
+  string = "";
+  foreach byte in bits {
+      string = string + ASCII((byte % 26) + 65);
+  }
+}
+
+Initial Outputlen = (floor(maxoutlen/8) )*8
+Initial Customization = ""
+Initial BlockSize = min bytes
+
+MCT(Msg, Outputlen, FunctionName, Customization, BlockSize)
+{
+  Output0 = Msg;
+  for (j=0; j<100; j++) {
+      for (i=1; i<1001; i++) {
+          M[i] = 128 leftmost bits of Output[i-1];
+          Output[i] = CSHAKE(M[i],Outputlen,FunctionName,Customization);
+          If (i == 1000){
+              Outputlen[j] = Outputlen;
+          }
+          Rightmost_Output_bits = rightmost 16 bits of Output[i];
+          Range = (maxoutbytes – minoutbytes + 1);
+          Outputlen = minoutbytes + (Rightmost_Output_bits mod Range);
+          BlockSize = minBlockSize + (rightmost 8 bits of Rightmost_Output_bits mod blockSizeRange);
+          Customization = BitsToString(M[i] || Rightmost_Output_bits);
+      }
+      Output[j] = Output[1000];
+      OUTPUT: Outputlen[j], Output[j]
+  }
+}
+----
+
+[[TupleHash-MCT]]
+==== TupleHash Monte Carlo Test
+
+[source, code]
+----
+INPUT: The initial Single-Tuple of 288 bits long
+
+BitsToString(bits) {
+  string = "";
+  foreach byte in bits {
+      string = string + ASCII((byte % 26) + 65);
+  }
+}
+
+Initial Outputlen = (floor(maxoutlen/8) )*8
+Initial Customization = ""
+
+MCT(Msg, Tuple, Outputlen, Customization)
+{
+  Output0 = Msg;
+  for (j=0; j<100; j++) {
+      for (i=1; i<1001; i++) {
+          leftbits = 288 leftmost bits of Output[i-1];
+          tupleSize = 3 leftmost bits of leftbits + 1;
+          for (k=0; k<tupleSize; k++) {
+              T[i][k] = Substring of leftbits from (k * 288 / tupleSize) to ((k+1) * 288 / tupleSize - 1);
+          }
+          Output[i] = TupleHash(T[i],Outputlen,Customization);
+          If (i == 1000){
+              Outputlen[j] = Outputlen;
+          }
+          Rightmost_Output_bits = rightmost 16 bits of Output[i];
+          Range = (maxoutbytes – minoutbytes + 1);
+          Outputlen = minoutbytes + (Rightmost_Output_bits mod Range);
+          Customization = BitsToString(T[i][0] || Rightmost_Output_bits);
+      }
+      Output[j] = Output[1000];
+      OUTPUT: Outputlen[j], Output[j]
+  }
+}
+----
+
+=== Test Coverage
+
+The tests described in this document have the intention of ensuring an implementation is conformant to <<SP800-185>>.
+
+[[xof-coverage]]
+==== XOF Requirements Covered
+
+In TBD.
+
+[[xof-not-coverage]]
+==== XOF Requirements Not Covered
+
+Some requirements in the outlined specification are not easily tested. Often they are not ideal for black-box testing such as the ACVP. In TBD.

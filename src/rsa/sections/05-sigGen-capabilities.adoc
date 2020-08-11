@@ -1,0 +1,176 @@
+[[rsa_siggen_capabilities]]
+=== RSA SigGen Mode Capabilities
+
+The RSA / SigGen / * mode capabilities are advertised as JSON objects within the 'capabilities' array as part of the 'capability_exchange' element of the ACVP JSON registration message. See the ACVP specification for details on the registration message.
+
+Each RSA SigGen mode capability is advertised as a self-contained JSON object consisting of the algorithm, mode, and capabilities array. The capabilities array may contain multiple elements, each pertaining to a sigType that is supported by the client for the RSA mode being advertised.
+
+The following table defines the capabilities that may be advertised by the ACVP compliant crypto modules.
+
+[[mode_SigGenCap_FIPS186-4]]
+==== RSA SigGen 1.0 Capabilities Table
+
+The following RSA / SigGen / 1.0 capabilities *MAY* be advertised by the ACVP compliant crypto module:
+
+[[SigGenRSAFIPS186-4]]
+.Supported RSA SigGen 1.0 JSON Values
+|===
+| JSON value | Description | JSON type | Valid values
+
+| sigType | supported RSA signature types  - see <<FIPS186-4>>, Section 5 | string | one of {"ansx9.31", "pkcs1v1.5", "pss"}
+| properties | RSA signature generation parameters  - see <<FIPS186-4>>, Section 5 | array | modulo, hashAlg, and saltLen (when sigType is "pss")
+| modulo | supported RSA modulo for signature generation - see <<FIPS186-4>>, Section 5 | integer | any one of the supported modulo sizes {2048, 3072, 4096}
+| hashPair | supported hash algorithms and optional salt length for signature generation for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | an array of objects containing a hashAlg and an optional saltLen
+| hashAlg | supported hash algorithms for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512"}
+| saltLen | supported salt lengths for PSS signature generation - see <<FIPS186-4>>, Section 5.5 | integer | See the note below
+|===
+
+NOTE: The 'saltLen' property for each hash algorithm *SHALL* only be present of the 'sigType' is "pss". The values allowed in PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.
+
+The following is an example of a registration for RSA / SigGen / 1.0
+
+[source, json]
+----
+{
+    "algorithm": "RSA",
+    "mode": "sigGen",
+    "revision": "1.0",
+    "prereqVals": [{"algorithm": "DRBG", "valValue": "same"}, {"algorithm": "SHA", "valValue": "same"}],
+    "conformances": [
+        "SP800-106"
+    ],
+    "capabilities" :
+    [
+        {
+            "sigType" : "ansx9.31",
+            "properties" :
+            [
+                {
+                    "modulo" : 2048,
+                    "hashPair" : [
+                        {
+                            "hashAlg" : "SHA2-224"
+                        }
+                    ]
+                },
+                {
+                    "modulo" : 3072,
+                    "hashPair" : [
+                        {
+                            "hashAlg" : "SHA2-256"
+                        },
+                        {
+                            "hashAlg" : "SHA2-512"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "sigType" : "pkcs1v1.5",
+            "properties" :
+            [
+                {
+                    "modulo" : 4096,
+                    "hashPair" : [
+                        {
+                            "hashAlg" : "SHA2-224"
+                        },
+                        {
+                            "hashAlg" : "SHA2-256"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "sigType" : "pss",
+            "properties" :
+            [
+                {
+                    "modulo" : 3072,
+                    "hashPair" : [
+                        {
+                            "hashAlg" : "SHA2-224",
+                            "saltLen" : 28
+                        },
+                        {
+                            "hashAlg" : "SHA2-256",
+                            "saltLen" : 32
+                        },
+                        {
+                            "hashAlg" : "SHA2-512",
+                            "saltLen" : 64
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+----
+
+[[mode_SigGenCap_FIPS186-5]]
+==== RSA SigGen FIPS186-5 Capabilities Table
+
+The following RSA / SigGen / FIPS186-5 capabilities *MAY* be advertised by the ACVP compliant crypto module:
+
+[[SigGenRSAFIPS186-5]]
+.Supported RSA SigGen FIPS186-5 JSON Values
+|===
+| JSON value | Description | JSON type | Valid values
+
+| sigType | supported RSA signature types  - see <<FIPS186-5>>, Section 5 | string | one of {"pkcs1v1.5", "pss"}
+| properties | RSA signature generation parameters  - see <<FIPS186-5>>, Section 5 | array | modulo, hashAlg, and saltLen (when sigType is "pss")
+| modulo | supported RSA modulo for signature generation - see <<FIPS186-5>>, Section 5 | integer | any one of the supported modulo sizes {2048, 3072, 4096}
+| maskFunction | the mask function used, only valid for PSS | array | any non-empty subset of {"mgf1", "shake-128", "shake-256"}
+| hashPair | supported hash algorithms and optional salt length for signature generation for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | an array of objects containing a hashAlg and an optional saltLen
+| hashAlg | supported hash algorithms for this sigType and modulo - see <<SP800-131A>>, Section 9 | array | any non-empty subset of {"SHA-1", "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512"}
+| saltLen | supported salt lengths for PSS signature generation - see <<FIPS186-5>>, Section 5.5 | integer | See the note below
+|===
+
+NOTE: The 'saltLen' property for each hash algorithm *SHALL* only be present of the 'sigType' is "pss". The values allowed in PSS signature generation is between 0 and the length of the corresponding hash function output block (in bytes), the end points included.
+
+For an example of the RSA / SigGen / FIPS186-5 registration see the following abbreviated example for PSS
+
+[source, json]
+----
+{
+    "algorithm": "RSA",
+    "mode": "sigGen",
+    "revision": "FIPS186-5",
+    "prereqVals": [{"algorithm": "DRBG", "valValue": "same"}, {"algorithm": "SHA", "valValue": "same"}],
+    "conformances": [
+        "SP800-106"
+    ],
+    "capabilities" :
+    [
+        {
+            "sigType" : "pss",
+            "properties" :
+            [
+                {
+                    "modulo" : 3072,
+                    "maskFunction": [
+                        "SHAKE-128", "MGF1"
+                    ]
+                    "hashPair" : [
+                        {
+                            "hashAlg" : "SHA2-224",
+                            "saltLen" : 28
+                        },
+                        {
+                            "hashAlg" : "SHA2-256",
+                            "saltLen" : 32
+                        },
+                        {
+                            "hashAlg" : "SHA2-512",
+                            "saltLen" : 64
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+----

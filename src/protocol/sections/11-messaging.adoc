@@ -1,0 +1,1690 @@
+
+== Messaging and Workflow
+
+=== Product Registration/Capabilities Exchange
+
+The product registration will utilize the URI resources  <<uriResources>> to register and provide cryptographic capabilities.  This exchange will consist of several message exchanges and will provide a detailed list of cryptographic algorithms and their options to be tested during the testSession, see <<xml_msgFlows>>, retrieval of test vectors, submission of test responses, determining test result, and a certification step to associate the product and tested environment information with the completed test. A set URI resources are also available to retrieve and manage the available metadata such as companay name, primary contact, product descriptions, and operational environment descriptions.
+
+=== Test Exchange
+
+The test exchange consists of the ACV client requesting a particular vectorSet associated with the testSession. The server responds with the vectorSet. The client *MAY* retreive and process the vectorSets in order and *MAY* retreive a vectorSet and immediately return results or request all of the vectorSets and return results at a later time. The client repeats this process until all of the vectorSets in the testSession list have been processed. Once a vectorSet result has been POSTed to the server the client may request success/failure results from the server at any time, however if vectorSets have not been completed the overall status will be incomplete. A minimal message flow is described below <<xml_msgFlows>>.
+
+[[jwtToken]]
+=== JSON Web Token (JWT)
+
+JSON Web Token is described in <<RFC7519>> and is used as an authorization mechanism for gaining access to different resources.
+
+[[jwt_example]]
+[align=center,alt=,type=]
+An example JWT
+
+....
+{
+"alg" : "none"
+}
+   {
+     "iss" : "nist.gov",
+     "exp" : 1426420800,
+     "company" : "MyCompany",
+     "jti" : 0987654321,
+     "pkey" : "cc74f56acdba635079383a03941d68db55c7b3c2f (truncated)"
+  }
+  {
+  Empty octet string (since alg is none).
+  }
+
+....
+
+
+The JWT can be secured if desired using the header encryption "alg" value defined to HS256(HMAC-SHA256) or one of the other secure values. Key agreement would follow RFC7518.
+
+The first four claims are required, however "pkey" is an optional private claim used to pass the key used for encrypting the database at the server. Enabling this option is discussed further in <<testSessions_post>>
+
+[[jwtAuthFlows]]
+==== Authorization flows with JWT
+
+JSON Web Token is described in <<RFC7519>> and is used as an authorization mechanism for gaining access to different resources.
+
+In order to access any resource which requires authorization a client must supply the JWT
+as an `Authorization` header value as a `Bearer` token. An example header value is:
+
+[align=center,alt=,type=]
+....
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c (truncated)"
+
+....
+
+[[xml_figureFlows]]
+[align=center,alt=,type=]
+Workflow authorization flows. All exchanges shown are over HTTP.
+
+....
+         +--------+---------------------------------+------+--------+
+         | Client |                                 |Server|  Notes |
+         +--------+---------------------------------+------+--------+
+         |        |POST to /login or similar with   |      |        |
+         |        |appropriate credentials          |      |        |
+         |        |-------------------------------->|      |        |
+         |        |                                 |      |        |
+         |        |receive the access token         |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
+         |        |                                 |      |        |
+
+....
+
+
+
+[[jwtExpire]]
+==== JWT Expiration/Renewal
+
+The JWT access tokens received from either the /login server endpoint *SHALL* be set to expire after a
+pre-defined period. The specific length of the expiration period is out of scope for this specification.
+However, the expiration period length impacts both the security and protocol overhead. Longer expiration
+periods reduce the overhead but increase the window for attacks. Attempting to access a service with an
+expired JWT *SHALL* result in a "401 Unauthorized" HTTP status code.
+
+A client may renew an expired JWT access token using the mechanism shown in <<xml_figureRenewalFlows>>below.
+
+[[xml_figureRenewalFlows]]
+[align=center,alt=,type=]
+JWT access token renewal flows. All exchanges shown are over HTTP.
+
+....
+         +--------+---------------------------------+------+--------+
+         | Client |                                 |Server|  Notes |
+         +--------+---------------------------------+------+--------+
+         |        |POST to /login or similar with   |      |        |
+         |        |appropriate credentials          |      |        |
+         |        |and expired JWT access token     |      |        |
+         |        |-------------------------------->|      |session |
+         |        |                                 |      |or      |
+         |        |                                 |      |login   |
+         |        |                                 |      |JWT     |
+         |        |receive the renewed access token |      |        |
+         |        |<-  -  -  -  -  -  -  -  -  -  - |      |        |
+
+....
+
+[[flow]]
+=== Message Flow
+
+An example minimum message flow between client and server after receiving the JWT is seen in the figure
+below.
+
+[[xml_msgFlows]]
+[align=center,alt=,type=]
+An example minimal message flow. All exchanges shown are over HTTP.
+
+....
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
+   |        |POST testSessions                  |      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |   Submit   |
+   |        |testSessions URL                   |      |Registration|
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/testSessions/1/vectorSets/1       |      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |  Retrieve  |
+   |        |send test vectors for vsId 1       |      |  Request   |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |POST results                       |      |   Submit   |
+   |        |---------------------------------->|      |  Response  |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |testSessions/1/vectorSets/1/results|      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |  Retrieve  |
+   |        |receive results                    |      |Disposition |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |PUT                                |      |            |
+   |        |/testSessions/1                    |      |            |
+   |        |---------------------------------->|      |  Certify   |
+   |        |                                   |      |Test Session|
+   |        |receive request identifier         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/1                        |      |            |
+   |        |---------------------------------->|      |  Retrieve  |
+   |        |                                   |      |  Request   |
+   |        |receive validation identifier      |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+....
+
+[[metadata_msgFlow]]
+[align=left,alt=,type=]
+Metadata creation and update example. The list of available metadata endpoints can be found in <<uriResources>>.
+
+....
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
+   |        |POST /vendors                      |      | Create     |
+   |        |---------------------------------->|      | Metadata   |
+   |        |                                   |      |            |
+   |        |receive request identifier         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/1                        |      | Retrieve   |
+   |        |---------------------------------->|      | Request    |
+   |        |                                   |      |            |
+   |        |receive vendor URL                 |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |PUT /vendors                       |      | Update     |
+   |        |---------------------------------->|      | Metadata   |
+   |        |                                   |      |            |
+   |        |receive request identifier         |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |GET                                |      |            |
+   |        |/requests/2                        |      |  Retrieve  |
+   |        |---------------------------------->|      |  Request   |
+   |        |                                   |      |            |
+   |        |receive vendor URL                 |      |  updated   |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |  or new    |
+....
+
+[[large_msgFlow]]
+[align=left,alt=,type=]
+In the event a submission response exceeds server defined thresholds the following workflow will need to be followed in order to submit the test result. See <<largeSubmission>> for more information.
+
+....
+   +--------+-----------------------------------+------+------------+
+   | Client |                                   |Server|  Notes     |
+   +--------+-----------------------------------+------+------------+
+   |        |POST                               |      |            |
+   |        |/large                             |      |            |
+   |        |---------------------------------->|      |            |
+   |        |                                   |      |            |
+   |        |receive large submission URI       |      |            |
+   |        |and JWT access token               |      |            |
+   |        |<-  -  -  -  -  -  -  -  -  -  -  -|      |            |
+   |        |                                   |      |            |
+   |        |POST                               |      |<uri>       |
+   |        |/<uri>                             |      |received    |
+   |        |---------------------------------->|      |from prior  |
+   |        |MUST use specific JWT              |      |step        |
+....
+
+[[paging]]
+=== Paging
+
+Some resource operations require paging in order to avoid returning large amounts of data. Each operation that uses paging will indicate that uses paging and what the value for each element will be within the section describing that operation. All paged responses *MUST* follow the format described in <<paging_response>>. Conversely, clients may navigate pages using the paging parameters described in <<paging_parameters>>. Server implementations *SHOULD* impose limitations on the page size limit based on resource constraints.
+
+[[paging_parameters]]
+==== Parameters
+
+A Server *MUST* accept requests without paging parameters. If not all results are returned, the response *MUST*
+indicate that not all of the results were provided using the `incomplete` property of a paged response described in <<paging_response>>. The query parameters clients *MUST* use to specify paging are described below:
+
+* *limit* - `number`, the maximum number of entries to return. Server implementations *MUST* allow requests without a provided value, but the default value is a choice for server implementations.
+* *offset* - `number`, the offset into the list of entries, *MUST* default to `0` if not provided.
+
+GET /acvp/v1/vendors?offset=20&limit=20 HTTP/1.1
+
+[[paging_response]]
+==== Response
+
+A paged response has the following properties:
+
+* *totalCount* - `number`, the total number of resources available to return
+* *incomplete* - `boolean`, true if more resources are avaiable than what is returned in the response
+* *links* - `object`, links to use when navigating the pages
+** *first* - `string`, a link to the first page in the result set
+** *next* - `string`, a link to the next page in the result set, `null` if no next page is available
+** *prev* - `string`, a link to the previous page in the result set, `null` if no previous page is available
+** *last* - `string`, a link to the last page in the result set
+* *data* - `array`, contains an array of data appropriate to the resource requested
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "totalCount" : 22007,
+        "incomplete" : true,
+        "links" : {
+            "first" : "/acvp/v1/<resource>?offset=0&limit=20",
+            "next" : "/acvp/v1/<resource>?offset=20&limit=20",
+            "prev" : null,
+            "last" : "/acvp/v1/<resource>?offset=22000&limit=20"
+        },
+        "data" : [ <resource response> ]
+    }
+]
+
+....
+
+[[query_parameters]]
+=== Query Parameters
+
+Some of the resource listing operations allow for query parameters to be provided to filter out the returned values. Each resource will list what properties and operations are available but the general format of the query parameter string is consistent across all resources. The format allows for the specification of complex filters with the concept of groups, where all elements in the same group *MUST* be AND'ed together and different groups are OR'ed together. The URL including the parameter values *MUST* conform to <<RFC3986>> and *MUST* use UTF-8 character encoding.
+
+[align=center,alt=,type=]
+General format of a query parameter element.
+
+....
+<property>[<index>]=<operation>:<value>
+
+....
+
+* *property* - is the property to be specified
+* *index* - is an arbitrary group index, elements with same group index are AND'ed together and elements with different indices are OR'ed togther. `index` *MUST* be between 0 and 99 inclusive.
+* *operation* - is an operation on a property and a value. Not all operations require a value, and not all properties will permit every operation. Available operations are:
+** *eq* - filter based on property equal to the value
+** *ne* - filter based on the property not equal to the value
+** *gt* - filter based on the property greater than the value
+** *ge* - filter based on the property greater than or equal to the value
+** *lt* - filter based on the property less than the value
+** *le* - filter based on the property less than or equal to the value
+** *contains* - filter based on the property containing the value
+** *start* - filter based on the property starting with the value
+** *end* - filter based on the property ending with the value
+* *value* - the value to filter on, it *MAY* be constrained based on the property
+
+[align=center,alt=,type=]
+Example 1
+
+....
+/resource?property1[0]=eq:foo&property2[0]=eq:foo
+&property1[1]=eq:test&property2[1]=ne:bar
+
+....
+
+For the example above the results returned would include resources that have: `property1` equal to `foo` and `property2` equal to `foo` or resources that have `property1` equal to `test` and `property2` not equal to `bar`.
+
+[align=center,alt=,type=]
+Example 2 based on <<vendors_get>>.
+
+....
+
+/vendors?name[0]=contains:acme&name[1]=contains:test
+
+....
+
+For the example above the vendor results returned would include resources that have a `name` property value that contains either `acme` or `test`.
+
+[[requests]]
+=== Requests
+
+Some resource operations make a request to modify or create data. To facilitate an out-of-band approval step, where data can be inspected to insure it meets the business requirements of the validation authority which operates the server, the operations will return a `request` url that can be used to obtain information about the status and disposition of the requested modification. Whether or how an authority implements an approval step is outside the scope of this specification.
+
+A request resource is not externally updateable, but *SHOULD* update based on server processing. The properties for a request response:
+
+* *url* - `string`, identifier for this resource
+* *status* - `string`, one of:
+** *initial* - initial state of the request, created
+** *processing* - server is processing the request
+** *approved* - the requested operation was successfully processed
+** *rejected* - the requested operation was rejected and no change was made
+* *message* - `string`, a placeholder for any message describing a rejection
+* *approvedUrl* - `string`, a link to the resource which was created or modified as a result of the requested operation
+
+[[requests_get]]
+==== Request Listing
+
+*GET /requests*
+
+Returns a paged listing of requests for the current user. Each element in the `data` array is a `request object` as described in <<request_get>>. See also <<paging_response>> for a description of a paged response.
+
+[[request_get]]
+==== Vendor Information
+
+*GET /requests/{requestId}*
+
+Retrieve Information for a specific request
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "url": "/acvp/v1/requests/2",
+        "status": "approved",
+        "approvedUrl" : "/acvp/v1/vendors/2"
+    }
+]
+
+....
+
+
+[[vendors]]
+=== Vendor Resources
+
+The available properties for vendor resources are:
+
+* *url* - `string`, identifier for the vendor resource within which this property is located
+* *name* - `string`
+* *parentUrl* - a parent vendor identifier, allows for multiple divisions or business units to share a parent company identifier
+* *website* - `string`
+* *emails* - array of `string`
+* *phoneNumbers* - array of phone objects,
+** *number* - `string`
+** *type* - `string`, one of (fax, voice)
+* *contactsUrl* - `string`, identifier for the list of person resources associated with this vendor
+* *addresses* - an address object,
+** *url* - `string`, identifier for the address resource
+** *street1* - `string`
+** *street2* - `string`
+** *street3* - `string`
+** *locality* - `string`
+** *region* - `string`
+** *country* - `string`
+** *postalCode* - `string`
+
+[[vendors_get]]
+==== Vendor Listing
+
+*GET /vendors*
+
+Returns a paged listing of vendors. Each element in the `data` array is a `vendor object` as described in <<vendor_get>>. See also <<paging_response>> for a description of a paged response.
+
+Available <<query_parameters>>:
+
+* *name*: `eq`, `start`, `end`, `contains`
+* *website*: `eq`, `start`, `end`, `contains`
+* *email*: `eq`, `start`, `end`, `contains`
+* *phoneNumber*: `eq`, `start`, `end`, `contains`
+
+[[vendors_post]]
+==== Create a New Vendor
+
+*POST /vendors*
+
+Request the creation of a new Vendor.
+
+===== Request
+
+`name` is required and all other properties are OPTIONAL.
+`url` is not allowed.
+`contactUrl` is not allowed.
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+      "name": "Acme, LLC",
+      "website": "www.acme.acme",
+      "emails" : [ "inquiry@acme.acme" ],
+      "phoneNumbers" : [{
+          "number" : "555-555-1234",
+          "type" : "voice"
+      }],
+      "addresses" : [{
+          "street1" : "123 Main Street",
+          "locality" : "Any Town",
+          "region" : "AnyState",
+          "country" : "USA",
+          "postalCode" : "123456"
+      }]
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the vendor resource which was created. The url of any resources created incidental to the creation of the vendor resource would be available through the <<vendor_get>> operation.
+
+Reply is a request response as described in <<requests>>.
+
+[[vendor_get]]
+==== Vendor Information
+
+*GET /vendors/{vendorId}*
+
+Retrieve Information for a specific vendor
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "url": "/acvp/v1/vendors/2",
+        "name": "Acme, LLC",
+        "website": "www.acme.acme",
+        "emails" : [ "inquiry@acme.acme" ],
+        "phoneNumbers" : [{
+          "number" : "555-555-1234",
+          "type" : "voice"
+        }],
+        "contactsUrl": "/acvp/v1/vendors/2/contacts",
+        "addresses" : [{
+            "url" : "/acvp/v1/vendors/1/addresses/4",
+            "street1" : "123 Main Street",
+            "locality" : "Any Town",
+            "region" : "AnyState",
+            "country" : "USA",
+            "postalCode" : "123456"
+        }]
+    }
+]
+
+....
+
+[[vendor_put]]
+==== Update an existing Vendor
+
+*PUT /vendors/{vendorId}*
+
+Update a vendor
+
+The `url` property is not updateable.
+
+===== Request
+
+Can be any subset of the updateable properties. If a property is not included its value is not changed. A `null` value for a property indicates the value should be removed.
+
+When updating the addresses array, the `url` of every address resource to be kept *MUST* be included. Any missing addresses will be removed and any new addresses will be created.
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "name": "Acme, LLC",
+        "website": "www.acme.acme",
+        "emails" : [ "inquiry@acme.acme" ],
+        "addresses" : [{
+                "url" : "/acvp/v1/vendors/2/addresses/4",
+                "street1" : "123 Main Street",
+                "locality" : "Any Town",
+                "region" : "AnyState",
+                "country" : "USA",
+                "postalCode" : "123456"
+        }]
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the vendor resource which was updated. A server implementation *MAY* create a new resource instead of updating the existing resource.
+
+[[vendor_delete]]
+==== Remove a Vendor
+
+*DELETE /vendors/{vendorId}*
+
+Request to delete a specific vendor. Reply is a request response as described in <<requests>>.
+
+The server is not required to remove the resource but *MUST* return a `rejection`value for the `status` property if the resource will not be removed.
+
+[[contacts_get]]
+==== Contact Listing for a Vendor
+
+*GET /vendors/{vendorId}/contacts*
+
+Returns a paged listing of persons specific to the vendor. Each element in the `data` array is a `person object` as described in <<person_get>>. See also <<paging_response>> for a description of a paged response.
+
+[[addresses]]
+=== Address Resources
+
+The available properties for address resources are:
+
+* *url* - `string`, identifier for this resource
+* *street1* - `string`
+* *street2* - `string`
+* *street3* - `string`
+* *locality* - `string`
+* *region* - `string`
+* *country* - `string`
+* *postalCode* - `string`
+
+[[addresses_get]]
+==== Address Listing
+
+*GET /vendors/{vendorId}/addresses*
+
+Returns a paged listing of addresses for the vendor. Each element in the `data` array is an `address object` as described in <<address_get>>. See also <<paging_response>> for a description of a paged response.
+
+The addresses returned are equivalent to the address array returned in <<vendor_get>> for the same vendor resource.
+
+[[address_get]]
+==== Address Information
+
+*GET /vendors/{vendorId}/addresses/{addressId}*
+
+Retrieve Information for a specific address
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "url" : "/vendors/2/addresses/4"
+        "street1" : "123 Main Street",
+        "locality" : "Any Town",
+        "region" : "AnyState",
+        "country" : "USA",
+        "postalCode" : "123456"
+    }
+]
+
+....
+
+[[persons]]
+=== Person Resources
+
+The available properties for person resources are:
+
+* *url* - `string`, identifier for this resource
+* *fullName* - `string`
+* *vendorUrl* - `string`, identifier for the vendor resource this person is associated with
+* *emails* - array of `string`
+* *phoneNumbers* - array of phone objects,
+** *number* - `string`
+** *type* - `string`, one of (fax, voice)
+
+The email and phone number values are specific to the person resource and are independent of the
+equivalent information in the vendor resource.
+
+[[persons_get]]
+==== Person Listing
+
+*GET /persons*
+
+Returns a paged listing of persons. Each element in the `data` array is a `person object` as described in <<person_get>>. See also <<paging_response>> for a description of a paged response.
+
+Available <<query_parameters>>:
+
+* *fullName*: `eq`, `start`, `end`, `contains`
+* *email*: `eq`, `start`, `end`, `contains`
+* *phoneNumber*: `eq`, `start`, `end`, `contains`
+* *vendorId*: `eq`, `ne`, `lt`, `le`, `gt`, `ge`
+
+[[persons_post]]
+==== Create a New Person
+
+*POST /persons*
+
+Request the creation of a new Person.
+
+===== Request
+
+`url` is not allowed.
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+      "fullName": "Jane Smith",
+      "vendorUrl" : "/acvp/v1/vendors/2"
+      "emails": ["jane.smith@acme.acme"],
+      "phoneNumbers" : [
+          {
+              "number": "555-555-0001",
+              "type" : "fax"
+          }, {
+              "number": "555-555-0002",
+              "type" : "voice"
+          }
+      ]
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the person resource which was created.
+
+[[person_get]]
+==== Person Information
+
+*GET /persons/{personId}*
+
+Retrieve Information for a specific person
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+      "url": "/acvp/v1/persons/4",
+      "fullName": "Jane Smith",
+      "vendorUrl" : "/acvp/v1/vendors/2"
+      "emails": ["jane.smith@acme.acme"],
+      "phoneNumbers" : [
+          {
+              "number": "555-555-0001",
+              "type" : "fax"
+          }, {
+              "number": "555-555-0002",
+              "type" : "voice"
+          }
+      ]
+    }
+]
+
+....
+
+[[person_put]]
+==== Update an existing Person
+
+*PUT /persons/{personId}*
+
+Update a person
+
+The `url` property is not updateable.
+
+===== Request
+
+Can be any subset of the updateable properties. If a property is not included its value is not changed. A `null` value for a property indicates the value should be removed.
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+      "fullName": "Jane Smith",
+      "emails": ["jane.smith@acme.acme"],
+      "phoneNumbers" : [
+          {
+              "number": "555-555-0001",
+              "type" : "fax"
+          }, {
+              "number": "555-555-0002",
+              "type" : "voice"
+          }
+      ]
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the person resource which was updated. A server implementation *MAY* create a new resource instead of updating the existing resource.
+
+[[person_delete]]
+==== Remove a Person
+
+*DELETE /persons/{personId}*
+
+Request to delete a specific person. Reply is a request response as described in <<requests>>.
+
+The server is not required to remove the resource but *MUST* return a `rejection` value for the `status` property if the resource will not be removed.
+
+[[modules]]
+=== Modules
+
+The available properties for module resources are:
+
+* *url* - `string`, identifier for this resource
+* *name* - `string`
+* *version* - `string`
+* *type* - `string`, valid values are:
+** `Software` - software-based modules
+** `Hardware` - hardware-based modules
+** `Firmware` - firmware-based modules
+* *website* - `string`
+* *vendorUrl* - `string`,  identifier for a <<vendors>>
+* *addressUrl* - `string`, identifier for an <<addresses>>
+* *contactUrls* - `string array`, array of identifiers for a <<persons>>
+* *description* - `string`, a description of the implementation
+
+[[modules_get]]
+==== List Modules
+
+*GET /modules*
+
+Returns a paged listing of modules. Each element in the `data` array is a `module object` as described in <<module_get>>. See also <<paging_response>> for a description of a paged response.
+
+Available <<query_parameters>>:
+
+* *name*: `eq`, `start`, `end`, `contains`
+* *version*: `eq`, `start`, `end`, `contains`
+* *website*: `eq`,  `start`, `end`, `contains`
+* *type*: `eq`, `ne`
+* *vendorId*: `eq`, `ne`, `lt`, `le`, `gt`, `ge`
+* *description*: `eq`, `start`, `end`, `contains`
+
+[[modules_post]]
+==== Register a new Module
+
+*POST /modules*
+
+Register a new module.
+
+===== Request
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "name": "ACME ACV Test Module",
+        "version": "3.0",
+        "type": "Software",
+        "vendorUrl": "/acvp/v1/vendors/2",
+        "addressUrl": "/acvp/v1/vendors/2/addresses/4",
+        "contactUrls": ["/acvp/v1/persons/1" ],
+        "description" : "ACME module with more"
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the module resource which was created. The url of any resources created incidental to the creation of the module resource would be available through the <<module_get>> operation.
+
+[[module_get]]
+==== Retrieve information for a Module
+
+*GET /modules/{moduleId}*
+
+Returns information about a specific module.
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "url": "/acvp/v1/modules/2",
+        "name": "ACME ACV Test Module",
+        "version": "2.0",
+        "type": "Software",
+        "website" : "www.acme.acme"
+        "vendorUrl": "/acvp/v1/vendors/2",
+        "addressUrl": "/acvp/v1/vendors/2/addresses/4",
+        "contactUrls": ["/acvp/v1/persons/1" ],
+        "description": "ACME module with features."
+    }
+]
+
+....
+
+[[module_put]]
+==== Update a Module
+
+*PUT /modules/{moduleId}*
+
+Update an existing module.
+
+It may not be possible to update all properties of a module once the module has been associated with a test session.
+
+===== Request
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "description" : "ACME module with more"
+    }
+]
+
+....
+
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the module resource which was updated. A server implementation *MAY* create a new resource instead of updating the existing resource.
+
+[[module_delete]]
+==== Delete a Module
+
+*DELETE /modules/{moduleId}*
+
+Request to delete a specific module. Reply is a request response as described in <<requests>>.
+
+The server is not required to remove the resource but *MUST* return a `rejection` value for the `status` property if the resource will not be removed.
+
+[[oes]]
+=== Operational Environments (OEs)
+
+The available properties for operational environment resources are:
+
+* *url* - `string`, identifier for this resource
+* *name* - `string`
+* *dependencyUrls* - an array of `string` which identify the <<dependencies>> which comprise this OE.
+* *dependencies* - an array of <<dependencies>>s which comprise this OE. Only valid on update or
+create and *MAY* be used in combination with the `dependencyUrls` property.
+
+[[oes_get]]
+==== List Operational Environments
+
+*GET /oes*
+
+Returns a paged listing of available operational environments. Each element in the `data` array is a `operational environment object` as described in <<oe_get>>. See also <<paging_response>> for a description of a paged response.
+
+Available <<query_parameters>>:
+
+* *name*: `eq`, `start`, `end`, `contains`
+
+[[oes_post]]
+==== Create a new Operational Environment
+
+*POST /oes*
+
+Create a new operational environment.
+
+===== Request
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "name": "Ubuntu Linux 3.1 on AMD 6272 Opteron Processor
+                 with Acme installed",
+        "dependencyUrls": [
+            "/acvp/v1/dependencies/4",
+            "/acvp/v1/dependencies/5",
+            "/acvp/v1/dependencies/7"
+        ]
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the operational environment resource which was created. The url of any resources created incidental to the creation of the operational environment resource would be available through the <<vendor_get>> operation.
+
+[[oe_get]]
+==== Retrieve information for an Operational Environment
+
+*GET /oes/{oeId}*
+
+Returns information about a specific operational environment.
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+  {
+    "acvVersion": "1.0"
+  },
+  {
+    "url": "/acvp/v1/oes/21495",
+    "name": "Test DMC0428 Inline Ubuntu Linux 3.1 on AMD 6272 Opteron Processor with Acme package installed",
+    "dependencies": [
+      {
+        "url": "/acvp/v1/dependencies/23563",
+        "type": "software",
+        "name": "Linux 3.1 DMC0427 Extra",
+        "description": "Testing0427 cpe-2.3:o:ubuntu:linux:04.27"
+      },
+      {
+        "url": "/acvp/v1/dependencies/23564",
+        "type": "software",
+        "name": "Linux 4.3 DMC0428 A1",
+        "description": "Testing0428 A1 cpe-2.3:o:ubuntu:linux:4.3",
+        "cpe": "cpe-2.3:oa1:ubuntu:linux:4.3"
+      },
+      {
+        "url": "/acvp/v1/dependencies/23565",
+        "type": "software",
+        "name": "Linux 4.3 DMC0428 B1",
+        "description": "Testing0428 B1 cpe-2.3:o:ubuntu:linux:4.3",
+        "cpe": "cpe-2.3:ob1:ubuntu:linux:4.3"
+      },
+      {
+        "url": "/acvp/v1/dependencies/23566",
+        "type": "software",
+        "name": "Linux 4.3 DMC0428 C1",
+        "description": "Testing0428 C1 cpe-2.3:o:ubuntu:linux:4.3",
+        "cpe": "cpe-2.3:oc1:ubuntu:linux:4.3"
+      }
+    ]
+  }
+]
+
+....
+
+[[oe_put]]
+==== Update an Operational Environment
+
+*PUT /oes/{oeId}*
+
+Update an existing operational environment.
+
+It may not be possible to update all (or any) properties of an operational environment resource once the resource has been associated with a test session.
+
+===== Request
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "name": "Windows 10 on Intel Xeon 5100 Series Processor",
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the operational environment resource which was updated. A server implementation *MAY* create a new resource instead of updating the existing resource.
+
+[[oe_delete]]
+==== Delete an Operational Environment
+
+*DELETE /oes/{oeId}*
+
+Request to delete an operation environment. Reply is a request response as described in <<requests>>.
+
+The server is not required to remove the resource but *MUST* return a `rejection` value for the `status` property if the resource will not be removed.
+
+[[dependencies]]
+=== Dependencies
+
+An operational environment is composed of one or more dependencies which fully characterize and describe the operational environment under which a module was tested. An operational environment *MAY* have many different types of dependencies.
+
+The available properties for dependency resources are:
+
+* *url* - `string`, identifier for this resource
+* *type* - `string`, the type of the dependency, a non-inclusive list of values that *MAY* be allowed are:
+** *os* - operating system
+** *cpu* - Central Processing Unit (CPU) chip
+** *software* - a software dependency
+** *firmware* - a firmware dependency
+* *name* - `string`, a short name of the dependency
+* *description* - `string`, a longer description of the dependency providing any additional detail that may be useful
+* `{varies}` the value of `type` for a dependency *MAY* require or allow for different name/value pairs to be added to a dependency to better describe and define the dependency which in turn describes the operational environment that a module will operate under. The possible name/value pairs for a given value of `type` *MAY* be provided by the response of <<dependencies_properties_get>>, if the server implements this endpoint.
+Otherwise a server *MAY* choose to restrict or not restrict the range of name/value pairs available, but any
+restrictions *MUST* be clearly documented.
+
+[[dependencies_get]]
+==== List Dependencies
+
+*GET /dependencies*
+
+Returns a paged listing of available dependencies. Each element in the `data` array is a `dependency object` as described in <<dependency_get>>. See also <<paging_response>> for a description of a paged response.
+
+Available <<query_parameters>>:
+
+* *name*: `eq`, `start`, `end`, `contains`
+* *type*: `eq`, `start`, `end`, `contains`
+* *description*: `eq`, `start`, `end`, `contains`
+
+[[dependencies_post]]
+==== Register a new Dependency
+
+*POST /dependencies*
+
+Register a new dependency.
+
+===== Request
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "type": "software",
+        "name": "Linux 3.1",
+        "description" : "Ubuntu Linux Distribution 3.1",
+        "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the dependency resource which was created.
+
+[[dependencies_properties_get]]
+==== List Dependency Properties
+
+////
+ -- This section still needs plenty of work to iron it out.
+////
+
+(Optional) *GET /dependencies/properties*
+
+Returns a <<paging>> list of available dependency properties.
+
+An array of property objects is returned with the following properties:
+
+* *name* - `string`
+* *dataType* - `string`
+* *validTypes* - an array of `string` where each element corresponds to a dependency type value that this property may be used with.
+* *description* - `string`
+
+===== Example Dependency Property Elements
+
+[align=center,alt=,type=]
+....
+    {
+       "name": "swid",
+       "dataType": "string",
+       "validTypes": ["software"],
+       "description": "A Software identification (SWID) tag as
+        described in ISO/IEC 19770-2:2015. NIST IR 8060,
+        https://csrc.nist.gov/publications/detail/nistir/8060/final,
+        provides guidance on creating and maintaining SWID tags."
+    },
+    {
+       "name": "cpe",
+       "dataType": "string",
+       "validTypes": [
+           "software",
+           "processor"
+       ],
+       "description": "A Common Platform Enumeration (CPE)
+        formatted name according to Version 2.3 of the CPE
+        Naming Specification found in NISTIR 7695,
+        https://csrc.nist.gov/publications/detail/nistir/7695/final."
+    },
+    {
+       "name": "manufacturer",
+       "dataType": "string",
+       "validTypes": ["processor"],
+       "description": "The name of the manufacturer of
+                       the processor dependency."
+    },
+    {
+       "name": "family",
+       "dataType": "string",
+       "validTypes": ["processor"],
+       "description": "The name of the family of the processor."
+    },
+    {
+       "name": "series",
+       "dataType": "string",
+       "validTypes": ["processor"],
+       "description": "The name of the series of the processor."
+    }
+
+....
+
+[[dependency_get]]
+==== Retrieve information for a Dependency
+
+*GET /dependencies/{dependencyId}*
+
+Returns information about a specific dependency.
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "type": "software",
+        "name": "Linux 3.1",
+        "description" : "Ubuntu Linux Distribution 3.1",
+        "cpe": "cpe-2.3:o:ubuntu:linux:3.1"
+    }
+]
+
+....
+
+[[dependency_put]]
+==== Update a Dependency
+
+*PUT /dependencies/{dependencyId}*
+
+Update an existing dependency.
+
+It may not be possible to update all (or any) properties of a dependency resource once the resource has been associated with an operational environment.
+
+===== Request
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "name": "Linux 3.1.0",
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the dependency resource which was updated. A server implementation *MAY* create a new resource instead of updating the existing resource.
+
+[[dependency_delete]]
+==== Delete a Dependency
+
+*DELETE /dependencies/{dependencyId}*
+
+Request to delete a dependency. Reply is a request response as described in <<requests>>.
+
+The server is not required to remove the resource but *MUST* return a `rejection` value for the `status` property if the resource will not be removed.
+
+[[algorithms]]
+=== Algorithms
+
+The Algorithm resources are informational only.
+////
+ -- Do we want to provide guidance on standardizing the output?
+////
+
+[[algorithms_get]]
+==== Algorithms Listing
+
+*GET /algorithms*
+
+Returns a list of available algorithms on the server.
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {"algorithms": [
+        {
+            "url": "/acvp/v1/algorithms/2",
+            "name": "AES",
+            "mode": "GCM",
+            "versions": [
+                <acvp-version>,
+                <acvp-version>
+            ]
+        },
+        {
+            "url": "/acvp/v1/algorithms/3",
+            "name": "AES",
+            "mode": "ECB",
+            "versions": [
+                <acvp-version>
+            ]
+        }
+    ]}
+]
+
+....
+
+[[algorithm_get]]
+==== Algorithm Information
+
+*GET /algorithms/{algorithmId}*
+
+Retrieve Information for about a specific algorithm.
+
+===== Response
+
+Response may vary from server depending on internal representation.
+
+////
+ -- Is this ok? Or do we want to standardize?
+////
+
+[[testSessions]]
+=== Test Sessions
+
+The available properties for test session resources are:
+
+* *url* - `string`, identifier for this resource
+* *acvpVersion* - `string`, version of ACV protocol used to created the test session.
+* *createdOn* - <<dateType>>
+* *expiresOn* - <<dateType>>
+* *encryptAtRest* - `boolean`
+* *vectorSetsUrl* - `string`, resource for all of the vector sets
+* *publishable*  - `boolean`, indicates whether this test session may be submitted for validation
+* *passed* - `boolean`, indicates whether all of the vector set tests have passed
+
+////
+ -- disposition for consistency?
+////
+
+* *isSample* - `boolean`, if true <<vectorSet_expected_get>> will return expected result values. As well, Test Vector Sets *MAY* contain fewer Test Cases for quicker generation and verification.
+
+[[testSessions_get]]
+==== Test Session Listing (Current User)
+
+*GET /testSessions*
+
+This is an OPTIONAL operation.
+
+Returns a paged listing of test sessions for the current user. Each element in the `data` array is a `test session object` as described in <<testSession_get>>. See also <<paging_response>> for a description of a paged response.
+
+[[testSessions_post]]
+==== Create a New Test Session
+
+*POST /testSessions*
+
+Create a new Test Session.
+
+===== Request
+
+`algorithms` is an array of algorithm objects. Each algorithm object has the following available properties:
+
+* *algorithm* - `string`, required
+
+Additional properties for each algorithm are based on the algorithm definition available in each sub-specification.
+
+If not provided `isSample`, and `encryptAtRest` default to `false`.
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+    "isSample" : true,
+    "algorithms": [{
+        "algorithm": "TEST_ALGO_1",
+        "property1": true,
+        "property2": ["operation1", "operation2"]
+    }]}
+]
+
+....
+
+===== Response
+
+`accessToken` is a <<RFC7519>> which *MUST* be supplied as described in <<jwtToken>> in order to access the Test Session.
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "url": "/acvp/v1/testSessions/2",
+        "acvpVersion": <acvp-version>,
+        "createdOn": "2018-05-31T12:03:43Z",
+        "expiresOn": "2018-06-30T12:03:43Z",
+        "encryptAtRest": false,
+        "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+        "publishable": false,
+        "passed": true,
+        "isSample": true,
+        "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6Ik (truncated)"
+    }
+]
+
+....
+
+[[testSession_get]]
+==== Test Session Information
+
+*GET /testSessions/{testSessionId}*
+
+Returns information about the specific Test Session
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "url": "/acvp/v1/testSessions/2",
+        "acvpVersion": <acvp-version>,
+        "createdOn": "2018-05-31T12:03:43Z",
+        "expiresOn": "2018-06-30T12:03:43Z",
+        "encryptAtRest": false,
+        "vectorSetsUrl": "/acvp/v1/testSessions/2/vectorSets",
+        "publishable": false,
+        "passed": true,
+        "isSample": true
+    }
+]
+
+....
+
+[[testSession_put]]
+==== Submit For Validation
+
+*PUT /testSessions/{testSessionId}*
+
+Certify the Test Session for validation.
+
+Associates all of the testing information with the test session. The test session *MUST* be have both `publishable` and `passed` set to `true`.
+
+===== Request
+
+Available properties:
+
+* *moduleUrl* - `string`
+* *module* - a <<modules>>, *MAY* be used instead of `moduleUrl`, but *SHOULD* only be used when the goal is to create a new module resource, otherwise use `moduleUrl` to use an existing module.
+* *oeUrl* - `string`
+* *oe* - an <<oes>>, *MAY* be used instead of `oeUrl`, but *SHOULD* only be used when the goal is to create a new operating environment resource, otherwise use `oeUrl` to use an existing operating environment.
+* *algorithmPrerequisites* - array of algorithm prerequiste objects, optional, for any algorithm that has a prerequisite that was not included in testing, the prerequisite *MUST* be provided by adding an element to this array
+** *algorithm* - `string`, name of the algorithm
+** *mode* - `string`, mode of the algorithm, optional, not all algorithms have a mode
+** *prerequisites* - `string`, array of prerequiste objects
+////
+ -- this needs some additional work
+////
+*** *algorithm* - `string`, required
+*** *validationId* - `string`, required
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "moduleUrl": "/acvp/v1/modules/20",
+        "oeUrl": "/acvp/v1/oes/60",
+        "algorithmPrerequisites": [{
+            "algorithm": "TEST_ALGO_1",
+            "prerequisites": [
+                {
+                    "algorithm": "TEST_ALGO_0",
+                    "validationId": "123456"
+                },
+                {
+                    "algorithm": "TEST_ALGO_0.1",
+                    "validationId": "123456"
+                }
+            ]
+        }]
+    }
+]
+
+....
+
+===== Response
+
+Reply is a request response as described in <<requests>>. If `status` is `approved` the `approvedUrl` returned will be the identifier of the validation resource which was created or updated as a result of this certification.
+
+[[testSession_delete]]
+==== Cancel Test Session
+
+*DELETE /testSessions/{testSessionId}*
+
+Delete a test session.
+
+Marks a test session as being cancelled and may be deleted by the server. Further operations with the test session resource may return 404 HTTP Status.
+
+[[testSession_results_get]]
+==== Request Validation Results
+
+*GET /testSessions/{testSessionId}/results*
+
+Request Validation Results for a Test Session
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+  {"acvVersion": <acvp-version>},
+  {
+    "passed": false,
+    "results": [
+        {
+          "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/1",
+          "status": "incomplete"
+        },
+        {
+           "vectorSetUrl": "/acvp/v1/testSessions/2/vectorSets/2",
+           "status": "passed"
+        }
+    ]
+  }
+]
+
+....
+
+[[vectorSet]]
+=== Vector Sets
+
+The *REQUIRED* properties for vector set resources are:
+
+* *url* - `string`, identifier for this resource
+* *vsId* - `number`
+* *algorithm* - `string`
+* *mode* - `string`
+* *testGroups* - array of test group objects,
+** `{varies}` - based on the values of `algorithm` and `mode` there are zero or more test group properties.
+** *testType* - string defined in algorithm extensions outlining the procedure to complete the corresponding test cases.
+** *tgId* - `number`
+** *tests* - array of test objects,
+*** *tcId* - `number`
+*** `{varies}` - based on the values of `algorithm` and `mode` there are zero or more test properties.
+
+[[vectorSets_get]]
+==== Vectors Set Listing
+
+*GET /testSessions/{testSessionId}/vectorSets*
+
+Returns a list of Vector Sets for the specific Test Session.
+
+The property returned is:
+
+* *vectorSetUrls* - array of `string`
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {"vectorSetUrls": [
+        "/acvp/v1/testSessions/2/vectorSets/1",
+        "/acvp/v1/testSessions/2/vectorSets/2"
+    ]}
+]
+
+....
+
+[[vectorSet_get]]
+==== Vector Set Download
+
+*GET /testSessions/{testSessionId}/vectorSets/{vectorSetId}*
+
+Vector Set download request.
+
+The server will respond with the vector set associated with the vsId for the client to process. The test group content contained in the response will vary depending on the specific sub-specification of the algorithm and testType being tested.
+
+===== Response
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {
+        "vsId": 1,
+        "algorithm": "TEST_ALGO_1",
+        "revision": "1.0.0",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "testGroupProperty1": 1,
+                "testType": "type1",
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "testCaseProperty1": 1,
+                        "testCaseProperty2": "2"
+                    },
+                    {
+                        "tcId": 2,
+                        "testCaseProperty1": 3,
+                        "testCaseProperty2": "4"
+                    }
+                    ... additional tests ...
+                ]
+            },
+            ... additional test groups ...
+            {
+                "tgId": 3,
+                "testGroupProperty1": 2,
+                "testType": "type2",
+                "tests": [{
+                    "tcId": 2139,
+                    "testCaseProperty3": 10
+                }]
+            }
+            ... additional test groups ...
+        ]
+    }
+]
+
+....
+
+If the server did not have enough time to generate the vector set for a given test session, the server may reply:
+
+[align=center,alt=,type=]
+....
+[
+  { "acvVersion": <acvp-version> },
+  { "vsId": 1,
+    "retry" : 30
+  }
+]
+
+....
+
+Where:
+
+* *retry* - represents the number of seconds for the client to wait before retrying the request.
+
+The server may set the `retry` value based on the current server load and expected processing time to generate the vector set.
+
+[[vectorSet_delete]]
+==== Cancel Testing of a Vector Set
+
+*DELETE /testSessions/{testSessionId}/vectorSets/{vectorSetId}*
+
+Cancel testing for a specific Vector Set.
+
+There may be cases where a particular vector set may not be cancelled and the entire Test Session will need to be cancelled instead.
+
+[[vectorSet_results_get]]
+==== Request Validation Results
+
+*GET /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results*
+
+Request Validation Results for a Vector Set.
+
+===== Response
+
+The client will send this request to learn the validation results for an individual vector set. Properties are:
+
+* *vsId* - `number`
+* *disposition* - `string`, the overall result for the vector set with:
+** `fail` - indicates at least one test case has failed.
+** `unreceived` - indicates the server has not received responses from the client for all the test cases.
+** `incomplete` - indicates not all tests have been processed by the server, however none have failed thus far.
+** `expired` - indicates not all the test case responses were received from the client prior to expiry.
+** `passed` - indicates all test cases have been processed by the server and have passed.
+* *tests* - array of test result objects
+** *tcId* - `number`
+** *result* - `string`, the result for a test case with:
+*** `fail` - indicates the test case has failed.
+*** `unreceived` - indicates the server has not received a response from the client for the test case.
+*** `incomplete` - indicates the server has not processed the test case.
+*** `expired` - indicates the client did not send the test case response to the server prior to expiry.
+*** `passed` - indicates the test case passed.
+** *reason* - `number`, provides additional detail in case of a `failed` `result` value.
+
+[align=center,alt=,type=]
+....
+[
+    {"acvVersion": <acvp-version>},
+    {"results": {
+        "vsId": 1437,
+        "disposition": "incomplete",
+        "tests": [
+            {
+                "tcId": 12340,
+                "result": "passed",
+                "reason": ""
+            },
+            {
+                "tcId": 12341,
+                "result": "incomplete",
+                "reason": ""
+            },
+            {
+                "tcId": 12342,
+                "result": "failed",
+                "reason": "Algorithm reason XXX"
+            }
+        ]
+    }}
+]
+
+....
+
+[[vectorSet_results_post]]
+==== Submit Results
+
+*POST /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results*
+
+Initial Submission of Vector Set Test Results.
+
+===== Request
+
+The client will send this request to submit the test results for an individual vector set. Similar to the vector set download the format will vary depending on the specific sub-specification of the algorithm and testType being tested.
+
+[align=center,alt=,type=]
+....
+[
+  {"acvVersion": <acvp-version>},
+  {
+    "vsId": 1437,
+    "revision": "1.0.0",
+    "testGroups": [{
+      "tgId": 1,
+      "tests": [{
+          "tcId": 12340,
+          "testCaseProperty1": "ABCD",
+          "testCaseProperty2": "1234"
+        },
+        {
+          "tcId": 12341,
+          "testCaseProperty1": "5678",
+          "testCaseProperty2": "FEDC"
+        }, ...
+      ]
+    }, ...
+    ]
+  }
+]
+
+....
+
+===== Response
+
+No content response. Standard HTTP status codes will indicate success or failure of the submission, but do not indicated the disposition of the tests.
+
+[[vectorSet_results_put]]
+==== Update Results Submission
+
+*PUT /testSessions/{testSessionId}/vectorSets/{vectorSetId}/results*
+
+Update Vector Set Test Results Submission.
+
+When one or more test cases fails, the client will need to correct the issue in the crypto module and send the responses again. The resending of responses for failed test cases will occur for an entire vector set. Therefore, even if only a single test case in the vector set failed, the client will need to download, process, and upload responses to the server for the entire vector set (presumably after the problem has been corrected in the implementation). The resending of vector set responses *MUST* occur prior to expiry.
+
+===== Request
+
+The request content is identical to the request content described in <<vectorSet_results_post>>.
+
+[[vectorSet_expected_get]]
+==== Retrieve Expected Results
+
+*GET /testSessions/{testSessionId}/vectorSets/{vectorSetId}/expected*
+
+Expected Test Results.
+
+===== Response
+
+The response is identical to the request content described in <<vectorSet_results_post>>.

@@ -1,0 +1,25 @@
+[[rsa_decprim_capabilities]]
+=== RSA DecryptionPrimitive Mode Capabilities
+
+The RSA decryptionPrimitive mode capabilities are advertised as JSON objects within the array of 'capabilities' as part of the 'capability_exchange' element of the ACVP JSON registration message. A single property is allowed in the registration, 'modulo' with the only approved value of 2048. In this mode, the only tested capability is the correct exponentiation 's = cipherText\^d mod n', where 'cipherText' is a cipherText to be decrypted, 'd' is the private exponent and 'n' is the modulus. See <<SP800-56B>>, Section 7.1.2 for details.
+
+In testing, only 'cipherText' is supplied by the ACVP server. The client is responsible for generating RSA key pairs of modulus 'n', private key 'd', and calculates 's'. If a client does not support decryption with a standard RSA private exponent 'd', the equivalent Chinese Remainder Theorem (CRT) private key values are allowed to be used. Only 2048-bit RSA keys are allowed for this capability.
+
+See <<rsa_decprim_tgjs>> for additional details on constraints for 'cipherText' and 'n'. The client provides the public exponent 'e', modulus 'n' and the computed result 's' in its response to the ACVP - see <<rsa_decprim_responses>>. The client must first check if '0 < cipherText < n-1' and return an error if this is not the case. The client returns a value 's' only when 'cipherText' is in the proper range for the size of the selected modulus 'n'. See the ACVP specification for details on the registration message.
+
+An example registration is the following
+
+[source, json]
+----
+{
+    "algorithm": "RSA",
+    "mode": "decryptionPrimitive",
+    "revision": "1.0",
+    "prereqVals":
+    [
+        {"algorithm": "DRBG", "valValue": "123456"},
+        {"algorithm": "DRBG", "valValue": "654321"},
+        {"algorithm": "SHA", "valValue": "7890"}
+    ]
+}
+----
