@@ -1,0 +1,57 @@
+name: build-documents
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    types: [opened, ready_for_review]    
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    container: docker://metanorma/mn
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup metanorma
+        run: |
+          gem install metanorma-cli
+          metanorma setup --agree-to-terms
+      - name: Install gems from local Gemfile
+        run: |
+          curl -LO --retry 3 https://raw.githubusercontent.com/metanorma/metanorma-build-scripts/master/gemfile-to-bundle-add.sh | bash
+      - name: Build document in the Metanorma container
+        env:
+          LC_ALL: C.UTF-8
+          LANG: C.UTF-8
+          LANGUAGE: C.UTF-8
+        run: |
+          make clean all publish
+        working-directory: ./src
+      - uses: actions/upload-artifact@master
+        with:
+          name: documents
+          path: ./src/documents
+
+  deploy-gh-pages:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: build-docker
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/download-artifact@v1
+      with:
+        name: documents
+    - name: Deploy to GH Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.GH_DEPLOY_KEY }}
+        publish_dir: documents
+        force_orphan: true
+        enable_jekyll: true
+        user_name: ${{ github.actor }}
+        user_email: ${{ format('{0}@users.noreply.github.com', github.actor) }}
+        commit_message: "${{ format('Deploy to GitHub Pages: {0}', github.sha) }}"
+    - uses: kolpav/purge-artifacts-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        expire-in: 0
