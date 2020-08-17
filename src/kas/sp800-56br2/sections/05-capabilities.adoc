@@ -28,12 +28,15 @@ Each algorithm capability advertised is a self-contained JSON object using the f
 |===
 | JSON Value| Description| JSON Type| Valid Values| Optional
 
-| algorithm| The algorithm under test| value| KAS-IFC, KTS-IFC| No
-| revision| The algorithm testing revision to use.| value| "Sp800-56Br2"| No
-| prereqVals| Prerequisite algorithm validations| array of prereqAlgVal objects| See <<prereq_algs>>| No
-| function| Type of function supported| array| See <<supported_functions>>| Yes
-| iutId| The identifier of the IUT.| hex|  | No 
-| scheme| Array of supported key agreement schemes each having their own capabilities| object| See <<supported_schemes>>| No
+| algorithm | The algorithm under test| value | KAS-IFC, KTS-IFC | No
+| revision | The algorithm testing revision to use. | value | "Sp800-56Br2" | No
+| prereqVals | Prerequisite algorithm validations| array of prereqAlgVal objects | See <<prereq_algs>> | No
+| function | Type of function supported | array of string | See <<supported_functions>> | Yes
+| iutId | The identifier of the IUT. | hex |  | No 
+| keyGenerationMethods | The supported key generation methods. | array of string | See <<key_generation_methods>> | No
+| modulo | The supported common modulo | array of integer | See <<modulo>> | No
+| fixedPubExp | The fixed public exponent used for key generation.  Required if using at least 1 static fixed public exponent key generation method. | hex | | Yes
+| scheme | Array of supported key agreement schemes each having their own capabilities | object | See <<supported_schemes>>| No
 |===
 
 
@@ -47,6 +50,29 @@ The following function types *MAY* be advertised by the ACVP compliant crypto mo
 * keyPairGen - IUT can perform keypair generation.
 
 * partialVal - IUT can perform partial public key validation ([SP800-56Br2] section 6.4.2.2).
+
+[[key_generation_methods]]
+=== Supported Key Generation Methods
+
+At least one key generation method is *REQUIRED* within the array.  The following types *MAY* be advertised by the ACVP compliant crypto module:
+
+* rsakpg1-basic - An RSA key pair with a private key in the basic format, and with a fixed public exponent.
+* rsakpg1-prime-factor - An RSA key pair with a private key in the prime factor format, and with a fixed public exponent.
+* rsakpg1-crt - An RSA key pair with a private key in the Chinese Remainder Theorem format, and with a fixed public exponent.
+* rsakpg2-basic - An RSA key pair with a private key in the basic format, with a random public exponent.
+* rsakpg2-prime-factor - An RSA key pair with a private key in the prime factor format, with a random public exponent.
+* rsakpg2-crt - An RSA key pair with a private key in the Chinese Remainder Theorem format, with a random public exponent.
+
+[[modulo]]
+=== Supported Common Modulo
+
+At least one supported common modulo is *REQUIRED* within the array.  The following common modulo *MAY* be advertised by the ACVP compliant crypto module:
+
+* 2048 - estimated security strength 112
+* 3072 - estimated security strength 128
+* 4096 - estimated security strength 152
+* 6144 - estimated security strength 176
+* 8192 - estimated security strength 200
 
 [[schemes]]
 === KAS IFC Schemes
@@ -82,40 +108,10 @@ KTS Schemes
 | JSON Value| Description| JSON Type| Valid Values| Optional
 
 | kasRole| Roles supported for key agreement| array| initiator and/or responder| No
-| keyGenerationMethods | The key generation methods this scheme supports | object | <<keygenmethod>> | No
 | kdfMethods| The KDF methods to use when testing KAS schemes. | object| <<kdfmethods>>| Not optional for KAS schemes.
 | ktsMethods| The KTS methods to use when testing KTS schemes. | object| <<ktsmethods>>| Not optional for KTS schemes.
 | macMethods| The MAC methods to use when testing KAS or KTS schemes with key confirmation. | object| <<macmethods>>| Not optional for KAS/KTS schemes making use of key confirmation.
 | l | The length of the key to derive (using a KDF) or transport (using a KTS scheme).  This value should be large enough to accommodate the key length used for the mac algorithms in use for key confirmation, ideally the maximum value the IUT can support with their KAS/KTS implementation.  Maximum value (for testing purposes) is 1024.| integer| 128 minimum without KC, 136 minimum with KC, maximum 1024.| No
-|===
-
-[[keygenmethod]]
-===== Supported Key Generation Methods
-
-Note that *AT LEAST* one Key Generation method is required.  The following *MAY* be advertised by the ACVP compliant crypto module:
-
-[[keygen_options_table]]
-.Key Generation Options
-|===
-| JSON Value| Description| JSON Type| Valid Values| Optional
-
-| rsakpg1-basic | Private key basic format with a fixed exponent.  A fixed public exponent is *REQUIRED* to be specified in the underlying object.| object| <<keygenobjcap>> | Yes
-| rsakpg1-prime-factor | Private key prime factor format with a fixed exponent.  A fixed public exponent is *REQUIRED* to be specified in the underlying object. | object | <<keygenobjcap>> | Yes
-| rsakpg1-crt | Private key CRT format with a fixed exponent.  A fixed public exponent is *REQUIRED* to be specified in the underlying object. | object | <<keygenobjcap>> | Yes
-| rsakpg2-basic | Private key basic format with a random exponent. | object | <<keygenobjcap>> | Yes
-| rsakpg2-prime-factor | Private key prime factor format with a random exponent. | object | <<keygenobjcap>> | Yes
-| rsakpg2-crt | Private key CRT format with a random exponent. | object | <<keygenobjcap>> | Yes
-|===
-
-[[keygenobjcap]]
-====== KeyGenerationMethod Object Capabilities
-
-.Key Generation Object Options
-|===
-| JSON Value| Description| JSON Type| Valid Values| Optional
-
-| modulo| The modulo the IUT supports. | aray of integers | 2048, 3072, 4096, 5120, 6144, 7168, 8192 | No
-| fixedPubExp| The fixed public exponent in use for the KeyGenerationMethod. | hex| Odd number, gt 2^16, lt 2^256| Yes, required for fixed exponent key generation methods.
 |===
 
 [[kdfmethods]]
@@ -312,19 +308,14 @@ The following is a example JSON object advertising support for KAS IFC.
     "partialVal"
   ],
   "iutId": "CAFECAFE",
+  "keyGenerationMethods": ["rsakpg2-crt"],
+  "modulo": [2048],
   "scheme": {
     "KAS1-Party_V-confirmation": {
       "kasRole": [
         "initiator",
         "responder"
       ],
-      "keyGenerationMethods": {
-        "rsakpg2-crt": {
-          "modulo": [
-            2048
-          ]
-        }
-      },
       "kdfMethods": {
         "oneStepKdf": {
           "auxFunctions": [
@@ -418,19 +409,14 @@ The following is a example JSON object advertising support for KTS IFC.
     "partialVal"
   ],
   "iutId": "CAFECAFE",
+  "keyGenerationMethods": ["rsakpg2-basic"],
+  "modulo": [2048],
   "scheme": {
     "KTS-OAEP-Party_V-confirmation": {
       "kasRole": [
         "initiator",
         "responder"
       ],
-      "keyGenerationMethods": {
-        "rsakpg2-basic": {
-          "modulo": [
-            2048
-          ]
-        }
-      },
       "ktsMethod": {
         "hashAlgs": [
           "SHA2-224"
