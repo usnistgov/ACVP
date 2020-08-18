@@ -128,14 +128,14 @@ The demo server allows validation of the following algorithms (a superset of the
 * [SHAKE-256](./draft-celi-acvp-sha3.txt) - [HTML](./draft-celi-acvp-sha3.html)
 
 ### XOFs
-* [cSHAKE-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
-* [cSHAKE-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
-* [KMAC-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
-* [KMAC-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
-* [ParallelHash-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
-* [ParallelHash-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
-* [TupleHash-128](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
-* [TupleHash-256](./draft-celi-acvp-xof-00.txt) - [HTML](./draft-celi-acvp-xof-00.html)
+* [cSHAKE-128](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
+* [cSHAKE-256](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
+* [KMAC-128](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
+* [KMAC-256](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
+* [ParallelHash-128](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
+* [ParallelHash-256](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
+* [TupleHash-128](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
+* [TupleHash-256](./draft-celi-acvp-xof.txt) - [HTML](./draft-celi-acvp-xof.html)
 
 ### Message Authentication
 * [AES-GMAC](./draft-celi-acvp-symmetric.txt) - [HTML](./draft-celi-acvp-symmetric.html)
