@@ -222,6 +222,7 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS IFC KAS2-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS KDF HKDF Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](./draft-hammett-acvp-kas-kdf-hkdf.html) - DEMO only
 * [KAS KDF OneStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-onestep.html) - DEMO only
 * [KAS KDF TwoStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-twostep.html) - DEMO only
 * [KAS SSC ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
