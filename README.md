@@ -239,6 +239,8 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS SSC FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
 * [KAS SSC FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
 * [KAS SSC FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
+* [KAS SSC IFC KAS1 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
+* [KAS SSC IFC KAS2 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
 
 ### KDFs
 * [Counter KDF](./draft-celi-acvp-kbkdf.txt) - [HTML](./draft-celi-acvp-kbkdf.html)

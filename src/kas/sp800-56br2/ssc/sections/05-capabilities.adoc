@@ -1,0 +1,157 @@
+
+[[prereq_algs]]
+=== Prerequisite Algorithms
+
+Some algorithm implementations rely on other cryptographic primitives. For example, IKEv2 uses an underlying SHA algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:
+
+
+[[rereqs_table]]
+
+.Prerequisite Algorithms JSON Values
+|===
+| JSON Value | Description | JSON Type | Valid Values | Optional
+
+| algorithm | a prerequisite algorithm | value | DRBG, RSA, RSADP, | No
+| valValue | algorithm validation number | value | actual number or "same" | No
+| prereqAlgVal | prerequisite algorithm validation | object with algorithm and valValue properties | see above | Yes
+|===
+
+
+[[cap_ex]]
+=== Algorithm Capabilities JSON Values
+
+Each algorithm capability advertised is a self-contained JSON object using the following values.
+
+[[caps_table]]
+
+.KAS ECC Capabilities JSON Values
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| algorithm | The algorithm under test| value | KAS-IFC, KTS-IFC | No
+| revision | The algorithm testing revision to use. | value | "Sp800-56Br2" | No
+| prereqVals | Prerequisite algorithm validations| array of prereqAlgVal objects | See <<prereq_algs>> | No
+| keyGenerationMethods | The supported key generation methods. | array of string | See <<key_generation_methods>> | No
+| modulo | The supported common modulo | array of integer | See <<modulo>> | No
+| fixedPubExp | The fixed public exponent used for key generation.  Required if using at least 1 static fixed public exponent key generation method. | hex | | Yes
+| scheme | Array of supported key agreement schemes each having their own capabilities | object | See <<supported_schemes>>| No
+| hashFunctionZ | Optional hash function to apply to the shared secret `z` in instances where the IUT is unable to return the `z` in the clear. | string | See <<hashFunctionZ>>
+|===
+
+Note: Some optional values are *REQUIRED* depending on the algorithm. Failure to provide these values will result in the ACVP server returning an error to the ACVP client during registration.
+
+[[key_generation_methods]]
+=== Supported Key Generation Methods
+
+At least one key generation method is *REQUIRED* within the array.  The following types *MAY* be advertised by the ACVP compliant crypto module:
+
+* rsakpg1-basic - An RSA key pair with a private key in the basic format, and with a fixed public exponent.
+* rsakpg1-prime-factor - An RSA key pair with a private key in the prime factor format, and with a fixed public exponent.
+* rsakpg1-crt - An RSA key pair with a private key in the Chinese Remainder Theorem format, and with a fixed public exponent.
+* rsakpg2-basic - An RSA key pair with a private key in the basic format, with a random public exponent.
+* rsakpg2-prime-factor - An RSA key pair with a private key in the prime factor format, with a random public exponent.
+* rsakpg2-crt - An RSA key pair with a private key in the Chinese Remainder Theorem format, with a random public exponent.
+
+[[modulo]]
+=== Supported Common Modulo
+
+At least one supported common modulo is *REQUIRED* within the array.  The following common modulo *MAY* be advertised by the ACVP compliant crypto module:
+
+* 2048 - estimated security strength 112
+* 3072 - estimated security strength 128
+* 4096 - estimated security strength 152
+* 6144 - estimated security strength 176
+* 8192 - estimated security strength 200
+
+[#hashFunctionZ]
+==== Hash Function Z
+
+An optional hash function that should be applied to `z` from both the ACVP server and IUT for comparison purposes.  The provided `hashFunctionZ`'s security strength *MUST* be at least as strong as the greatest security strength modulo selected from <<modulo>>
+
+The following hash functions *MAY* be advertised by an ACVP compliant server:
+
+* SHA2-224
+* SHA2-256
+* SHA2-384
+* SHA2-512
+* SHA2-512/224
+* SHA2-512/256
+* SHA3-224
+* SHA3-256
+* SHA3-384
+* SHA3-512
+
+[[schemes]]
+=== KAS IFC Schemes
+
+All other scheme capabilities are advertised as a self-contained JSON object using the following values.  Note that *AT LEAST* one valid scheme must be registered.
+   
+[[supported_schemes]]
+==== KAS IFC Scheme Capabilities JSON Values
+
+KAS Schemes
+
+* KAS1
+
+* KAS2
+
+[[scheme_caps_table]]
+.KAS IFC Capabilities JSON Values
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| kasRole| Roles supported for key agreement| array| initiator and/or responder| No
+|===
+
+[[app-reg-ex]]
+=== Example Registration
+
+The following is a example JSON object advertising support for KAS IFC SSC.
+
+[source,json]
+---- 
+{
+  "vsId": 0,
+  "algorithm": "KAS-IFC-SSC",
+  "revision": "Sp800-56Br2",
+  "scheme": {
+    "KAS1": {
+      "kasRole": [
+        "initiator",
+        "responder"
+      ]
+    },
+    "KAS2": {
+      "kasRole": [
+        "initiator",
+        "responder"
+      ]
+    }
+  },
+  "keyGenerationMethods": [
+    "rsakpg2-basic",
+    "rsakpg2-crt"
+  ],
+  "modulo": [
+    2048
+  ],
+  "hashFunctionZ": "SHA2-512"
+}
+----
+
+[[generation_reqs_per_scheme]]
+== Generation Requirements per Party per Scheme
+
+The various schemes of KAS/KTS all have their own requirements as to keys and nonces per scheme, per party. The below table demonstrates those generation requirements:
+
+[[scheme_generation_requirements]]
+.Required Party Generation Obligations
+|===
+| Scheme| KasMode| KasRole| KeyPair| Generates Cipher Text
+
+| KAS1| NoKdfNoKc| InitiatorPartyU| False| True
+| KAS1| NoKdfNoKc| ResponderPartyV| True| False
+| KAS2| NoKdfNoKc| InitiatorPartyU| True| True
+| KAS2| NoKdfNoKc| ResponderPartyV| True| True
+|===
+
