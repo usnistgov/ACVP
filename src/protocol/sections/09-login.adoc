@@ -17,42 +17,83 @@ claims from an expired JWT in order to access a resource protected with those cl
 
 *POST /login* (Initial)
 
-[align=center,alt=,type=]
-....
+[source,json]
+----
 [
-  {"acvVersion": <acvp-version>},
+  {"acvVersion": "{acvp-version}"},
   {
- "password": "<password>"
+    "password": "{password}"
   }
 ]
-
-....
+----
 
 *POST /login* (Renewal)
 
-[align=center,alt=,type=]
-....
+[source,json]
+----
 [
-  {"acvVersion": <acvp-version>},
+  {"acvVersion": "{acvp-version}"},
   {
- "password": "<password>",
- "accessToken": "<jwt value>"
+    "password": "{password}",
+    "accessToken": "{jwt value}"
   }
 ]
-
-....
+----
 
 === Response
 
-[align=center,alt=,type=]
-....
+[source,json]
+----
 [
-  {"acvVersion": <acvp-version>},
-    {
-        "accessToken": "<jwt value>",
-        "largeEndpointRequired": false,
-        "sizeConstraint": -1
-    }
+  {"acvVersion": "{acvp-version}"},
+  {
+    "accessToken": "{jwt value}",
+    "largeEndpointRequired": false,
+    "sizeConstraint": -1
+  }
 ]
+----
 
-....
+[[multiRefresh]]
+=== Multi Refresh JWT
+
+This endpoint can be utilized for refreshing multiple JWTs with a single POST.  Because a JWT with claims is issued for each test session created and clients have the option of performing more than one test session at a time, a mechanism for refreshing multiple JWTs across multiple test sessions simultaneously *MAY* be made available.
+
+==== Request
+
+*POST /login/refresh*
+
+[source,json]
+----
+[
+  {"acvVersion": "{acvp-version}"},
+  {
+    "password": "{password}",
+    "accessToken": [
+      "{jwt1}",
+      "{jwt2}",
+      "..."
+    ]
+  }
+]
+----
+
+==== Response
+
+[source,json]
+----
+[
+  {"acvVersion": "{acvp-version}"},
+  {
+    "accessToken": [
+      "{newJwt1}",
+      "{newJwt2}",
+      "..."
+    ],
+    "largeEndpointRequired": false,
+    "sizeConstraint": -1
+  }
+]
+----
+
+Note the order of JWTs between the request and response is preserved.
