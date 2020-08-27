@@ -222,23 +222,23 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS IFC KAS2-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KAS KDF HKDF Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](./draft-hammett-acvp-kas-kdf-hkdf.html) - DEMO only
-* [KAS KDF OneStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-onestep.html) - DEMO only
-* [KAS KDF TwoStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-twostep.html) - DEMO only
-* [KAS SSC ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
-* [KAS SSC ECC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
-* [KAS SSC ECC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
-* [KAS SSC ECC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
-* [KAS SSC ECC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
-* [KAS SSC ECC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
-* [KAS SSC ECC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html) - DEMO only
-* [KAS SSC FFC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
-* [KAS SSC FFC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)  - DEMO only
-* [KAS SSC FFC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
-* [KAS SSC FFC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
-* [KAS SSC FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
-* [KAS SSC FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
-* [KAS SSC FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html) - DEMO only
+* [KAS KDF HKDF Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](./draft-hammett-acvp-kas-kdf-hkdf.html)
+* [KAS KDF OneStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-onestep.html)
+* [KAS KDF TwoStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-twostep.html)
+* [KAS SSC ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS SSC ECC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS SSC ECC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS SSC ECC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS SSC ECC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS SSC ECC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS SSC ECC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS SSC FFC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS SSC FFC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS SSC FFC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS SSC FFC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS SSC FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS SSC FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS SSC FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
 * [KAS SSC IFC KAS1 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
 * [KAS SSC IFC KAS2 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
 
@@ -259,8 +259,8 @@ The demo server allows validation of the following algorithms (a superset of the
 * [PBKDF](./draft-celi-acvp-pbkdf.txt) - [HTML](./draft-celi-acvp-pbkdf.html)
 
 ### Safe Primes
-* [SafePrimes KeyGen](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html) - DEMO only
-* [SafePrimes KeyVer](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html) - DEMO only
+* [SafePrimes KeyGen](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html)
+* [SafePrimes KeyVer](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html)
 
 The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
