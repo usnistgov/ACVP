@@ -1,0 +1,121 @@
+
+[[caps_reg]]
+
+[[cipher_caps_reg]]
+=== Conditioning Component Algorithm Capabilities Registration
+
+This section describes the constructs for advertising support of conditioning component algorithms to the ACVP server.
+
+[[mode_cipher_caps]]
+==== Block Cipher Based Conditioning Component Capabilities
+
+The following ConditioningComponent / AES-CBC-MAC / SP800-90B and ConditioningComponent / BlockCipher_DF / SP800-90B capabilities *MAY* be advertised by the ACVP compliant crypto module:
+
+[[caps_table]]
+.Block Cipher Conditioning Component Algorithm Capabilities JSON Values
+|===
+| JSON Value | Description | JSON type | Valid Values
+
+| algorithm | The algorithm to be validated | string | "ConditioningComponent"
+| mode | The specific conditioning component to be validated | "AES-CBC-MAC" or "BlockCipher_DF"
+| revision | The algorithm testing revision to use | string | "SP800-90B"
+| keyLen | The length of keys supported in bits | array | [128, 192, 256]
+| payloadLen | The lengths in bits supported by the IUT | domain | [{"min": 8, "max": 65536, "inc": 8}]
+|===
+
+NOTE: For ConditioningComponent / AES-CBC-MAC / SP800-90B, the payload itself is processed through the encryption engine. Therefore the minimum 'payloadLen' is 128 bits and the minimum increment is 128 bits. In other words, all values within the 'payloadLen' must correspond to complete AES blocks in bits (a multiple of 128).
+
+The following is an example of a registration for ConditioningComponents / AES-CBC-MAC / SP800-90B
+
+[source, json]
+----
+{
+  "algorithm": "ConditioningComponent",
+  "mode": "AES-CBC-MAC",
+  "revision": "SP800-90B",
+  "keyLen": [
+    128,
+    192,
+    256
+  ],
+  "payloadLen": [
+    {
+      "min": 128,
+      "max": 65536,
+      "increment": 128
+    }
+  ]
+}
+----
+
+The following is an example of a registration for ConditioningComponents / BlockCipher_DF / SP800-90B
+
+[source, json]
+----
+{
+  "algorithm": "ConditioningComponent",
+  "mode": "BlockCipher_DF",
+  "revision": "SP800-90B",
+  "keyLen": [
+    128,
+    192,
+    256
+  ],
+  "payloadLen": [
+    {
+      "min": 8,
+      "max": 65536,
+      "increment": 8
+    }
+  ]
+}
+----
+
+[[mode_hash_caps]]
+==== Hash Based Conditioning Component Capabilities
+
+The following ConditioningComponent / Hash_DF / SP800-90B capabilities *MAY* be advertised by the ACVP compliant crypto module:
+
+[[hash_caps_table]]
+.Hash Conditioning Component Algorithm Capabilities JSON Values
+|===
+| JSON Value | Description | JSON type | Valid Values
+
+| algorithm | The algorithm to be validated | string | "ConditioningComponent"
+| mode | The specific conditioning component to be validated | "Hash_DF"
+| revision | The algorithm testing revision to use | string | "SP800-90B"
+| capabilities | An array of supported capability objects | array of objects | Each element in the array is made of exactly one 'payloadLen' field and one 'hashAlg' field
+| payloadLen | The lengths in bits supported by the IUT | domain | [{"min": 1, "max": 65536, "inc": 1}]
+| hashAlg | The hash algorithm that supports the specific lengths | array | Any non-zero number of elements from <<hash_supported>>
+|===
+
+The following is an example of a registration for ConditioningComponents / Hash_DF / SP800-90B
+
+[source, json]
+----
+{
+  "algorithm": "ConditioningComponent",
+  "mode": "Hash_DF",
+  "revision": "SP800-90B",
+  "capabilities": [
+    {
+      "payloadLen": [
+        {
+          "min": 1,
+          "max": 65536,
+          "increment": 1
+        }
+      ],
+      "hashAlg": [
+        "SHA-1",
+        "SHA2-224",
+        "SHA2-256",
+        "SHA2-384",
+        "SHA2-512",
+        "SHA2-512/224",
+        "SHA2-512/256"
+      ]
+    }
+  ]
+}
+----
