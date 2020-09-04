@@ -19,6 +19,7 @@ All current information about ACVP may be found within this Github project. View
   * [Key Agreement](#key-agreement)
   * [KDFs](#kdfs)
   * [SafePrimes](#safe-primes)
+  * [ConditioningComponents](#conditioning-components)
 * [Accessing the demo server](#accessing-the-demo-server)
 * [Contribution guidelines](contribution-guidelines)
 * [Related projects](#related-projects)
@@ -261,6 +262,11 @@ The demo server allows validation of the following algorithms (a superset of the
 ### Safe Primes
 * [SafePrimes KeyGen](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html)
 * [SafePrimes KeyVer](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html)
+
+### Conditioning Components
+* [ConditioningComponent AES-CBC-MAC](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
+* [ConditioningComponent BlockCipher_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
+* [ConditioningComponent Hash_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
 
 The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
