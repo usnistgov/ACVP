@@ -1,7 +1,9 @@
 # ACVP
 The [Automated Cryptographic Validation Protocol](./draft-fussell-acvp-spec.html) (ACVP) is a protocol currently under development to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
 
-All current information about ACVP may be found within this Github project. View the documents at https://usnistgov.github.io/ACVP/.
+All current information about ACVP protocol may be found within this Github project. View the protocol documents at https://usnistgov.github.io/ACVP/.
+
+For issues regarding the actual ACVP Server implementation, as well as pre-release (demo) and release notes (prod), see the ACVP-Server repository: https://github.com/usnistgov/ACVP-Server/
 
 # Jump to
 * [Background](#background)
