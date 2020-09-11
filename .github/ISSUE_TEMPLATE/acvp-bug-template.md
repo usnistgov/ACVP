@@ -1,26 +1,7 @@
 ---
-name: ACVP Bug Template
-about: Use this issue template when encountering an ACVP implementation server issue
+name: ACVP-Server Bug Template
+about: See https://github.com/usnistgov/ACVP-Server
 
 ---
 
-**environment**
-The environment the issue was experienced (Demo or Prod)
-
-**testSessionId**
-The test session ID
-
-**vsId**
-The vectorSet ID displaying the issue
-
-**Algorithm registration**
-The pertinent algorithm registration pieces (algorithm tested, capabilities, etc) in json format
-
-**Endpoint in which the error is experienced**
-https://[acvpUrl]/acvp/[endpoint] GET
-
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Additional context**
-Add any other context about the problem here.
+Note if this issue is in regards to a suggestion, issue, or question regarding NIST's **implementation** of the ACVP protocol, rather than the protocol itself, that issue should be opened at https://github.com/usnistgov/ACVP-Server/issues/new?template=acvp-bug-template.md
