@@ -22,38 +22,31 @@ This section describes the design of the tests used to validate implementations 
 
 [source, code]
 ----
-INPUT: The initial Msg of 128 bits long
+INPUT: The initial Msg is the length of the digest size
 
-BitsToString(bits) {
-  string = "";
-  foreach byte in bits {
-      string = string + ASCII((byte % 26) + 65);
-  }
-}
-
-Initial Outputlen = (floor(maxoutlen/8) )*8
-Initial FunctionName = ""
-Initial Customization = ""
-
-MCT(Msg, Outputlen, FunctionName, Customization)
+MCT(Msg, MaxOutLen, MinOutLen)
 {
-  Output0 = Msg;
-  for (j=0; j<100; j++) {
-      for (i=1; i<1001; i++) {
-          M[i] = 128 leftmost bits of Output[i-1];
-          Output[i] = CSHAKE(M[i],Outputlen,FunctionName,Customization);
-          If (i == 1000){
-              Outputlen[j] = Outputlen;
-          }
-          Rightmost_Output_bits = rightmost 16 bits of Output[i];
-          Leftmost_Output_bits = leftmost 16 bits of Output[i];
-          Range = (maxoutbytes – minoutbytes + 1);
-          Outputlen = minoutbytes + (Rightmost_Output_bits mod Range);
-          Customization = BitsToString(M[i] || Rightmost_Output_bits);
-      }
-      Output[j] = Output[1000];
-      OUTPUT: Outputlen[j], Output[j]
+  Range = (MaxOutLen – MinOutLen + 1);
+  OutputLen = (floor(MaxOutLen/8)) * 8;
+  FunctionName = "";
+  Customization = "";
+
+  Output[0] = Msg;
+  for (j = 0; j < 100; j++) 
+  {
+    for (i = 1; i < 1001; i++) 
+	{
+      InnerMsg = Left(Output[i-1] || ZeroBits(128), 128);
+      Output[i] = CSHAKE(InnerMsg, OutputLen, FunctionName, Customization);
+      Rightmost_Output_bits = Right(Output[i], 16);
+      OutputLen = MinOutLen + (8 * Rightmost_Output_bits % Range);
+      Customization = BitsToString(InnerMsg || Rightmost_Output_bits);
+    }
+	
+    OutputJ[j] = Output[1000];
   }
+
+  return OutputJ;
 }
 ----
 
@@ -62,38 +55,33 @@ MCT(Msg, Outputlen, FunctionName, Customization)
 
 [source, code]
 ----
-INPUT: The initial Msg of 128 bits long
+INPUT: The initial Msg is the length of the digest size
 
-BitsToString(bits) {
-  string = "";
-  foreach byte in bits {
-      string = string + ASCII((byte % 26) + 65);
-  }
-}
-
-Initial Outputlen = (floor(maxoutlen/8) )*8
-Initial Customization = ""
-Initial BlockSize = min bytes
-
-MCT(Msg, Outputlen, FunctionName, Customization, BlockSize)
+MCT(Msg, MaxOutLen, MinOutLen, MaxBlockSize, MinBlockSize)
 {
-  Output0 = Msg;
-  for (j=0; j<100; j++) {
-      for (i=1; i<1001; i++) {
-          M[i] = 128 leftmost bits of Output[i-1];
-          Output[i] = CSHAKE(M[i],Outputlen,FunctionName,Customization);
-          If (i == 1000){
-              Outputlen[j] = Outputlen;
-          }
-          Rightmost_Output_bits = rightmost 16 bits of Output[i];
-          Range = (maxoutbytes – minoutbytes + 1);
-          Outputlen = minoutbytes + (Rightmost_Output_bits mod Range);
-          BlockSize = minBlockSize + (rightmost 8 bits of Rightmost_Output_bits mod blockSizeRange);
-          Customization = BitsToString(M[i] || Rightmost_Output_bits);
-      }
-      Output[j] = Output[1000];
-      OUTPUT: Outputlen[j], Output[j]
+  Range = (MaxOutLen – MinOutLen + 1);
+  OutputLen = (floor(MaxOutLen/8)) * 8;
+  BlockRange = (MaxBlockSize – MinBlockSize + 1);
+  BlockSize = MinBlockSize;
+  Customization = "";
+
+  Output[0] = Msg;
+  for (j = 0; j < 100; j++) 
+  {
+    for (i = 1; i < 1001; i++) 
+	{
+      InnerMsg = Left(Output[i-1] || ZeroBits(128), 128);
+      Output[i] = ParallelHash(InnerMsg, OutputLen, BlockSize, FunctionName, Customization);
+      Rightmost_Output_bits = Right(Output[i], 16);
+      OutputLen = MinOutLen + (8 * Rightmost_Output_bits % Range);
+	  BlockSize = MinBlockSize + Right(Rightmost_Output_bits, 8) % BlockRange;
+      Customization = BitsToString(InnerMsg || Rightmost_Output_bits);
+    }
+	
+    OutputJ[j] = Output[1000];
   }
+
+  return OutputJ;
 }
 ----
 
@@ -102,39 +90,48 @@ MCT(Msg, Outputlen, FunctionName, Customization, BlockSize)
 
 [source, code]
 ----
-INPUT: The initial Single-Tuple of 288 bits long
+INPUT: The initial Single-Tuple of a random length between 0 and 65536 bits.
 
+MCT(Tuple, MaxOutLen, MinOutLen)
+{
+  Range = (MaxOutLen – MinOutLen + 1);
+  OutputLen = (floor(MaxOutLen/8)) * 8;
+  Customization = "";
+
+  T[0][0] = Tuple;
+  
+  for (j = 0; j < 100; j++) 
+  {
+    for (i = 1; i < 1001; i++) 
+    {
+	  workingBits = Left(T[i-1][0] || ZeroBits(288), 288);
+      tupleSize = Left(workingBits, 3) + 1; // never more than 8 tuples to a round
+      for (k = 0; k < tupleSize; k++) 
+	  {
+          T[i][k] = Substring of workingBits from (k * 288 / tupleSize) to ((k+1) * 288 / tupleSize - 1);
+      }
+      Output[i] = TupleHash(T[i], OutputLen, Customization);
+      Rightmost_Output_bits = Right(Output[i], 16);
+      OutputLen = MinOutLen + (8 * Rightmost_Output_bits % Range);
+      Customization = BitsToString(T[i][0] || Rightmost_Output_bits);
+    }
+	
+    OutputJ[j] = Output[1000];
+  }
+  
+  return OutputJ;
+}
+----
+
+[bitsToString]
+==== BitsToString Function
+
+[source, code]
+----
 BitsToString(bits) {
   string = "";
   foreach byte in bits {
       string = string + ASCII((byte % 26) + 65);
-  }
-}
-
-Initial Outputlen = (floor(maxoutlen/8) )*8
-Initial Customization = ""
-
-MCT(Msg, Tuple, Outputlen, Customization)
-{
-  Output0 = Msg;
-  for (j=0; j<100; j++) {
-      for (i=1; i<1001; i++) {
-          leftbits = 288 leftmost bits of Output[i-1];
-          tupleSize = 3 leftmost bits of leftbits + 1;
-          for (k=0; k<tupleSize; k++) {
-              T[i][k] = Substring of leftbits from (k * 288 / tupleSize) to ((k+1) * 288 / tupleSize - 1);
-          }
-          Output[i] = TupleHash(T[i],Outputlen,Customization);
-          If (i == 1000){
-              Outputlen[j] = Outputlen;
-          }
-          Rightmost_Output_bits = rightmost 16 bits of Output[i];
-          Range = (maxoutbytes – minoutbytes + 1);
-          Outputlen = minoutbytes + (Rightmost_Output_bits mod Range);
-          Customization = BitsToString(T[i][0] || Rightmost_Output_bits);
-      }
-      Output[j] = Output[1000];
-      OUTPUT: Outputlen[j], Output[j]
   }
 }
 ----
