@@ -2,32 +2,27 @@
 [[vector_responses]]
 === Test Vector Responses
 
-
 After the ACVP client downloads and processes a vector set, it *SHALL* send the response vectors back to the ACVP server within the alloted timeframe. The following table describes the JSON object that represents a vector set response.
 
 [[vr_top_table]]
-
-[cols="<,<,<"]
 .Vector Set Response JSON Object
 |===
-| JSON Value| Description| JSON type
+| JSON Value | Description | JSON type
 
-| acvVersion| Protocol version identifier| string
-| vsId| Unique numeric identifier for the vector set| integer
-| testResults| Array of JSON objects that represent each test vector result, which uses the same JSON schema as defined in <<tcjs>>| array of testGroup objects
+| acvVersion | Protocol version identifier | string
+| vsId | Unique numeric identifier for the vector set | integer
+| testGroups | Array of JSON objects that represent each test vector result, which uses the same JSON schema as defined in <<tcjs>> | array of testGroup objects
 |===
 
 The testGroup Response section is used to organize the ACVP client response in a similar manner to how it receives vectors. Several algorithms *SHALL* require the client to send back group level properties in its response. This structure helps accommodate that.
 
 [[vr_group_table]]
-
-[cols="<,<,<"]
 .Vector Set Group Response JSON Object
 |===
-| JSON Value| Description| JSON type
+| JSON Value | Description | JSON type
 
-| tgId| The test group identifier| integer
-| tests| The tests associated to the group specified in tgId| array of testCase objects
+| tgId | The test group identifier | integer
+| tests | The tests associated to the group specified in tgId | array of testCase objects
 |===
 
 Each test case is a JSON object that represents a single test object to be processed by the ACVP client.
@@ -35,17 +30,67 @@ Each test case is a JSON object that represents a single test object to be proce
 The following table describes the JSON elements for each test case object.
 
 [[vs_tr_table]]
-
-[cols="<,<,<"]
 .Test Case Results JSON Object
 |===
-| JSON Value| Description| JSON type
+| JSON Value | Description | JSON type
 
-| tcId| Numeric identifier for the test case, unique across the entire vector set.| integer
-| md| The IUT's message digest response to an AFT test| string (hex)
-| resultsArray| Array of JSON objects that represent each iteration of an MCT. Each iteration will contain the msg and md| array of objects containing the md
+| tcId | Numeric identifier for the test case, unique across the entire vector set. | integer
+| md | The IUT's message digest response to an AFT or LDT test | string (hex)
+| resultsArray | Array of JSON objects that represent each iteration of an MCT. Each iteration will contain the msg and md|  array of objects containing the md
 |===
 
 Note: The tcId *MUST* be included in every test case object sent between the client and the server.
 
+The following is a example JSON object for secure hash test results sent from the crypto module to the ACVP server. The group identified by tgId 1 is a group of AFTs. The group identified by tgId 2 is a group of MCTs. The group identified by tgId 3 is a group of LDTs.
 
+[source, json]
+----
+{
+    "vsId": 0,
+    "algorithm": "SHA2-224",
+    "revision": "1.0",
+    "testGroups": [
+        {
+            "tgId": 1,
+            "tests": [
+                {
+                    "tcId": 1,
+                    "md": "D14A028C2A3A2BC9476102BB288234C415A2B01F828EA62AC5B3E42F"
+                },
+                {
+                    "tcId": 2,
+                    "md": "D14A028C2A3A2BC9476102BB288234C415A2B01F828EA62AC5B3E42F"
+                }
+            ]
+        },
+        {
+            "tgId": 2,
+            "tests": [
+                {
+                    "tcId": 1028,
+                    "resultsArray": [
+                        {
+                            "md": "E82B1FA3D510C2E423D03CEDF01F66C995CDD573EB63D5A33FDAE640"
+                        },
+                        {
+                            "md": "00179AE4CE57DCBD156B981A414370B5089FA8E1098A05443DF3CD62"
+                        },
+                        {
+                            "md": "8F6C7F546940352613E8389D4F4B87473A57CACD7E289A27E4F51965"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "tgId": 3,
+            "tests": [
+                {
+                    "tcId": 1029,
+                    "md": "E4F8B44B32F5A25D1F4784601BF095CF5F7C6F4E9EAA1005AD19F09A"
+                }
+            ]
+        }
+    ]
+}
+----
