@@ -32,6 +32,124 @@ Each test group *SHALL* contain an array of one or more test cases.  Each test c
 | len| Length of the message or seed| integer
 | outLen| Length of the digest| integer
 | msg| Value of the message or seed.  Messages are represented as little-endian hex for all SHA3 variations.| string (hex)
+| largeMsg | Object describing the message for an LDT group | large data object, see <<LD_test>> for more information
 |===
 
-Note: All properties listed in the above table are *REQUIRED* except for outLen which is only *REQUIRED* when the algorithm is SHAKE-128 or SHAKE-256.
+NOTE: All properties listed in the above table are *REQUIRED* except for outLen which is only *REQUIRED* when the algorithm is SHAKE-128 or SHAKE-256.
+
+The following is an example JSON object for secure hash test vectors sent from the ACVP server to the crypto module. Notice that the single bit message is represented as "01". This complies with the little-endian nature of SHA3. All hex displayed is little-endian bit order when associated with SHA3 or any of its variations.
+
+[source, json]
+----
+[
+    { "acvVersion": <acvp-version> },
+    {
+        "vsId": 1564,
+        "algorithm": "SHA3-512",
+        "revision": "1.0",
+        "testGroups": [
+        {
+            "tgId": 1,
+            "testType": "AFT",
+            "tests": [
+            {
+                "tcId": 1,
+                "len": 0,
+                "msg": "00"
+            },
+            {
+                "tcId": 2,
+                "len": 1,
+                "msg": "01"
+            }]
+        },
+        {
+            "tgId": 2,
+            "testType": "MCT",
+            "tests": [
+            {
+                "tcId": 3,
+                "len": 512,
+                "msg": "30850bd984b14ff5aff18993329...",
+            }]
+        },
+        {
+            "tgId": 3,
+            "testType": "LDT",
+            "tests": [
+                {
+                    "tcId": 4,
+                    "largeMsg": {
+                        "content": "DE26",
+                        "contentLength": 16,
+                        "fullLength": 42949672960,
+                        "expansionTechnique": "repeating"
+                    }
+                }
+            ]
+        }]
+    }
+]
+----
+
+The following is an example JSON object for SHAKE.
+
+[source, json]
+----
+[
+    { "acvVersion": <acvp-version> },
+    {
+        "vsId": 1564,
+        "algorithm": "SHAKE-128",
+        "revision": "1.0",
+        "testGroups": [
+        {
+            "tgId": 1,
+            "testType": "AFT",
+            "tests": [
+            {
+                "tcId": 1,
+                "len": 0,
+                "msg": "00"
+            },
+            {
+                "tcId": 2,
+                "len": 1,
+                "msg": "01"
+            }]
+        },
+        {
+            "tgId": 2,
+            "testType": "MCT",
+            "inBit": true,
+            "outBit": true,
+            "inEmpty": false,
+            "maxOutLen": 4096,
+            "minOutLen": 128,
+            "tests": [
+            {
+                "tcId": 3,
+                "len": 512,
+                "msg": "30850bd984b14ff5aff18993329...",
+            }]
+        },
+        {
+            "tgId": 3,
+            "testType": "VOT",
+            "tests": [
+            {
+                "tcId": 4,
+                "len": 128,
+                "msg": "7a4c48eb710299e4ff2be3f446327a6f",
+                "outLen": 16
+            },
+            {
+                "tcId": 5,
+                "len": 128,
+                "msg": "b16f331b3a0cf4507124b4358f9d15f5",
+                "outLen": 144
+            }]
+        }]
+    }
+]
+----
