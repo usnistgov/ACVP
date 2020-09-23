@@ -228,22 +228,22 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS KDF HKDF Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](./draft-hammett-acvp-kas-kdf-hkdf.html)
 * [KAS KDF OneStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-onestep.html)
 * [KAS KDF TwoStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-twostep.html)
-* [KAS SSC ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
-* [KAS SSC ECC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
-* [KAS SSC ECC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
-* [KAS SSC ECC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
-* [KAS SSC ECC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
-* [KAS SSC ECC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
-* [KAS SSC ECC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
-* [KAS SSC FFC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS SSC FFC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS SSC FFC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS SSC FFC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS SSC FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS SSC FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS SSC FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS SSC IFC KAS1 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
-* [KAS SSC IFC KAS2 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
+* [KAS ECC SSC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS ECC SSC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS ECC SSC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS ECC SSC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS ECC SSC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS ECC SSC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS ECC SSC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
+* [KAS FFC SSC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS FFC SSC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS FFC SSC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS FFC SSC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS FFC SSC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS FFC SSC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS FFC SSC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
+* [KAS IFC SSC KAS1 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
+* [KAS IFC SSC KAS2 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
 
 ### KDFs
 * [Counter KDF](./draft-celi-acvp-kbkdf.txt) - [HTML](./draft-celi-acvp-kbkdf.html)
