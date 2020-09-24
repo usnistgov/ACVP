@@ -188,6 +188,10 @@ The demo server allows validation of the following algorithms (a superset of the
 * [EDDSA mode: sigVer](./draft-celi-acvp-eddsa.txt) - [HTML](./draft-celi-acvp-eddsa.html) - DEMO only
 
 ### Key Agreement
+#### Full KAS Testing
+
+  Tests against shared secret computation (SSC), key derivation functions (KDF), and optionally key confirmation (KC).  Test vectors issued under this set of tests (with the exception of 1.0 component based tests) are consider "full kas" testing.
+
 * [KAS ECC ephemeralUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
 * [KAS ECC fullMqv](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
 * [KAS ECC fullUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
@@ -195,7 +199,6 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS ECC onePassMqv](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
 * [KAS ECC OnePassUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
 * [KAS ECC staticUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
-* [KAS ECC CDH-Component](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
 * [KAS FFC dhHybrid1](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC mqv2](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html) 
 * [KAS FFC dhEphem](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
@@ -225,9 +228,26 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS IFC KAS2-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
 * [KTS IFC KTS-OAEP-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KAS KDF HKDF Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](./draft-hammett-acvp-kas-kdf-hkdf.html)
-* [KAS KDF OneStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-onestep.html)
-* [KAS KDF TwoStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-twostep.html)
+
+#### KAS SSC Testing
+
+Standalone KAS SSC testing from SP800-56A/B.  Can be used in conjunction with KDF testing (as opposed to full KAS testing) to be considered a valid KAS implementation.
+
+* [KAS ECC ephemeralUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC fullMqv](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC fullUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC onePassDh](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC onePassMqv](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC OnePassUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC staticUnified](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS ECC CDH-Component](./draft-fussell-acvp-kas-ecc.txt) - [HTML](./draft-fussell-acvp-kas-ecc.html)
+* [KAS FFC dhHybrid1](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC mqv2](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html) 
+* [KAS FFC dhEphem](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC dhHybridOneFlow](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC mqv1](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC dhOneFlow](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
+* [KAS FFC dhStatic](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
 * [KAS ECC SSC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
 * [KAS ECC SSC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
 * [KAS ECC SSC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ecc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ecc.html)
@@ -244,6 +264,14 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS FFC SSC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
 * [KAS IFC SSC KAS1 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
 * [KAS IFC SSC KAS2 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
+
+#### KAS KDF Testing SP800-56Cr1
+
+  Standalone KAS KDF testing from SP800-56Cr1.  Can be used in conjunction with SSC testing (as opposed to full KAS testing) to be considered a valid KAS implementation.
+
+* [KAS KDF HKDF Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](./draft-hammett-acvp-kas-kdf-hkdf.html)
+* [KAS KDF OneStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-onestep.html)
+* [KAS KDF TwoStep Sp800-56Cr1](./draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](./draft-hammett-acvp-kas-kdf-twostep.html)
 
 ### KDFs
 * [Counter KDF](./draft-celi-acvp-kbkdf.txt) - [HTML](./draft-celi-acvp-kbkdf.html)
