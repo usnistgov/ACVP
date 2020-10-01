@@ -206,28 +206,28 @@ The demo server allows validation of the following algorithms (a superset of the
 * [KAS FFC mqv1](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC dhOneFlow](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC dhStatic](./draft-fussell-acvp-kas-ffc.txt) - [HTML](./draft-fussell-acvp-kas-ffc.html)
-* [KAS ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
-* [KAS ECC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
-* [KAS ECC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
-* [KAS ECC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
-* [KAS ECC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
-* [KAS ECC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
-* [KAS ECC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html) - DEMO only
-* [KAS FFC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
-* [KAS FFC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)  - DEMO only
-* [KAS FFC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
-* [KAS FFC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
-* [KAS FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
-* [KAS FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
-* [KAS FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html) - DEMO only
-* [KAS IFC KAS1-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KAS IFC KAS1-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KAS IFC KAS2-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KAS IFC KAS2-bilateral-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KAS IFC KAS2-Party_U-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KAS IFC KAS2-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KTS IFC KTS-OAEP-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
-* [KTS IFC KTS-OAEP-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html) - DEMO only
+* [KAS ECC ephemeralUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS ECC fullMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS ECC fullUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS ECC onePassDh Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS ECC onePassMqv Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS ECC OnePassUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS ECC staticUnified Sp800-56Ar3](./draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS FFC dhHybrid1 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
+* [KAS FFC mqv2 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
+* [KAS FFC dhEphem Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
+* [KAS FFC dhHybridOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
+* [KAS FFC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
+* [KAS FFC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
+* [KAS FFC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](./draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
+* [KAS IFC KAS1-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
+* [KAS IFC KAS1-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
+* [KAS IFC KAS2-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
+* [KAS IFC KAS2-bilateral-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
+* [KAS IFC KAS2-Party_U-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
+* [KAS IFC KAS2-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
+* [KTS IFC KTS-OAEP-basic](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
+* [KTS IFC KTS-OAEP-Party_V-confirmation](./draft-hammett-acvp-kas-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ifc.html)
 
 #### KAS SSC Testing
 
@@ -262,8 +262,8 @@ Standalone KAS SSC testing from SP800-56A/B.  Can be used in conjunction with KD
 * [KAS FFC SSC mqv1 Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
 * [KAS FFC SSC dhOneFlow Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
 * [KAS FFC SSC dhStatic Sp800-56Ar3](./draft-hammett-acvp-kas-ssc-ffc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ffc.html)
-* [KAS IFC SSC KAS1 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
-* [KAS IFC SSC KAS2 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html) - DEMO only
+* [KAS IFC SSC KAS1 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html)
+* [KAS IFC SSC KAS2 Sp800-56Br2](./draft-hammett-acvp-kas-ssc-ifc.txt) - [HTML](./draft-hammett-acvp-kas-ssc-ifc.html)
 
 #### KAS KDF Testing SP800-56Cr1
 
@@ -298,7 +298,7 @@ Standalone KAS SSC testing from SP800-56A/B.  Can be used in conjunction with KD
 * [ConditioningComponent BlockCipher_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
 * [ConditioningComponent Hash_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
 
-The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, KAS/KTS-IFC, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
+The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
 ## Current 1.0 Support
 Please check the [protocol specification](./draft-fussell-acvp-spec.html) for details on how to access the available resources. 
