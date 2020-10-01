@@ -6,13 +6,15 @@ This section describes the design of the tests used to validate implementations 
 
 === Test Types
 
-There are three types of tests for these hash functions: functional tests, Monte Carlo tests and Variable Output tests. Each has a specific value to be used in the testType field.  The testType field definitions are:
+There are four types of tests for these hash functions: functional tests, Monte Carlo tests, Variable Output tests and Large Data tests. Each has a specific value to be used in the testType field. The testType field definitions are:
 
-* "AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'hash' operation.  AFTs cause the implementation under test to exercise nomral operations on a single block, multiple blocks, or partial blocks. In all cases,random data is used. The functional tests are designed to verify that the logical components of the hash function (block chunking, block padding etc.) are operating correctly.
+* "AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'hash' operation.  AFTs cause the implementation under test to exercise normal operations on a single block, multiple blocks, or partial blocks. In all cases, random data is used. The functional tests are designed to verify that the logical components of the hash function or extenable output function (block chunking, block padding etc.) are operating correctly.
 
 * "MCT" - Monte Carlo Test. These tests exercise the implementation under test under stenuous circumstances. The implementation under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect potential memory leaks over time, and problems in allocation of resources, addressing variables, error handling, and generally improper behavior in response to random inputs. Each MCT processes 100 pseudorandom tests. Each algorithm and mode SHOULD have at least one MCT group. See <<MC_test>> for implementation details.
 
-* "VOT" - Variable Output Test. XXX
+* "VOT" - Variable Output Test. These tests are for SHAKE only, and ensure that an IUT can properly perform the extendable output function to produce digests of specifc lengths. These tests differ from the AFTs for SHAKE in that the AFTs all produce a single digest size, matching the security strength of the extendable output function. The VOTs SHALL produce varying digest sizes based on the capabilities of the IUT.
+
+* "LDT" - Large Data Test. These tests are for SHA3 only. This test performs the hash function on a message that is multiple gigabytes in length. This pushes the bounds of 32-bit data types to ensure an implementation can handle all types of data. See <<LDT>> for more information motivating the LDT. As a multiple gigabyte message cannot be communicated naturally via ACVP, a specific structure is outlined in <<LD_test>>.
 
 [[MC_test]]
 === Monte Carlo tests for SHA3 and SHAKE
@@ -20,6 +22,70 @@ There are three types of tests for these hash functions: functional tests, Monte
 [[SHA3-MCT]]
 ==== SHA3 Monte Carlo Test
 
+The MCTs start with an initial condition (SEED which is a single message) and perform a series of chained computations. The algorithm is shown below.
+
+.SHA-3 Monte Carlo Test
+[source, code]
+----
+For j = 0 to 99
+MD[0] = SEED;
+    For i = 1 to 1000
+        MSG[i] = MD[i-1]
+        MD[i] = SHA3(MSG[i])
+    Output MD[1000]
+    SEED = MD[1000]
+----
+
 [[SHAKE-MCT]]
 ==== SHAKE Monte Carlo Test
 
+The MCTs start with an initial condition (SEED which is a single message) and perform a series of chained computations. Some values used in the algorithm are based on properties provided during the registration. They are as follows.
+
+* minOutBytes = smallest number of bytes supported
+* maxOutBytes = largest number of bytes supported
+
+The SHAKE function used in the pseudocode takes in a bitstring and a desired output length in bits. The M[i] input to SHAKE MUST always contain at least 128 bits. If this is not the case as the previous digest was too short, append empty bits to the rightmost side of the digest. The MCT algorithm is shown below.
+
+.SHAKE Monte Carlo Test
+[source, code]
+----
+Range = maxOutBytes - minOutBytes + 1
+OutputLen = maxOutBytes
+For j = 0 to 99
+    MD[0] = SEED
+    For i = 1 to 1000
+        MSG[i] = 128 leftmost bits of MD[i-1]
+        if (MSG[i] < 128 bits)
+            Append 0 bits on rightmost side of MSG[i] til MSG[i] is 128 bits
+        MD[i] = SHAKE(M[i], OutputLen * 8)
+
+        if (i != 1000)
+            RightmostOutputBits = 16 rightmost bits of MD[i] as an integer
+            OutputLen = minOutBytes + (RightmostOutputBits % Range)
+
+    Output MD[1000], OutputLen
+    SEED = MD[1000]
+----
+
+[[LD_test]]
+=== Large Data tests for SHA-3
+
+The large data tests are intended to test the ability of a module to hash multiple gigabytes of data at once. This much information cannot be communicated via the JSON files as a normal message property. Instead a new type is defined as a large data type. It is an object that contains a small content hex string, a content length in bits, a full length in bits and an expansion technique string. The following is an example of this structure.
+
+[source, json]
+----
+"largeMsg": {
+    "content": "DE26",
+    "contentLength": 16,
+    "fullLength": 42949672960,
+    "expansionTechnique": "repeating"
+}
+----
+
+The 'contentLength' property describes the number of bits in the 'content' property. The 'content' property is the hex string that can be expanded to the full large message. The 'expansionTechnique' describes the process used to obtain the full large message. The 'fullLength' is the final length of the full large message.
+
+There may be multiple 'expansionTechnique' types defined. Here are the types defined for SHA-3 testing.
+
+* "repeating" - Append the number of content bits specified in 'contentLength' to itself as many times as needed until a hex string of exactly 'fullLength' bits is acquired. In the example shown, the final large message would have the form "DE26DE26DE26...DE26".
+
+There are multiple ways hash functions can be implemented in an IUT. The most common are via a single Hash() call on the message or via a series of Init(), any number of Update(), Final() calls. As noted in <<LDT>>, the difference between these hashing techniques can have consequences in the cryptographic module. If both interfaces are offered and accessible for testing, the IUT *MUST* only utilize a single Update() call for the large message.

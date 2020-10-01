@@ -2,19 +2,16 @@
 [[tgjs]]
 === Test Groups
 
-Test vector sets MUST contain one or many test groups, each sharing similar properties.                      For instance, all test vectors that use the same testType would be grouped together.  The testGroups element at the top level of the test vector JSON object SHALL be the array of test groups.  The Test Group JSON object MUST contain meta-data that applies to all test cases within the group.  The following table describes the JSON elements that MAY appear from the server in the Test Group JSON object:
-
+Test vector sets *MUST* contain one or many test groups, each sharing similar properties. For instance, all test vectors that use the same testType would be grouped together. The testGroups element at the top level of the test vector JSON object *SHALL* be the array of test groups. The Test Group JSON object *MUST* contain meta-data that applies to all test cases within the group. The following table describes the JSON elements that *MAY* appear from the server in the Test Group JSON object:
 
 [[vs_tg_table]]
-
-[cols="<,<,<"]
 .Test Group JSON Object
 |===
-| JSON Value| Description| JSON type
+| JSON Value | Description | JSON type
 
-| tgId| Numeric identifier for the test group, unique across the entire vector set| integer
-| testType| Test category type (AFT or MCT). See <<testtypes>> for more information| string
-| tests| Array of individual test case JSON objects, which are defined in	<<tcjs>>| array of testCase objects
+| tgId | Numeric identifier for the test group, unique across the entire vector set | integer
+| testType | Test category type (AFT, MCT or LDT). See <<testtypes>> for more information | string
+| tests | Array of individual test case JSON objects, which are defined in	<<tcjs>> | array of testCase objects
 |===
 
 All properties described in the previous table MUST appear in the prompt file from the server for every testGroup object.
@@ -22,18 +19,75 @@ All properties described in the previous table MUST appear in the prompt file fr
 [[tcjs]]
 === Test Case
 
-Each test group *SHALL* contain an array of one or more test cases.  Each test case is a JSON object that represents a single case to be processed by the ACVP client.  The following table describes the JSON elements for each test case.
+Each test group *SHALL* contain an array of one or more test cases. Each test case is a JSON object that represents a single case to be processed by the ACVP client. The following table describes the JSON elements for each test case.
 
 [[vs_tc_table]]
-
-[cols="<,<,<"]
 .Test Case JSON Object
 |===
-| JSON Value| Description| JSON type
+| JSON Value | Description | JSON type
 
-| tcId| Numeric identifier for the test case, unique across the entire vector set.| integer
-| len| Length of the message or MCT seed| integer
-| msg| Value of the message or MCT seed in big-endian hex| integer
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| len | Length of the message or MCT seed | integer
+| msg | Value of the message or MCT seed in big-endian hex | integer
+| largeMsg | Object describing the message for an LDT group | large data object, see <<LD_test>> for more information
 |===
 
 All properties described in the previous table *MUST* appear in the prompt file from the server for every testCase object.
+
+The following is an example JSON object for secure hash test vectors sent from the ACVP server to the crypto module. Note the single bit message is represented as "80". This complies with SHA1 and SHA2 being big-endian by nature. All hex strings associated with SHA1 and SHA2 *SHALL* be big-endian.
+
+[source, json]
+----
+[
+    { "acvVersion": <acvp-version> },
+    {
+        "vsId": 1564,
+        "algorithm": "SHA2-512/224",
+        "revision": "1.0",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "testType": "AFT",
+                "tests": [
+                    {
+                        "tcId": 0,
+                        "len": 0,
+                        "msg": "00"
+                    },
+                    {
+                        "tcId": 1,
+                        "len": 1,
+                        "msg": "80"
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "testType": "MCT",
+                "tests": [
+                    {
+                        "tcId": 2175,
+                        "len": 20,
+                        "msg": "331b04d56f6e3ed5af349bf1fd9f9591b6ec886e",
+                    }
+                ]
+            },
+            {
+                "tgId": 3,
+                "testType": "LDT",
+                "tests": [
+                    {
+                        "tcId": 1029,
+                        "largeMsg": {
+                            "content": "DE26",
+                            "contentLength": 16,
+                            "fullLength": 42949672960,
+                            "expansionTechnique": "repeating"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]
+----
