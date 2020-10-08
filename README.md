@@ -283,7 +283,7 @@ Standalone KAS SSC testing from SP800-56A/B.  Can be used in conjunction with KD
 * [SRTP](./draft-celi-acvp-kdf-srtp.txt) - [HTML](./draft-celi-acvp-kdf-srtp.html)
 * [SSH](./draft-celi-acvp-kdf-ssh.txt) - [HTML](./draft-celi-acvp-kdf-ssh.html)
 * [TLS](./draft-celi-acvp-kdf-tls.txt) - [HTML](./draft-celi-acvp-kdf-tls.html)
-* [TLS v1.3](./draft-hammett-acvp-kdf-tls-v1.3.txt) - [HTML](./draft-hammett-acvp-kdf-tls-v1.3.html)
+* [TLS v1.3](./draft-hammett-acvp-kdf-tls-v1.3.txt) - [HTML](./draft-hammett-acvp-kdf-tls-v1.3.html) - DEMO only
 * [TPM](./draft-celi-acvp-kdf-tpm.txt) - [HTML](./draft-celi-acvp-kdf-tpm.html)
 * [ANSX9.63](./draft-celi-acvp-kdf-ansi-x963.txt) - [HTML](./draft-celi-acvp-kdf-ansi-x963.html)
 * [ANSX9.42](./draft-celi-acvp-kdf-ansi-x942.txt) - [HTML](./draft-celi-acvp-kdf-ansi-x942.html)
