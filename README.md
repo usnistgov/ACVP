@@ -294,9 +294,9 @@ Standalone KAS SSC testing from SP800-56A/B.  Can be used in conjunction with KD
 * [SafePrimes KeyVer](./draft-hammett-acvp-safe-primes.txt) - [HTML](./draft-hammett-acvp-safe-primes.html)
 
 ### Conditioning Components
-* [ConditioningComponent AES-CBC-MAC](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
-* [ConditioningComponent BlockCipher_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
-* [ConditioningComponent Hash_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](.draft-celi-acvp-conditioning-components.html)
+* [ConditioningComponent AES-CBC-MAC](./draft-celi-acvp-conditioning-components.txt) - [HTML](./draft-celi-acvp-conditioning-components.html)
+* [ConditioningComponent BlockCipher_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](./draft-celi-acvp-conditioning-components.html)
+* [ConditioningComponent Hash_DF](./draft-celi-acvp-conditioning-components.txt) - [HTML](./draft-celi-acvp-conditioning-components.html)
 
 The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
 
