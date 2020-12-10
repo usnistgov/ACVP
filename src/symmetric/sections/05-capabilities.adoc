@@ -48,6 +48,8 @@ Each algorithm capability advertised is a self-contained JSON object and *SHALL*
 | overflowCounter| Indicates if the implementation can handle a counter exceeding the maximum value| boolean
 | incrementalCounter| Indicates if the implementation increments the counter (versus decrementing the counter)| boolean
 | performCounterTests| Indicates if the implementation can perform the Counter tests which check for an always increasing (or decreasing) counter value| boolean
+| tweakLen | The domain of values allowed for ACVP-AES-FF1's tweak value. Allowed range is 0-128 bits mod 8. See <<property_grid_misc>> | domain
+An array of objects that describes an IUT's capabilities as they pertain to ACVP-AES-FF1 and ACVP-AES-FF3-1. See <<property_grid_misc>> and <<property_grid_ff_capabilities>> | Array of Objects
 |===
 
 NOTE: The 'conformances' property is only valid for algorithms listed in <<conformances>>. The valid values in the array are also listed in that section. The array is always optional.
@@ -117,19 +119,35 @@ The following grid outlines which properties are *REQUIRED*, as well as the poss
 
 The following grid outlines which properties are *REQUIRED*, as well as the possible values a server *MAY* support for each miscellaneous block cipher algorithm:
 
-[cols="<,<,<,<,<,<,<,<,<,<"]
 [[property_grid_misc]]
 .Miscellaneous Block Cipher Algorithm Capabilities Applicability Grid
 
 |===
-| algorithm| revision| direction| keyLen| payloadLen| tweakMode| keyingOption| overflowCounter| incrementalCounter| performCounterTests
+| algorithm| revision| direction| keyLen| payloadLen| tweakMode| keyingOption| overflowCounter| incrementalCounter| performCounterTests | tweakLen | capabilities
 
-| AES-CBC-CS1| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | |
-| AES-CBC-CS2| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | |
-| AES-CBC-CS3| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | |
-| AES-CTR| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 1, "Max": 128, "Inc": any}| | | true, false| true, false | true, false
-| AES-XTS| "1.0"| ["encrypt", "decrypt"]| [128, 256]| {"Min": 128, "Max": 65536, "Inc": 128}| ["hex", "number"]| | | |
-| TDES-CTR| "1.0"| ["encrypt", "decrypt"]| | {"Min": 1, "Max": 64, "Inc": any}| | [1, 2] Note: 2 is only available for decrypt operations| true, false| true, false| true, false
+| AES-CBC-CS1| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | | | |
+| AES-CBC-CS2| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | | | |
+| AES-CBC-CS3| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | | | |
+| AES-CTR| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 1, "Max": 128, "Inc": any}| | | true, false| true, false | true, false | |
+| AES-XTS| "1.0"| ["encrypt", "decrypt"]| [128, 256]| {"Min": 128, "Max": 65536, "Inc": 128}| ["hex", "number"]| | | | | |
+| TDES-CTR| "1.0"| ["encrypt", "decrypt"]| | {"Min": 1, "Max": 64, "Inc": any}| | [1, 2] Note: 2 is only available for decrypt operations| true, false|  | |true, false| true, false
+| AES-FF1| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | | Domain 0-128 bits, mod 8. | At least one set 
+of capabilities is required. See <<property_grid_ff_capabilities>> |
+| AES-FF-31| "1.0"| ["encrypt", "decrypt"]| [128, 192, 256]| {"Min": 128, "Max": 65536, "Inc": any}| | | | | | At least one set of capabilities is required. See <<property_grid_ff_capabilities>> |
 |===
 
 NOTE: keyingOption 2 *SHALL* only available for decrypt operations.
+
+[[property_grid_ff_capabilities]]
+.Format Preserving Encryption Capabilities Object
+
+The following grid outlines which properties are REQUIRED within the capabilities object array in use for ACVP-AES-FF1 and ACVP-AES-FF3-1.
+
+|===
+| Property Name | Description | Type | Valid Values |
+
+| alphabet | An alphabet the IUT supports for Format Preserving Encryption.  Example "0123456789abcdefghijklmnopqrstuvwxyz". Alphabets should be a minimum of two characters, and a maximum of 64 (all numbers and upper and lower case letters, additionally "+" and "/"). | string | Alphanumeric non repeating characters. |
+| radix | The number base for this capability, should match the number of characters from the alphabet. | integer | 2-62 |
+| minLen | The minimum payload length the IUT can support for this alphabet. | 2 - maxLen |
+| maxLen | The maximum payload length the IUT can support for this alphabet. | minLen - variable calculation based on radix and algorithm, see <<SP800-38Gr1>>. |
+|===
