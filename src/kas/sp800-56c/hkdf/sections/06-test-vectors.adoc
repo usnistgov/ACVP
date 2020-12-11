@@ -1,7 +1,7 @@
 [[tgjs]]
 === Test Groups JSON Schema
 
-The testGroups element at the top level in the test vector JSON object is an array of test	groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped	together. The Test Group JSON object contains meta data that applies to all test vectors within	the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+The testGroups element at the top level in the test vector JSON object is an array of test  groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped  together. The Test Group JSON object contains meta data that applies to all test vectors within  the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
 
 .Test Group Properties
 |===
@@ -10,7 +10,8 @@ The testGroups element at the top level in the test vector JSON object is an arr
 | tgId | Test group identifier | integer
 | testType | Describes the operation the client should perform on the tests data | string
 | tests | Array of individual test cases | See <<testCase>>
-| kdfConfiguration | Describes the Kdf configuration values used for the group | See <<kdfconfig>>
+| kdfConfiguration | Describes the Kdf configuration values used for single expansion groups. | See <<kdfconfig>>
+| kdfMultiExpansionConfiguration | Describes the Kdf configuration values used for multi expansion groups. | See <<kdfmulticonfig>>
 |===
 
 The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' the group is addressing.
@@ -26,8 +27,25 @@ Describes the KDF configuration for use under the test group.
 
 | kdfType| The type of KDF to use for the group. | value - HKDF
 | saltMethod | The strategy used for salting. | value - default (all 00s), random
+| saltLen | The bit length of the salt. | integer
 | fixedInfoPattern| The pattern used for constructing the fixedInfo. | value - See <<fixedinfopatcon>>.
 | fixedInfoEncoding| The encoding used for constructing the fixedInfo. | value.
+| hmacAlg | The MAC function used in the KDF. | value 
+| l | the bit length of keying material to derive from the KDF | value
+|===
+
+[#kdfmulticonfig]
+==== KDF Multi Expansion Configuration JSON Schema
+
+Describes the KDF Multi Expansion configuration for use under the test group.
+
+.KdfConfiguration JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| kdfType| The type of KDF to use for the group. | value - HKDF
+| saltMethod | The strategy used for salting. | value - default (all 00s), random
+| saltLen | The bit length of the salt. | integer
 | hmacAlg | The MAC function used in the KDF. | value 
 | l | the bit length of keying material to derive from the KDF | value
 |===
@@ -42,9 +60,10 @@ Each test group contains an array of one or more test cases. Each test case is a
 | JSON Value | Description | JSON Type
 
 | tcId | Numeric identifier for the test case, unique across the entire vector set.
-| kdfParameter | Object representing inputs into the KDF | See <<kdfParameter>>.
-| fixedInfoPartyU | Fixed information specific to party U | See <<fixedInfo>>.
-| fixedInfoPartyV | Fixed information specific to party V | See <<fixedInfo>>.
+| kdfParameter | Object representing inputs into the KDF for single expansion tests. | See <<kdfParameter>>.
+| fixedInfoPartyU | Fixed information specific to party U for single expansion tests. | See <<fixedInfo>>.
+| fixedInfoPartyV | Fixed information specific to party V for single expansion tests. | See <<fixedInfo>>.
+| kdfMultiExpansionParameter | Object representing inputs into the KDF for multi expansion tests. | See <<kdfMultiExpansionParameter>>.
 
 |===
 
@@ -64,6 +83,7 @@ KDF specific options used for the test case.
 | label | The random "label" used for the test case when applicable to the fixedInfo pattern. | value
 | l | the bit length of keying material to derive from the KDF | value
 | z | shared secret z value to be used for the test case. | value
+| t | secondary shared secret t.  For <<SP800-56Cr2>> only. | value
 |===
 
 [[fixedInfo]]
@@ -79,12 +99,37 @@ Fixed information that is included for party U/V for fixed info construction
 | ephemeralData | Ephemeral data (randomly) included as a part of the parties fixed info construction | value
 |===
 
+[[kdfMultiExpansionParameter]]
+==== KDF Multi Expansion Parameter JSON Schema
+
+KDF specific options used for the test case.
+
+.KDF Multi Expansion Parameter JSON Object
+|===
+| JSON Value | Description | JSON Type
+| salt | The salt used for the test case. | value
+| z | shared secret z value to be used for the test case. | value
+| iterationParameters | the per iteration parameters for multi expansion | See <<iterationParameters>>.
+|===
+
+[[iterationParameters]]
+===== KDF Multi Expansion IterationParameters JSON Schema
+
+The per multi expansion iteration specific parameters used within a test case.
+
+.KDF Multi Expansion IterationParameters JSON Object
+|===
+| JSON Value | Description | JSON Type
+| l | The length of keying material to derive for the current iteration. | value
+| fixedInfo | The fixed information for the current iteration. Note that <<SP800-56Cr2>> does not go into detail regarding how this per iteration fixed info should be constructed, but it obviously needs to be different each iteration.| value
+|===
+
 [[app-vs-ex]]
 === Example Test Vectors JSON
 
-The following is a example JSON object for KAS-FFC test vectors sent from the ACVP server to the crypto module.
+The following is a example JSON object for KAS-KDF HKDF test vectors sent from the ACVP server to the crypto module.
 
-.Vector Set JSON Example
+.Vector Set JSON Example SP800-56Cr1
 [source,json]
 ---- 
 {
@@ -318,6 +363,250 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
         "fixedInfoEncoding": "concatenation",
         "hmacAlg": "SHA2-256"
       }
+    }
+  ]
+}
+----
+
+.Vector Set JSON Example SP800-56Cr2
+[source,json]
+----
+{
+  "vsId": 0,
+  "algorithm": "KAS-KDF",
+  "mode": "HKDF",
+  "revision": "Sp800-56Cr2",
+  "isSample": true,
+  "testGroups": [{
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [{
+          "tcId": 1,
+          "kdfParameter": {
+            "kdfType": "hkdf",
+            "requiresAdditionalNoncePair": false,
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "t": "40FD8005E9DB9F2B51A041E3AC94C8C4",
+            "z": "1D441E0CCF7BB36E5AA0E0542A5FFCC4E2591A4B456F85127EA58019AAFC",
+            "l": 1024,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation",
+            "hmacAlg": "SHA2-224"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "86F69E3C0EB5469A3B79D57D3DB79109"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "41F372D604653BA1A01D2CDB89DEDA48"
+          }
+        },
+        {
+          "tcId": 2,
+          "kdfParameter": {
+            "kdfType": "hkdf",
+            "requiresAdditionalNoncePair": false,
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "t": "F5BDD01D922A0D8F2483EF651C63B93B",
+            "z": "0DF21E4B645BEAE3DC233D62EACDC2D4C4361499DB9D99652E936644C3D6",
+            "l": 1024,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation",
+            "hmacAlg": "SHA2-224"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "6E55897EC9530DBEDAAFAEFF0FA86B83",
+            "ephemeralData": "5D59E9552CF21226C5276C2E578FA646E22E0A59DFFAD17F6D33C56838CA"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "CF55CE043D28FD50488AE68177EC9459",
+            "ephemeralData": "C0E9443007471C6061B71DC4869D77961807D2551205C5022731EF220D2A"
+          }
+        }
+      ],
+      "kdfConfiguration": {
+        "kdfType": "hkdf",
+        "l": 1024,
+        "saltLen": 224,
+        "saltMethod": "default",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+        "fixedInfoEncoding": "concatenation",
+        "hmacAlg": "SHA2-224"
+      }
+    },
+    {
+      "tgId": 2,
+      "testType": "AFT",
+      "tests": [{
+          "tcId": 6,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "hkdf",
+            "z": "C8A1ABB821ACD67A013B5BDAD536E129E2802ECE78E97A1B131522ECC170",
+            "hmacAlg": "SHA2-224",
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "iterationParameters": [{
+                "l": 1024,
+                "fixedInfo": "C7D221E58CAF7D508872D8A49A10AEF2"
+              },
+              {
+                "l": 1024,
+                "fixedInfo": "EE0D9F58864635020FA807D1716520B3"
+              },
+              {
+                "l": 1024,
+                "fixedInfo": "70FE21E6C586A2A2ED3739ABBE0CC2A0"
+              }
+            ]
+          }
+        },
+        {
+          "tcId": 7,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "hkdf",
+            "z": "57F6F90A84D894E521AA3A7CE90F01F7CA9AD4DD98F2640C2C61E8732F48",
+            "hmacAlg": "SHA2-224",
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "iterationParameters": [{
+                "l": 1024,
+                "fixedInfo": "9EB2783FFFC68EA1AA3CAC26C0FFEEA0"
+              },
+              {
+                "l": 1024,
+                "fixedInfo": "8DDAA8243588E4CD994733119EA3AF4F"
+              },
+              {
+                "l": 1024,
+                "fixedInfo": "589BB97230E295091B0B8D398405C4F0"
+              },
+              {
+                "l": 1024,
+                "fixedInfo": "F885072441F265A76CD28B81AE463CC2"
+              }
+            ]
+          }
+        }
+      ],
+      "kdfMultiExpansionConfiguration": {
+        "kdfType": "hkdf",
+        "l": 1024,
+        "saltLen": 224,
+        "saltMethod": "default",
+        "hmacAlg": "SHA2-224"
+      }
+    },
+    {
+      "tgId": 201,
+      "testType": "VAL",
+      "tests": [{
+          "tcId": 1001,
+          "kdfParameter": {
+            "kdfType": "hkdf",
+            "requiresAdditionalNoncePair": false,
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "t": "A729D08B11D540859879D5E53D850658",
+            "z": "02A6F58DEBBB1A9A57B77BF767D63668A3A485938436191BB3B419CA",
+            "l": 1024,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation",
+            "hmacAlg": "SHA2-224"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "5FA901D03FD310123F5E9D0DDF44DF9B",
+            "ephemeralData": "A8E75497D8CB95C440B3E933722525C85EAF0DD2190F196E694E30D5"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "8F3AC635C62C9958C5B8BA5B70998678"
+          },
+          "dkm": "DC6029AB75B2B69D7F0A6F7F786DA68FBC08FA03A958865F650248C41872EA0BBEE49AB280FED61698FC5432501E929666033DAFE4F5B168F154C4CB5E2FEC4B3CA76DC5E926EA516126D4D249779F2E635AB844A7FA3B591D37DBC9623812F004EF0068A6230786B6F0BF9836649F69CF62E4D8843D3F8F7ABB00B49C351B78"
+        },
+        {
+          "tcId": 1002,
+          "kdfParameter": {
+            "kdfType": "hkdf",
+            "requiresAdditionalNoncePair": false,
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "t": "F7FF5C84A9764E677AC3D7C02A25A638",
+            "z": "3FC7CBC389DB1FB69D22CBAAD3F8B122D87C97672088B6E4D307F103",
+            "l": 1024,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation",
+            "hmacAlg": "SHA2-224"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "29C2041E82B0CD219A22B512E4B2A362"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "EF19107D15E340623AB8FFA256B557EA",
+            "ephemeralData": "3E74B0AAF9A3BFE91173D82EB25DB27F9F1BDCB25D8F6DC597E5C4BE"
+          },
+          "dkm": "8BC3D9FD0B661A2A2B70480A88EE3B3E2307DA7CC9C7F9EA0F21C04799926AFCF06911B19D219056C82429BFE42CBBA9C21B4CEB14E1B9D2B9FD2932BFA098363CCD6D14600BF724ABC5B9A3FD4DB75705DB4EE94E13C4CF255C5D40E3CA20FB88FD39D6A34F00B72628B7023C0B7C2319307D858040D7346C04921CC5AE0422"
+        }
+      ],
+      "kdfConfiguration": {
+        "kdfType": "hkdf",
+        "l": 1024,
+        "saltLen": 224,
+        "saltMethod": "default",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+        "fixedInfoEncoding": "concatenation",
+        "hmacAlg": "SHA2-224"
+      }
+    },
+    {
+      "tgId": 202,
+      "testType": "VAL",
+      "tests": [{
+          "tcId": 1006,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "hkdf",
+            "z": "5A76689DF696A0C1E516F0D758C1AB2BF745D323A31BD78A0D76FFEF",
+            "hmacAlg": "SHA2-224",
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "iterationParameters": [{
+                "l": 1024,
+                "fixedInfo": "29CF6727AB8532DE29172CB33D724565"
+              },
+              {
+                "l": 1024,
+                "fixedInfo": "955A85676B01BCF89F22C1850D06D11F"
+              }
+            ]
+          },
+          "dkms": [
+            "811016DE3078644C12F915E7898DD56EED26FCDC968CD489FB676C29D019FE2660F5AB0169B006D0C11AFB16506B4AD868D994847AF16A3F37478C6FA8F08534C059675E3C52257B2F69093719D87E91AB943E21D3D5AF5B1E512C38868C32C6C7013F33879E2633601E36859BD15863BBCB5A399AD06DD225F84EA650D16E88",
+            "46A9EE75DC5C380B3356F2EF168F6EB2329CB604AD2300BAF7A6BDEFB32C3A55F6DD438B02582734B3AC63D44F3D5812E0F5BDF839C5E2439BCEA11B7B9EB92950D1FA84CAB011D3C0D9A9BBB1C2D6016BBBC664A96516450AB686318C73315514CDFD4C6145F0A10117E2E97C5380D38AE6380B4BABFD2375EB17E6DAA53EA6"
+          ]
+        },
+        {
+          "tcId": 1007,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "hkdf",
+            "z": "48816B785166CEED40E314EB73DFCFC76A75260D74D9FEEAB387BB31",
+            "hmacAlg": "SHA2-224",
+            "salt": "00000000000000000000000000000000000000000000000000000000",
+            "iterationParameters": [{
+                "l": 1024,
+                "fixedInfo": "841048CDDE2F5A5315B25B3D1D32A20C"
+              },
+              {
+                "l": 1024,
+                "fixedInfo": "CD98A7219599294E3AE4AC9981092B3E"
+              }
+            ]
+          },
+          "dkms": [
+            "22D1CFC3D3A4B6028F86B3621583D77677535635FBB271231ECEFD0D2F72522591F5B85DA8EA3C725B689CF583AECA50F3A9C748D6374BB068E554FDB94320EA6AA0C2363AB45DB3C73811764EF3DABE8897864E853896DD0D30449C666D6D4C4F81DF0066E9624650AE6172FA7EE98B182EFFA64CBA2C5114C3A2B502E6A839",
+            "F8557EFD353C98E5F61DCE37A3F91E411081BAFF4C09C9B54EA5397EE5AC59DB5E126E1FF9D617956ABDBE8EB3073A6C40EA9C8B8C3FF9385AF1F2C1FA620422D8BD59D4CC0728514842B729BF2503F5ED3AEEEEDF409E0B3F4C9C0ADF639290F4E073C01AD8A04E3C3EE91AC6546E01ED6E785FF05E09BB25122E8DE8514135"
+          ]
+        }
+      ],
+      "kdfMultiExpansionConfiguration": {
+        "kdfType": "hkdf",
+        "l": 1024,
+        "saltLen": 224,
+        "saltMethod": "default",
+        "hmacAlg": "SHA2-224"
+      },
+      "multiExpansion": true
     }
   ]
 }
