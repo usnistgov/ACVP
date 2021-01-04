@@ -9,10 +9,8 @@ The testGroups element at the top level in the test vector JSON object is an arr
 
 | tgId | Test group identifier | integer
 | kdfType | The type of ANS x9.42 KDF | string
-| zzLen | The length of ZZ in bits | integer
-| otherInfoLen | The length of the other info in bits | integer
-| keyLen | The key output length in bits | integer
 | hashAlg | The hash algorithm used | string
+| oid | The OID used within the other info in the "DER" KDF | hex
 | testType | Operation client should perform on the test data | string
 | tests | Array of individual test cases | array
 |===
@@ -28,8 +26,13 @@ Each test group contains an array of one or more test cases. Each test case is a
 | JSON Values | Description | JSON Type
 
 | tcId | Test case idenfitier | integer
+| keyLen | The expected length in bits of the resulting derived key | integer
 | zz | Zz value | hex
-| otherInfo | Other info value | hex
+| partyUInfo | Supplemental party U information for "DER" KDF | hex
+| partyVInfo | Supplemental party V information for "DER" KDF | hex
+| suppPubInfo | Supplemental public information for "DER" KDF | hex
+| suppPrivInfo | Supplemental private information for "DER" KDF | hex
+| otherInfo | Other information for "concatentation" KDF | hex
 |===
 
 Here is an abbreviated yet fully constructed example of the prompt
@@ -37,31 +40,54 @@ Here is an abbreviated yet fully constructed example of the prompt
 [source, json]
 ----
 {
-  "vsId": 1,
+  "vsId": 0,
   "algorithm": "kdf-components",
   "mode": "ansix9.42",
   "revision": "1.0",
+  "isSample": false,
   "testGroups": [
     {
       "tgId": 1,
       "testType": "AFT",
+      "hashAlg": "SHA-1",
+      "kdfType": "DER",
+      "oid": "060B2A864886F70D0109100306",
       "tests": [
         {
           "tcId": 1,
-          "zz": "F2",
-          "otherInfo": ""
+          "zz": "17A29984964A768CBFCFDBF88D83063D...",
+          "partyUInfo": "",
+          "partyVInfo": "",
+          "suppPubInfo": "",
+          "suppPrivInfo": ""
         },
         {
           "tcId": 2,
-          "zz": "96",
-          "otherInfo": ""
+          "zz": "782A64268C960FB4236D5075AA3BC7A0...",
+          "partyUInfo": "A0B65EC9ACD5488E90633C51...",
+          "partyVInfo": "04F21C3CB720FE76A32681AD...",
+          "suppPubInfo": "E25196CB15D545D6B2F2205...",
+          "suppPrivInfo": "ADD68D627F9C1FE03EA409..."
         }
-      ],
+      ]
+    },
+    {
+      "tgId": 12,
+      "testType": "AFT",
       "hashAlg": "SHA-1",
-      "keyLen": 256,
-      "kdfType": "DER",
-      "otherInfoLen": 0,
-      "zzLen": 8
+      "kdfType": "concatenation",
+      "tests": [
+        {
+          "tcId": 551,
+          "zz": "B9DBEC70446BB90A5FDB0B5CDC283927...",
+          "otherInfo": "8F228F82F740C6C027071A9E3..."
+        },
+        {
+          "tcId": 552,
+          "zz": "BC",
+          "otherInfo": "7119740C20D9EF03888A6253C..."
+        }
+      ]
     }
   ]
 }
