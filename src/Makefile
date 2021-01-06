@@ -18,6 +18,6 @@ clean:
 publish:
 	mkdir -p documents
 	cp ../index.html documents/index.html # can't start in the same directory because of the clean command
-	cp ../_config.yml documents/_config.yml
+	cp ../slate.css documents/slate.css
 	mv *.html documents/
 	mv *.txt documents/
