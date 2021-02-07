@@ -11,9 +11,25 @@ Some algorithm implementations rely on other cryptographic primitives. For examp
 |===
 | JSON Value| Description| JSON Type| Valid Values| Optional
 
-| algorithm| a prerequisite algorithm| value| CMAC, DRBG, ECDSA, HMAC, KMAC, RSA, RSADP, SHA, SP800-108| No
+| algorithm| a prerequisite algorithm| value| CMAC, DRBG, HMAC, KMAC, RSA, RSADP, SHA, SP800-108| No
 | valValue| algorithm validation number| value| actual number or "same"| No
-| prereqAlgVal| prerequistie algorithm validation| object with algorithm and valValue properties| see above| Yes
+| prereqAlgVal| prerequisite algorithm validation| object with algorithm and valValue properties| see above| Yes
+|===
+
+KAS has conditional prerequisite algorithms, depending on the capabilities registered:
+
+[[prereqs_requirements_table]]
+
+.Prerequisite requirement conditions
+|===
+| Prerequisite Algorithm| Condition
+
+| DRBG | Always *REQUIRED*
+| SHA | Always *REQUIRED*
+| RSA | RSA KeyGen validation *REQUIRED* when IUT makes use of the generation/validation of keys within the module boundary.
+| CMAC | CMAC validation *REQUIRED* when IUT is performing KeyConfirmation (KC) or a KDF and utilizing CMAC.
+| HMAC | HMAC validation *REQUIRED* when IUT is performing KeyConfirmation (KC) or a KDF and utilizing HMAC.
+| KMAC | KMAC validation *REQUIRED* when IUT is performing KeyConfirmation (KC) or a KDF and utilizing KMAC.
 |===
 
 
@@ -108,10 +124,10 @@ KTS Schemes
 | JSON Value| Description| JSON Type| Valid Values| Optional
 
 | kasRole| Roles supported for key agreement| array| initiator and/or responder| No
-| kdfMethods| The KDF methods to use when testing KAS schemes. | object| <<kdfmethods>>| Not optional for KAS schemes.
-| ktsMethods| The KTS methods to use when testing KTS schemes. | object| <<ktsmethods>>| Not optional for KTS schemes.
-| macMethods| The MAC methods to use when testing KAS or KTS schemes with key confirmation. | object| <<macmethods>>| Not optional for KAS/KTS schemes making use of key confirmation.
-| l | The length of the key to derive (using a KDF) or transport (using a KTS scheme).  This value should be large enough to accommodate the key length used for the mac algorithms in use for key confirmation, ideally the maximum value the IUT can support with their KAS/KTS implementation.  Maximum value (for testing purposes) is 1024.| integer| 128 minimum without KC, 136 minimum with KC, maximum 1024.| No
+| kdfMethods| The KDF methods to use when testing KAS schemes. | object| <<kdfmethods>>| Only applicable (as well as *REQUIRED*) for KAS schemes.
+| ktsMethods| The KTS methods to use when testing KTS schemes. | object| <<ktsmethods>>| Only applicable (as well as *REQUIRED*) for KTS schemes.
+| macMethods| The MAC methods to use when testing KAS or KTS schemes with key confirmation. | object| <<macmethods>>| *REQUIRED* for KAS/KTS schemes making use of Key Confirmation.
+| l | The length of the key to derive (using a KDF) or transport (using a KTS scheme - note that the IUT may be providing their own wrapped key of length `l` for KTS AFT testing as an initiator).  This value should be large enough to accommodate the key length used for the mac algorithms in use for key confirmation, ideally the maximum value the IUT can support with their KAS/KTS implementation.  Maximum value (for testing purposes) is 1024.| integer| 128 minimum without KC, 136 minimum with KC, maximum 1024.| No
 |===
 
 [[kdfmethods]]
@@ -144,7 +160,7 @@ Note that *AT LEAST* one KDF Method is required for KAS schemes.  The following 
 |===
 | JSON Value| Description| JSON Type| Valid Values| Optional
 
-| auxFunctionName| The auxiliary function to use.| string| SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512, HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512, KMAC-128, KMAC-256 | No
+| auxFunctionName| The auxiliary function to use. Note that a customization string of "KDF" is used for the function when KMAC is utilized.| string| SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512, HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512, KMAC-128, KMAC-256 | No
 | macSaltMethods| How the salt is determined (default being all 00s, random being a random salt). | array of string| default, random| Not optional for mac based auxiliary functions.
 |===
 
@@ -256,8 +272,8 @@ Note that *AT LEAST* one mac method must be supplied when making use of Key Conf
 | HMAC-SHA3-256| Utilizes HMAC-SHA3-256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
 | HMAC-SHA3-384| Utilizes HMAC-SHA3-384 as the MAC algorithm. | object| See <<supmacopt>>| Yes
 | HMAC-SHA3-512| Utilizes HMAC-SHA3-512 as the MAC algorithm. | object| See <<supmacopt>>| Yes
-| KMAC-128| Utilizes KMAC-128 as the MAC algorithm. | object| See <<supmacopt>>| Yes
-| KMAC-256| Utilizes KMAC-256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| KMAC-128| Utilizes KMAC-128 as the MAC algorithm. Note that a customization string of "KC" is used for the function when KMAC is utilized for Key Confirmation.| object| See <<supmacopt>>| Yes
+| KMAC-256| Utilizes KMAC-256 as the MAC algorithm. Note that a customization string of "KC" is used for the function when KMAC is utilized for Key Confirmation.| object| See <<supmacopt>>| Yes
 |===
 
 [[supmacopt]]
