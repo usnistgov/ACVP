@@ -16,6 +16,7 @@ A registration *SHALL* use these properties:
 | capabilities | The two step configuration objects | array of <<twostepkdf>> | See <<twostepkdf>>
 | z| The domain of values representing the min/max lengths of Z the implementation can support.| Domain
 | l| The largest DKM the implementation can produce (up to a max of 2048).| number
+| performMultiExpansionTests | Should multi expansion runs of the KDF be tested (in addition to the single expansion tests)? Only applicable for <<SP800-56Cr2>> | boolean
 |===
 
 [[prereq_algs]]
@@ -85,6 +86,9 @@ algorithmId.
 * l
   ** The length of the derived keying material in bits, *MUST* be represented in 32 bits for ACVP testing.
 
+* t
+  ** A random value used to represent a secondary shared secret. Only applicable to <<SP800-56Cr2>>.
+
 Example (Note that party U is the server in this case "434156536964", party V is the IUT "a1b2c3d4e5"):
 
 * "concatenation" :
@@ -96,7 +100,7 @@ Evaluated as:
 
 === Registration Example
 
-.Registration JSON Example
+.Registration JSON Example SP800-56Cr1
 [source,json]
 ----
 {
@@ -124,6 +128,64 @@ Evaluated as:
         "default"
       ],
       "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+      "encoding": [
+        "concatenation"
+      ],
+      "kdfMode": "feedback",
+      "macMode": [
+        "HMAC-SHA3-224",
+        "HMAC-SHA2-512"
+      ],
+      "supportedLengths": [
+        512
+      ],
+      "fixedDataOrder": [
+        "after fixed data",
+        "before iterator"
+      ],
+      "counterLength": [
+        32
+      ],
+      "requiresEmptyIv": false,
+      "supportsEmptyIv": false
+    }
+  ],
+  "l": 2048,
+  "z": [
+    512
+  ]
+}
+----
+
+.Registration JSON Example SP800-56Cr1
+[source,json]
+----
+{
+  "algorithm": "KAS-KDF",
+  "mode": "TwoStep",
+  "revision": "Sp800-56Cr1",
+  "prereqVals": [
+    {
+      "algorithm": "DRBG",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "SHA",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "HMAC",
+      "valValue": "123456"
+    }
+  ],
+  "performMultiExpansionTests": true,
+  "capabilities": [
+    {
+      "macSaltMethods": [
+        "random",
+        "default"
+      ],
+      "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
       "encoding": [
         "concatenation"
       ],

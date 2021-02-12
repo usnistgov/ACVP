@@ -281,6 +281,14 @@ Standalone KAS KDF testing from SP800-56Cr1. Can be used in conjunction with SSC
 * [KAS KDF OneStep Sp800-56Cr1](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.html)
 * [KAS KDF TwoStep Sp800-56Cr1](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
 
+#### KAS KDF Testing SP800-56Cr2
+
+  Standalone KAS KDF testing from SP800-56Cr2.  Can be used in conjunction with SSC testing (as opposed to full KAS testing) to be considered a valid KAS implementation.
+
+* [KAS KDF HKDF Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-hkdf.html)
+* [KAS KDF OneStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestep.html)
+* [KAS KDF TwoStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
+
 ### KDFs
 * [Counter KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [Feedback KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
