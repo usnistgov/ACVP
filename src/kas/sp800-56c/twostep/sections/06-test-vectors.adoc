@@ -11,6 +11,8 @@ The testGroups element at the top level in the test vector JSON object is an arr
 | testType | Describes the operation the client should perform on the tests data | string
 | tests | Array of individual test cases | See <<testCase>>
 | kdfConfiguration | Describes the Kdf configuration values used for the group | See <<kdfconfig>>
+| kdfConfiguration | Describes the Kdf configuration values used for single expansion groups. | See <<kdfconfig>>
+| kdfMultiExpansionConfiguration | Describes the Kdf configuration values used for multi expansion groups. | See <<kdfmulticonfig>>
 |===
 
 The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' the group is addressing.
@@ -35,6 +37,22 @@ Describes the KDF configuration for use under the test group.
 | l | the bit length of keying material to derive from the KDF | value
 |===
 
+[#kdfmulticonfig]
+==== KDF Multi Expansion Configuration JSON Schema
+
+Describes the KDF Multi Expansion configuration for use under the test group.
+
+.KdfConfiguration JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| kdfType| The type of KDF to use for the group. | value - HKDF
+| saltMethod | The strategy used for salting. | value - default (all 00s), random
+| saltLen | The bit length of the salt. | integer
+| hmacAlg | The MAC function used in the KDF. | value 
+| l | the bit length of keying material to derive from the KDF | value
+|===
+
 [[testCase]]
 === Test Case JSON Schema
 
@@ -45,9 +63,10 @@ Each test group contains an array of one or more test cases. Each test case is a
 | JSON Value | Description | JSON Type
 
 | tcId | Numeric identifier for the test case, unique across the entire vector set.
-| kdfParameter | Object representing inputs into the KDF | See <<kdfParameter>>.
-| fixedInfoPartyU | Fixed information specific to party U | See <<fixedInfo>>.
-| fixedInfoPartyV | Fixed information specific to party V | See <<fixedInfo>>.
+| kdfParameter | Object representing inputs into the KDF for single expansion tests. | See <<kdfParameter>>.
+| fixedInfoPartyU | Fixed information specific to party U for single expansion tests. | See <<fixedInfo>>.
+| fixedInfoPartyV | Fixed information specific to party V for single expansion tests. | See <<fixedInfo>>.
+| kdfMultiExpansionParameter | Object representing inputs into the KDF for multi expansion tests. | See <<kdfMultiExpansionParameter>>.
 
 |===
 
@@ -83,12 +102,37 @@ Fixed information that is included for party U/V for fixed info construction
 | ephemeralData | Ephemeral data (randomly) included as a part of the parties fixed info construction | value
 |===
 
+[[kdfMultiExpansionParameter]]
+==== KDF Multi Expansion Parameter JSON Schema
+
+KDF specific options used for the test case.
+
+.KDF Multi Expansion Parameter JSON Object
+|===
+| JSON Value | Description | JSON Type
+| salt | The salt used for the test case. | value
+| z | shared secret z value to be used for the test case. | value
+| iterationParameters | the per iteration parameters for multi expansion | See <<iterationParameters>>.
+|===
+
+[[iterationParameters]]
+===== KDF Multi Expansion IterationParameters JSON Schema
+
+The per multi expansion iteration specific parameters used within a test case.
+
+.KDF Multi Expansion IterationParameters JSON Object
+|===
+| JSON Value | Description | JSON Type
+| l | The length of keying material to derive for the current iteration. | value
+| fixedInfo | The fixed information for the current iteration. Note that <<SP800-56Cr2>> does not go into detail regarding how this per iteration fixed info should be constructed, but it obviously needs to be different each iteration.| value
+|===
+
 [[app-vs-ex]]
 === Example Test Vectors JSON
 
 The following is a example JSON object for KAS-FFC test vectors sent from the ACVP server to the crypto module.
 
-.Vector Set JSON Example
+.Vector Set JSON Example SP800-56Cr1
 [source,json]
 ---- 
 {
@@ -385,6 +429,304 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
         "ivLen": 512
       }
     }
+  ]
+}
+----
+
+.Vector Set JSON Example SP800-56Cr2
+[source,json]
+---- 
+{
+  "vsId": 0,
+  "algorithm": "KAS-KDF",
+  "mode": "TwoStep",
+  "revision": "Sp800-56Cr2",
+  "isSample": true,
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 1,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "73669F6D823C5AAB0C3E2B8CF7E8BDD71D4E659BCD6CFF92CD6C9708D2232470100A0E7513A1D932FDEAC0DE2F8B32B045467013B894CF81DBB20F5C6E5895CD",
+            "t": "86B6B4E25737D8B42CAE4B135A46AA5E",
+            "z": "B5730243292A071FFF6CD3448D4644C01BD59435BBAE5B1BE7E7D2D9B2D8824C4CCEF5778C33CAC0AD7A5D19E3705510F21799561A1558ABEA8E77F3EBB4995D",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
+            "fixedInputEncoding": "concatenation",
+            "iv": "DBBE8E4B36080300B04DAE64E8F66FF88EB85F8ECE30CE8063CF5F1D1609F999F25FEA5BAD2716E544831326B83B848BCC611D54DF9DBEC6193C734DEE4884C4",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "2C78BEAFBDC7896D3E1865C0D4CEC989"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "E719A3BEA7D292D815790740AF32CB18"
+          }
+        },
+        {
+          "tcId": 2,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "29DEC0ED49BD992D49D2760D463234815F663D0CE5A2957B5B733DC573714F882437057801D5185F19160955A8C680CB2B7263984D39CA2F56C1C2611DB34453",
+            "t": "69C874B72E75FC0895A815DFEE0870FC",
+            "z": "F8F7368992EF282A515FEFCE6397E1346346E11B30CCECF605502A9A718363EA89EA2925446E00F3771DF409D9A5549693C8A44FC6F9AF211C7AF793E39F4845",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
+            "fixedInputEncoding": "concatenation",
+            "iv": "E40E3ABAC9CDB2FEA2579A4176969C8CFCE2124AA238A4CE826D1C79F75178B7BB6D297F2B45287C1216F0D2437F76B2210D3166BF2C6A0D8E66FFF149C41493",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "115BED271DE2A0036BF85621EBDC6FC4"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "F5C07CBE3A72463203FBBB879144100A"
+          }
+        },
+      ],
+      "kdfConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 512,
+        "saltMethod": "random",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
+        "fixedInfoEncoding": "concatenation",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      }
+    },
+    {
+      "tgId": 2,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 6,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "twoStep",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32,
+            "salt": "A0DCAD75DAF16543013DF2D838B0F043C70E66795DF15C725F2F8E73939C3744DBDC09EC9D28E5BB892BCC7CB1D80B1B74310745E0065AAAC84A9EBFACEE6FCD",
+            "iv": "86F0F24DCF144927D946E05313039C5575261EB45E5C22EFA55C00CA4EDF5080C5E9549C0E4F9BF95203A459FB5961D7550FCEDA1F3E79DB8D009D6A0D9B2A7D",
+            "z": "F9CBD2C724EF2353D85C62D671040E5C77EA0899E87FFE07B935F039735938AA829110D49F0E2D1194869C7F3BCED631FD578DEC81270509A071D55100B8DA75",
+            "iterationParameters": [
+              {
+                "l": 512,
+                "fixedInfo": "5C95F8AEF753345A12863D223BA83F8A"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "E367A16FD5FA56D7337136C8927B7F19"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "EF3A620269F1E88C20D55011F7380209"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "B9A3B043CB6474CE53467FB89B24BDFD"
+              }
+            ]
+          }
+        },
+        {
+          "tcId": 7,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "twoStep",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32,
+            "salt": "829BB5915FA3FB20972CA6C22F1AED6BC40119EA50487BCA520CD60729964EFE218F40AEC3B2D78EF853EE068F30E1E628B5BCDB2EC1D0C34A78443632F47486",
+            "iv": "27DC1483266BD740E05CDA5DA3882EED1CF0A1E1E55A0BCCDE9F73E94B0FC5DF14C1AD320C08FF21585F5F26C158EDD6740E03A68BC4DDD50F208C258D2F9F40",
+            "z": "281ED3C7FE60F4C2FE8B45B0D2EB3D1DD45A78B7C577A7F8FE03D8F59817EA5FC6DB41E5E45526A32A280FF531C9322EB75B7908120B2E6904B71D24041EEB0E",
+            "iterationParameters": [
+              {
+                "l": 512,
+                "fixedInfo": "4208FB9D1C803414A141C4E333B3D6A5"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "3235F21101152080DC48AC200BC54297"
+              }
+            ]
+          }
+        }
+      ],
+      "kdfMultiExpansionConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 512,
+        "saltMethod": "random",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      },
+      "multiExpansion": true
+    },
+    {
+      "tgId": 65,
+      "testType": "VAL",
+      "tests": [
+        {
+          "tcId": 321,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "06614CC285E42B00C7625244594D27B5BB932A7C5E85EA02B116D191A7682F01DFCC4F207E912127AA11DA2D468A0414984D43327632AE5581CA53A70BD611A2",
+            "t": "ACA02E08F6D7BAF6FC470435D5B88EE9",
+            "z": "6B91690E9D667043924421ABFA4056AA51A15793255B975BE5C44E37A40B892588640E90C8F5FBA0F8179C677F830DB68110A55BEF71107A2132039806685A2E",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
+            "fixedInputEncoding": "concatenation",
+            "iv": "5D54A0FE3A35C6B76D056883EBF7E7FD4C71200E6C6B0A210EDF91B5297D7F89B5EF90ED66A7A0CCAE9B7301F9C9D68DFC2EB3554244D8ED4206A6DB027452E1",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "4865F140D0239D4967496C99D2C9E8AB"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "05F2D726E8C660784404DD69CD391EA3"
+          },
+          "dkm": "0BD0E7F866581520EC749F2EAAE31C46184EAA3B1CA3E3DB706A94CCFF6093B1E4483BF80BF83068816F8CEE3A25A6013BA0096FCF283113E0ECF85756F2A75A"
+        },
+        {
+          "tcId": 322,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "requiresAdditionalNoncePair": false,
+            "salt": "05566C08DD5415A956FC2BA699547882DD22BA74CD02F4C69EAFD7EF9AD8D7AFF7218C337A88477ABD554CC20758621F2355E6DC954533918AE79025CFD2FEA2",
+            "t": "AB9864A12B7531DD07EB22CC4D2FE623",
+            "z": "8CDBA4BA67446579B5AB939A9BE589349B1479FA9A1E2E00E9C8D74AFA177FCA99E9A126427FB1A9A956BFFF04C90546ECFD41F27228312E01E63A18ED0ECF74",
+            "l": 512,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
+            "fixedInputEncoding": "concatenation",
+            "iv": "E1C558C98C2A62FD8ACD9C735CB894CC220C2FEBECE60C45C7CE1DD426BBFC9D5A96D182DAF181DA83508737BAF8AB24C049874ACD40B9B24833BB0E05E54E12",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32
+          },
+          "fixedInfoPartyU": {
+            "partyId": "30AEBBA0D104E03D6EA2022A73A78F47",
+            "ephemeralData": "4CF8A744EF46B6DC72FC5E43670E7EA8B2DBDBBC81C8A07090FAD03D96D6C913B6BD15DA8EBA5E76E73171A0D16B5392535B2E6193E58162D336FE4DBC9D0DE4"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "9A2AB0A90060DB58C115C557977F2EC3"
+          },
+          "dkm": "07423F264BB882C8CF3D2D08DDA2E0742AEAFBDF819EED35F8B5FFB4960AB5CCEDE479E2746390D539F65FCEB58C08B706B36CC859FBD873FF180C7E5612F04B"
+        }
+      ],
+      "kdfConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 512,
+        "saltMethod": "random",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
+        "fixedInfoEncoding": "concatenation",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      }
+    },
+    {
+      "tgId": 66,
+      "testType": "VAL",
+      "tests": [
+        {
+          "tcId": 326,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "twoStep",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32,
+            "salt": "C814F6C4E49E535DFB59CE72EFEA3F8BD770043CA2E1AF6C9D459CD07D38EC129DB838C2AB6C184BC43C065459E221EB7B0200593D1F3B01D7A231FCE9189A02",
+            "iv": "7A512E648ADAE756B97A90D62E3B56CBC3D5B4E12E139B94060F03D9BB1F189A75D961FE7C203D93432AC84E831F95A847889A25A5ED44DC4FAA84C76D2A8182",
+            "z": "D568E0018EBEB1139E35F8391C698977017B7B68147000D9C055A97D0823FB855904C7A1BDA996E8FE49C8A969C3984966A18429F264669D099EAA25A7B05C67",
+            "iterationParameters": [
+              {
+                "l": 512,
+                "fixedInfo": "1AE9DA67B06472641A3BF37811051055"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "4286E9173B9A3AF2CA0E7D3944E38D1F"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "AD285511D6BA8ED8CA415BDDE2860ECE"
+              }
+            ]
+          },
+          "dkms": [
+            "F87E73FA73B856684BAC4F84E0811413EDBDAA126AB9157265BF46EA7EF75D41B9393546F96D44D67E2F6E62B9107281383909A7292186936121427B41CCCE72",
+            "35F6C469BAB2A9CF929B72EBB8F985EA82863EBFA14CFEAEA7E669D3BC084897984A51EDFC406A1144807DF846F835331ACA96DA1AADE029130FF4DF88E09846",
+            "7B8494EC4A8BAA3518EFB0CBF0CD587EFDC56B87A2B23155031D2C579ED42F0C7743D2FC8CB67969FB85C31274C9BE10F17438D4EC780C6CBC91D45F87D7006C"
+          ]
+        },
+        {
+          "tcId": 327,
+          "kdfMultiExpansionParameter": {
+            "kdfType": "twoStep",
+            "kdfMode": "feedback",
+            "macMode": "HMAC-SHA2-512",
+            "counterLocation": "after fixed data",
+            "counterLen": 32,
+            "salt": "7B02B397B12B1BC773B3487D73D8F4281A5A3795AC11A3229F668C78D2737494BB706BE69A3F6E65C64E6684E509C98B8138D570951322E7E94DD72090E116DA",
+            "iv": "AC9EAC5B613BB418B5E81141729CFDEA261ED2851211D9EBC2B95D363EFA95A06E07B5605C0AFFC04C3EFC92F17124142D30A155E1C36A62FF096561FC0057B2",
+            "z": "6F2244DBD5E43AC838CD40529AE2CD4F46337E8A99B67EC35A3EC0E293E6942D8B4060DDC01300F0587042B04348F2508F2B1D4DDF0AE2D00004EED5D493397B",
+            "iterationParameters": [
+              {
+                "l": 512,
+                "fixedInfo": "47065AC25033394A84068D0B518013E8"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "1D5F11557F50A7DB20231D5855D0B645"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "871C59E84EADC342ADCF5CFA2F39316F"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "382E863C637660EFCACCA9CFF88C7076"
+              }
+            ]
+          },
+          "dkms": [
+            "4332AE745C762A6C4A2BF5A52D6FEE7B85123BFD447C40F6888E26C7EE4A480040ACA97BA55C856C1261DB90918D4B3B5196ADE6372A25CC2E8DD423559C2F73",
+            "967CCA41FDDF0E51F68B9B1B43614EE302B2B1CD5ACEAE3A531F9A16C62F02ECBCAA83BA76FE86886010797E37A7B4792E9A5E2C56D71A75E900E751E6092999",
+            "1FC05E9FECBF82DE01C7A81F1DA360054C987A9EFF0C522F67D9B3609C0823A65DFF0E2812BBDF3868C45F4F3ABB69434B976FDF25627300F08A2A230931B489",
+            "8EFB4A8EBFABB877D2CD76723599FF6DB4334A166E676E678AAC161FC548142DBE7D804ADB94824B1AAADDBE281FC6C0F65F482582AF965B7F5C9087456A5945"
+          ]
+        }
+      ]
+    }        
   ]
 }
 ----

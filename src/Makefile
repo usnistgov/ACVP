@@ -17,7 +17,7 @@ clean:
 
 publish:
 	mkdir -p documents
-	cp ../README.md documents/README.md
-	cp ../_config.yml documents/_config.yml
+	cp ../index.html documents/index.html # can't start in the same directory because of the clean command
+	cp ../slate.css documents/slate.css
 	mv *.html documents/
 	mv *.txt documents/
