@@ -149,8 +149,8 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [TupleHash-256](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.html)
 
 ### Message Authentication
-* [AES-GMAC](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-CCM](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
+* [AES-GMAC](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.html)
 * [CMAC-AES](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.html)
 * [CMAC-TDES](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.html)
 * [HMAC-SHA-1](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.html)
