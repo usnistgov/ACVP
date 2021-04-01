@@ -299,7 +299,7 @@ Standalone KAS KDF testing from SP800-56Cr1. Can be used in conjunction with SSC
 * [SRTP](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.html)
 * [SSH](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.html)
 * [TLS](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.html)
-* [TLS v1.3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.html) - DEMO only
+* [TLS v1.3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.html)
 * [TPM](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tpm.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tpm.html)
 * [ANSX9.63](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.html)
 * [ANSX9.42](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.html)
