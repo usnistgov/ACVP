@@ -221,6 +221,7 @@ Tests against shared secret computation (SSC), key derivation functions (KDF), a
 * [KAS ECC onePassMqv Sp800-56Ar3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
 * [KAS ECC OnePassUnified Sp800-56Ar3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
 * [KAS ECC staticUnified Sp800-56Ar3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
+* [KAS ECC CDH-Component Sp800-56Ar3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ecc-sp800-56ar3.html)
 * [KAS FFC dhHybrid1 Sp800-56Ar3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
 * [KAS FFC mqv2 Sp800-56Ar3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
 * [KAS FFC dhEphem Sp800-56Ar3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ffc-sp800-56ar3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-ffc-sp800-56ar3.html)
