@@ -1,6 +1,6 @@
 
 [[reqpre]]
-=== Required Prerequisite Algorithms for SP800-108 KDF Validations
+=== Required Prerequisite Algorithms for SP 800-108 KDF Validations
 
 Each SP800-108 KDF implementation relies on other cryptographic primitives. For example, the KDF must utilize an underlying MAC algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:
 
@@ -15,13 +15,15 @@ Each SP800-108 KDF implementation relies on other cryptographic primitives. For 
 |===
 
 [[kdfreg]]
-=== SP800-108 KDF Algorithm Capabilities Registration
+=== Property Registration
 
 Each algorithm capability advertised is a self-contained JSON object using the following values.
 
-.SP800-108 KDF Algorithm Capabilities JSON Values
+A registration *SHALL* use these properties:
+
+.Registration Properties
 |===
-| JSON Value | Description | JSON Type | Valid Values
+| JSON Property | Description | JSON Type | Valid Values
 
 | algorithm | The KDF to be validated. | string | KDF
 | revision | The algorithm testing revision to use. | string | "1.0"
@@ -29,10 +31,8 @@ Each algorithm capability advertised is a self-contained JSON object using the f
 | capabilities | Array of JSON objects, each with fields pertaining to the KDF mode identified uniquely by the combination of the "kdfMode" and indicated properties | array of JSON objects | See <<properties>>
 |===
 
-NOTE: Some optional values are required depending on the algorithm. Failure to provide these values will result in the ACVP server returning an error to the ACVP client during registration.
-
 [[kdfmodes]]
-=== Supported SP800-108 KDF Modes
+==== Supported SP 800-108 KDF Modes
 
 The following SP800-108 KDF modes may be advertised by the ACVP compliant crypto module:
 
@@ -41,7 +41,7 @@ The following SP800-108 KDF modes may be advertised by the ACVP compliant crypto
 * double pipeline iteration
 
 [#properties]
-=== Supported KDF Modes Capabilities
+==== Supported KDF Modes Capabilities
 
 The KDF mode capabilities are advertised as JSON objects within the 'capabilities' value of the ACVP registration message - see Table 2. The 'capabilities' value is an array, where each array element is a JSON object corresponding to a particular KDF mode defined in this section. The 'capabilities' value is part of the 'capability_exchange' element of the ACVP JSON registration message. See the ACVP specification <<ACVP>> for details on the registration message.
 
@@ -66,8 +66,10 @@ NOTE: The 'fixedDataOrder' options "none" and "before iterator" are not valid fo
 
 NOTE: A 'counterLength' of 0 describes that there is no counter used. The 0 option is not valid for "counter"  KDF.
 
+NOTE: When 'counterLength' contains a value of "0", 'fixedDataOrder' must contain a value of "none" and vice versus.
+
 [#valid-mac]
-=== Supported SP800-108 KDF MACs
+==== Supported SP 800-108 KDF MACs
 
 The following MAC functions *MAY* be advertised by an ACVP compliant client
 
@@ -89,15 +91,131 @@ The following MAC functions *MAY* be advertised by an ACVP compliant client
 
 === Registration Example
 
-A registration *SHALL* use these properties
+The following is a example JSON object advertising support for a SP 800-108 KDF.
 
-.Registration Properties
-|===
-| JSON Property | Description | JSON Type | Valid Values
+// [align=left,alt=,type=]
+....
+                    
+	{
+       "algorithm": "KDF",
+       "revision": "1.0",
+       "prereqVals": [
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           },
+           {
+               "algorithm": "DRBG",
+               "valValue": "123456"
+           }
+       ],
+       "capabilities": [
+           {
+               "kdfMode": "counter",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+                   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "after fixed data",
+                   "before fixed data",
+                   "middle fixed data"
+               ],
+               "counterLength": [
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": false
+           },
+           {
+               "kdfMode": "feedback",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+                   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "none",
+                   "after fixed data",
+                   "before fixed data",
+                   "before iterator"
+               ],
+               "counterLength": [
+                   0,
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": true,
+               "requiresEmptyIv": false
+           },
+           {
+               "kdfMode": "double pipeline iteration",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+				   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "none",
+                   "after fixed data",
+                   "before fixed data",
+                   "before iterator"
+               ],
+               "counterLength": [
+                   0,
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": false
+           }
+       ]
+   }
 
-| algorithm | Name of the algorithm to be validated | string | "KDF"
-| revision | ACVP Test version | string | "1.0"
-| prereqVals | Prerequisites of the algorithm | object | See <<prerequisites>>
-| capabilities | Properties of the algorithm and mode the IUT supports | array | See <<properties>>
-|===
+....
 
