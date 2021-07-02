@@ -1,0 +1,1456 @@
+
+
+
+
+Network Working Group                                    R. Hammett, Ed.
+Internet-Draft                                               2 July 2021
+Intended status: Informational                                          
+Expires: 3 January 2022
+
+
+                   ACVP KAS KDF OneStep Specification
+             draft-ietf-acvp-sub-kas-kdf-onestep-sp800-56c
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 3 January 2022.
+
+Copyright Notice
+
+   Copyright (c) 2021 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 1]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   3
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported KAS-KDF OneStep . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   4
+       6.2.1.  Requirements Covered  . . . . . . . . . . . . . . . .   5
+       6.2.2.  Requirements Not Covered  . . . . . . . . . . . . . .   5
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   5
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   5
+     7.2.  Property Registration . . . . . . . . . . . . . . . . . .   6
+       7.2.1.  Prerequisite Algorithms for KAS KDF Validations . . .   8
+       7.2.2.  AuxFunction options . . . . . . . . . . . . . . . . .   8
+       7.2.3.  FixedInfoPatternConstruction  . . . . . . . . . . . .   9
+     7.3.  Registration Example  . . . . . . . . . . . . . . . . . .  10
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  11
+     8.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  12
+       8.1.1.  KDF Configuration JSON Schema . . . . . . . . . . . .  13
+     8.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  14
+       8.2.1.  KDF Parameter JSON Schema . . . . . . . . . . . . . .  15
+       8.2.2.  FixedInfo PartyU/V JSON Schema  . . . . . . . . . . .  16
+     8.3.  Example Test Vectors JSON . . . . . . . . . . . . . . . .  17
+   9.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  21
+     9.1.  Example Test Vectors Response JSON  . . . . . . . . . . .  22
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  25
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  25
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  25
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  26
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing KAS-KDF-OneStep
+   SP800-56C implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 2]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing KAS-KDF-
+   OneStep SP800-56C implementations using ACVP.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 3]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported KAS-KDF OneStep
+
+   The following key derivation functions MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  KAS-KDF / OneStep / SP800-56Cr1
+
+   *  KAS-KDF / OneStep / SP800-56Cr2
+
+6.  Test Types and Test Coverage
+
+   The ACVP server performs a set of tests on the KDFs specific to the
+   KAS protocol in order to assess the correctness and robustness of the
+   implementation.  A typical ACVP validation session SHALL require
+   multiple tests to be performed for every supported permutation of KDF
+   capabilities.  This section describes the design of the tests used to
+   validate implementations of KAS-KDF algorithms.
+
+6.1.  Test Types
+
+   There are two test types for KAS-KDF testing:
+
+   *  "AFT" - Algorithm Function Test.  In the AFT test mode, the IUT
+      SHALL act as a party in the Key Agreement with the ACVP server.
+      The server SHALL generate and provide all necessary information
+      for the IUT to perform a successful key agreement; both the server
+      and IUT MAY act as party U/V.
+
+   *  "VAL" - Validation Test.  In the VAL test mode, The ACVP server
+      MUST generate a complete (from both party U and party V's
+      perspectives) key agreement, and expects the IUT to be able to
+      determine if that agreement is valid.  Various types of errors
+      MUST be introduced in varying portions of the key agreement
+      process that the IUT MUST be able to detect and report on.
+
+6.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [SP800-56Cr1] and [SP800-56Cr2].
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 4]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+6.2.1.  Requirements Covered
+
+   *  SP 800-56C - 4 One-Step Key Derivation.  All functionality
+      described in the specification is covered by ACVP testing.
+
+6.2.2.  Requirements Not Covered
+
+   *  SP 800-56Ar3 / SP 800-56Br2 - ASN.1 encoding for the KDF is not
+      currently supported.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of KAS-KDF-OneStep SP800-56C
+   algorithms to the ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the "prereqVals" JSON property array inside each element of the
+   "algorithms" array.  Each element in the "prereqVals" array MUST
+   contain the following properties
+
+
+
+
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 5]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  Property Registration
+
+   The KAS-KDF-OneStep SP800-56C mode capabilities are advertised as
+   JSON objects within a root "algorithm" object.
+
+   A registration SHALL use these properties:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 6]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   +==================+=================+==============+===============+
+   | JSON Value       |Description      |JSON Type     | Valid Values  |
+   +==================+=================+==============+===============+
+   | algorithm        |The algorithm    |value         | KAS-KDF       |
+   |                  |under test       |              |               |
+   +------------------+-----------------+--------------+---------------+
+   | mode             |The mode under   |value         | OneStep       |
+   |                  |test             |              |               |
+   +------------------+-----------------+--------------+---------------+
+   | revision         |The algorithm    |value         | "Sp800-56Cr1" |
+   |                  |testing revision |              |               |
+   |                  |to use.          |              |               |
+   +------------------+-----------------+--------------+---------------+
+   | prereqVals       |Prerequisite     |array of      | See           |
+   |                  |algorithm        |prereqAlgVal  | Section 7.2.1 |
+   |                  |validations      |objects       |               |
+   +------------------+-----------------+--------------+---------------+
+   | auxFunctions     |The auxiliary    |array of      | See           |
+   |                  |capabilities of  |Section 7.2.2 | Section 7.2.2 |
+   |                  |the              |              |               |
+   |                  |implementation.  |              |               |
+   +------------------+-----------------+--------------+---------------+
+   | fixedInfoPattern |The pattern used |string        | See           |
+   |                  |for fixedInfo    |              | Section 7.2.3 |
+   |                  |construction.    |              |               |
+   +------------------+-----------------+--------------+---------------+
+   | encoding         |The encoding type|array of      | concatenation |
+   |                  |to use with      |string        |               |
+   |                  |fixedInfo        |              |               |
+   |                  |construction.    |              |               |
+   |                  |Note             |              |               |
+   |                  |concatenation is |              |               |
+   |                  |currently        |              |               |
+   |                  |supported.  ASN.1|              |               |
+   |                  |should be coming.|              |               |
+   +------------------+-----------------+--------------+---------------+
+   |                  |The domain of    |Domain        |               |
+   |                  |values           |              |               |
+   |                  |representing the |              |               |
+   |                  |min/max lengths  |              |               |
+   |                  |of Z the         |              |               |
+   |                  |implementation   |              |               |
+   |                  |can support.     |              |               |
+   +------------------+-----------------+--------------+---------------+
+
+                      Table 2: Registration Properties
+
+
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 7]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+7.2.1.  Prerequisite Algorithms for KAS KDF Validations
+
+   Some algorithm implementations rely on other cryptographic
+   primitives.  For example, IKEv2 uses an underlying SHA algorithm.
+   Each of these underlying algorithm primitives must be validated,
+   either separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
+
+   +==============+================+=====================+=============+
+   | JSON Value   | Description    | JSON Type           | Valid       |
+   |              |                |                     | Values      |
+   +==============+================+=====================+=============+
+   | algorithm    | a prerequisite | value               | DRBG,       |
+   |              | algorithm      |                     | HMAC,       |
+   |              |                |                     | KMAC, SHA   |
+   +--------------+----------------+---------------------+-------------+
+   | valValue     | algorithm      | value               | actual      |
+   |              | validation     |                     | number or   |
+   |              | number         |                     | "same"      |
+   +--------------+----------------+---------------------+-------------+
+   | prereqAlgVal | prerequisite   | object with         | see above   |
+   |              | algorithm      | algorithm and       |             |
+   |              | validation     | valValue properties |             |
+   +--------------+----------------+---------------------+-------------+
+
+                      Table 3: Prerequisite Algorithms
+
+7.2.2.  AuxFunction options
+
+   +=================+==============+=============+====================+
+   | JSON Value      |Description   |JSON Type    |Valid Values        |
+   +=================+==============+=============+====================+
+   | auxFunctionName |The auxiliary |string       |SHA-1, SHA2-224,    |
+   |                 |function to   |             |SHA2-256, SHA2-384, |
+   |                 |use.          |             |SHA2-512,           |
+   |                 |              |             |SHA2-512/224,       |
+   |                 |              |             |SHA2-512/256,       |
+   |                 |              |             |SHA3-224, SHA3-256, |
+   |                 |              |             |SHA3-384, SHA3-512, |
+   |                 |              |             |HMAC-SHA-1, HMAC-   |
+   |                 |              |             |SHA2-224, HMAC-     |
+   |                 |              |             |SHA2-256, HMAC-     |
+   |                 |              |             |SHA2-384, HMAC-     |
+   |                 |              |             |SHA2-512, HMAC-     |
+   |                 |              |             |SHA2-512/224, HMAC- |
+   |                 |              |             |SHA2-512/256, HMAC- |
+   |                 |              |             |SHA3-224, HMAC-     |
+   |                 |              |             |SHA3-256, HMAC-     |
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 8]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   |                 |              |             |SHA3-384, HMAC-     |
+   |                 |              |             |SHA3-512, KMAC-128, |
+   |                 |              |             |KMAC-256            |
+   +-----------------+--------------+-------------+--------------------+
+   | No              |macSaltMethods|How the salt |array of string     |
+   |                 |              |is determined|                    |
+   |                 |              |(default     |                    |
+   |                 |              |being all    |                    |
+   |                 |              |00s, random  |                    |
+   |                 |              |being a      |                    |
+   |                 |              |random salt).|                    |
+   |                 |              |Required for |                    |
+   |                 |              |MAC based    |                    |
+   |                 |              |auxFunctions.|                    |
+   +-----------------+--------------+-------------+--------------------+
+
+                        Table 4: AuxFunction Options
+
+7.2.3.  FixedInfoPatternConstruction
+
+   IUTs MUST be capable of specifying how the FixedInfo is constructed
+   for the KDF construction.  Note that for the purposes of testing
+   against the ACVP system, both uPartyInfo and vPartyInfo are REQUIRED
+   to be registered within the fixed info pattern.
+
+   Pattern candidates:
+
+   *  literal[0123456789ABCDEF]
+
+      -  uses the specified hex within "[]". literal[0123456789ABCDEF]
+         substitutes "0123456789ABCDEF" in place of the field
+
+   *  uPartyInfo
+
+      -  uPartyId { || ephemeralKey } { || ephemeralNonce } { ||
+         dkmNonce } { || c }
+
+         o  "optional" items such as ephemeralKey MUST be included when
+            available for ACVP testing.
+
+   *  vPartyInfo
+
+      -  vPartyId { || ephemeralKey } { || ephemeralNonce } { ||
+         dkmNonce } { || c }
+
+         o  "optional" items such as ephemeralKey MUST be included when
+            available for ACVP testing.
+
+
+
+
+Hammett                  Expires 3 January 2022                 [Page 9]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   *  context
+
+      -  Random value chosen by ACVP server to represent the context.
+
+   *  algorithmId
+
+      -  Random value chosen by ACVP server to represent the
+         algorithmId.
+
+   *  label
+
+      -  Random value chosen by ACVP server to represent the label.
+
+   *  l
+
+      -  The length of the derived keying material in bits, MUST be
+         represented in 32 bits for ACVP testing.
+
+   *  t
+
+      -  A random value used to represent a secondary shared secret.
+         Only applicable to [SP800-56Cr2].
+
+   Example (Note that party U is the server in this case "434156536964",
+   party V is the IUT "a1b2c3d4e5"):
+
+   *  "concatenation" :
+      "literal[123456789CAFECAFE]||uPartyInfo||vPartyInfo"
+
+   Evaluated as:
+
+   *  "123456789CAFECAFE434156536964a1b2c3d4e5"
+
+7.3.  Registration Example
+
+Note there is no difference in registration properties for OneStep testing between <<SP800-56Cr1>> and <<SP800-56Cr2>> aside from the new "t" secondary shared secret that can be used for a <<SP800-56Cr2>> Fixed info pattern (See <<fixedinfopatcon>>).
+
+                 Figure 1: Registration JSON Example
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 10]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   {
+     "algorithm": "KAS-KDF",
+     "mode": "OneStep",
+     "revision": "Sp800-56Cr1",
+     "prereqVals": [
+       {
+         "algorithm": "DRBG",
+         "valValue": "123456"
+       },
+       {
+         "algorithm": "SHA",
+         "valValue": "123456"
+       },
+       {
+         "algorithm": "KMAC",
+         "valValue": "123456"
+       },
+       {
+         "algorithm": "HMAC",
+         "valValue": "123456"
+       }
+     ],
+     "auxFunctions": [
+       {
+         "auxFunctionName": "KMAC-128",
+         "macSaltMethods": [
+           "default"
+         ]
+       }
+     ],
+     "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+     "encoding": [
+       "concatenation"
+     ],
+     "z": [{"min": 224, "max": 8192, "increment": 8}],
+     "l": 2048
+   }
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual algorithm defined during the
+   capability exchange.  This section describes the JSON schema for a
+   test vector set used with KAS-KDF-OneStep SP800-56C algorithms.
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 11]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test groups containing test | array     |
+    |             | data, see Section 8.1                |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 5: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+   {
+     "acvVersion": "version",
+     "vsId": 1,
+     "algorithm": "Alg1",
+     "mode": "Mode1",
+     "revision": "Revision1.0",
+     "testGroups": [ ... ]
+   }
+
+8.1.  Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the KAS-KDF-OneStep SP800-56C JSON elements
+   of the Test Group JSON object
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 12]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+    +==================+====================================+=========+
+    | JSON Values      | Description                        | JSON    |
+    |                  |                                    | Type    |
+    +==================+====================================+=========+
+    | tgId             | Test group identifier              | integer |
+    +------------------+------------------------------------+---------+
+    | testType         | Describes the operation the client | string  |
+    |                  | should perform on the tests data   |         |
+    +------------------+------------------------------------+---------+
+    | tests            | Array of individual test cases     | See     |
+    |                  |                                    | Section |
+    |                  |                                    | 8.2     |
+    +------------------+------------------------------------+---------+
+    | kdfConfiguration | Describes the Kdf configuration    | See     |
+    |                  | values used for the group          | Section |
+    |                  |                                    | 8.1.1   |
+    +------------------+------------------------------------+---------+
+
+                       Table 6: Test Group Properties
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' the
+   group is addressing.
+
+8.1.1.  KDF Configuration JSON Schema
+
+   Describes the KDF configuration for use under the test group.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 13]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+      +===================+=====================+===================+
+      | JSON Value        | Description         | JSON Type         |
+      +===================+=====================+===================+
+      | kdfType           | The type of KDF to  | value - onestep   |
+      |                   | use for the group.  |                   |
+      +-------------------+---------------------+-------------------+
+      | saltMethod        | The strategy used   | value - default   |
+      |                   | for salting.        | (all 00s), random |
+      +-------------------+---------------------+-------------------+
+      | fixedInfoPattern  | The pattern used    | value - See       |
+      |                   | for constructing    | Section 7.2.3.    |
+      |                   | the fixedInfo.      |                   |
+      +-------------------+---------------------+-------------------+
+      | fixedInfoEncoding | The pattern used    | value - See       |
+      |                   | for constructing    | Section 7.2.3.    |
+      |                   | the fixedInfo.      |                   |
+      +-------------------+---------------------+-------------------+
+      | auxFunction       | The auxiliary       | value - See       |
+      |                   | function used in    | Section 7.2.2.    |
+      |                   | the KDF.            |                   |
+      +-------------------+---------------------+-------------------+
+      | l                 | the bit length of   | value             |
+      |                   | keying material to  |                   |
+      |                   | derive from the KDF |                   |
+      +-------------------+---------------------+-------------------+
+
+                   Table 7: KdfConfiguration JSON Object
+
+8.2.  Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each KAS/KTS ECC test vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 14]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+      +==============+============================+=================+
+      | JSON Value   | Description                | JSON Type       |
+      +==============+============================+=================+
+      | tcId         | Numeric identifier for the | kdfParameter    |
+      |              | test case, unique across   |                 |
+      |              | the entire vector set.     |                 |
+      +--------------+----------------------------+-----------------+
+      | Object       | See Section 8.2.1.         | fixedInfoPartyU |
+      | representing |                            |                 |
+      | inputs into  |                            |                 |
+      | the KDF      |                            |                 |
+      +--------------+----------------------------+-----------------+
+      | Fixed        | See Section 8.2.2.         | fixedInfoPartyV |
+      | information  |                            |                 |
+      | specific to  |                            |                 |
+      | party U      |                            |                 |
+      +--------------+----------------------------+-----------------+
+
+                       Table 8: Test Case JSON Object
+
+8.2.1.  KDF Parameter JSON Schema
+
+   KDF specific options used for the test case.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 15]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+        +=============+==================================+=======+
+        | JSON Value  | Description                      | JSON  |
+        |             |                                  | Type  |
+        +=============+==================================+=======+
+        | kdfType     | The type of KDF utilized.        | value |
+        +-------------+----------------------------------+-------+
+        | salt        | The salt used for the test case. | value |
+        +-------------+----------------------------------+-------+
+        | iv          | The iv used for the test case.   | value |
+        +-------------+----------------------------------+-------+
+        | algorithmId | The random "algorithID" used for | value |
+        |             | the test case when applicable to |       |
+        |             | the fixedInfo pattern.           |       |
+        +-------------+----------------------------------+-------+
+        | context     | The random "context" used for    | value |
+        |             | the test case when applicable to |       |
+        |             | the fixedInfo pattern.           |       |
+        +-------------+----------------------------------+-------+
+        | label       | The random "label" used for the  | value |
+        |             | test case when applicable to the |       |
+        |             | fixedInfo pattern.               |       |
+        +-------------+----------------------------------+-------+
+        | z           | shared secret z value to be used | value |
+        |             | for the test case.               |       |
+        +-------------+----------------------------------+-------+
+        | l           | the bit length of keying         | value |
+        |             | material to derive from the KDF  |       |
+        +-------------+----------------------------------+-------+
+
+                    Table 9: KDF Parameter JSON Object
+
+8.2.2.  FixedInfo PartyU/V JSON Schema
+
+   Fixed information that is included for party U/V for fixed info
+   construction
+
+        +===============+=================================+=======+
+        | JSON Value    | Description                     | JSON  |
+        |               |                                 | Type  |
+        +===============+=================================+=======+
+        | partyId       | The party identifier            | value |
+        +---------------+---------------------------------+-------+
+        | ephemeralData | Ephemeral data (randomly)       | value |
+        |               | included as a part of the       |       |
+        |               | parties fixed info construction |       |
+        +---------------+---------------------------------+-------+
+
+                      Table 10: Fixed Info JSON Object
+
+
+
+Hammett                  Expires 3 January 2022                [Page 16]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+8.3.  Example Test Vectors JSON
+
+   The following is a example JSON object for KAS-KDF HKDF test vectors
+   sent from the ACVP server to the crypto module.  Note there is no
+   difference in the vector set properties for OneStep testing between
+   [SP800-56Cr1] and [SP800-56Cr2] aside from the new "t" secondary
+   shared secret that can be used for a [SP800-56Cr2] Fixed info pattern
+   (See Section 7.2.3).
+
+   {
+     "vsId": 0,
+     "algorithm": "KAS-KDF",
+     "mode": "OneStep",
+     "revision": "Sp800-56Cr1",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "tests": [
+           {
+             "tcId": 1,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "00000000000000000000000000000000",
+               "z": "06477FB9ADB516D1D90FE0C24C1147861F5D532C2A7FEB436F83446F05765D"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "1C5B2F8FB3A411302BF1E39BB4414FD3",
+               "ephemeralData": "A1495C3CB11BE555A283A911DD5778A3C3B5D68E59339D4EE8C256856C9918"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "5A9D98AFFD66598D7C81DBE6A13399BB",
+               "ephemeralData": "BDF38642B74FDAF7C8DD14A2F59E9253F1AB113A9F16F694D00A7ED81710E0"
+             }
+           },
+           {
+             "tcId": 2,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "00000000000000000000000000000000",
+               "z": "6C96B7341119A41000E1801FDB2D2A664F37A35C449634ECDC9A96853001DB"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "CD85C097D9BD8AC639D243ABB6649C74",
+               "ephemeralData": "4F6908C29515F35722A4803EBFD0299E35A8897DE12000F91E254D3C4B1C1D"
+             },
+             "fixedInfoPartyV": {
+
+
+
+Hammett                  Expires 3 January 2022                [Page 17]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+               "partyId": "3CBCF123AABD4677262F4A9B16CC4B1F",
+               "ephemeralData": "66FFF9C3F848AAFA539991BD31C1D097F05C8F3848F3F979C48FC5EF6D3B88"
+             }
+           },
+           {
+             "tcId": 3,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "00000000000000000000000000000000",
+               "z": "36562B4EFCE532C47AC991445E0A838103ED54471CC7E7D9F8BCDBA6C0734D"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "0025B6C42E4EA0C46F3F6A67849DCAFF",
+               "ephemeralData": "0EB59A43A4999B43179B69B67C1D9090ADAABFF673FBF98418F01A74E892EB"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "0578CC6E6E0084DAE5C26D996393E50D"
+             }
+           },
+           {
+             "tcId": 4,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "00000000000000000000000000000000",
+               "z": "6A2B2B0504AF9B54D6AD3C0169C10FDDDCAA7BD982320DD3A4607EE1DD36DC"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "3B6D427A4DAA7A9BC2422BFBDB21BA06",
+               "ephemeralData": "125C5F9287CDFFCCB2E0CE591E7CC8E1A79F5CCF45885F2E1478C89BA58B6B"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "3FF2FCA29CAC0D413DCE869F9982742E"
+             }
+           },
+           {
+             "tcId": 5,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "00000000000000000000000000000000",
+               "z": "77A82D6931A138CE2314462B1166ED43E9D54C80D9A57A4FFF49A998349DA0"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "8E64E8C81E14939B637581FDA3AE9422",
+               "ephemeralData": "E55AF53197750278C1EC329EEBB62ED12296170760667A8BB0DA6765802A16"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "835C151B8217FEBABB112802528213D3",
+               "ephemeralData": "63A6691AA031FB1DA91F4395F38D801F957E42F16308692A7DEF7931994CF2"
+
+
+
+Hammett                  Expires 3 January 2022                [Page 18]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+             }
+           }
+         ],
+         "kdfConfiguration": {
+           "kdfType": "oneStep",
+           "saltMethod": "default",
+           "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+           "fixedInfoEncoding": "concatenation",
+           "auxFunction": "KMAC-128"
+         }
+       },
+       {
+         "tgId": 62,
+         "testType": "VAL",
+         "tests": [
+           {
+             "tcId": 306,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "150DE797DE69C94A9A539C7A3E8329FF",
+               "z": "50B69546925466939D6D69B474BF8A11299099E1D24EE00B234F8E82BAEF43429E8C5DBE"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "FEFC967B698F2F4DEBBCC93ABBAD2E7B"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "2A76DCBC3A1B2751D6D8E9189E3303E3",
+               "ephemeralData": "4A3F7D3E195290B0A0A1E8E5D44463B28291623B5669FC2103DA8427D4CE48EED4EBB256"
+             },
+             "dkm": "E84EE084A05BF2B6A2A3ED8A33E44CFEB270A53F87BEF4F5447F190A15EC9A2E8706CDC2AFE0AA47460E2035043ECF4386DD2815D0CBCCD732BC98277DBC99D97CAD9E836773218CA79E7504227DADE34177DF0001D6E2480A58F52D9A4D89C439F1396F9BE922CCCD01700F316DFB1041F116A33593BF2A0C42408049EF0C7C"
+           },
+           {
+             "tcId": 307,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "C81EE36994067D90AC11850A2E904B35",
+               "z": "98AE8419CEDD3CBEABAC947E4AD281235586A16AD9463A638296A03962FCC0C99A24FDD2"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "C8292D3655488EEE69F52E4F74A98A6E",
+               "ephemeralData": "DF507114129074574BEF5B698CF50611F8DF6AAD8CDE69C8C3FCA45114341BD92A50A5C8"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "C288C96A2526A5F889FD60756E946E5D"
+             },
+             "dkm": "8FDF4DD962170D16523B8E6EFC7D37C4196306C1533CA95AF17C89F7A922AB8FDFBB7AFE1D50293EBEC61176D56045A007AEFA62BB1AA1305AAE5CF61C8CA217FB4CA4AFA660294404AE9C594231846E60D8FF4FF1D1166BD859F20283D5B0D34EDD722C5E49A1E929CD92474B284A8D7DECF7F00C4ABD06D682A0C06D0C74C8"
+           },
+           {
+
+
+
+Hammett                  Expires 3 January 2022                [Page 19]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+             "tcId": 308,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "74D2F0F804640E0D9F67C9DAAC68744E",
+               "z": "DF950F3038B3697473BD6488FCB0B17B202E26D4777ED77C7A241CFD6CB824FEA59EF88F"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "D22FEC8F3622EDA5BEAEFBBC299CC4D9"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "416D49EC6993F74567991CA148DEF9B2"
+             },
+             "dkm": "99DDEA165FB6E56B19DDDD1C549038C8420739326CCA65B674A677A26B6AC1F0CB79F107C31C9089F09F9638CC8370A06BA5C9C5FB3F30FA9D5FD0DA7793623F403B2C78F1405AFAC5266A94DBB856FC2A33B01CAB8F859371FB64F8B84EDC1D996B31B78A6B238E22981764FE400B06E7424EA25AAEBD9D5B27EE7332FAFD38"
+           },
+           {
+             "tcId": 309,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "8992D0472722054FDB68E2E7F874A9F9",
+               "z": "BC8FD6C54393D785E513BA1701F967BE0961B53852EB4C6AB4FF2B509DFA9BB100C9E0DF"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "91EFD01A0271B4E3BBA8D7AF5D237458",
+               "ephemeralData": "0B3CD301E7B5CB1149621D3DBFE7590392C3F92FBD93EEBC9779171487F6E9C8E777CB89"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "D6EB44DDC627232EBF9AD52C8A90D517",
+               "ephemeralData": "6702BBDFE0CC6C9CF6199027BE2D65386959A687B2E89691614976AC87AAAAB7E42F6CFF"
+             },
+             "dkm": "067F1BDB2CB6FC773169FC7D5B049DC534B2E78C2D5AC0EFDD88CC0B58355052B3A5367D18C829D3DE2BD899B9941BAD7D7C343717ED65C06FE77675D3DB6DFEEB8381E31AB919713287B87D18AD146F0E4BBF1D73AD1764B6B4F30FB8FB84915A24E9604537DCDF1A5E6FBAE6EAC4D0809D76A7585C8E36CA7F7EEF3B28C3E0"
+           },
+           {
+             "tcId": 310,
+             "kdfParameter": {
+               "kdfType": "oneStep",
+               "salt": "DBFC5DAD60398D25DD0D0C7793458BCB",
+               "z": "030B3F6CBD884428859BD0CEA63A07F896EB03B96682E72F3FE124B2D25E6AF149E7DC13"
+             },
+             "fixedInfoPartyU": {
+               "partyId": "BC42C34BA8923F797AB18B0CC3C36906",
+               "ephemeralData": "E54E1EC091ABCCB8EFA82C1463C022AF2EB46FD49ED5B18A7F0E4B68A89C69EB2C3F8FCD"
+             },
+             "fixedInfoPartyV": {
+               "partyId": "53760ABD8EEFFBA340A41A26FF1A409F",
+               "ephemeralData": "E432035756AE32193D18C07F7E9508B45494FEEF626CBE7C9F9BF0ADC1BE18DCCFAB3A8E"
+             },
+             "dkm": "7C4E1AA4683AC60BB5938B50C3D3D164E7B7EA344F5ACFD28DC22419EA542D982E7E4176DC6F66914C9D49D361BDB803465E0427D5F2373DCDDD592936EFBBD15D2FA8D6A555D7C6D7E897F2FEECD848DB935F10197483654C6E1DC972EE1E4D5F589E91048BBD86206229324B9C8DAA63D2022513EF50B9EEA93313E1CFCC26"
+           }
+
+
+
+Hammett                  Expires 3 January 2022                [Page 20]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+         ],
+         "kdfConfiguration": {
+           "kdfType": "oneStep",
+           "saltMethod": "random",
+           "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+           "fixedInfoEncoding": "concatenation",
+           "auxFunction": "KMAC-128"
+         }
+       }
+     ]
+   }
+
+9.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it MUST
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | acvVersion    | The version of the protocol | string    |
+        +---------------+-----------------------------+-----------+
+        | vsId          | The vector set identifier   | integer   |
+        +---------------+-----------------------------+-----------+
+        | testGroups    | The test group data         | array     |
+        +---------------+-----------------------------+-----------+
+
+                  Table 11: Vector Set Response Properties
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+         +===============+===========================+===========+
+         | JSON Property | Description               | JSON Type |
+         +===============+===========================+===========+
+         | tgId          | The test group identifier | integer   |
+         +---------------+---------------------------+-----------+
+         | tests         | The test case data        | array     |
+         +---------------+---------------------------+-----------+
+
+                  Table 12: Test Group Response Properties
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 21]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   The testCase section is used to organize the ACVP client response in
+   a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+   The following table describes the JSON object that represents a test
+   case response for a KAS-KDF-OneStep SP800-56C.
+
+    +============+=========================================+=========+
+    | JSON       | Description                             | JSON    |
+    | Property   |                                         | Type    |
+    +============+=========================================+=========+
+    | tcId       | The test case identifier                | integer |
+    +------------+-----------------------------------------+---------+
+    | testPassed | Was the provided "dkm" valid?  Only     | boolean |
+    |            | valid for the "VAL" test type.          |         |
+    +------------+-----------------------------------------+---------+
+    | dkm        | The derived keying material.  Provided  | hex     |
+    |            | by the IUT for "AFT" test type test     |         |
+    |            | cases.  For single expansion tests.     |         |
+    +------------+-----------------------------------------+---------+
+    | dkms       | The derived keying materials.  Provided | array   |
+    |            | by the IUT for "AFT" test type test     | of hex  |
+    |            | cases.  For multi expansion groups.     |         |
+    +------------+-----------------------------------------+---------+
+
+                 Table 13: Test Case Response Properties
+
+   Here is an abbreviated example of the response.  Note there is no
+   difference in the vector set response for OneStep testing between
+   [SP800-56Cr1] and [SP800-56Cr2].
+
+9.1.  Example Test Vectors Response JSON
+
+   {
+     "vsId": 0,
+     "algorithm": "KAS-KDF",
+     "mode": "OneStep",
+     "revision": "Sp800-56Cr1",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "dkm": "C91D23ED66A9A9E487FC5608B26F4B66401BCC38A09F52A3DC638D73AFE474CCB70A461CFC68FDBE0C41C406438D49DFD9B0FAC17886542AB3C6204425458958BAD042940919D6AD3D3A7894C19EDEED6DCC56DF775DD609623763D4CA1D048C2396EE204956028EE690110405EB5F3371DBF1C4BC131E7E7FCDEB97D12EED5D"
+           },
+
+
+
+Hammett                  Expires 3 January 2022                [Page 22]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+           {
+             "tcId": 2,
+             "dkm": "D2DDA9897416B2994EA3C42AC36D0BD18E65A16A8DDA689EB2D1DC6D8830D902BB9D5B4BF9DE247A02E8A6AE3881F1D7CB101E7FED9199E3D4B13C06D7E8A197D55CBA8D412DC85457700FB38FFFB21C597671D19638D850EC37028F11D887E6EF9F6A8059C022D07EB88A505F44F54DEB21AD577633B42031C787C0E96209CA"
+           },
+           {
+             "tcId": 3,
+             "dkm": "7C6F142D087D055FEFEB044AF5069E0A12589039FBFEEE2206439B86452EF5591469DD82AB83E8527FA2CFD6DB51C6068D3C046CFCC29B1F8B8CD5F0A3BC4FF0AF5A4D43B66F465B01FA3D255FE6962C06E54421EE5776E822DE4AD03F91F127D2A3113CE4841F1655CF214D5C205AC5EF122EF84502B53EB3A1DC4355A2A982"
+           },
+           {
+             "tcId": 4,
+             "dkm": "38702289323D6123CB1F274106DA6F96E9CF6ACBFDEF5A17EA8A7FF07D1019B006E7FBDB454D63E7AF121F13BBACA7B6158E18F9FF582E02B97022A570A1C890457A1EBB0FDE58069FCCB1FCB405CF72E099312A829855C59973D4F58CB9D791F5D40EFEB2F925484BDCE6915B5D6B48E899A35E9FC80A1E356F7BC4D02CE2AF"
+           },
+           {
+             "tcId": 5,
+             "dkm": "63179FFD195A08CD0884D0E7556BDE51209686655267CDFADE2C7DB0462246CE2E8305F9B0AC1EA1296B21E9B7F618E9D699B49B8BAA56B30F586D4B3F44440F9AECDB62AAFB9BCFC4DD17E0E74A6F24E8547540619860CDD3E501EAB64C49141726C74B7CA3CEC981401F14BD924F12492B057FD7F86600C081C34649C735D6"
+           }
+         ]
+       },
+       {
+         "tgId": 62,
+         "tests": [
+           {
+             "tcId": 306,
+             "testPassed": true
+           },
+           {
+             "tcId": 307,
+             "testPassed": true
+           },
+           {
+             "tcId": 308,
+             "testPassed": true
+           },
+           {
+             "tcId": 309,
+             "testPassed": true
+           },
+           {
+             "tcId": 310,
+             "testPassed": false
+           }
+         ]
+       }
+     ]
+   }
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 23]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   {
+     "vsId": 0,
+     "algorithm": "KAS-KDF",
+     "mode": "TwoStep",
+     "revision": "Sp800-56Cr2",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "dkm": "172B0AE028CB09306CA6AEFA17AB09BE8425B3F2BDD23EED544E0DB7A0235BDA4B033E943D5D85C32B748BB825AC5DA843966A0E0484BFD1A532F794B20EFB1E"
+           },
+           {
+             "tcId": 2,
+             "dkm": "7D354541FAF19904E030ED8D5BDF7F5B0A922782CF7739498D8290245AE4FAD37C8F2D3313F1AE1433BC3E68885D199E73670ABEE5ED460804907E8532EA9EF6"
+           }
+         ]
+       },
+       {
+         "tgId": 2,
+         "tests": [
+           {
+             "tcId": 6,
+             "dkms": [
+               "9A78CCE443803B9DDFC24059E9E55322E3A2AC2A610E311B9F09C03F433B2B4DC1B34F82B7A749D6B5F5F1023E4107F981A207F512DA9221B726696C93F9CDEA",
+               "DFA32FFC8D7CEF8DB966A060DF3B057C0441BA0BD9F47130E6CBA5FBB70E5052CE073A8CDDED2E246DC31FF16EA84E1D6FA569DFF2516D69D99937C7A9157A6D",
+               "5285A2B15C84DF8406ACFE2376AE34D449B9907455E40BE28FC093AC44EF2240AE4ED17ACCEECDB3C862570F451EE3B03C52D477363FCE0AA7143608CBE3180A",
+               "850D83899FF9B776669AC2DD4A1B0EE36DFD5BEE64DDB48FC29F30C7CA3070D0AE321283F433913A310B07805041F3632C113FA9A578153BE8A5D61E3A043925"
+             ]
+           },
+           {
+             "tcId": 7,
+             "dkms": [
+               "6D790D62C4FA908C1E5E30A70EC99C02D66CCDDF17F2D2736749FB8BB22BEEB3013546511CA2C7F082AD4F61AB4ADCD88F7350A4D6CDBB3534A7E0E706D494E2",
+               "5534529DC884F95AAB14C19075427C7FFF6D897DE187A8C08EF4FC53ECBDA5EADDE0F3CA78A1BD2D7B47C039BD9940100F9E09A502C9CF7770EF5A026E27897E"
+             ]
+           }
+         ]
+       },
+       {
+         "tgId": 65,
+         "tests": [
+           {
+             "tcId": 321,
+             "testPassed": true
+           },
+
+
+
+Hammett                  Expires 3 January 2022                [Page 24]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+           {
+             "tcId": 322,
+             "testPassed": true
+           }
+         ]
+       },
+       {
+         "tgId": 66,
+         "tests": [
+           {
+             "tcId": 326,
+             "testPassed": true
+           },
+           {
+             "tcId": 327,
+             "testPassed": false
+           }
+         ]
+       }
+     ]
+   }
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, IETF RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, IETF RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, IETF RFC 8174,
+              DOI 10.17487/RFC8174, May 2017,
+              <https://www.rfc-editor.org/info/rfc8174>.
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 25]
+
+Internet-Draft            ACVP KAS KDF OneStep                 July 2021
+
+
+   [SP800-108]
+              Chen, L., "Recommendation for Key Derivation Using
+              Pseudorandom Functions (Revised)", NIST SP 800-108,
+              October 2009.
+
+   [SP800-56Ar3]
+              Barker, E. B., Chen, L., Roginsky, A., Vassilev, A., and
+              R. Davis, "Recommendation for Pair-Wise Key-Establishment
+              Schemes Using Discrete Logarithm Cryptography", NIST SP
+              800-56A Rev. 3, April 2018.
+
+   [SP800-56Cr1]
+              Barker, E. B., Chen, L., and R. Davis, "Recommendation for
+              Key-Derivation Methods in Key-Establishment Schemes", NIST
+              SP 800-56C Rev. 1, April 2018.
+
+   [SP800-56Cr2]
+              "", NIST SP 800-56C Rev. 2.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Author's Address
+
+   Russell Hammett (editor)
+
+   Email: russell.hammett@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                  Expires 3 January 2022                [Page 26]
