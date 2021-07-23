@@ -1,0 +1,128 @@
+
+[[prereq_algs]]
+=== Prerequisite Algorithms
+
+Some algorithm implementations rely on other cryptographic primitives. For example, IKEv2 uses an underlying SHA algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same   submission. ACVP provides a mechanism for specifying the required prerequisites:
+
+[[rereqs_table]]
+
+.Prerequisite Algorithms JSON Values
+|===
+| JSON Value| Description| JSON type| Valid Values| Optional
+
+| algorithm| a prerequisite algorithm| value| CMAC, DRBG, DSA, HMAC, KMAC, SafePrimes, SHA, SP800-108| No
+| valValue| algorithm validation number| value| actual number or "same"| No
+| prereqAlgVal| prerequistie algorithm validation| object with algorithm and valValue properties| see above| Yes
+|===
+
+KAS has conditional prerequisite algorithms, depending on the capabilities registered:
+
+[[prereqs_requirements_table]]
+
+.Prerequisite requirement conditions
+|===
+| Prerequisite Algorithm| Condition
+
+| CMAC | CMAC validation *REQUIRED* when IUT is performing KeyConfirmation (KC) or a KDF and utilizing CMAC.
+| HMAC | HMAC validation *REQUIRED* when IUT is performing KeyConfirmation (KC) or a KDF and utilizing HMAC.
+| KMAC | KMAC validation *REQUIRED* when IUT is performing KeyConfirmation (KC) or a KDF and utilizing KMAC.
+|===
+
+
+[[cap_ex]]
+=== Algorithm Capabilities JSON Values
+
+Each algorithm capability advertised is a self-contained JSON object using the following values.
+
+[[caps_table]]
+.Capabilities JSON Values
+|===
+| JSON Value| Description| JSON type| Valid Values| Optional
+
+| algorithm| The algorithm under test| value| KAS-FFC| No
+| revision| The algorithm testing revision to use.| value| "Sp800-56Ar3"| No
+| prereqVals| Prerequisite algorithm validations| array of prereqAlgVal objects| See <<prereq_algs>>| No
+| kasRole| Roles supported for key agreement| array| initiator and/or responder| No
+| keyConfirmationMethod| The KeyConfirmation capabilities supported.| object| <<keyconfirmmethod>>| Yes
+|===
+
+[[keyconfirmmethod]]
+===== Supported KeyConfirmation Method
+
+.KAS FFC KeyConfirmation Capabilities JSON Values
+|===
+| JSON Value| Description| JSON type| Valid Values| Optional
+
+| macMethods| The MAC methods to use when testing KAS or KTS schemes with key confirmation.| object| <<supmacmet>>| No
+| keyConfirmationDirections| The directions in which key confirmation is supported.| array| unilateral, bilateral| No
+| keyConfirmationRoles| The roles in which key confirmation is supported.| array| provider, recipient| No
+|===
+
+[[supmacmet]]
+===== Supported MAC Methods
+
+Note that AT LEAST one mac method must be supplied when making use of Key Confirmation.
+
+.MAC Method Options
+|===
+| JSON Value| Description| JSON type| Valid Values| Optional
+
+| CMAC| Utilizes CMAC as the MAC algorithm. | object| See <<supmacopt>>.  Note that the keyLen must be 128, 192, or 256 for this MAC.| Yes
+| HMAC-SHA-1| Utilizes HMAC-SHA-1 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-224| Utilizes HMAC-SHA2-224 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-256| Utilizes HMAC-SHA2-256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-384| Utilizes HMAC-SHA2-384 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-512| Utilizes HMAC-SHA2-512 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-512/224| Utilizes HMAC-SHA2-512/224 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA2-512/256| Utilizes HMAC-SHA2-512/256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-224| Utilizes HMAC-SHA3-224 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-256| Utilizes HMAC-SHA3-256 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-384| Utilizes HMAC-SHA3-384 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| HMAC-SHA3-512| Utilizes HMAC-SHA3-512 as the MAC algorithm. | object| See <<supmacopt>>| Yes
+| KMAC-128| Utilizes KMAC-128 as the MAC algorithm. Note that a customization string of "KC" is used for the function when KMAC is utilized for Key Confirmation.| object| See <<supmacopt>>| Yes
+| KMAC-256| Utilizes KMAC-256 as the MAC algorithm. Note that a customization string of "KC" is used for the function when KMAC is utilized for Key Confirmation.| object| See <<supmacopt>>| Yes
+|===
+
+[[supmacopt]]
+====== Supported MAC Options
+
+.MAC Method Base Options
+|===
+| JSON Value| Description| JSON type| Valid Values| Optional
+
+| keyLen| The amount of bits from the DKM to pass into the KeyConfirmation MAC function.| integer| 128 - 512.  Note that the DKM is *Required* to have at least 8 bits available after subtracting the keyLen specified.| No
+| macLen| The amount of bits to use as the tag from the MAC function.| integer| 64 - 512. | No
+|===
+
+[[app-reg-ex]]
+=== Example Registration
+
+The following is a example JSON object advertising support for KAS FFC.
+
+[source,json]
+----                         
+{
+  "algorithm": "KAS-KC",
+  "revision": "Sp800-56",
+  "kasRole": [
+    "initiator",
+    "responder"
+  ],
+  "keyConfirmationMethod": {
+    "macMethods": {
+      "KMAC-128": {
+        "keyLen": 128,
+        "macLen": 128
+      }
+    },
+    "keyConfirmationDirections": [
+      "unilateral",
+      "bilateral"
+    ],
+    "keyConfirmationRoles": [
+      "provider",
+      "recipient"
+    ]
+  }
+}
+----
