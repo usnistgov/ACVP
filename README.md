@@ -288,6 +288,7 @@ Standalone KAS KDF testing from SP800-56Cr1. Can be used in conjunction with SSC
 
 * [KAS KDF HKDF Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-hkdf.html)
 * [KAS KDF OneStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestep.html)
+* [KAS KDF OneStepNoCounter Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.html)
 * [KAS KDF TwoStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
 
 ### KDFs

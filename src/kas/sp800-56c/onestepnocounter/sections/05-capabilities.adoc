@@ -1,0 +1,135 @@
+[#properties]
+=== Property Registration
+
+The {spec-algorithm} mode capabilities are advertised as JSON objects within a root "algorithm" object.  The OneStepNoCounter differs from the OneStep KDF only so far as the "l" property is specified on a per auxiliary function basis, there is no counter or loop within the KDF implementation itself, and as such is limited to producing DKM at a maximum length of the output length of the auxiliary function. 
+
+A registration *SHALL* use these properties:
+
+.Registration Properties
+|===
+| JSON Value| Description| JSON Type| Valid Values
+
+| algorithm | The algorithm under test| value| KAS-KDF
+| mode | The mode under test| value| OneStep
+| revision | The algorithm testing revision to use.| value| "Sp800-56Cr2"
+| prereqVals | Prerequisite algorithm validations| array of prereqAlgVal objects| See <<prereq_algs>>
+| auxFunctions | The auxiliary capabilities of the implementation.| array of <<auxfunc>>| See <<auxfunc>>
+| fixedInfoPattern | The pattern used for fixedInfo construction. | string| See <<fixedinfopatcon>>
+| encoding | The encoding type to use with fixedInfo construction.  Note concatenation is currently supported.  ASN.1 should be coming. | array of string| concatenation
+| z | The domain of values representing the min/max lengths of Z the implementation can support. | Domain | 
+|===
+
+[[prereq_algs]]
+==== Prerequisite Algorithms for KAS KDF Validations
+
+Some algorithm implementations rely on other cryptographic primitives. For example, IKEv2 uses an underlying SHA algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:
+
+.Prerequisite Algorithms
+|===
+| JSON Value | Description | JSON Type | Valid Values
+
+| algorithm | a prerequisite algorithm | value | DRBG, HMAC, KMAC, SHA
+| valValue | algorithm validation number | value | actual number or "same"
+| prereqAlgVal | prerequisite algorithm validation | object with algorithm and valValue properties| see above
+|===
+
+[[auxfunc]]
+==== AuxFunction options
+
+.AuxFunction Options
+|===
+| JSON Value| Description| JSON Type| Valid Values
+
+| auxFunctionName| The auxiliary function to use.| string| SHA-1, SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512, HMAC-SHA-1, HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512, KMAC-128, KMAC-256 
+| l | The length (in bits) of the keying material to derive (up to a max of 2048 for KMAC). The length may not exceed the output length of the auxiliary function. | number | 
+| macSaltMethods| How the salt is determined (default being all 00s, random being a random salt). Required for MAC based auxFunctions.| array of string| default, random
+|===
+
+[[fixedinfopatcon]]
+==== FixedInfoPatternConstruction
+
+IUTs *MUST* be capable of specifying how the FixedInfo is constructed for the KDF construction. Note that for the purposes of testing against the ACVP system, both uPartyInfo and vPartyInfo are *REQUIRED* to be registered within the fixed info pattern.
+
+Pattern candidates:
+
+* literal[0123456789ABCDEF]
+  ** uses the specified hex within "[]". literal[0123456789ABCDEF]
+substitutes "0123456789ABCDEF" in place of the field
+
+* uPartyInfo
+  ** uPartyId { || ephemeralKey } { || ephemeralNonce } { || dkmNonce } { || c }
+    *** "optional" items such as ephemeralKey *MUST* be included when available for ACVP testing.
+
+* vPartyInfo
+  ** vPartyId { || ephemeralKey } { || ephemeralNonce } { || dkmNonce } { || c }
+    *** "optional" items such as ephemeralKey *MUST* be included when available for ACVP testing.
+
+* context
+  ** Random value chosen by ACVP server to represent the context.
+
+* algorithmId
+  ** Random value chosen by ACVP server to represent the
+algorithmId.
+
+* label
+  ** Random value chosen by ACVP server to represent the label.
+
+* l
+  ** The length of the derived keying material in bits, *MUST* be represented in 32 bits for ACVP testing.
+
+* t
+  ** A random value used to represent a secondary shared secret. Only applicable to <<SP800-56Cr2>>.
+
+Example (Note that party U is the server in this case "434156536964", party V is the IUT "a1b2c3d4e5"):
+
+* "concatenation" :
+"literal[123456789CAFECAFE]||uPartyInfo||vPartyInfo"
+
+Evaluated as:
+
+* "123456789CAFECAFE434156536964a1b2c3d4e5"
+
+=== Registration Example
+
+.Registration JSON Example
+
+[source,json]
+----
+{
+  "algorithm": "KAS-KDF",
+  "mode": "OneStepNoCounter",
+  "revision": "Sp800-56Cr2",
+  "prereqVals": [
+    {
+      "algorithm": "DRBG",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "SHA",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "KMAC",
+      "valValue": "123456"
+    },
+    {
+      "algorithm": "HMAC",
+      "valValue": "123456"
+    }
+  ],
+  "auxFunctions": [
+    {
+      "auxFunctionName": "KMAC-128",
+      "l": 256,
+      "macSaltMethods": [
+        "default"
+      ]
+    }
+  ],
+  "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+  "encoding": [
+    "concatenation"
+  ],
+  "z": [{"min": 224, "max": 8192, "increment": 8}]
+}
+----

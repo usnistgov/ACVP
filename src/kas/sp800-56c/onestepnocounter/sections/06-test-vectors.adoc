@@ -1,0 +1,341 @@
+[[tgjs]]
+=== Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test	groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped	together. The Test Group JSON object contains meta data that applies to all test vectors within	the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+.Test Group Properties
+|===
+| JSON Values | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| testType | Describes the operation the client should perform on the tests data | string
+| tests | Array of individual test cases | See <<testCase>>
+| kdfConfiguration | Describes the Kdf configuration values used for the group | See <<kdfconfig>>
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' the group is addressing.
+
+[#kdfconfig]
+==== KDF Configuration JSON Schema
+
+Describes the KDF configuration for use under the test group.
+
+.KdfConfiguration JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| kdfType | The type of KDF to use for the group. | value - oneStepNoCounter
+| saltMethod |  The strategy used for salting. | value - default (all 00s), random
+| fixedInfoPattern | The pattern used for constructing the fixedInfo. | value - See <<fixedinfopatcon>>.
+| fixedInfoEncoding | The pattern used for constructing the fixedInfo. | value - See <<fixedinfopatcon>>.
+| auxFunction | The auxiliary function used in the KDF.| value - See <<auxfunc>>.
+| l | the bit length of keying material to derive from the KDF | value
+|===
+
+[[testCase]]
+=== Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each KAS/KTS ECC test vector.
+
+.Test Case JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set.
+| kdfParameter | Object representing inputs into the KDF | See <<kdfParameter>>.
+| fixedInfoPartyU | Fixed information specific to party U | See <<fixedInfo>>.
+| fixedInfoPartyV | Fixed information specific to party V | See <<fixedInfo>>.
+
+|===
+
+[[kdfParameter]]
+==== KDF Parameter JSON Schema
+
+KDF specific options used for the test case.
+
+.KDF Parameter JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| kdfType | The type of KDF utilized. | value
+| salt | The salt used for the test case. | value
+| iv | The iv used for the test case. | value
+| algorithmId | The random "algorithID" used for the test case when applicable to the fixedInfo pattern. | value
+| context | The random "context" used for the test case when applicable to the fixedInfo pattern. | value
+| label | The random "label" used for the test case when applicable to the fixedInfo pattern. | value
+| z | shared secret z value to be used for the test case. | value
+| l | the bit length of keying material to derive from the KDF | value
+|===
+
+[[fixedInfo]]
+==== FixedInfo PartyU/V JSON Schema
+
+Fixed information that is included for party U/V for fixed info construction
+
+.Fixed Info JSON Object
+|===
+| JSON Value | Description | JSON Type
+
+| partyId | The party identifier | value
+| ephemeralData | Ephemeral data (randomly) included as a part of the parties fixed info construction | value
+|===
+
+[[app-vs-ex]]
+=== Example Test Vectors JSON
+
+The following is a example JSON object for KAS-KDF HKDF test vectors sent from the ACVP server to the crypto module.
+
+.Vector Set JSON Example
+[source,json]
+---- 
+{
+  "vsId": 0,
+  "algorithm": "KAS-KDF",
+  "mode": "OneStepNoCounter",
+  "revision": "Sp800-56Cr2",
+  "isSample": true,
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 1,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "FD45F9D02A220E2D473396E459BB3DF4",
+            "z": "AF2FBB3E62F0A3AECF263C440140AD0E5BC0ECB408760E34DC90893A4EFB2BEBBB92347D4DDADC29596B21D609B5CFEA7400D18646E2DBE3AC09183F19FD19F0",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "3CA563ABC8D4D93E6139B1D65B5B2749"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "DF789D2D9897A02C04AE7691F3CF3E7F"
+          }
+        },
+        {
+          "tcId": 2,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "170A24A5574004D1327EA311543428B5",
+            "z": "39A58D72D3B9AF380F8976507397550D25134BF5EF6E582F9DF755AFCB82A83B9A48AC366BA56ADA82388E8E93D332C0EAF7AC1E33AE22E5DBF8173D9331719D",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "8E8D491F3563353B6A3B2B2975F814DA"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "B3A22B239C0092721FC449D415E05E7F",
+            "ephemeralData": "1F5EDF4843471F140F11EF7338A772DFA382CBB02E9DE8C67C84B93BAD34E981C00A17CE3A99B75634CB0524C42EF27C2A21EFF054131B372C1AE1FB9D53E014"
+          }
+        },
+        {
+          "tcId": 3,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "0D29627FC827D6CE7E689607390B95DC",
+            "z": "AE1A59CA0120510CC892731DBFE8AB8E7C15B1562F8E8F37F749250AAE5630056755FC61041A0709D40D037AB544BFDF7B485269B740D7AA7C5EE408292619CB",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "587EDD74EB7E4C75BA719AFC38B1D882"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "74DD2D4805B8A28D9E91499513B6769D"
+          }
+        },
+        {
+          "tcId": 4,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "EDF998C72F5091BE8DF7D6F2248F1B1B",
+            "z": "301FB94EC8C1CE26F63A968B5AE8955DA57E6154D765951E533302C6525B2A8A856B8EDA437976B13D938AB3630C6C46BA34190F96821ABFFAFDC83F720BB981",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "50E9BB251D45B93943F4E1BEE40BFCAF"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "7564046A41F72C64F0F3F910A544E6D4"
+          }
+        },
+        {
+          "tcId": 5,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "70E46AD01C51D121A5A17BE69A555728",
+            "z": "1E75DBAF8A37678C727552D6E074711C53A3A4C58DA63D5489AA9A918A9AD013C293D4A227EE00A36BED5DFB9293F0A7E0B5CE01FCB559F317039E8ADBD27AD0",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "FEA560B7BD3D09460D4F2A3330E9F3C5"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "C879DA1F622AFE285BC0EBB35F310B9B",
+            "ephemeralData": "73BBFDC4149D92CAB5C884A9C6F12968D26CA2AB1D19F90F197BE943D3992FF4C42F26AB242C0BD5280712BE43CF142E39C12BBBB814CD996621F11F72BBD2C7"
+          }
+        }
+      ],
+      "kdfConfiguration": {
+        "kdfType": "oneStepNoCounter",
+        "l": 256,
+        "saltLen": 128,
+        "saltMethod": "default",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+        "fixedInfoEncoding": "concatenation",
+        "auxFunction": "KMAC-128"
+      }
+    },
+    {
+      "tgId": 29,
+      "testType": "VAL",
+      "tests": [
+        {
+          "tcId": 141,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "689FB52D22D81808999723AFCC80C5E6",
+            "z": "13E85CBF95936BB2C85C72990A5B8D6DB92A04BDCEB258310C4669F343C53F3C19DA063F371AD844BE80A70C2D1B22C74BAB4E6E9366E01A2794D96DD7293370",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "4001B2F5B3FB0EDB5D5768892E574D06",
+            "ephemeralData": "293B53F49FAE7CC52FB29291EA564325C12987CFD78C4B8CCD376736915FE7536900D3A8778A2FFD350530FBAD6FC79E70D54DB1D68891FCE3CA7FCFABB2CA60"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "75652DA4B020A290373A44EECA821E91",
+            "ephemeralData": "A3324DE8BA5E5B6FF5A670B4E740A0E6C8F87E8078BE95C2467BACD6012B9A3816978B0272EF5A1F09E1D35F04B145631039D997B9B9CB2F34C0D8157D6551C9"
+          },
+          "dkm": "B885B1EEC05F92A1837EAC6ED586729137FA939AEB919EAE885844E48282DD4C"
+        },
+        {
+          "tcId": 142,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "E0B5C1B59E744B9DC8B2677B7C94A64C",
+            "z": "5B365ECDC21BA87AE09B97DF4EA3E3C95FBC059BD73DE9FB6A3B7D6BB46A63036013AD506AC3C97EDC4AA2F25106C051D0F478FB0762130987C9918B9A84C483",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "55DB248D8156DB60CE2C59A610E1C1D0"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "A620F1FDB82AD23D4F735BE3EB2DB800",
+            "ephemeralData": "8EE8E50FF4B4BED8B70DFEEB4670C5FCC617EF79EEF2EC4522A105299C808BDB35E96316028669C06E66EDF4A835AA8CF32D0B2660F96DF1FFE7965E742C3FA4"
+          },
+          "dkm": "F4143B33AC54F2B37113B426C52DD506B0A6E366D79CD0E114906280EDCCD5F3"
+        },
+        {
+          "tcId": 143,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "18C3E8B0A8DC3D47517D7E744468FEA3",
+            "z": "A0E218736BF8F09B3CCAC7C1AB33697103A2BECC5B7DF300278D7371D8B9D25E7B352692E6084BE4B7710E4DFC26047572CC44AEBFB119C675FE7CB6DCA80D4B",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "26EA16905AFCFE770101F48ADC6036E4"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "10E7B4217A803C7D0797BA8AF2287505",
+            "ephemeralData": "DDAAE7C46BF1951A1D2F5644475EA97AB7D197CCF756C0C0F88CE2C8539FB34A144A558781B70DD5C87B59ADBAA36DC3D10685AB6FCAC23331687C78C65D9677"
+          },
+          "dkm": "0CC4172977044F8635992D5011CB69C1E0140FCBC5E2F5677889434EFEE60384"
+        },
+        {
+          "tcId": 144,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "34EDAE5424170A8ADEA093D5F869B641",
+            "z": "93DD72B39B5E2B3B23B578F8DD5C79A0802517B48F1EC1520F8A5AE7F787BB688DEA46C9F17F9F2AC2DC927E75B577C79E690AB888DE46DAA763323B88ED17B6",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "130D4C73BD22A5EC6CB67183FD20505C"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "E4DF5CEEFCBCBC6306F0940CEA5050FE"
+          },
+          "dkm": "B5CB805A457E8D6459FC467B65A24F7BA0A225548AE16D0426B67BF3BE9114CE"
+        },
+        {
+          "tcId": 145,
+          "kdfParameter": {
+            "kdfType": "oneStepNoCounter",
+            "requiresAdditionalNoncePair": false,
+            "auxFunction": "KMAC-128",
+            "salt": "00000000000000000000000000000000",
+            "t": "2F08D9DD73BFE5361049A7AA32360466",
+            "z": "F229AF192F5AECC89E7A4DF9F2F433FB265CEACB33D44C7BEBD7A4BD70A0DA8372346BC0DA62D8AEBCE083B4BBDFEA7E8BEA10B45EDC765DEA897B0808A9A921",
+            "l": 256,
+            "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+            "fixedInputEncoding": "concatenation"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "C3F1ADAE683FF413D9CD7970D9DA6A42"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "22CCD2A74AD0A80160367842768DDF3B"
+          },
+          "dkm": "842CA4681DE4703E5431A0D5FA9270FD87837FB4F5D7C019029EE49B158C1F06"
+        }
+      ],
+      "kdfConfiguration": {
+        "kdfType": "oneStepNoCounter",
+        "l": 256,
+        "saltLen": 128,
+        "saltMethod": "default",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+        "fixedInfoEncoding": "concatenation",
+        "auxFunction": "KMAC-128"
+      }
+    }
+  ]
+}
+----
