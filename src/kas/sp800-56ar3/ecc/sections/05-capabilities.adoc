@@ -103,6 +103,7 @@ Note that AT LEAST one KDF Method is required for KAS schemes.  The following *M
 | JSON Value| Description| JSON Type| Valid Values| Optional
 
 | oneStepKdf| Indicates the IUT will be testing key derivation using the SP800-56Cr1 OneStepKdf.| object| <<onestepkdf>>| Yes
+| oneStepNoCounterKdf| Indicates the IUT will be testing key derivation using the SP800-56Cr1 OneStepNoCounterKdf.| object| <<onestepnocounterkdf>>| Yes
 | twoStepKdf| Indicates the IUT will be testing key derivation using the SP800-56Cr1 TwoStepKdf. | object| <<twostepkdf>>| Yes
 |===
 
@@ -124,6 +125,30 @@ Note that AT LEAST one KDF Method is required for KAS schemes.  The following *M
 | JSON Value| Description| JSON Type| Valid Values| Optional
 
 | auxFunctionName| The auxiliary function to use. Note that a customization string of "KDF" is used for the function when KMAC is utilized.| string| SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512, HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512, KMAC-128, KMAC-256 | No
+| macSaltMethods| How the salt is determined (default being all 00s, random being a random salt). | array of string| default, random| Not optional for mac based auxiliary functions.
+|===
+
+[[onestepnocounterkdf]]
+====== One Step No Counter KDF Capabilities
+
+The one step no counter KDF is a special implementation of the one step KDF.  This implementation of the KDF does not utilize a 32 bit counter as a part of the concatenation that gets fed into function `H`.  As such, there is no loop within the KDF due to there being no information changing between iterations of the potential concatenation, and the KDF output length is capped at the output length of the chosen aux function (or 2048 in the case of KMAC).
+
+.One Step No Counter KDF Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| auxFunctions| The auxiliary functions to use with the KDF.| array of <<auxfuncnocounter>>| See <<auxfuncnocounter>>| No
+| fixedInfoPattern| The pattern used for fixedInfo construction. | string| See <<fixedinfopatcon>>| No
+| encoding| The encoding type to use with fixedInfo construction.  Note concatenation is currently supported.  ASN.1 should be coming. | array of string| concatenation| No
+|===
+
+[[auxfuncnocounter]]
+.AuxFunction Options
+|===
+| JSON Value| Description| JSON Type| Valid Values| Optional
+
+| auxFunctionName| The auxiliary function to use. Note that a customization string of "KDF" is used for the function when KMAC is utilized.| string| SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA2-512/224, SHA2-512/256, SHA3-224, SHA3-256, SHA3-384, SHA3-512, HMAC-SHA2-224, HMAC-SHA2-256, HMAC-SHA2-384, HMAC-SHA2-512, HMAC-SHA2-512/224, HMAC-SHA2-512/256, HMAC-SHA3-224, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512, KMAC-128, KMAC-256 | No
+| l| The length of the keying material to derive (cannot exceed output length of aux function)| No
 | macSaltMethods| How the salt is determined (default being all 00s, random being a random salt). | array of string| default, random| Not optional for mac based auxiliary functions.
 |===
 
@@ -299,6 +324,21 @@ The following is a example JSON object advertising support for KAS ECC.
           "auxFunctions": [
             {
               "auxFunctionName": "KMAC-128",
+              "macSaltMethods": [
+                "default"
+              ]
+            }
+          ],
+          "fixedInfoPattern": "algorithmId||l||uPartyInfo||vPartyInfo",
+          "encoding": [
+            "concatenation"
+          ]
+        },
+        "oneStepNoCounterKdf": {
+          "auxFunctions": [
+            {
+              "auxFunctionName": "KMAC-128",
+              "l": 256,
               "macSaltMethods": [
                 "default"
               ]
