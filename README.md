@@ -58,6 +58,14 @@ metanorma compile -t ietf -x html file.adoc
 
 You can switch between `-x html` and `-x txt` for different RFC output formats. 
 
+If you make changes to a file that's referenced by a top level spec, run metanorma 
+on the referenced file prior to running it on the top level file. E.g.,
+
+```
+metanorma compile -t ietf -x html symmetric/sections/04-testtypes.adoc
+metanorma compile -t ietf -x html draft-celi-acvp-symmetric.adoc 
+```
+
 Or you can use the `Makefile` which is available. 
 
 To build all documents, html and txt
