@@ -192,6 +192,7 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [ECDSA mode: keyGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: keyVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html) 
+* [Deterministic ECDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html) 
 * [ECDSA mode: sigVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [DSA mode: keyGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.html)
 * [DSA mode: sigVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.html)
