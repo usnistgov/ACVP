@@ -2,7 +2,29 @@ name: manual-deploy-nist-pages
 
 on:
   workflow_dispatch:
-    branches: [ nist-pages ]
+    branches: [ master, nist-pages ]
 
 jobs:
   deploy-gh-pages:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/download-artifact@v1
+      with:
+        name: documents
+    - name: Deploy to GH Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.GH_DEPLOY_KEY }}
+        publish_dir: documents
+        publish_branch: nist-pages
+        force_orphan: true
+        enable_jekyll: true
+        user_name: ${{ github.actor }}
+        user_email: ${{ format('{0}@users.noreply.github.com', github.actor) }}
+        commit_message: "${{ format('Deploy to GitHub Pages: {0}', github.sha) }}"
+    - uses: kolpav/purge-artifacts-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        expire-in: 0
