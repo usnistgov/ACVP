@@ -24,10 +24,10 @@ This section describes the design of the tests used to validate implementations 
 ----
 INPUT: The initial Msg is the length of the digest size
 
-MCT(Msg, MaxOutLen, MinOutLen)
+MCT(Msg, MaxOutLen, MinOutLen, OutLenIncrement)
 {
   Range = (MaxOutLen – MinOutLen + 1);
-  OutputLen = (floor(MaxOutLen/8)) * 8;
+  OutputLen = MaxOutLen;
   FunctionName = "";
   Customization = "";
 
@@ -39,7 +39,7 @@ MCT(Msg, MaxOutLen, MinOutLen)
       InnerMsg = Left(Output[i-1] || ZeroBits(128), 128);
       Output[i] = CSHAKE(InnerMsg, OutputLen, FunctionName, Customization);
       Rightmost_Output_bits = Right(Output[i], 16);
-      OutputLen = MinOutLen + (8 * Rightmost_Output_bits % Range);
+      OutputLen = MinOutLen + (floor((Rightmost_Output_bits % Range) / OutLenIncrement) * OutLenIncrement);
       Customization = BitsToString(InnerMsg || Rightmost_Output_bits);
     }
 
@@ -57,10 +57,10 @@ MCT(Msg, MaxOutLen, MinOutLen)
 ----
 INPUT: The initial Msg is the length of the digest size
 
-MCT(Msg, MaxOutLen, MinOutLen, MaxBlockSize, MinBlockSize)
+MCT(Msg, MaxOutLen, MinOutLen, OutLenIncrement, MaxBlockSize, MinBlockSize)
 {
   Range = (MaxOutLen – MinOutLen + 1);
-  OutputLen = (floor(MaxOutLen/8)) * 8;
+  OutputLen = MaxOutLen;
   BlockRange = (MaxBlockSize – MinBlockSize + 1);
   BlockSize = MinBlockSize;
   Customization = "";
@@ -73,7 +73,7 @@ MCT(Msg, MaxOutLen, MinOutLen, MaxBlockSize, MinBlockSize)
       InnerMsg = Left(Output[i-1] || ZeroBits(128), 128);
       Output[i] = ParallelHash(InnerMsg, OutputLen, BlockSize, FunctionName, Customization);
       Rightmost_Output_bits = Right(Output[i], 16);
-      OutputLen = MinOutLen + (8 * Rightmost_Output_bits % Range);
+      OutputLen = MinOutLen + (floor((Rightmost_Output_bits % Range) / OutLenIncrement) * OutLenIncrement);
       BlockSize = MinBlockSize + Right(Rightmost_Output_bits, 8) % BlockRange;
       Customization = BitsToString(InnerMsg || Rightmost_Output_bits);
     }
@@ -92,10 +92,10 @@ MCT(Msg, MaxOutLen, MinOutLen, MaxBlockSize, MinBlockSize)
 ----
 INPUT: The initial Single-Tuple of a random length between 0 and 65536 bits.
 
-MCT(Tuple, MaxOutLen, MinOutLen)
+MCT(Tuple, MaxOutLen, MinOutLen, OutLenIncrement)
 {
   Range = (MaxOutLen – MinOutLen + 1);
-  OutputLen = (floor(MaxOutLen/8)) * 8;
+  OutputLen = MaxOutLen;
   Customization = "";
 
   T[0][0] = Tuple;
@@ -112,7 +112,7 @@ MCT(Tuple, MaxOutLen, MinOutLen)
       }
       Output[i] = TupleHash(T[i], OutputLen, Customization);
       Rightmost_Output_bits = Right(Output[i], 16);
-      OutputLen = MinOutLen + (8 * Rightmost_Output_bits % Range);
+      OutputLen = MinOutLen + (floor((Rightmost_Output_bits % Range) / OutLenIncrement) * OutLenIncrement);
       Customization = BitsToString(T[i][0] || Rightmost_Output_bits);
     }
   
