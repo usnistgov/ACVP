@@ -5,7 +5,7 @@ The new testing scope, 17ACVT, is available, and defined in [NIST Handbook 150-1
 
 All current information about ACVP protocol may be found within this Github project at https://github.com/usnistgov/ACVP. View the protocol documents at https://pages.nist.gov/ACVP/.
 
-For issues regarding the actual ACVP Server implementation, as well as pre-release (demo) and release notes (prod), see the ACVP-Server repository: https://github.com/usnistgov/ACVP-Server/
+For issues regarding the actual ACVP Server implementation, as well as pre-release (demo) and release notes (prod), see the ACVP-Server repository: https://github.com/usnistgov/ACVP-Server/. 
 
 # Jump to
 * [Background](#background)
