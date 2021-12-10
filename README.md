@@ -118,6 +118,9 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [AES-FF3-1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html) - DEMO only
 * [TDES-CBC](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CBCI](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
+* [TDES-CFB1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
+* [TDES-CFB8](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
+* [TDES-CFB64](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CFBP1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CFBP8](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CFBP64](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
