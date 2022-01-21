@@ -5,7 +5,7 @@ The new testing scope, 17ACVT, is available, and defined in [NIST Handbook 150-1
 
 All current information about ACVP protocol may be found within this Github project at https://github.com/usnistgov/ACVP. View the protocol documents at https://pages.nist.gov/ACVP/.
 
-For issues regarding the actual ACVP Server implementation, as well as pre-release (demo) and release notes (prod), see the ACVP-Server repository: https://github.com/usnistgov/ACVP-Server/. 
+For issues regarding the actual ACVP Server implementation, as well as pre-release (demo) and release notes (prod), see the ACVP-Server repository: https://github.com/usnistgov/ACVP-Server/.
 
 # Jump to
 * [Background](#background)
@@ -30,7 +30,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
 * [Licensing Terms](#licensing-terms)
 
 # Background
-The rapid development of cryptographic technology over the last two decades and its adoption in many different technology domains has resulted in a sharp increase in the number and complexity of approved algorithms. The volume of cryptographic algorithm validations has outstripped the available human resources available to test, report, and validate results. The plethora of different algorithms has created a dire need for consistent requesting and reporting of test data and results. We also live in times of unprecedented levels of threats and exploits that require frequent product updates to fix defects and remove security vulnerabilities, which in turn requires much faster turnaround of validation updates than what the existing validation model allows. See the NIST [Automated Cryptographic Validation Testing project](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) for broader context and information. 
+The rapid development of cryptographic technology over the last two decades and its adoption in many different technology domains has resulted in a sharp increase in the number and complexity of approved algorithms. The volume of cryptographic algorithm validations has outstripped the available human resources available to test, report, and validate results. The plethora of different algorithms has created a dire need for consistent requesting and reporting of test data and results. We also live in times of unprecedented levels of threats and exploits that require frequent product updates to fix defects and remove security vulnerabilities, which in turn requires much faster turnaround of validation updates than what the existing validation model allows. See the NIST [Automated Cryptographic Validation Testing project](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) for broader context and information.
 
 Requirements documents for the existing Cryptographic Algorithm Validation Program (CAVP) and the 17CAV scope can be found at https://nvlpubs.nist.gov/nistpubs/hb/2020/NIST.HB.150-2020.pdf. The requirements documents for the 17ACVT scope can be found on the same page.
 
@@ -40,7 +40,7 @@ General information about CAVP can be found at https://csrc.nist.gov/Projects/Cr
 
 Using Metanorma is not required to view the documents in the GitHub repository. When changes occur, documents will automatically be built and deployed to https://pages.nist.gov/ACVP.
 
-Metanorma is a library for writing standards. It can compile `.adoc` files into multiple common standards formats including the IETF's RFC format. 
+Metanorma is a library for writing standards. It can compile `.adoc` files into multiple common standards formats including the IETF's RFC format.
 
 Use the instructions here to set up Metanorma: https://www.metanorma.com/author/topics/install/
 
@@ -50,23 +50,23 @@ To compile an individual file, to make sure your gem versions are up to date run
 gem install metanorma-cli
 ```
 
-From there run 
+From there run
 
 ```
 metanorma compile -t ietf -x html file.adoc
 ```
 
-You can switch between `-x html` and `-x txt` for different RFC output formats. 
+You can switch between `-x html` and `-x txt` for different RFC output formats.
 
-If you make changes to a file that's referenced by a top level spec, run metanorma 
+If you make changes to a file that's referenced by a top level spec, run metanorma
 on the referenced file prior to running it on the top level file. E.g.,
 
 ```
 metanorma compile -t ietf -x html symmetric/sections/04-testtypes.adoc
-metanorma compile -t ietf -x html draft-celi-acvp-symmetric.adoc 
+metanorma compile -t ietf -x html draft-celi-acvp-symmetric.adoc
 ```
 
-Or you can use the `Makefile` which is available. 
+Or you can use the `Makefile` which is available.
 
 To build all documents, html and txt
 
@@ -90,18 +90,18 @@ make clean
 The objective of this project is to define a protocol allowing independent implementation by all vendors participating in the NIST cryptographic validation programs ([CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program#)) for accelerated test data generation and requisition, reporting of test results, and validation of NIST-approved cryptographic algorithms (see FIPS140-2 [Annex A](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexa.pdf), [Annex C](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexc.pdf) and [Annex D](https://csrc.nist.gov/CSRC/media/Publications/fips/140/2/final/documents/fips1402annexd.pdf)). For FIPS140-3, the NIST-approved cryptographic algorithms are defined in the [SP800-140 Document Series](https://csrc.nist.gov/publications/detail/sp/800-140/final).
 
 # Project Goals
-The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and 
+The development of an Automated Cryptographic Validation Protocol (ACVP) that enables the generation and
 validation of standardized algorithm test evidence to facilitate the [modernization](https://csrc.nist.gov/Projects/Automated-Cryptographic-Validation-Testing) of [CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program#) and [CMVP](https://csrc.nist.gov/projects/cryptographic-module-validation-program).
 
 # Status
-The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the [protocol specification](./draft-fussell-acvp-spec.html) are available. Some additional endpoinds defined in https://github.com/usnistgov/ACVP-Server are also available but not considered part of this protocol.
+The demo server (demo.acvts.nist.gov) supports ACVP version 1.0. All endpoints defined in the [protocol specification](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html) are available. Some additional endpoinds defined in https://github.com/usnistgov/ACVP-Server are also available but not considered part of this protocol.
 
 The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same endpoints defined.
 
 ## Supported Algorithms
 
 ### Block Cipher Modes
-* [AES-CBC](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html) 
+* [AES-CBC](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-CFB1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-CFB8](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-CFB128](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
@@ -124,7 +124,7 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [TDES-CFBP1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CFBP8](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CFBP64](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
-* [TDES-CTR](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html) 
+* [TDES-CTR](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-ECB](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-KW](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-OFB](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
@@ -194,8 +194,8 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [ECDSA mode: sigGenComponent](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: keyGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: keyVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
-* [ECDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html) 
-* [Deterministic ECDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html) 
+* [ECDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
+* [Deterministic ECDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: sigVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [DSA mode: keyGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.html)
 * [DSA mode: sigVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.html)
@@ -220,7 +220,7 @@ Tests against shared secret computation (SSC), key derivation functions (KDF), a
 * [KAS ECC OnePassUnified](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.html)
 * [KAS ECC staticUnified](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.html)
 * [KAS FFC dhHybrid1](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
-* [KAS FFC mqv2](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html) 
+* [KAS FFC mqv2](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC dhEphem](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC dhHybridOneFlow](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC mqv1](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
@@ -263,7 +263,7 @@ Standalone KAS SSC testing from SP800-56A/B. Can be used in conjunction with KDF
 * [KAS ECC staticUnified](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.html)
 * [KAS ECC CDH-Component](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ecc.html)
 * [KAS FFC dhHybrid1](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
-* [KAS FFC mqv2](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html) 
+* [KAS FFC mqv2](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC dhEphem](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC dhHybridOneFlow](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
 * [KAS FFC mqv1](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-kas-ffc.html)
@@ -314,7 +314,7 @@ Standalone KAS KDF testing from SP800-56Cr1. Can be used in conjunction with SSC
 * [Feedback KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [Double Pipeline Iterator KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [IKEv1](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.html)
-* [IKEv2](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.html) 
+* [IKEv2](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.html)
 * [SNMP](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.html)
 * [SRTP](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.html)
 * [SSH](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.html)
@@ -335,11 +335,11 @@ Standalone KAS KDF testing from SP800-56Cr1. Can be used in conjunction with SSC
 * [ConditioningComponent BlockCipher_DF](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.html)
 * [ConditioningComponent Hash_DF](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.html)
 
-The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard. 
+The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard.
 
 # Accessing the Server
 
-To access the demo server one needs a TLS credential **and** a one-time password (OTP). The [protocol specification](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html) and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work. 
+To access the demo server one needs a TLS credential **and** a one-time password (OTP). The [protocol specification](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html) and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work.
 
 To set expectations, since this is a demo system, it will be in a state of flux and any all data on the system is considered temporary and may be reset to accommodate development of the Automated Cryptographic Validation Protocol (ACVP) service. We will try to keep the demo service relatively stable, but we plan to update it as we continue to add new algorithms and capabilities.
 
@@ -347,7 +347,7 @@ To access the prod server, first you must demonstrate compentency on the demo se
 
 ## Obtaining TLS credentials
 
-To access the [demo environment](https://demo.acvts.nist.gov/acvp/home) you will need to send your CSR to us. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send a request to acvts-demo@nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR. 
+To access the [demo environment](https://demo.acvts.nist.gov/acvp/home) you will need to send your CSR to us. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send a request to acvts-demo@nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR.
 
 You are expected to protect the key pair from unauthorized use and to notify NIST in the event the keypair becomes compromised. Also, since we do not have a formal login page the following notice applies when accessing the ACVP system:
 
@@ -359,15 +359,15 @@ You are accessing a U.S. Government information system, which includes: 1) this 
 
 ## Configuring and using One-Time-Passwords (OTP)
 
-TOTP has been configured on all servers. See details [here](https://github.com/usnistgov/ACVP/wiki#second-factor-authentication-and-authorization-schema-for-accessing-and-working-with-the-nist-automated-cryptographic-validation-services). 
+TOTP has been configured on all servers. See details [here](https://github.com/usnistgov/ACVP/wiki#second-factor-authentication-and-authorization-schema-for-accessing-and-working-with-the-nist-automated-cryptographic-validation-services).
 
 # Contribution Guidelines
 
-If you want to contribute, please follow the simple rules below and send us pull requests. 
+If you want to contribute, please follow the simple rules below and send us pull requests.
 
 - See [Metanorma](#how-to-use-metanorma) for installation instructions
 - Documents are templated out and organized into folders, find and edit the appropriate document and build the HTML or TXT file to ensure the changes are correct
-- Create a Pull Request with the updated ADOC files. GitHub Actions will verify the files can compile. 
+- Create a Pull Request with the updated ADOC files. GitHub Actions will verify the files can compile.
 - Once approved by a NIST member, GitHub Actions will rebuild the `nist-pages` branch to be reflected on https://pages.nist.gov/ACVP
 
 If you would like to talk to our developers, you may want to send email to our mailing list algotest@list.nist.gov. You may also report bugs or request new tests.
@@ -393,4 +393,4 @@ You may improve, modify, and create derivative works of the data or any portion 
 
 ## Citation Format
 
-Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date). 
+Author/editor (Publication Year), Title, Publisher, Persistent Identifier (PID) or URL (Access date).
