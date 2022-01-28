@@ -138,10 +138,10 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [SHA-512](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.html)
 * [SHA-512/224](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.html)
 * [SHA-512/256](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.html)
-* [SHA3-224 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
-* [SHA3-256 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
-* [SHA3-384 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
-* [SHA3-512 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
+* [SHA3-224 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html) - no longer supported by ACVTS
+* [SHA3-256 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html) - no longer supported by ACVTS
+* [SHA3-384 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html) - no longer supported by ACVTS
+* [SHA3-512 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html) - no longer supported by ACVTS
 * [SHA3-224 2.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
 * [SHA3-256 2.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
 * [SHA3-384 2.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
