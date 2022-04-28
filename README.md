@@ -113,7 +113,8 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [AES-KWP](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-OFB](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-XPN](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
-* [AES-XTS](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
+* [AES-XTS 1.0](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html) - no longer supported by ACVTS
+* [AES-XTS 2.0](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-FF1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-FF3-1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html) - DEMO only
 * [TDES-CBC](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
