@@ -297,13 +297,13 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [KDA HKDF Sp800-56Cr2](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-hkdf.html)
 * [KDA OneStep Sp800-56Cr2](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.html)
 * [KDA OneStepNoCounter Sp800-56Cr2](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.html)
-* [KDA TwoStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
+* [KDA TwoStep Sp800-56Cr2](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
 
 #### KAS KC Testing SP800-56
 
   Standalone KAS Key Confirmation testing from SP800-56Ar3 and/or SP800-56Br2.  Can be as a KC primitive validation as a part of a KAS validation.
 
-* [KAS KC Sp800-56](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kc-sp800-56.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kc-sp800-56.html)
+* [KAS KC Sp800-56](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.html)
 
 ### KDFs
 * [Counter KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
