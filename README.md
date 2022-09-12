@@ -294,10 +294,10 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [KDA HKDF Sp800-56Cr1](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-hkdf.html)
 * [KDA OneStep Sp800-56Cr1](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.html)
 * [KDA TwoStep Sp800-56Cr1](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
-* [KDA HKDF Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-hkdf.html)
-* [KDA OneStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestep.html)
-* [KDA OneStepNoCounter Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.html)
-* [KDA TwoStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
+* [KDA HKDF Sp800-56Cr2](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-hkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-hkdf.html)
+* [KDA OneStep Sp800-56Cr2](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestep.html)
+* [KDA OneStepNoCounter Sp800-56Cr2](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-onestepnocounter.html)
+* [KDA TwoStep Sp800-56Cr2](https://usnistgov.github.io/ACVP/draft-hammett-acvp-kas-kdf-twostep.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kdf-twostep.html)
 
 #### KAS KC Testing SP800-56
 
