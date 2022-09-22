@@ -1,10 +1,10 @@
 
 [[reqpre]]
-=== Required Prerequisite Algorithms for SP 800-108r1 KDF Validations
+=== Required Prerequisite Algorithms for SP 800-108 KDF Validations
 
-Each SP800-108r1 KDF implementation relies on other cryptographic primitives. For example, the KDF must utilize an underlying MAC algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:
+Each SP800-108 KDF implementation relies on other cryptographic primitives. For example, the KDF must utilize an underlying MAC algorithm. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:
 
-.SP800-108r1 KDF Required Prerequisites
+.SP800-108 KDF Required Prerequisites
 |===
 | JSON Value | Description | JSON Type | Valid Values
 
@@ -19,23 +19,22 @@ Each SP800-108r1 KDF implementation relies on other cryptographic primitives. Fo
 
 Each algorithm capability advertised is a self-contained JSON object using the following values.
 
-Two algorithm registrations are possible to test SP 800-108r1 KDFs. The first is for the "KDF" / "1.0" which covers the counter, feedback, and double pipeline iteration key derivation functions. The second is for "KDF" / "KMAC" / "Sp800-108r1" which covers the KMAC function when used as a key derivation function, introduced in the new revision, SP 800-108r1. A registration *SHALL* use these properties:
+A registration *SHALL* use these properties:
 
 .Registration Properties
 |===
 | JSON Property | Description | JSON Type | Valid Values
 
 | algorithm | The KDF to be validated. | string | KDF
-| mode | The KDF mode to be validated. | string | KMAC
-| revision | The algorithm testing revision to use. | string | "1.0" when "mode" is not included, or "Sp800-108r1" when "mode" is set to "KMAC"
+| revision | The algorithm testing revision to use. | string | "1.0"
 | prereqVals | Prerequisite algorithm validations | array of prereqAlgVal objects | See <<reqpre>>
 | capabilities | Array of JSON objects, each with fields pertaining to the KDF mode identified uniquely by the combination of the "kdfMode" and indicated properties | array of JSON objects | See <<properties>>
 |===
 
 [[kdfmodes]]
-==== Supported SP 800-108r1 KDF Modes
+==== Supported SP 800-108 KDF Modes
 
-The following SP800-108 KDF modes or "modes of iteration" may be advertised by the ACVP compliant crypto module as the "kdfMode" property:
+The following SP800-108 KDF modes or "modes of iteration" may be advertised by the ACVP compliant crypto module:
 
 * counter
 * feedback
@@ -54,7 +53,7 @@ The complete list of KDF key generation capabilities may be advertised by the AC
 |===
 | JSON Value | Description | JSON Type | Valid Values
 
-| kdfMode | The type of SP800-108r1 KDF or "mode of iteration" | string | See <<kdfmodes>>
+| kdfMode | The type of SP800-108 KDF or "mode of iteration" | string | See <<kdfmodes>>
 | macMode | The MAC or PRF algorithm used | string | See <<valid-mac>>
 | supportedLengths | The supported derived keying material lengths in bits | domain | Min: 1, Max: 4096
 | fixedDataOrder | Describes where the counter appears in the fixed data | array | Any non-empty subset of {"none", "after fixed data", "before fixed  data", "middle fixed data", "before iterator"}
@@ -70,20 +69,8 @@ NOTE: A 'counterLength' of 0 describes that there is no counter used. The 0 opti
 
 NOTE: When 'counterLength' contains a value of "0", 'fixedDataOrder' must contain a value of "none" and vice versus.
 
-The following table describes the capabilities that may be advertisd by the ACVP compliant crypto module for "KDF" / "KMAC" / "Sp800-108r1":
-
-.KDF KMAC Mode Capabilities
-|===
-| JSON Value | Description | JSON Type | Valid Values
-
-| macMode | The MAC or PRF algorithm used | string | See <<valid-mac>>
-| keyDerivationKeyLength | The lengths of the key derivation key in bits | domain | Min: 8, Max: 4096, Inc: 8
-| contextLength | The lengths of the context field in bits | domain | Min: 8, Max: 4096, Inc: 8
-| labelLength | The lengths of the label field in bits. This field can be excluded if no label is used. | domain | Min: 8, Max: 4096, Inc: 8
-| derivedKeyLength | The lengths of the derived keys in bits | domain | Min: 112, Max: 4096, Inc: 8
-
 [#valid-mac]
-==== Supported SP 800-108r1 KDF MACs
+==== Supported SP 800-108 KDF MACs
 
 The following MAC or PRF functions *MAY* be advertised by an ACVP compliant client
 
@@ -102,179 +89,134 @@ The following MAC or PRF functions *MAY* be advertised by an ACVP compliant clie
 * HMAC-SHA3-256
 * HMAC-SHA3-384
 * HMAC-SHA3-512
-* KMAC-128
-* KMAC-256
-
-NOTE: The "KMAC-128" and "KMAC-256" options are only allowed for, and are the only options allowed for, "KDF" / "KMAC" / "Sp800-108r1".
 
 === Registration Example
 
-The following is a example JSON object advertising support for a SP 800-108r1 KDF.
-
-// [align=left,alt=,type=]
-....                 
-{
-    "algorithm": "KDF",
-    "revision": "1.0",
-    "prereqVals": [
-        {
-            "algorithm": "SHA",
-            "valValue": "123456"
-        },
-        {
-            "algorithm": "DRBG",
-            "valValue": "123456"
-        }
-    ],
-    "capabilities": [
-        {
-            "kdfMode": "counter",
-            "macMode": [
-                "CMAC-AES128",
-                "CMAC-AES192",
-                "CMAC-AES256",
-                "CMAC-TDES",
-                "HMAC-SHA-1",
-                "HMAC-SHA2-224",
-                "HMAC-SHA2-256",
-                "HMAC-SHA2-384",
-                "HMAC-SHA2-512"
-            ],
-            "supportedLengths": [
-                {
-                    "min": 8,
-                    "max": 1024,
-                    "increment": 1
-                }
-            ],
-            "fixedDataOrder": [
-                "after fixed data",
-                "before fixed data",
-                "middle fixed data"
-            ],
-            "counterLength": [
-                8,
-                16,
-                24,
-                32
-            ],
-            "supportsEmptyIv": false
-        },
-        {
-            "kdfMode": "feedback",
-            "macMode": [
-                "CMAC-AES128",
-                "CMAC-AES192",
-                "CMAC-AES256",
-                "CMAC-TDES",
-                "HMAC-SHA-1",
-                "HMAC-SHA2-224",
-                "HMAC-SHA2-256",
-                "HMAC-SHA2-384",
-                "HMAC-SHA2-512"
-            ],
-            "supportedLengths": [
-                {
-                    "min": 8,
-                    "max": 1024,
-                    "increment": 1
-                }
-            ],
-            "fixedDataOrder": [
-                "none",
-                "after fixed data",
-                "before fixed data",
-                "before iterator"
-            ],
-            "counterLength": [
-                0,
-                8,
-                16,
-                24,
-                32
-            ],
-            "supportsEmptyIv": true,
-            "requiresEmptyIv": false
-        },
-        {
-            "kdfMode": "double pipeline iteration",
-            "macMode": [
-                "CMAC-AES128",
-                "CMAC-AES192",
-                "CMAC-AES256",
-                "CMAC-TDES",
-                "HMAC-SHA-1", 
- 			    "HMAC-SHA2-224",
-                "HMAC-SHA2-256",
-                "HMAC-SHA2-384",
-                "HMAC-SHA2-512"
-            ],
-            "supportedLengths": [
-                {
-                    "min": 8,
-                    "max": 1024,
-                    "increment": 1
-                } 
-            ],
-            "fixedDataOrder": [
-                "none",
-                "after fixed data",
-                "before fixed data",
-                "before iterator"
-            ],
-            "counterLength": [
-                0,
-                8,
-                16,
-                24,
-                32
-            ], 
-            "supportsEmptyIv": false
-        }
-    ]
-}
-....
-
-The following is a example JSON object advertising support for a "KDF" / "KMAC" / "Sp800-108r1".
+The following is a example JSON object advertising support for a SP 800-108 KDF.
 
 // [align=left,alt=,type=]
 ....
-{
-    "algorithm": "KDF",
-    "mode": "KMAC",
-    "revision": "Sp800-108r1",
-    "macMode": [
-        "KMAC-128",
-        "KMAC-256"
-    ],
-    "keyDerivationKeyLength": [
-        {
-            "min": 112,
-            "max": 4096,
-            "increment": 8
-        }
-    ],
-    "contextLength": [
-        {
-            "min": 8,
-            "max": 4096,
-            "increment": 8
-        }
-    ],
-    "labelLength": [
-        {
-            "min": 8,
-            "max": 4096,
-            "increment": 8
-        }
-    ],
-    "derivedKeyLength": [
-        {
-            "min": 112,
-            "max": 4096,
-            "increment": 8
-        }
-    ]
-}
+                    
+	{
+       "algorithm": "KDF",
+       "revision": "1.0",
+       "prereqVals": [
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           },
+           {
+               "algorithm": "DRBG",
+               "valValue": "123456"
+           }
+       ],
+       "capabilities": [
+           {
+               "kdfMode": "counter",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+                   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "after fixed data",
+                   "before fixed data",
+                   "middle fixed data"
+               ],
+               "counterLength": [
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": false
+           },
+           {
+               "kdfMode": "feedback",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+                   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "none",
+                   "after fixed data",
+                   "before fixed data",
+                   "before iterator"
+               ],
+               "counterLength": [
+                   0,
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": true,
+               "requiresEmptyIv": false
+           },
+           {
+               "kdfMode": "double pipeline iteration",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+				   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "none",
+                   "after fixed data",
+                   "before fixed data",
+                   "before iterator"
+               ],
+               "counterLength": [
+                   0,
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": false
+           }
+       ]
+   }
+
 ....
 
