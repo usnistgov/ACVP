@@ -2,7 +2,7 @@
 [[tgjs]]
 === Test Groups JSON Schema
 
-The testGroups element at the top level in the test vector JSON object is an array of test	groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped	together. The Test Group JSON object contains meta data that applies to all test vectors within	the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object.
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object.
 
 .Test Group JSON Object
 |===
@@ -10,7 +10,7 @@ The testGroups element at the top level in the test vector JSON object is an arr
 
 | tgId | Test group identifier | integer
 | kdfMode | The kdfMode used for the test group | string
-| macMode | Psuedorandom function (PRF) HMAC or CMAC used | string
+| macMode | Psuedorandom function (PRF) HMAC, CMAC, or KMAC used | string
 | counterLocation | "none", "after fixed data", "before fixed data", "middle fixed data", or "before iterator"| string
 | keyOutLength | Expected length of the derived keying material or key in bits | integer
 | counterLength | Expected length of the counter in bits | integer
@@ -20,6 +20,18 @@ The testGroups element at the top level in the test vector JSON object is an arr
 |===
 
 NOTE: The feedback mode KDF counter location of "counter after iterator" is referenced with the option "before fixed data" in the 'counterLocation' specification.
+
+For "KDF" / "KMAC" / "Sp800-108r1" the following table describes the JSON elements of the Test Group JSON object.
+
+.Test Group JSON Object for "KDF" / "KMAC" / "Sp800-108r1"
+|===
+| JSON Values | Description | JSON Type
+
+| tgId | Test group identifier | integer
+| macMode | Psuedorandom function (PRF) KMAC used | string
+| testType | Describes the operation being performed | string 
+| tests | Array of individual test cases | array
+|===
 
 The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' the group is addressing.
 
@@ -36,43 +48,92 @@ Each test group contains an array of one or more test cases. Each test case is a
 | iv | The initialization vector used only for feedback KDFs | hex
 |===
 
+The following table describes the JSON elements for each "KDF" / "KMAC" / "Sp800-108r1" test vector.
+
+.Test Case JSON Object
+|===
+| JSON Values | Description | JSON Type
+
+| tcId | Test case idenfitier | integer
+| keyDerivationKey | Input key | hex
+| context | The context value used | hex
+| label | The label value used | hex
+| derivedKeyLength | The expected length of the derived key | integer
+|===
 
 === Example Test Vector JSON Object
 
-The following is a example JSON object for SP 800-108 KDF test vectors sent from the ACVP server to the crypto module.
+The following is a example JSON object for SP 800-108r1 KDF test vectors sent from the ACVP server to the crypto module.
 
 // [align=left,alt=,type=]
 ....
-                        
-[{
-                "acvVersion": "0..54"
-        },
-        {
-                "vsId": 1564,
-                "algorithm": "counterMode",
-                "revision": "1.0",
-                "testGroups": [{
-                        "tgId": 1,
-                        "kdfMode": "counter",
-                        "macMode": "CMAC-AES128",
-                        "counterLocation": "after fixed data",
-                        "keyOutLength": 1024,
-                        "counterLength": 8,
-                        "tests": [{
-                                        "tcId": 1,
-                                        "keyIn": "5DA38931E8D9174BC3279C8942D2DB82",
-                                        "deferred": false
-                                },
-                                {
-                                        "tcId": 2,
-                                        "keyIn": "58F5426A40E3D5D2C94F0F97EB30C739",
-                                        "deferred": false
-                                }
-                        ]
-                }]
-        }
-]
-            
-                    
+[
+    {
+        "acvVersion": "v1.0"
+    },
+    {
+        "vsId": 1564,
+        "algorithm": "counterMode",
+        "revision": "1.0",
+        "testGroups": [{
+            "tgId": 1,
+            "kdfMode": "counter",
+            "macMode": "CMAC-AES128",
+            "counterLocation": "after fixed data",
+            "keyOutLength": 1024,
+            "counterLength": 8,
+            "tests": [{
+                    "tcId": 1,
+                    "keyIn": "5DA38931E8D9174BC3279C8942D2DB82",
+                    "deferred": false
+                },
+                {
+                    "tcId": 2,
+                    "keyIn": "58F5426A40E3D5D2C94F0F97EB30C739",
+                    "deferred": false
+                }
+            ]
+        }]
+    }
+]              
 ....
 
+The following is a example JSON object for "KDF" / "KMAC" / "Sp800-108r1" test vectors sent from the ACVP server to the crypto module.
+
+// [align=left,alt=,type=]
+....
+[
+    {
+        "acvVersion": "v1.0"
+    },
+{
+    "vsId": 0,
+    "algorithm": "KDF",
+    "mode": "KMAC",
+    "revision": "Sp800-108r1",
+    "isSample": false,
+    "testGroups": [
+        {
+            "tgId": 1,
+            "testType": "AFT",
+            "macMode": "KMAC-128",
+            "tests": [
+                {
+                    "tcId": 1,
+                    "keyDerivationKey": "FA4E...",
+                    "context": "4476...",
+                    "label": "146EE...",
+                    "derivedKeyLength": 112
+                },
+                {
+                    "tcId": 2,
+                    "keyDerivationKey": "2BE6...",
+                    "context": "5E2E...",
+                    "label": "0DD6...",
+                    "derivedKeyLength": 112
+                }
+            ]
+        }
+    }
+]              
+....
