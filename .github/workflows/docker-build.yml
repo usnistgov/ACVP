@@ -2,53 +2,80 @@ name: build-documents
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main ]
   pull_request:
-    types: [opened, synchronize, ready_for_review]
 
 jobs:
   build-docker:
     runs-on: ubuntu-latest
-    container: docker://metanorma/mn:1.4.12
+    container:
+      image: ghcr.io/metanorma/metanorma-nist:latest
+      credentials:
+        username: metanorma-ci
+        password: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - name: Install gems from local Gemfile
-        run: |
-          curl -LO --retry 3 https://raw.githubusercontent.com/metanorma/metanorma-build-scripts/master/gemfile-to-bundle-add.sh | bash
-      - name: Build document in the Metanorma container
-        env:
-          LC_ALL: C.UTF-8
-          LANG: C.UTF-8
-          LANGUAGE: C.UTF-8
-        run: |
-          make clean all publish
-        working-directory: ./src
-      - uses: actions/upload-artifact@master
+
+      - uses: actions/cache@v2
         with:
-          name: documents
-          path: ./src/documents
+          path: /config/fonts
+          key: metanorma-nist-fonts
+          restore-keys: metanorma-nist-fonts
+
+      - name: Cache built documents
+        uses: actions/cache@v2
+        with:
+          path: site/
+          key: ${{ hashFiles('metanorma.yml') }}-${{ hashFiles('src/*.adoc') }}
+
+      - uses: metanorma/metanorma-build-scripts/gh-rubygems-setup-action@main
+        with:
+          token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
+
+      - uses: metanorma/metanorma-build-scripts/docker-gem-install@main
+
+      - uses: actions-mn/cli/site-gen@main
+        with:
+          agree-to-terms: true
+
+      - name: Build NIST site on GitHub Pages
+        run: |
+          rm -f site/index.html
+          find site/documents/src \( -name '*.html' -or -name '*.pdf' -or \
+            -name '*.rxl' -or -name '*.xml' \) -exec mv \{} site/ \;
+          rm -rf site/documents
+          cp _config.yml site/
+          cp -a _includes site/
+          cp README.md site/index.md
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: site
+          path: site
 
   deploy-gh-pages:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build-docker
     steps:
-    - uses: actions/checkout@master
-    - uses: actions/download-artifact@v1
-      with:
-        name: documents
-    - name: Deploy to GH Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        deploy_key: ${{ secrets.GH_DEPLOY_KEY }}
-        publish_dir: documents
-        publish_branch: nist-pages
-        force_orphan: true
-        enable_jekyll: true
-        user_name: ${{ github.actor }}
-        user_email: ${{ format('{0}@users.noreply.github.com', github.actor) }}
-        commit_message: "${{ format('Deploy to GitHub Pages: {0}', github.sha) }}"
-    - uses: kolpav/purge-artifacts-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        expire-in: 0
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: site
+
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ github.token }}
+          publish_dir: ./site
+          publish_branch: nist-pages
+          force_orphan: true
+          enable_jekyll: true
+          user_name: ${{ github.actor }}
+          user_email: ${{ format('{0}@users.noreply.github.com', github.actor) }}
+          commit_message: "${{ format('Deploy to GitHub Pages: {0}', github.sha) }}"
+
+      - uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ github.token }}
+          expire-in: 0
