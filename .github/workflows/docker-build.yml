@@ -15,15 +15,18 @@ jobs:
         password: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.METANORMA_CI_PAT_TOKEN || github.token }}
-          submodules: true
 
       - uses: actions/cache@v2
         with:
           path: /config/fonts
           key: metanorma-nist-fonts
           restore-keys: metanorma-nist-fonts
+
+      - name: Cache built documents
+        uses: actions/cache@v2
+        with:
+          path: site/
+          key: ${{ hashFiles('metanorma.yml') }}-${{ hashFiles('src/*.adoc') }}
 
       - uses: metanorma/metanorma-build-scripts/gh-rubygems-setup-action@main
         with:
@@ -34,6 +37,16 @@ jobs:
       - uses: actions-mn/cli/site-gen@main
         with:
           agree-to-terms: true
+
+      - name: Build NIST site on GitHub Pages
+        run: |
+          rm -f site/index.html
+          find site/documents/src \( -name '*.html' -or -name '*.pdf' -or \
+            -name '*.rxl' -or -name '*.xml' \) -exec mv \{} site/ \;
+          rm -rf site/documents
+          cp _config.yml site/
+          cp -a _includes site/
+          cp README.md site/index.md
 
       - uses: actions/upload-artifact@v2
         with:
@@ -53,7 +66,7 @@ jobs:
 
       - uses: peaceiris/actions-gh-pages@v3
         with:
-          deploy_key: ${{ secrets.GH_DEPLOY_KEY }}
+          github_token: ${{ github.token }}
           publish_dir: ./site
           publish_branch: nist-pages
           force_orphan: true
