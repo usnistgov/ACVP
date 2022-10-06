@@ -309,6 +309,7 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [Counter KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [Feedback KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [Double Pipeline Iterator KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
+* [KMAC KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [IKEv1](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.html)
 * [IKEv2](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.html)
 * [SNMP](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.html)
