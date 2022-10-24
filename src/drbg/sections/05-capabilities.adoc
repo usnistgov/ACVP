@@ -1,61 +1,95 @@
 
 [#properties]
-=== Property Registration
+=== DRBG Algorithm Registration Properties
 
-The SP800-90A DRBG mode capabilities are advertised as JSON objects within the 'capabilities_exchange' property.
-
-=== Default values
-
-ACVP has default values for many of the input parameters for testing the DRBG algorithms.For example, the Entropy Input, Nonce, Personalization String, and Addtional Input parameters have default values. The specific details and restrictions on each of these input lengths is specified in <<value_req_per_option>>, <<capabilities-table>> and the notes following it. To indicate a preference for using a default value for any of these parameters, the value zero (0) should be set. If the implementation does not support one of these defaults, the corresponding supported bit length values shall be set explicitly.
-
-=== Registration Example
-
-A registration *SHALL* use these properties within each object within the 'capabilities' array
-
-[[capabilities-table]]
-.Registration Capability Properties
-|===
-| JSON Value| Description| JSON type| Valid Values
-
-| mode | The algorithm mode to be validated | string | See <<supported>>
-| derFuncEnabled | Derivation function option. See <<capabilities-table>> notes below | boolean | true/false
-| entropyInputLen | See <<capabilities-table>> notes below | domain | Min: maximum security strength, Max: XXX
-| nonceLen | See <<capabilities-table>> notes below | domain | Min: half the maximum security strength, Max: XXX. Set to 0 if not supported
-| persoStringLen | Personalization string length. See <<capabilities-table>> notes below | domain | Min: maximum security strength, Max: XXX. Set to 0 if not supported
-| additionalInputLen | See <<capabilities-table>> notes below | domain | Min: maximum security strength, Max: XXX. Set to 0 if not supported
-| returnedBitsLen | See <<capabilities-table>> notes below | integer | |
-|===
-
-Each DRBG algorithm capability advertised is a self-contained JSON object. The following JSON values are used for DRBG algorithm capabilities:
+Each SP800-90A DRBG algorithm capability advertised is a self-contained JSON object using the following values.
 
 [[caps-table]]
-.DRBG Algorithm Capabilities
+.DRBG Algorithm Capabilities JSON Values
 |===
 | JSON Value | Description | JSON type | Valid Values
 
-| algorithm | Name of the algorithm to be validated | string | See <<supported>>
+| algorithm | The DRBG algorithm to be validated | string | See <<supported>>
 | revision | ACVP Test version | string | "1.0"
-| prereqVals | Prerequisites of the algorithm | object | See <<prerequisites>>
-| predResistanceEnabled | An implementation that can be used with prediction resistance. See <<capabilities-table>> notes below | array of boolean containing one or two distinct values | [true], [true, false], or [false]
-| reseedImplemented | Reseeding of the DRBG shall be performed in accordance with the specification for the given DRBG mechanism. See <<capabilities-table>> notes below | boolean | true or false
-| capabilities | An array of objects describing the capabilities of a mode of the algorithm. See <<capabilities-table>> for more information | array
+| prereqVals | Prerequisite algorithm validations | object with algorithm and valValue properties | See above
+| predResistanceEnabled | An implementation that can be used with prediction resistance. See the notes in <<caps_sec>> | array of boolean containing one or two distinct values | [true], [true, false], or [false]
+| reseedImplemented | Reseeding of the DRBG shall be performed in accordance with the specification for the given DRBG mechanism. See the notes in <<caps_sec>> | boolean | true or false
+| capabilities | The individual DRBG capabilities | array of capability objects	| See <<capabilities-table>>
 |===
 
-NOTE: 2 If an implementation utilizes a nonce in the construction of a seed during instantiation, the length of the nonce shall be at least half the maximum security strength supported. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the tested DRBG implementation.
+[#caps_sec]
+=== DRBG Capabilities JSON Values
 
-NOTE: 3 If an implementation can only be used without prediction resistance, the array 'predResistanceEnabled' shall only contain a single 'false' element. Implementations that either have prediction resistance always ON or always OFF, the array 'predResistanceEnabled' shall contain two distinct elements, 'true' and 'false'. Implementations containing multiple equal array elements for 'predResistanceEnabled' will be rejected.
+ACVP has default values for many of the input parameters for testing the DRBG algorithms. For example, the Entropy Input, Nonce, Personalization String, and Addtional Input parameters have default values. The specific details and restrictions on each of these input lengths is specified in this section and in <<value_req_per_option>>. To indicate a preference for using a default value for any of these parameters, the value zero (0) should be set. If the implementation does not support one of these defaults, the corresponding supported bit length values shall be set explicitly.
 
-NOTE: 4 For 'ctrDRBG' implementations, the 'derFuncEnabled' property must be included.
+Each DRBG algorithm capability advertised is a self-contained JSON object. A registration *SHALL* use these properties within each object within the 'capabilities' property.
 
-NOTE: 5 All DRBGs are tested at their maximum supported security strength so this is the minimum bit length of the entropy input that ACVP will accept. The maximum supported security strength is also the default value for this input. Longer entropy inputs are permitted, with the following exception: for 'ctrDRBG' with 'derFuncEnabled' set to 'false', the 'entropyInputLen' must equal the seed length. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the DRBG being tested.
+[[capabilities-table]]
+.Registration Capability JSON Values
+|===
+| JSON Value| Description| JSON type| Valid Values
 
-NOTE: 6 'ctrDRBG' with 'derFuncEnabled' set to 'false' does not use a nonce; the nonce values, if supplied, will be ignored for this case. The default nonce bit length is one-half the maximum security strength supported by the mechanism/option. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the tested DRBG implementation.
+| mode | The algorithm mode to be validated | string | See the mode column of <<supported_values>>
+| derFuncEnabled | Derivation function option. See the notes below. | boolean | true/false
+| entropyInputLen | See the notes below. | domain | Min: maximum security strength (see <<supported_values>>), Max: See <<supported_values>>
+| nonceLen | See the notes below. | domain | Min: half the maximum security strength (see <<supported_values>>), Max: See <<supported_values>>. Set to 0 if not supported
+| persoStringLen | Personalization string length. See the notes below. | domain | Min: maximum security strength (see <<supported_values>>), Max: See <<supported_values>>. Set to 0 if not supported
+| additionalInputLen | See the notes below. | domain | Min: maximum security strength (see <<supported_values>>), Max: See <<supported_values>>. Set to 0 if not supported
+| returnedBitsLen | Returned bits length | integer | Min: See <<supported_values>>, Max: 4096.
+|===
 
-NOTE: 7 ACVP allows bit length values for 'persoString' ranging from the maximum supported security strength except in the case of 'derFuncEnabled' set to 'false', where the second personalization string length must be less than or equal to the seed length. If the implementation only supports one personalization string length, then set only that value as the range min and max and set the step to 0. If the implementation does not use a 'persoString', set all range parameters (min, max, step) to 0. If the implementation can work with and without 'persoString', set the min to 0, set the max to at least the maximum supported strength and set the step equal to at least the maximum supported strength to avoid testing lengths less than that. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the tested DRBG implementation.
+ 
+NOTE: If an implementation utilizes a nonce in the construction of a seed during instantiation, the length of the nonce shall be at least half the maximum security strength supported. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the tested DRBG implementation.
 
-NOTE: 8 The 'addtionalInput' configuration and restrictions are the same as those for the 'persoString'.
+NOTE: If an implementation can only be used without prediction resistance, the array 'predResistanceEnabled' shall only contain a single 'false' element. Implementations that either have prediction resistance always ON or always OFF, the array 'predResistanceEnabled' shall contain two distinct elements, 'true' and 'false'. Implementations containing multiple equal array elements for 'predResistanceEnabled' will be rejected.
 
-An example registration within an algorithm capability exchange looks like this
+NOTE: For 'ctrDRBG' implementations, the 'derFuncEnabled' property must be included. For 'hashDRBG' or 'hmacDRBG' implementations, the 'derFuncEnabled' property must be omitted or set to false.
+
+NOTE: All DRBGs are tested at their maximum supported security strength so this is the minimum bit length of the entropy input that ACVP will accept. The maximum supported security strength is also the default value for this input. Longer entropy inputs are permitted, with the following exception: for 'ctrDRBG' with 'derFuncEnabled' set to 'false', the 'entropyInputLen' must equal the seed length. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the DRBG being tested.
+
+NOTE: 'ctrDRBG' with 'derFuncEnabled' set to 'false' does not use a nonce; the nonce values, if supplied, will be ignored for this case. The default nonce bit length is one-half the maximum security strength supported by the mechanism/option. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the tested DRBG implementation.
+
+NOTE: ACVP allows bit length values for 'persoString' ranging from the maximum supported security strength except in the case of 'derFuncEnabled' set to 'false', where the second personalization string length must be less than or equal to the seed length. If the implementation only supports one personalization string length, then set only that value as the range min and max and set the step to 0. If the implementation does not use a 'persoString', set all range parameters (min, max, step) to 0. If the implementation can work with and without 'persoString', set the min to 0, set the max to at least the maximum supported strength and set the step equal to at least the maximum supported strength to avoid testing lengths less than that. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the tested DRBG implementation.
+
+NOTE: The 'addtionalInput' configuration and restrictions are the same as those for the 'persoString'.
+
+[[value_req_per_option]]
+=== Supported values per DRBG option
+
+DRBG minimum/maximum values for the properties listed in <<capabilities-table>> vary depending on the DRBG capabilities registered. The following table lists those values.
+
+[[supported_values]]
+.Supported DRBG Values
+|===
+| DRBG Algorithm | Mode | Derivation Function | Max Security Strength | Min Entropy Len | Max Entropy Len | Max PersoString | Max Addl String | Min Nonce Len | Min returnedBits Len
+
+| ctrDRBG | "AES-128" | TRUE | 128 | 128 | 65536 | 65536 | 65536 | 64 | 128
+| ctrDRBG | "AES-192" | TRUE | 192 | 192 | 65536 | 65536 | 65536 | 96 | 128
+| ctrDRBG | "AES-256" | TRUE | 256 | 256 | 65536 | 65536 | 65536 | 128 | 128
+| ctrDRBG | "TDES" | TRUE | 112 | 112 | 65536 | 65536 | 65536 | 56 | 64
+| ctrDRBG | "AES-128" | FALSE | 128 | 256 | 256 | 256 | 256 | 0 | 128
+| ctrDRBG | "AES-192" | FALSE | 192 | 320 | 320 | 320 | 320 | 0 | 128
+| ctrDRBG | "AES-256" | FALSE | 256 | 384 | 384 | 384 | 384 | 0 | 128
+| ctrDRBG | "TDES" | FALSE | 112 | 232 | 232 | 232 | 232 | 0 | 64
+| hashDRBG | "SHA-1" | N/A | 128 | 128 | 65536 | 65536 | 65536 | 64 | 160
+| hashDRBG | "SHA2-224" | N/A | 192| 192 | 65536 | 65536 | 65536 | 96 | 224
+| hashDRBG | "SHA2-256" | N/A | 256| 256 | 65536 | 65536 | 65536 | 128 | 256
+| hashDRBG | "SHA2-384" | N/A | 256| 256 | 65536 | 65536 | 65536 | 128 | 384 
+| hashDRBG | "SHA2-512" | N/A | 256| 256 | 65536 | 65536 | 65536 | 128 | 512
+| hashDRBG | "SHA2-512/224" | N/A | 192 | 192 | 65536 | 65536 | 65536 | 96 | 224
+| hashDRBG | "SHA2-512/256" | N/A | 256 | 256 | 65536 | 65536 | 65536 | 128 | 256
+| hmacDRBG | "SHA-1" | N/A | 128 | 128 | 65536 | 65536 | 65536 | 64 | 160
+| hmacDRBG | "SHA2-224" | N/A | 192 | 192 | 65536 | 65536 | 65536 | 96 | 224
+| hmacDRBG | "SHA2-256" | N/A | 256 | 256 | 65536 | 65536 | 65536 | 128 | 256
+| hmacDRBG | "SHA2-384" | N/A | 256 | 256 | 65536 | 65536 | 65536 | 128 | 384
+| hmacDRBG | "SHA2-512" | N/A | 256 | 256 | 65536 | 65536 | 65536 | 128 | 512
+| hmacDRBG | "SHA2-512/224" | N/A | 192 | 192 | 65536 | 65536 | 65536 | 96 | 224 
+| hmacDRBG | "SHA2-512/256" | N/A | 256 | 256 | 65536 | 65536 | 65536 | 128 | 256
+|===
+
+=== DRBG Registration Example
+
+The following is an example registration.
 
 [source, json]
 ----
