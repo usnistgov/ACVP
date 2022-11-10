@@ -191,6 +191,7 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [RSA mode: sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
 * [RSA mode: signaturePrimitive (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
 * [RSA mode: decryptionPrimitive (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
+* [RSA mode: decryptionPrimitive SP800-56Br2 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
 * [RSA mode: legacySigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
 * [ECDSA mode: sigGenComponent](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: keyGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
