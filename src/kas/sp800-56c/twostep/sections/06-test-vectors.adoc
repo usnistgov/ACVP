@@ -11,13 +11,17 @@ The testGroups element at the top level in the test vector JSON object is an arr
 | testType | Describes the operation the client should perform on the tests data | string
 | tests | Array of individual test cases | See <<testCase>>
 | kdfConfiguration | Describes the KDA configuration values used for single expansion groups. | See <<kdfconfig>>
+| multiExpansion | Whether multi expansion tests should be run (true or false)? | boolean
 | kdfMultiExpansionConfiguration | Describes the KDA configuration values used for multi expansion groups. | See <<kdfmulticonfig>>
+| zLength | The length of the shared secret, Z, in bits. | integer
+| usesHybridSharedSecret | Will a hybrid shared secret be used (true or false)? | boolean
+| auxSharedSecretLen | The length of the auxiliary shared secret, T, in bits. Only applicable for <<SP800-56Cr2>> and when a hybrid shared secret is used. | integer
 |===
 
 The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' the group is addressing.
 
 [#kdfconfig]
-==== KDA Configuration JSON Schema
+==== kdfConfiguration JSON Schema
 
 Describes the KDA configuration for use under the test group.
 
@@ -37,7 +41,7 @@ Describes the KDA configuration for use under the test group.
 |===
 
 [#kdfmulticonfig]
-==== KDA Multi Expansion Configuration JSON Schema
+==== kdfMultiExpansionConfiguration JSON Schema
 
 Describes the KDA Multi Expansion configuration for use under the test group.
 
@@ -71,7 +75,7 @@ Each test group contains an array of one or more test cases. Each test case is a
 |===
 
 [[kdfParameter]]
-==== KDA Parameter JSON Schema
+==== kdfParameter JSON Schema
 
 KDA specific options used for the test case.
 
@@ -86,6 +90,7 @@ KDA specific options used for the test case.
 | context | The random "context" used for the test case when applicable to the fixedInfo pattern. | value
 | label | The random "label" used for the test case when applicable to the fixedInfo pattern. | value
 | z | shared secret z value to be used for the test case. | value
+| t | auxiliary shared secret t.  For <<SP800-56Cr2>> only. | value
 | l | the bit length of keying material to derive from the KDA | value
 |===
 
@@ -103,7 +108,7 @@ Fixed information that is included for party U/V for fixed info construction
 |===
 
 [[kdfMultiExpansionParameter]]
-==== KDA Multi Expansion Parameter JSON Schema
+==== kdfMultiExpansionParameter JSON Schema
 
 KDA specific options used for the test case.
 
@@ -112,11 +117,12 @@ KDA specific options used for the test case.
 | JSON Value | Description | JSON Type
 | salt | The salt used for the test case. | value
 | z | shared secret z value to be used for the test case. | value
+| t | auxiliary shared secret t.  For <<SP800-56Cr2>> only. | value
 | iterationParameters | the per iteration parameters for multi expansion | See <<iterationParameters>>.
 |===
 
 [[iterationParameters]]
-===== KDA Multi Expansion IterationParameters JSON Schema
+===== KDF Multi Expansion IterationParameters JSON Schema
 
 The per multi expansion iteration specific parameters used within a test case.
 
@@ -140,275 +146,84 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
   "algorithm": "KDA",
   "mode": "TwoStep",
   "revision": "Sp800-56Cr1",
-  "isSample": true,
   "testGroups": [
     {
       "tgId": 1,
       "testType": "AFT",
+      "kdfConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 1024,
+        "saltMethod": "random",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+        "fixedInfoEncoding": "concatenation",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      },
+      "zLength": 224,
       "tests": [
         {
           "tcId": 1,
           "kdfParameter": {
             "kdfType": "twoStep",
-            "salt": "0ADFBF33C04265B205163B6CDE97BB1B29FE1821B56E7022A74E4054ADC52AC3F339219C6B4C9B158EE95ED440AB1769FFFC33220B28F62C7B2A805B57F39C63",
-            "z": "576F1B40A4A640C72DD070C5D80380558D1A642DEEAA8F1978428ADE63D7DA4553780E25103F97E493F2626AB9F67CAA626A1F461BD08266942B7F3C8BD3BA90",
+            "salt": "01E17704420ADF5E3BABFA1302169E1122AABFC69B9C0FB798271A6EB69E4A81E2B66518CDAB4615B2EFB48D3C6DEFCAACB267DC2CB4F867FA44AF891F914EEF393780F1E14BC38987EC7B940409FB48B039FF048E84B963A846649034CE012E84B89738B59F04ACB7F661E517A1AE5ED5E45721BFD2A8D06F3691E5F77B80E8",
+            "z": "F0F0CCE8C584183E5A9A4E3F72118F7AEA1AA52F8340F7F97C514540",
             "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "3A29BC54ADE2C0AD617FFD70112445F87E15B21D67156E10CCBC07D0ECF8649163738EFEEFFAC01488875B8AE14F229CFC6C34EF641D04C928AB4F6DF74834BC",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
+            "iv": "E3A0B0A265F224038DB267BB7BA6B5F40A242D753F3A655F15591814F45A9A2D3F94E40F8E58639F86CEB44F7ABB889C55EB53177E85D4C8B03EFBC891ABD241"
           },
           "fixedInfoPartyU": {
-            "partyId": "806604B8DA9F7E391F8307486CD67D0A"
+            "partyId": "154C2274FC10A7DB2FFF56C4AF73F426"
           },
           "fixedInfoPartyV": {
-            "partyId": "20FE389DE49E9CA909D48E9F0BA5BAB2",
-            "ephemeralData": "02A918E3A64B8BC17907569DAA75BEC4DA331303460127A86C6CCEF2B62164BAA1459C3AE46A9E6302EE6A4BCA608E2726DAC275F6D1479EE4FC4E45AE8DAFE3"
+            "partyId": "062C938BC127A44615542680127413C7",
+            "ephemeralData": "D7B17E991ECDA5DD7BB921786ECC1CE59D3D9796E19023256B323B5D"
           }
         },
         {
           "tcId": 2,
           "kdfParameter": {
             "kdfType": "twoStep",
-            "salt": "BE4FEA6C28C7F6D571B0EC89CAB2E586053CDE9208CA409D164F03FD58938CFB47E63C3BE589DD512A6F659ECD60AD9EA784213DD81F7AFB8BCFF506192044D6",
-            "z": "025E3E3EF6B67354DE9778F793214A7A9CC8C0DD87DA70E27F7C47E63F9E33B89AB20AB6339FFBD8F827C19FE7AA144B89537EB0731A030D1571DEF28E6C7CA0",
+            "salt": "1D491C4921151927FB376F0D7CFDD198761DF7C464493015B8E67E43F5C7F6921FC028DC87CDCBA23BDD4B9A6ED3214954822A6F039F794526A317EDB8540547D2DEE19E46251BA08DFA64DD8F56B8D0D33697FB0EC870015F6F01A26D589C9FBBDAF127A3F57FEC7D383773A0D8B52846854554F3C122C3068494C61299D8C4",
+            "z": "37D63739A7CB7C50FD871FD3EF0C1F03F74AE2440A2532CDD68260AB",
             "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "375FA1A86CD4CD1A7833F88BE886545D6ED652BC3F6B173B5A768B01BA740BF1B3AA263B078321DC0FBD1B8A565E84A17398669A5D2F4A5E9AA92B8EB0DCD894",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
+            "iv": "7762E6BF97BB4E6D74F23E2DF2736AA2AEF8CE15F34133C00B13A38644AB2CE6F86FC4682ACDCBBE2212442A0AEE57AEAB76790269591A3BCA118D6379717FB8"
           },
           "fixedInfoPartyU": {
-            "partyId": "181AA0E72E042B9803A213DF7CBB8051",
-            "ephemeralData": "C933CCD623CBC35246E713BD690F1C5FEA12722F281EE07BDE3219F2843BC29E58B4F76873CCFB1DA866BC4C045C36D711A440859073EAC09C40A21EE96CB903"
+            "partyId": "4BAE694570E0224BB547C9D1D94C7CE8"
           },
           "fixedInfoPartyV": {
-            "partyId": "AA783D9D6B897E04BE1F2004C3F21A35",
-            "ephemeralData": "4B5F015CE5974ED4FB992A634A47BEDA77F470EFEE10E7667FEAE1E7B8F53A204B15A97B893E6551FD3FE64F8014F255ADAE070F4E2F31F4DB8B9A4BE84B13E1"
+            "partyId": "5B969CDA952E26645F9FC3CB414E71FB",
+            "ephemeralData": "18A36D79ACB81DF688C63EB37FCEE7B8173FB1A457D739267196C821"
           }
         },
         {
           "tcId": 3,
           "kdfParameter": {
             "kdfType": "twoStep",
-            "salt": "3040A6C24E8CDA5E53DDF7C42335FA82383FC3B1F2C95E3D335D9720BD3AB251DF07712EF3824ECDB00C7267B30552225FE5B5889765A2A16F9A459D5A8A6BC5",
-            "z": "653DFF10216BDC7C6817F78FAE59FF15400061951EEB9AF309819AE7A2904829C29127688FC1A1A40F62F9CE886A1A3B01D729B59278168DA58ED2C210ECDE61",
+            "salt": "F152D89599CA2F3442414F622C3B28C73909DA4ABE2FBBF11484F603C44C2855EC4EC93F0E592024A4A72EF35F20E80C5EDC49955D8694BA92E7EFB9EFD3DB7135AF83144886A3829F38D153EA4DD8033EE5D79FBD5E056F6311C6B2DBBF5C75FA1841382326F2367C06F462F6F7CC5899CA794C49D58976E7A63B3BBD1F8893",
+            "z": "D29D57D82D870868AAFD44C6DE25335A674A97E37A76AA6EC2D0568D",
             "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "E680F9C99500ED6AB6F40D35783F81DC44AAD381F12EAABB5ABD697C2C57981D97710E0A465EE6D5591BE43C33714A0F0AFE1AA90976D2F48A3F277BD546859A",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
+            "iv": "78EA8687F385001122643B91758281D64B4309E056C825CDAF3C9CD3AF793D68187EEA2BD49009E70689228D174720174959E8FF386E0C63165B17FD6C079A45"
           },
           "fixedInfoPartyU": {
-            "partyId": "427A430E34956099A11A34996C68B585",
-            "ephemeralData": "CE4FCE03CD168399D90D499BA988D7A16738730F0E713B3783A297D3858F7F28623959E2622F15B7E5E0A793F9DF99855CF3F9602E0A2628313132E2CE697980"
+            "partyId": "F991070A2BDC80388AC84F3A46284816"
           },
           "fixedInfoPartyV": {
-            "partyId": "44D5D13558C15CF6EE886E69E005A8EC"
-          }
-        },
-        {
-          "tcId": 4,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "F9916CA1F2B351D833AD84391A48DC3753D21E156C32F961F26897376A3ED5AB18689B99B3CF1BFE55EDF56AA1ADEFEF5022395346B1D9942B20710DB2A6C629",
-            "z": "BAF85001AAF675464043635BEC546B935A6542DCF401B3744ED1E633F912827A925869FD0DC1DA9392042ACD10D53A9BEBE260BB63F8FC23F55EC38589084A6B",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "10743126EF5675BA21A5D4F025A8D21157703C447D93EFC47F5853827CFC3967F55076E3E6910B2726DE4E53BC7C7C49E03F81C3703FBB875818B8FA7E9B9970",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "50B610281A9C8768B5B7E84E39E866A4"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "BB234C26EFBEB3D13F17366B14917967",
-            "ephemeralData": "42D9BB758F33884617A1554CB1F149FE7CB9164F62E775DDCF5B48F640C0E15E783A41C5F9357CF9D12F38A566D69A35A5BF361728C7D4849FB4AA0B2C5A764F"
-          }
-        },
-        {
-          "tcId": 5,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "956E5333A9A29004CB4C3CAC3750FACCB46106900B7E7CDA166D6DCB7BE8A2679F195203C4DDD8E34EF6E90D52E39465A15E2C42CDC537E87218118186DEFAB4",
-            "z": "6F3EDA174C2DD8C611D126300C6AB0D61D6AEB804D527C87801BDE3AD3F6AD2C8B7E4976633AB154A92AD79105695EBC996514D1A8E40EB8B53D51FD8181F1E9",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "632C996B274A3C313C93645B0B32C5D21960BCC4DF105924E970C19F6BEDE80E86E3C4CA3B771D552AF3E10109F82876DDBDEA6A9077CC27F7D5E244A066251E",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "6929DD85147EE842DE5F921E247B598F"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "3DAC69CEB1620DE4DB065A71DEC68C1C",
-            "ephemeralData": "555F54BEC5FCF9269F53C55E6EC8EEB324581E5D12A75274481D01FA0320A1D6D17E742CFD85394975FF1E90784EFA06C3AEE88CBCA848C98C5144FF456F26BD"
+            "partyId": "0C17E9A3CF85104088422DA7DBDEC8FC"
           }
         }
-      ],
-      "kdfConfiguration": {
-        "kdfType": "twoStep",
-        "l": 512,
-        "saltLen": 512,
-        "saltMethod": "random",
-        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-        "fixedInfoEncoding": "concatenation",
-        "kdfMode": "feedback",
-        "macMode": "HMAC-SHA2-512",
-        "counterLocation": "after fixed data",
-        "counterLen": 32,
-        "ivLen": 512
-      }
+      ]
     },
     {
       "tgId": 33,
       "testType": "VAL",
-      "tests": [
-        {
-          "tcId": 161,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "A12858E5715B0A82E684B2D4433768BD56FD2FB701AB7367B0095DEBB1511FB467AEDBE9E70DFEBC4E5375574B8597717CB2D8CB6D560A7D1240F36F1758D65C",
-            "z": "366F5863F9B2F6F56FCEDD44D1CF1585C83D7CFBC146C0B8A5835D05F9F4BF1225ECB140BD6BB30CA3DF9B27336CFF4DFB3293B480AB6CE8B016CEACBF9AD50A",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "F611B1D01C10B85CF2FDA62E2E70CE73301D9FCEFFB523D6BDCE5176C8A50A4A0ECA9702E02F6A9B01926AA4812AB7018C9652C9E4E4D58E13910087ACB9EF5C",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "8FA71E55677BC77BEFF5399FF56E8580"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "505F428AAB0F0385F035E11AE22A38A2",
-            "ephemeralData": "649B3A141042D4D2DBBB0A40820688C02B6C8AD363C50209ED792E8131DC45171B85F144E636190539A46553451FC083234ED71966617D55E0204B29470E7641"
-          },
-          "dkm": "ABD671702D3E4F6040DD4EF8CE7F93C048071AA2A4857E9D90DF14EADA758E5CCB702A14039EA0BDE758F688097661FEFC2FB71350CB4205C74F0326807C7E3B"
-        },
-        {
-          "tcId": 162,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "45A57043BECD4048EE868278CF78907DB3C3D6B2740E4C36FFD6CE98775D7966AA80DB17ACFD9DD2D47B85736E43E10F0724A9672BD57321BC1C405C9F14C473",
-            "z": "E8257C5D497449D2BA04D3FB79A0BD15FAA76511DD726E80211A8EC6830EBB64CAAEA785704C3AC68FCE36A1BBF738A06D2530E7B6F5758FABECAA833AD8A1F1",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "F33F177DDBFAE1F942E21D41FAE4D01E4177604A34C43721D068D6108781C9A7C5BC1701572E6FF3E331B163872E49D9FC2106762638440B406FAC4BEDC52AF3",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "2ED2A1A8514BB3302CB0C0501C325C0B"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "BA287A7504EDEAE60FE82BC1A974E793",
-            "ephemeralData": "A68EF3B1402B3A2A8E1C075302196DCB9DC99F240061F2BD5FE8B1AA77C9E2962239BA28C3D66A0D4A3049A9B2D5775C97214C1D6FC42A60B6B687AA38845BD8"
-          },
-          "dkm": "E24017258025637EB0175E0916B5C8152AE22185269096B7AD03A21EFB3DFB8AF863A2D574F5F8C91B5B7E59A51F534AB2F93A8FEF15F37A9CDF1B4BBF6DEBAC"
-        },
-        {
-          "tcId": 163,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "4F08A21287BA7AD996B25B9BEED8D734A09E2A958050B6FCE024C6F302B4652C129834785ADF840B9A6BF83E83C8937AB8342FA059E29E8480FCF10BC515448F",
-            "z": "4FA641D15099935020D57449CF2DFE5D9430BCD85BBB1EF4367F474FA699AD7CC6FAC9DCA26D1F0D46DCF9FC3302392F88FDC42A378E211882E33E6FA6DA2D1A",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "D1A84B095C875B585BF3677DD4A0D875EFEE2AD3B37F2412032563FDC57A00AD5ACD9D0B78281EB3D177AA5CA1253EE6E104EAA78787E76FB4C4317A3A2CCF05",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "516D813DDD3ECBBAE738572A7DBBC827",
-            "ephemeralData": "95E1D0001556173E6F3C505D4DD0658B668B397C01B2A4B44AFCB3C9FCF8604826CFE3F7367D1445C50669B30010346C78B3652FAEBB5578D8077D2A9BDD44D8"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "0C4804B70E4CC537B9AFB66CCE659586",
-            "ephemeralData": "D2F7F4316DFADBD61CCD3761899A4B697B515CFDF8E2AA6DCC03834F25EA8C4ACE39B72D03971517B6D4FABCD4E77B1CC3E34AE65CB1BD8924F8C9821291AA16"
-          },
-          "dkm": "48B0E4139CAF7818490A0FED0AA83509B1E665EA84D6748CC7E03FFB7B4F693D71B9A2B4DAA43F4D9DBA957B437282B9E92325DEBDDD52DEFBD9D2E29594839D"
-        },
-        {
-          "tcId": 164,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "0FA2DB567054A3FD5B4C80F7BC3EB7FDFFEB2DE24A7E15B9825AAC7965CEF61A725D5EA530C7F9239EED953D2086E36FDEE9953A361BB06E470B1D697741EAF1",
-            "z": "AD5B5575642BF653381470A00D261602A5444C19EFFDFB7965AE9A70911C9611C35DE20B8F0C467EBE359E88F9EE0E2E847F886CA39BB89067E482ABA9B488D7",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "9D6A8E1B559B812DB1F0B4A88D625EE75943241AF3347C527937A61139F76E73DE2CEA58D66872A9997BA01FED32C80DF5BBA31727660388C26584C7441BA852",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "31A445A08D8089609314ED6CD691D75B",
-            "ephemeralData": "4BF9B00CA328F2792D937663B051ED5B9916249AAF8854F0B40AF266C70E63F9510D9787F016AC920214396EBB41944F9F24EF496F793EE381A02350BBF48D67"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "6E6764B019CA8D8A5D395DE0E6752830",
-            "ephemeralData": "6357D8183753E697C365BFF5E672BF8AE52394C50FFF15F23AD3045F1A900DBA8B147D79ABD526F3B4FEB930AE727E3D5A40A766C9734DE0D083EE5D469A957C"
-          },
-          "dkm": "647A0008C671EE83B17A32887ABA2DFD190C33AAE20537599A048171A8B6B760F6674E18E5E465F0104CFBB1DBDB1CADCAE9EA57CCF29241D62D558DFDD8F826"
-        },
-        {
-          "tcId": 165,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "DF6847F01DF268B26A95870776389BE7E74F3E0E58E4EBB169CF9C6CF0B3071096CA8722FCD33BF455C4ADAC94A44A1E95ACB7E3851A0B668A44C359E6BD7617",
-            "z": "E16F10272E509C404C4669428313CE083196F8CD49FAB74E64EFDD972D0933DE4DAF2809DD952873A13775816EE2F8A79CE3C3579813E80979EDBC56C43D77C2",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
-            "fixedInputEncoding": "concatenation",
-            "iv": "C8D7247CBB6AEBF5EE90E13203303B2145A1D5A5CBFBB6722CE373C98A1604836A79B2AA043E4871898E534E8615ECECB6466CC9C0E23B7A8228BB03DB748441",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "7AD3ED7BC9207D09C904B6B924B9C639",
-            "ephemeralData": "EA712C47B0CA7183EB1F3BCBDD6282E240473D09C9FD3644BA0DCD343AC49CD6C852D17C48C47A4AC95178723F071018473E3DC18CFBECBCED750B2B143AD563"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "0CC0877A3BFB4C024B12037825B6339A",
-            "ephemeralData": "68995A7D9A588A87BC1184EA586876E3D9A5484F4C9FA81B36247B77C6C37DBDB1FB70E3407FDA166FDFC72287D62F12C517735D03C3B7D97D9AFC756FFA6683"
-          },
-          "dkm": "0A3A1C08B55A60DA29E84FB82A54FA386008B07F74F192E179E99ED509E6AEB6580BA7B6E8D3DAC7E0E0A93D1F25F8F9F95297CA65F36D44A38C586EB7CF9F0C"
-        }
-      ],
       "kdfConfiguration": {
         "kdfType": "twoStep",
         "l": 512,
-        "saltLen": 512,
+        "saltLen": 1024,
         "saltMethod": "random",
         "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
         "fixedInfoEncoding": "concatenation",
@@ -417,7 +232,66 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
         "counterLocation": "after fixed data",
         "counterLen": 32,
         "ivLen": 512
-      }
+      },
+      "zLength": 256,
+      "tests": [
+        {
+          "tcId": 206,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "salt": "227C2578D2B5F8ECFD034DD43C60146BFA568DC70A482AE8FDBD7AA138B24B9F2A5F0566D124FF434E250F256C038449183189C8BCC67727E3F79DD1F846110C29B9D8C1AA2C9D831E498D82700DDF9B8F73E74ABF75590321AF926EA81D8CDCA87F334B9E14BC007C483E15CA99D7756545EF8523B98C5D0576D5662C19CC5C",
+            "z": "CDC603A4A6E5FDA8830236C1C6377A7E3F8786AC12B5F205CF455C27A04DC180",
+            "l": 512,
+            "iv": "DB0ACEAC2034CA45F57D2AC04F29FE71D23608CACF76919C7224D9702BF226ADC285EBC4A84CB547525623A4526529A8B6871AC6FB8305C6CF77F8D67C1C9B18"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "BE486A74CE495AB914AA96BB094F9B87"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "2B012A9E7629F7C9BF4919449731A1F5",
+            "ephemeralData": "482F1A9E809FF14A058142369562AF6426B53D0E33EC670C22D0E8837E37118B"
+          },
+          "dkm": "9ED06EEEFFC01C0C594EB54775A7A05405F3F7DC6159686790F1E60C07CE2840F2B671F6F16E32FE52E587C24A3EC5E0ABFB4031457C34972D6DB3CD4E24257B"
+        },
+        {
+          "tcId": 207,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "salt": "61AFC626DC9F962040BFD74C9B37E06171AA633D3F8AB3B5860417935DE9744C7FBE60E0D2506F2896EA5B99D4558C768CFFE5AEFD2E8DC18F98764BC72C0A9B58ACA128AE6C615758606CCC4C434EFC50DEC06884CDF821E70F4C33A7C78902B7A7DC2252DD554C686A7BF64F74D1DCCC1E13502FC24335CEF30504B8CAC1D4",
+            "z": "414840092D47D2F3BC58388653745F904B9A5C35C3B35E82AB31E67C4DA0A1EF",
+            "l": 512,
+            "iv": "60E7FB6453843B7BAC39B0564717DA3D746FD8B87D13D8E7BF7570B28E702903EE5F2778FD3DA8B575332228FF70DEC4C559ABD0E61ECE885FF8A2FC39B0AECE"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "C59DE998A6DEC3C7723AC7F5880EB2F1",
+            "ephemeralData": "2706BAF2394BD64D8E71E633A75C5F2B5446679CB676B78F975650493B9B1AA8"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "5C2BBBC31065F1B761A7B1C00744F74E",
+            "ephemeralData": "AB91CB608042EFFAB77A943F23A4684FB0D5A51D0572ED0CA9C14B1D41896D51"
+          },
+          "dkm": "3706FD4B6450BB15120302B94E16FE695C73488DE711CCE08EC42CDB183660F711EBC6F5B354649578D8C8BA68BEDD778231802C8171A5EDBA0604B8EFC90765"
+        },
+        {
+          "tcId": 208,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "salt": "A8F37D9FF52F34C48C83E8985CDCE150C6DCEB24201F96E59AD15D8A3F61F29F0D3688E623A7BBA5BDC9578178A15B7FB31CEE59CAEF3C30D9A047B0D4F18EE3046139B85C956DB436B5145C507085E282327CCD45F70046EEE47B905CF15AD126A7F1FE83DDB130EA3351CA362A155530A3A22FC3B48AF65FBC950EC557E787",
+            "z": "E711827E4CD5EE79B3BC3EC6B7BA5E80D762E306F04B5EA869F9568DC0472B0A",
+            "l": 512,
+            "iv": "ADF3D162B6F6736C2CFDEFABBD15769B1C54985491D2BBB9733975C0411A76A267FBDC2D567AD56FB775D9AB04D2E1DFB998A837EA9306892128DC8C662BE205"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "89260CA34C15AC7C448E9450298725C7",
+            "ephemeralData": "C86C106F281A3A76CFEC87395CE128644C25EBAD819F46946ECCE63C1704361F"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "C0CFC2EF4DBCBABA3E8BD00C4C5F3A4B",
+            "ephemeralData": "6AB3DF9FCB7EA1A29D9440D98B7236D6D983FFA3CC01A0354997D82D44E43F00"
+          },
+          "dkm": "BF0E3773C61D51EF30742BEF784E29F7B60C85192DF381FCD597166A8DA7EF2BC7DB6A3AD6415A26DEAC9D98D42073E09E87455F0B0FDA0130A5F0AB0EF25EB7"
+        }
+      ]
     }
   ]
 }
@@ -436,71 +310,81 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
     {
       "tgId": 1,
       "testType": "AFT",
-      "tests": [
-        {
-          "tcId": 1,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "73669F6D823C5AAB0C3E2B8CF7E8BDD71D4E659BCD6CFF92CD6C9708D2232470100A0E7513A1D932FDEAC0DE2F8B32B045467013B894CF81DBB20F5C6E5895CD",
-            "t": "86B6B4E25737D8B42CAE4B135A46AA5E",
-            "z": "B5730243292A071FFF6CD3448D4644C01BD59435BBAE5B1BE7E7D2D9B2D8824C4CCEF5778C33CAC0AD7A5D19E3705510F21799561A1558ABEA8E77F3EBB4995D",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
-            "fixedInputEncoding": "concatenation",
-            "iv": "DBBE8E4B36080300B04DAE64E8F66FF88EB85F8ECE30CE8063CF5F1D1609F999F25FEA5BAD2716E544831326B83B848BCC611D54DF9DBEC6193C734DEE4884C4",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "2C78BEAFBDC7896D3E1865C0D4CEC989"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "E719A3BEA7D292D815790740AF32CB18"
-          }
-        },
-        {
-          "tcId": 2,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "29DEC0ED49BD992D49D2760D463234815F663D0CE5A2957B5B733DC573714F882437057801D5185F19160955A8C680CB2B7263984D39CA2F56C1C2611DB34453",
-            "t": "69C874B72E75FC0895A815DFEE0870FC",
-            "z": "F8F7368992EF282A515FEFCE6397E1346346E11B30CCECF605502A9A718363EA89EA2925446E00F3771DF409D9A5549693C8A44FC6F9AF211C7AF793E39F4845",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
-            "fixedInputEncoding": "concatenation",
-            "iv": "E40E3ABAC9CDB2FEA2579A4176969C8CFCE2124AA238A4CE826D1C79F75178B7BB6D297F2B45287C1216F0D2437F76B2210D3166BF2C6A0D8E66FFF149C41493",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "115BED271DE2A0036BF85621EBDC6FC4"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "F5C07CBE3A72463203FBBB879144100A"
-          }
-        },
-      ],
       "kdfConfiguration": {
         "kdfType": "twoStep",
         "l": 512,
-        "saltLen": 512,
+        "saltLen": 1024,
         "saltMethod": "random",
-        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
         "fixedInfoEncoding": "concatenation",
         "kdfMode": "feedback",
         "macMode": "HMAC-SHA2-512",
         "counterLocation": "after fixed data",
         "counterLen": 32,
         "ivLen": 512
-      }
+      },
+      "zLength": 240,
+      "usesHybridSharedSecret": true,
+      "auxSharedSecretLen": 112,
+      "multiExpansion": false,
+      "tests": [
+        {
+          "tcId": 1,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "salt": "C58783B4351C6F81A329EC7DD438F06BE4965750826DF31BD734A06A2E045F71B4A68828C5392597EC2C050C7346BDDBB25FE6062E818F4EAF49ED5BB45BAEA9365FC49213A2CBCB9C86D212BCA364C59054C6DCAE95D178389CCA9104C21EBE3EC2B0D80B4D2F783C949C00FAC8EB7ADAF21ED219EC6BE638CFDF431A075F39",
+            "z": "837D64EC83321D6EC458A727D35524F02786528E1F51A0A4180FEFACBF4B",
+            "t": "090D0537BBC91B65D5C2C0465CB5",
+            "l": 512,
+            "iv": "8AB64C847F71379616754F295FA6DCD4D80B11940E4BFDA93A03EF9B839AA76C9823FE84FBAC61358536D250385A558F3F9BA99718576F893A4731E1A7BCCDE8"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "8BBD8E5087320E24B12A4C466E8F23C0",
+            "ephemeralData": "843B8E38380359301E7DF30E5D65B653706B0939BF1B64C60B326ACD223F"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "A7F08D2B0AC9178E9E3FE2F7903E5ED6",
+            "ephemeralData": "F2732AF7CEC7777078DACBDBE8962937D3F96674F121AD97AE31EAD0DE9E"
+          }
+        },
+        {
+          "tcId": 2,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "salt": "17370EC787D758DC66FB00706F8EF6514186A55DDB749AAE6FE595736FE41E248306E5858DBCB204A301C0D4D79BBA9CA524CBF907EDC2FCBC9B843ADBFBDE26D0D70B2A2A9B750C80AC4B9D715649F31F716F4D0BEFFB8F30102103C932B0EE9F312B218EDA0D1471D6E9037CF30DDD9E4D6D8CE97E57FCF89A0438B0E7E369",
+            "z": "F2F4039AFA9CBBCD5B014509DB63624DCEFDCFC99F20809D5207EED68984",
+            "t": "322BDBDBBFAE2BEA4DBF213EAF79",
+            "l": 512,
+            "iv": "7849152268B7BE5724C0A8D24C5B7812B61AC1D6449987C49C5AABC2F21F5C639FA75DBD1B927E23241297568E3C7B2C5F45264B3A292CD50731B4E6DAE26ABB"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "0C521BBB2976030C460455718927F0DE"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "2F2569492D3777000EDB911A252D8B99",
+            "ephemeralData": "C219CCDD707B4C5FC30CFE4F4207A1D9CE9196AB3AA232EE9F9211D3ABDC"
+          }
+        }
+      ]
     },
     {
       "tgId": 2,
       "testType": "AFT",
+      "zLength": 240,
+      "usesHybridSharedSecret": true,
+      "auxSharedSecretLen": 112,
+      "multiExpansion": true,
+      "kdfMultiExpansionConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 1024,
+        "saltMethod": "random",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      },
       "tests": [
         {
           "tcId": 6,
@@ -510,25 +394,22 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
             "macMode": "HMAC-SHA2-512",
             "counterLocation": "after fixed data",
             "counterLen": 32,
-            "salt": "A0DCAD75DAF16543013DF2D838B0F043C70E66795DF15C725F2F8E73939C3744DBDC09EC9D28E5BB892BCC7CB1D80B1B74310745E0065AAAC84A9EBFACEE6FCD",
-            "iv": "86F0F24DCF144927D946E05313039C5575261EB45E5C22EFA55C00CA4EDF5080C5E9549C0E4F9BF95203A459FB5961D7550FCEDA1F3E79DB8D009D6A0D9B2A7D",
-            "z": "F9CBD2C724EF2353D85C62D671040E5C77EA0899E87FFE07B935F039735938AA829110D49F0E2D1194869C7F3BCED631FD578DEC81270509A071D55100B8DA75",
+            "salt": "6C8401A6A6A09F1C89CF0FCD94BAB0DC555EFAEA2308E32FC793766E6BD968B810FE1179655911E5498C13EF1AFA2A9303B48D9B2735B17EFD6600B786E8A99CBE2AC7BF4EB390E3F92120D487E195C74BFD57157527E2D8BD602DF63C0B0769619AD0B0C175905AC903C20A0E6FDF2B5D3DC38D520B378EDB8934DF0E5AE7BC",
+            "iv": "A845C6F96499C6E24915BB78A3F2B440B37EC3239AFE9E1B94A12B8AC4709B5E2D20EDD6CE4E4F99A8436957C98803B3EB5E690B0CEB32961C9448B4326F25B3",
+            "z": "5C0D84406A53A6B90E1665895558559A3C92C4E22685A3B47DFB228D9BD1",
+            "t": "D2EA090993AD23385D92C24139DD",
             "iterationParameters": [
               {
                 "l": 512,
-                "fixedInfo": "5C95F8AEF753345A12863D223BA83F8A"
+                "fixedInfo": "B078C870621E66AE618AC1EAB1386A7F"
               },
               {
                 "l": 512,
-                "fixedInfo": "E367A16FD5FA56D7337136C8927B7F19"
+                "fixedInfo": "3F3B5023C73397A500DCA4C6841B04EA"
               },
               {
                 "l": 512,
-                "fixedInfo": "EF3A620269F1E88C20D55011F7380209"
-              },
-              {
-                "l": 512,
-                "fixedInfo": "B9A3B043CB6474CE53467FB89B24BDFD"
+                "fixedInfo": "2B2E44660CF3040E8BA920ADB5BE61F2"
               }
             ]
           }
@@ -541,26 +422,99 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
             "macMode": "HMAC-SHA2-512",
             "counterLocation": "after fixed data",
             "counterLen": 32,
-            "salt": "829BB5915FA3FB20972CA6C22F1AED6BC40119EA50487BCA520CD60729964EFE218F40AEC3B2D78EF853EE068F30E1E628B5BCDB2EC1D0C34A78443632F47486",
-            "iv": "27DC1483266BD740E05CDA5DA3882EED1CF0A1E1E55A0BCCDE9F73E94B0FC5DF14C1AD320C08FF21585F5F26C158EDD6740E03A68BC4DDD50F208C258D2F9F40",
-            "z": "281ED3C7FE60F4C2FE8B45B0D2EB3D1DD45A78B7C577A7F8FE03D8F59817EA5FC6DB41E5E45526A32A280FF531C9322EB75B7908120B2E6904B71D24041EEB0E",
+            "salt": "C6C5798F0A8D3792AE7037FAF3085C47CF7245FCE0660CFAB7D8C78AD6034C45E41C8771C90822032FC2C483A8B6523CEA372AF5B4E2CB4D3742982C91665572F3E0B04544467EF968FADEABB3443C500458F12C7540269562CCB848028AFD0D6E77C8E5065795DB639F36DA772D19EF8A9AB78E74C3E9BCC6B69DDA22E2999F",
+            "iv": "AC3A0C1BD0CC61138546B0F75659CF05B050F889FC7993FDE7A9C9D6FE31A0468128CD3A524455DC0DE9297F158139B0BE32E25D77AEFE7A755F6026A96FFDAE",
+            "z": "5A995DC672E7D0FF93C85B26CC58F0CBD8FC74EAAB599689D1736A4D9405",
+            "t": "04639AA40438CFBE87CBE8DD26D5",
             "iterationParameters": [
               {
                 "l": 512,
-                "fixedInfo": "4208FB9D1C803414A141C4E333B3D6A5"
+                "fixedInfo": "FF34C7C32DBFCAB436E061D80C2EB873"
               },
               {
                 "l": 512,
-                "fixedInfo": "3235F21101152080DC48AC200BC54297"
+                "fixedInfo": "A6DA2A9B29D2644844FCACF1137C4253"
+              },
+              {
+                "l": 512,
+                "fixedInfo": "D456D9CD34C7EBBCE766EF5FFDEC4CFF"
               }
             ]
           }
         }
-      ],
+      ]
+    },
+    {
+      "tgId": 65,
+      "testType": "VAL",
+      "kdfConfiguration": {
+        "kdfType": "twoStep",
+        "l": 512,
+        "saltLen": 1024,
+        "saltMethod": "random",
+        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
+        "fixedInfoEncoding": "concatenation",
+        "kdfMode": "feedback",
+        "macMode": "HMAC-SHA2-512",
+        "counterLocation": "after fixed data",
+        "counterLen": 32,
+        "ivLen": 512
+      },
+      "zLength": 232,
+      "usesHybridSharedSecret": true,
+      "auxSharedSecretLen": 144,
+      "multiExpansion": false,
+      "tests": [
+        {
+          "tcId": 411,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "salt": "6EF94F801BFEE61DD2B464EF175C333AA60780B770734A09D4260E3ACE142D15A0415B0DDBFBFEE0FB66CCD7AE3A71CE23365F4D95486FC9072A7B1ADFE2839E8B1229892A5671065515FFDF3D51345040ED1C52B2B927CACA85644C0153F5FB460928E28AB1BC40891206BC123A4F6C777D6DD4DDC9A8B4F5B43AE697FA185B",
+            "z": "42301A3E95310A29E571B18AC752F1285D6291CDFB0D5F33B3523CEA11",
+            "t": "A60D8DE12F173F6E7327EAD4788BEDB41C50",
+            "l": 512,
+            "iv": "40AE95B609A5CFF5046F1EAF2A259EA2277A27BF89CC9C49D25AE80010420550BA540A1054B14179B0B129FFDAA055F65F43F5588DA4654BBFE9674B1F80A72D"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "CA2E1874BD0AE0E75B3DE32B4253DECD"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "88A429FACD3242169F671CAFD174DCB0",
+            "ephemeralData": "8D0BA014A2EBC11DD599B130854C1056FF6AE0F49030B0D0F10EEF524D"
+          },
+          "dkm": "DEEEAFD041674947C1FE3D794346E412C3A5AE6F7D6F300875C316342F3FC6B0DDB5F4016E2968FF443A70A79AE5CA5E8063313E908B2AF566E1284D5820F718"
+        },
+        {
+          "tcId": 412,
+          "kdfParameter": {
+            "kdfType": "twoStep",
+            "salt": "FE39D0278B7C1501563CB4BB960F55A72BAB0709D1E241556A16F461270763B39BFEB0D376274A57F0E53D79606DBC47B1F49A137EFE1EAF0C464ED6D306E693B615295357079BC5BF8508F0914E9BB9EDC8680E9A19C9C45107DA12EC0ADDF9D5CEC8FC27A9101A03352D48C370B6E7583BE0B1FFBC627E1250FD67219FFBEC",
+            "z": "727021F7854B84169D4C1D39B421552776E477F464A3144163772F85C0",
+            "t": "4279450CC64917ED8884D523F7D4E10233B3",
+            "l": 512,
+            "iv": "1BDA03A6E389CB84B95DBC012BEC2B2EECFB05A9B8F0BC06DA97FB3CA5B0E30885428A784C26B026FEDF67A17DCFFC9F50E6145A370B03A6524FCD93AFCA6320"
+          },
+          "fixedInfoPartyU": {
+            "partyId": "30A31F6CF2E301A97E8EE66C2F67765C"
+          },
+          "fixedInfoPartyV": {
+            "partyId": "0C06785053342FB1304B312FA20274C1"
+          },
+          "dkm": "F05325B0EE208E1975EFEDDCEBA86763AD14337156F7574C740FEC8BEBAE67ABC4615FFBEB6EF46465BC82A820984C1F2D0373649BDDD68233BB93196AE28808"
+        }
+      ]
+    },
+    {
+      "tgId": 66,
+      "testType": "VAL",
+      "zLength": 232,
+      "usesHybridSharedSecret": true,
+      "auxSharedSecretLen": 144,
+      "multiExpansion": true,
       "kdfMultiExpansionConfiguration": {
         "kdfType": "twoStep",
         "l": 512,
-        "saltLen": 512,
+        "saltLen": 1024,
         "saltMethod": "random",
         "kdfMode": "feedback",
         "macMode": "HMAC-SHA2-512",
@@ -568,147 +522,71 @@ The following is a example JSON object for KAS-FFC test vectors sent from the AC
         "counterLen": 32,
         "ivLen": 512
       },
-      "multiExpansion": true
-    },
-    {
-      "tgId": 65,
-      "testType": "VAL",
       "tests": [
         {
-          "tcId": 321,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "06614CC285E42B00C7625244594D27B5BB932A7C5E85EA02B116D191A7682F01DFCC4F207E912127AA11DA2D468A0414984D43327632AE5581CA53A70BD611A2",
-            "t": "ACA02E08F6D7BAF6FC470435D5B88EE9",
-            "z": "6B91690E9D667043924421ABFA4056AA51A15793255B975BE5C44E37A40B892588640E90C8F5FBA0F8179C677F830DB68110A55BEF71107A2132039806685A2E",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
-            "fixedInputEncoding": "concatenation",
-            "iv": "5D54A0FE3A35C6B76D056883EBF7E7FD4C71200E6C6B0A210EDF91B5297D7F89B5EF90ED66A7A0CCAE9B7301F9C9D68DFC2EB3554244D8ED4206A6DB027452E1",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "4865F140D0239D4967496C99D2C9E8AB"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "05F2D726E8C660784404DD69CD391EA3"
-          },
-          "dkm": "0BD0E7F866581520EC749F2EAAE31C46184EAA3B1CA3E3DB706A94CCFF6093B1E4483BF80BF83068816F8CEE3A25A6013BA0096FCF283113E0ECF85756F2A75A"
-        },
-        {
-          "tcId": 322,
-          "kdfParameter": {
-            "kdfType": "twoStep",
-            "salt": "05566C08DD5415A956FC2BA699547882DD22BA74CD02F4C69EAFD7EF9AD8D7AFF7218C337A88477ABD554CC20758621F2355E6DC954533918AE79025CFD2FEA2",
-            "t": "AB9864A12B7531DD07EB22CC4D2FE623",
-            "z": "8CDBA4BA67446579B5AB939A9BE589349B1479FA9A1E2E00E9C8D74AFA177FCA99E9A126427FB1A9A956BFFF04C90546ECFD41F27228312E01E63A18ED0ECF74",
-            "l": 512,
-            "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
-            "fixedInputEncoding": "concatenation",
-            "iv": "E1C558C98C2A62FD8ACD9C735CB894CC220C2FEBECE60C45C7CE1DD426BBFC9D5A96D182DAF181DA83508737BAF8AB24C049874ACD40B9B24833BB0E05E54E12",
-            "kdfMode": "feedback",
-            "macMode": "HMAC-SHA2-512",
-            "counterLocation": "after fixed data",
-            "counterLen": 32
-          },
-          "fixedInfoPartyU": {
-            "partyId": "30AEBBA0D104E03D6EA2022A73A78F47",
-            "ephemeralData": "4CF8A744EF46B6DC72FC5E43670E7EA8B2DBDBBC81C8A07090FAD03D96D6C913B6BD15DA8EBA5E76E73171A0D16B5392535B2E6193E58162D336FE4DBC9D0DE4"
-          },
-          "fixedInfoPartyV": {
-            "partyId": "9A2AB0A90060DB58C115C557977F2EC3"
-          },
-          "dkm": "07423F264BB882C8CF3D2D08DDA2E0742AEAFBDF819EED35F8B5FFB4960AB5CCEDE479E2746390D539F65FCEB58C08B706B36CC859FBD873FF180C7E5612F04B"
-        }
-      ],
-      "kdfConfiguration": {
-        "kdfType": "twoStep",
-        "l": 512,
-        "saltLen": 512,
-        "saltMethod": "random",
-        "fixedInfoPattern": "uPartyInfo||vPartyInfo||l||t",
-        "fixedInfoEncoding": "concatenation",
-        "kdfMode": "feedback",
-        "macMode": "HMAC-SHA2-512",
-        "counterLocation": "after fixed data",
-        "counterLen": 32,
-        "ivLen": 512
-      }
-    },
-    {
-      "tgId": 66,
-      "testType": "VAL",
-      "tests": [
-        {
-          "tcId": 326,
+          "tcId": 416,
           "kdfMultiExpansionParameter": {
             "kdfType": "twoStep",
             "kdfMode": "feedback",
             "macMode": "HMAC-SHA2-512",
             "counterLocation": "after fixed data",
             "counterLen": 32,
-            "salt": "C814F6C4E49E535DFB59CE72EFEA3F8BD770043CA2E1AF6C9D459CD07D38EC129DB838C2AB6C184BC43C065459E221EB7B0200593D1F3B01D7A231FCE9189A02",
-            "iv": "7A512E648ADAE756B97A90D62E3B56CBC3D5B4E12E139B94060F03D9BB1F189A75D961FE7C203D93432AC84E831F95A847889A25A5ED44DC4FAA84C76D2A8182",
-            "z": "D568E0018EBEB1139E35F8391C698977017B7B68147000D9C055A97D0823FB855904C7A1BDA996E8FE49C8A969C3984966A18429F264669D099EAA25A7B05C67",
+            "salt": "857922073668DECC47627AC83F249976D55329D03449A430D8245E1CCEA2CB36622E755C8591E32F411822B84F543CEB00287E753098E6FBD5A8991A9820E46A1BCA1C7B10999F54C859691A447AD8713EF63CB30CE6017EA986F524E5AC88AB32673227C57AE23DDC8B5C31179081CBCC7FC621CB17D14DF2E1F6F2D77BDF25",
+            "iv": "2997A65781403D9BC933B6134BA6616DE96E4D5B4C2797B41CF8A92F9A7CC42A0DD0EDF63D025A69BB9AEE51C30EBC900671E3D9141F7B178DE459DCA9F936B8",
+            "z": "A82287BF8A9681596448A0FD000EC57669F2FEB39074F9854794CF18EC",
+            "t": "7DE4D8B484751926E202D63E9525DC4D0179",
             "iterationParameters": [
               {
                 "l": 512,
-                "fixedInfo": "1AE9DA67B06472641A3BF37811051055"
+                "fixedInfo": "79CCA0C5D1132CDE2D78CDB57FFA46A7"
               },
               {
                 "l": 512,
-                "fixedInfo": "4286E9173B9A3AF2CA0E7D3944E38D1F"
-              },
-              {
-                "l": 512,
-                "fixedInfo": "AD285511D6BA8ED8CA415BDDE2860ECE"
+                "fixedInfo": "8A81ABC645A5F0041708CBDD34F360A0"
               }
             ]
           },
           "dkms": [
-            "F87E73FA73B856684BAC4F84E0811413EDBDAA126AB9157265BF46EA7EF75D41B9393546F96D44D67E2F6E62B9107281383909A7292186936121427B41CCCE72",
-            "35F6C469BAB2A9CF929B72EBB8F985EA82863EBFA14CFEAEA7E669D3BC084897984A51EDFC406A1144807DF846F835331ACA96DA1AADE029130FF4DF88E09846",
-            "7B8494EC4A8BAA3518EFB0CBF0CD587EFDC56B87A2B23155031D2C579ED42F0C7743D2FC8CB67969FB85C31274C9BE10F17438D4EC780C6CBC91D45F87D7006C"
+            "868A9AA69829DCE0F540151DC708A7C7E9856A9AB317C67FDE5314AEE5C3DB62091CDFC593D4AAD2C941A765D26ACD6708819B06E28223345AD4B0E0DECAA2B9",
+            "869EC40463921F1665FDBABD154D646BCCD469CD36F7175131FA7B96A8311C68B062785327932964AD4A044CABB04782B0399000B9F762D345B36003E7CFF6C4"
           ]
         },
         {
-          "tcId": 327,
+          "tcId": 417,
           "kdfMultiExpansionParameter": {
             "kdfType": "twoStep",
             "kdfMode": "feedback",
             "macMode": "HMAC-SHA2-512",
             "counterLocation": "after fixed data",
             "counterLen": 32,
-            "salt": "7B02B397B12B1BC773B3487D73D8F4281A5A3795AC11A3229F668C78D2737494BB706BE69A3F6E65C64E6684E509C98B8138D570951322E7E94DD72090E116DA",
-            "iv": "AC9EAC5B613BB418B5E81141729CFDEA261ED2851211D9EBC2B95D363EFA95A06E07B5605C0AFFC04C3EFC92F17124142D30A155E1C36A62FF096561FC0057B2",
-            "z": "6F2244DBD5E43AC838CD40529AE2CD4F46337E8A99B67EC35A3EC0E293E6942D8B4060DDC01300F0587042B04348F2508F2B1D4DDF0AE2D00004EED5D493397B",
+            "salt": "C3E26AE71C46D92EDDA5BFB29A1498F8F2395490F62966420EF4F6C41D7043C493F1D66D23AC0D08AEE09194A232117F94FF66751F1BD29A4F8E94294E880F6E3A62E4AC932DF759AE73ABC9C3B6D1A31D444C2DDE7D26789D699A1B06BB7B5AAA544B73D52FC3E02C45F346937003EAAA9BE5CAE2BAC385D6BADC570E249FA1",
+            "iv": "45D9E5F1639357A68A010D3F2D4892BB4475775F8E7C8AC817FC07F808156584D726D8AFEBEF929E04E056C1D42BB9D3B41EEA682E60231D89D0E1F6325B87E1",
+            "z": "9AE68C81F52EDD5207EF0DD998746D881346893AAB59CDC0A28528EF25",
+            "t": "A1752B0C9A12E4930E45D93B4A22BDF225D3",
             "iterationParameters": [
               {
                 "l": 512,
-                "fixedInfo": "47065AC25033394A84068D0B518013E8"
+                "fixedInfo": "CD0F291D388697FD04248B34647E460E"
               },
               {
                 "l": 512,
-                "fixedInfo": "1D5F11557F50A7DB20231D5855D0B645"
+                "fixedInfo": "E7F643C5EAC493E94043FF7B9EDF72C5"
               },
               {
                 "l": 512,
-                "fixedInfo": "871C59E84EADC342ADCF5CFA2F39316F"
+                "fixedInfo": "C0A83FA55D3599E41BECEF1333D20F14"
               },
               {
                 "l": 512,
-                "fixedInfo": "382E863C637660EFCACCA9CFF88C7076"
+                "fixedInfo": "B93E3AC7A17B3E030E2EE7A203FD3279"
               }
             ]
           },
           "dkms": [
-            "4332AE745C762A6C4A2BF5A52D6FEE7B85123BFD447C40F6888E26C7EE4A480040ACA97BA55C856C1261DB90918D4B3B5196ADE6372A25CC2E8DD423559C2F73",
-            "967CCA41FDDF0E51F68B9B1B43614EE302B2B1CD5ACEAE3A531F9A16C62F02ECBCAA83BA76FE86886010797E37A7B4792E9A5E2C56D71A75E900E751E6092999",
-            "1FC05E9FECBF82DE01C7A81F1DA360054C987A9EFF0C522F67D9B3609C0823A65DFF0E2812BBDF3868C45F4F3ABB69434B976FDF25627300F08A2A230931B489",
-            "8EFB4A8EBFABB877D2CD76723599FF6DB4334A166E676E678AAC161FC548142DBE7D804ADB94824B1AAADDBE281FC6C0F65F482582AF965B7F5C9087456A5945"
+            "52C3E181D4BEBECB0042FDFD2635AF472578ED4A0E78C5C6E3DDDB36259B81AD37AC808386BD3651670CF6BBA55162013262B495688C2E6EA26BB43EC6A65A90",
+            "E9A7881EF4F28254134F643CF39BCD469A66B4CB4C4768E51786FBC1531BD33E3BBAD16AE11791E78760A1DED6F543F31CDEB5059251E8D6E0F8F3290C6A867B",
+            "B71F7A1A1DBDBF234D660FA5CCEFC9945BB83DFBB08D5BB8FA6BED49F5E706A8E76B851D041D95D3FBE2D7A1C6AE4F87BC301A38B024F94E394A81D59FDCBE59",
+            "5255F56AB61AE53F98A55AE8183B7315DDD70288F58A090A68BCDC983D0B452B9A241D2E579FC15A13E532CFAB0522DB7D05EE33E2E48E339C4F6578C5EC55CB"
           ]
         }
       ]

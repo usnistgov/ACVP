@@ -14,8 +14,10 @@ A registration *SHALL* use these properties:
 | revision| The algorithm testing revision to use.| value| "Sp800-56Cr1" or "Sp800-56Cr2"
 | prereqVals| Prerequisite algorithm validations| array of prereqAlgVal objects| See <<prereq_algs>>
 | capabilities | The two step configuration objects | array of <<twostepkdf>> | See <<twostepkdf>>
-| z | The domain of values representing the min/max lengths of Z the implementation can support. | Domain | 
-| l | The length (in bits) of the largest derived keying material the implementation can produce (up to a max of 2048). | number | 
+| z | The length(s) of the shared secret, Z, the IUT supports in bits. | Domain | Min: 224, Max: 65536, Increment: 8
+| usesHybridSharedSecret | Whether the IUT uses a hybrid shared secret. Only applicable for <<SP800-56Cr2>>. This property is required for "SP800-56Cr2" testing. Omit this property for "SP800-56Cr1" testing. | Boolean | true or false
+| auxSharedSecretLen | The length(s) of the auxiliary shared secret, T, the IUT supports in bits. Only applicable for <<SP800-56Cr2>>. This property is required for IUTs that implement a hybrid shared secret. Omit this property for "SP800-56Cr1" testing and for "SP800-56Cr2" testing without a hybrid shared secret. | Domain | Min: 112, Max: 65536, Increment: 8
+| l | The length (in bits) of the largest derived keying material the implementation can produce (up to a max of 2048). | number | Min: 112; Max: 2048
 | performMultiExpansionTests | Should multi expansion runs of the KDA be tested (in addition to the single expansion tests)? Only applicable for <<SP800-56Cr2>> | boolean | true, false
 |===
 
@@ -85,9 +87,6 @@ algorithmId.
 
 * l
   ** The length of the derived keying material in bits, *MUST* be represented in 32 bits for ACVP testing.
-
-* t
-  ** A random value used to represent a secondary shared secret. Only applicable to <<SP800-56Cr2>>.
 
 Example (Note that party U is the server in this case "434156536964", party V is the IUT "a1b2c3d4e5"):
 
@@ -164,18 +163,20 @@ Evaluated as:
   "algorithm": "KDA",
   "mode": "TwoStep",
   "revision": "Sp800-56Cr2",
-  "prereqVals": [
+  "l": 512,
+  "z": [
     {
-      "algorithm": "DRBG",
-      "valValue": "123456"
-    },
+      "min": 224,
+      "max": 65536,
+      "increment": 8
+    }
+  ],
+  "usesHybridSharedSecret": true,
+  "auxSharedSecretLen": [
     {
-      "algorithm": "SHA",
-      "valValue": "123456"
-    },
-    {
-      "algorithm": "HMAC",
-      "valValue": "123456"
+      "min": 112,
+      "max": 65536,
+      "increment": 8
     }
   ],
   "performMultiExpansionTests": true,
@@ -185,15 +186,17 @@ Evaluated as:
         "random",
         "default"
       ],
-      "fixedInfoPattern": "uPartyInfo||vPartyInfo||t||l",
+      "fixedInfoPattern": "uPartyInfo||vPartyInfo||l",
       "encoding": [
         "concatenation"
       ],
       "kdfMode": "feedback",
       "macMode": [
         "HMAC-SHA3-224",
-        "HMAC-SHA2-512"
+        "HMAC-SHA2-512",
+        "HMAC-SHA2-512/224"
       ],
+      "customKeyInLength": 0,
       "supportedLengths": [
         512
       ],
@@ -207,10 +210,6 @@ Evaluated as:
       "requiresEmptyIv": false,
       "supportsEmptyIv": false
     }
-  ],
-  "l": 2048,
-  "z": [
-    512
   ]
 }
 ----
