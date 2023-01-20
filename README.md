@@ -20,7 +20,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [Message Authentication](#message-authentication)
   * [DRBG](#drbg)
   * [Digital Signature](#digital-signature)
-  * [Key Agreement](#key-agreement)
+  * [SP 800-56 Series Algorithms](#key-agreement)
   * [KDFs](#kdfs)
   * [Safe Primes](#safe-primes)
   * [Conditioning Components](#conditioning-components)
@@ -210,8 +210,8 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [EDDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html) - DEMO only
 * [EDDSA mode: sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html) - DEMO only
 
-### Key Agreement
-#### Full KAS Testing
+### SP 800-56 Series Algorithms
+#### Full KAS and KTS IFC Testing
 
 Tests against shared secret computation (SSC), key derivation functions (KDF) or key derivation algorithms (KDA), and optionally key confirmation (KC). Test vectors issued under this set of tests (with the exception of 1.0 component based tests) are considered "full KAS" testing.
 
