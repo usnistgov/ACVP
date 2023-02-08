@@ -42,7 +42,7 @@ Using Metanorma is not required to view the documents in the GitHub repository. 
 
 Metanorma is a library for writing standards. It can compile `.adoc` files into multiple common standards formats including the IETF's RFC format.
 
-Use the instructions here to set up Metanorma: https://www.metanorma.com/author/topics/install/
+Use the instructions here to set up Metanorma: [https://www.metanorma.com/author/topics/install/](https://www.metanorma.org/install/)
 
 To compile an individual file, to make sure your gem versions are up to date run
 
