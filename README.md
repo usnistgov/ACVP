@@ -336,9 +336,9 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [ConditioningComponent Hash_DF](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.html)
 
 ### Stateful Hash-Based Signatures
-* [LMS KeyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
-* [LMS SigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
-* [LMS SigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+* [LMS keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+* [LMS sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+* [LMS sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
 
 The prod server supports all of the above except for AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard.
 
