@@ -194,7 +194,7 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [RSA mode: decryptionPrimitive 1.0 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
 * [RSA mode: decryptionPrimitive Sp800-56Br2 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
 * [RSA mode: legacySigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-rsa.html)
-* [ECDSA mode: sigGenComponent](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
+* [ECDSA mode: sigGen Component](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: keyGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: keyVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
 * [ECDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-ecdsa.html)
@@ -305,24 +305,24 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 
   Standalone KAS Key Confirmation testing from SP800-56Ar3 and/or SP800-56Br2.  Can be as a KC primitive validation as a part of a KAS validation.
 
-* [KAS KC Sp800-56](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.html)
+* [KAS KC Sp800-56 (Component)](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.html)
 
 ### KDFs
 * [Counter KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [Feedback KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [Double Pipeline Iterator KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [KMAC KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
-* [IKEv1](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.html)
-* [IKEv2](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.html)
-* [SNMP](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.html)
-* [SRTP](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.html)
-* [SSH](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.html)
-* [TLS v1.0/v1.1](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.html)
-* [TLS v1.2](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.html)
-* [TLS v1.3](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.html)
-* [TPM](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tpm.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tpm.html)
-* [ANSX9.63](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.html)
-* [ANSX9.42](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.html)
+* [IKEv1 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev1.html)
+* [IKEv2 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ikev2.html)
+* [SNMP (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-snmp.html)
+* [SRTP (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-srtp.html)
+* [SSH (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ssh.html)
+* [TLS v1.0/v1.1 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.html)
+* [TLS v1.2 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tls.html)
+* [TLS v1.3 (Component)](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kdf-tls-v1.3.html)
+* [TPM (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tpm.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-tpm.html)
+* [ANSX9.63 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.html)
+* [ANSX9.42 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.html)
 * [PBKDF](https://pages.nist.gov/ACVP/draft-celi-acvp-pbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-pbkdf.html)
 
 ### Safe Primes
