@@ -24,6 +24,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [KDFs](#kdfs)
   * [Safe Primes](#safe-primes)
   * [Conditioning Components](#conditioning-components)
+  * [Stateful Hash-Based Signatures](#hash-based-signatures)
 * [Accessing the Server](#accessing-the-demo-server)
 * [Contribution Guidelines](contribution-guidelines)
 * [Related Projects](#related-projects)
@@ -334,7 +335,12 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [ConditioningComponent BlockCipher_DF](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.html)
 * [ConditioningComponent Hash_DF](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-conditioning-components.html)
 
-The prod server supports all of the above except for the EdDSA variants, AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard.
+### Stateful Hash-Based Signatures
+* [LMS keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+* [LMS sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+* [LMS sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+
+The prod server supports all of the above except for AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard.
 
 # Accessing the Server
 
