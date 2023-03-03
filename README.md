@@ -24,7 +24,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [KDFs](#kdfs)
   * [Safe Primes](#safe-primes)
   * [Conditioning Components](#conditioning-components)
-  * [Stateful Hash-Based Signatures](#hash-based-signatures)
+  * [Stateful Hash-Based Signatures](#stateful-hash-based-signatures)
 * [Accessing the Server](#accessing-the-demo-server)
 * [Contribution Guidelines](contribution-guidelines)
 * [Related Projects](#related-projects)
