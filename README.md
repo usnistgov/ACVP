@@ -20,7 +20,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [Message Authentication](#message-authentication)
   * [DRBG](#drbg)
   * [Digital Signature](#digital-signature)
-  * [SP 800-56 Series Algorithms](#key-agreement)
+  * [SP 800-56 Series Algorithms](#sp-800-56-series-algorithms)
   * [KDFs](#kdfs)
   * [Safe Primes](#safe-primes)
   * [Conditioning Components](#conditioning-components)
