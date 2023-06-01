@@ -206,10 +206,10 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [DSA mode: sigGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.html)
 * [DSA mode: pqgGen](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.html)
 * [DSA mode: pqgVer](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-dsa.html)
-* [EDDSA mode: keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html) - DEMO only
-* [EDDSA mode: keyVer](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html) - DEMO only
-* [EDDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html) - DEMO only
-* [EDDSA mode: sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html) - DEMO only
+* [EDDSA mode: keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html)
+* [EDDSA mode: keyVer](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html)
+* [EDDSA mode: sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html)
+* [EDDSA mode: sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-eddsa.html)
 
 ### SP 800-56 Series Algorithms
 #### Full KAS and KTS IFC Testing
