@@ -24,7 +24,9 @@ There are four types of tests for these hash functions: functional tests, Monte 
 
 The MCTs start with an initial condition (SEED which is a single message) and perform a series of chained computations. The algorithm is shown below.
 
-.SHA-3 Monte Carlo Test
+NOTE: The MCTs were updated, 5/2023, to support the case where !SupportedMessageLengths.Contains(digestSize), a limitation of the original MCT design. The change is backwards compatible. 
+
+SHA-3 Monte Carlo Test (Original):
 [source, code]
 ----
 For j = 0 to 99
@@ -34,6 +36,34 @@ MD[0] = SEED;
         MD[i] = SHA3(MSG[i])
     Output MD[1000]
     SEED = MD[1000]
+----
+
+SHA-3 Monte Carlo Test (Updated):
+[source, code]
+----
+if SupportedMessageLengths.Contains(digestSize):
+    For j = 0 to 99
+    MD[0] = SEED;
+        For i = 1 to 1000
+            MSG[i] = MD[i-1]
+            MD[i] = SHA3(MSG[i])
+        Output MD[1000]
+        SEED = MD[1000]
+else
+    SEED = GetRandomBitsOfLength(MinimumSupportedMessageLengthGreaterThanZero)
+    MD[0] = SEED
+    For 100 iterations
+        For 1000 iterations (i = 1)
+            M[i] = MD[i-1];
+            If  !SupportedMessageLengths.Contains(LEN(M[i])):
+                M[i] = TruncateToSize(M[i], MinimumSupportedMessageLengthGreaterThanZero)
+            MD[i] = SHA3(M[i])
+            If MinimumSupportedMessageLengthGreaterThanZero >= digestSize:
+                MD[i] = MD[i] || CreateZeroBitStringOfLength(MinimumSupportedMessageLengthGreaterThanZero - digestSize)
+            Else:
+                MD[i] = TruncateToSize(MD[i], MinimumSupportedMessageLengthGreaterThanZero)
+        MD[0] = MD[1000]
+        Output MD[0]
 ----
 
 [[SHAKE-MCT]]
