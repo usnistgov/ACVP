@@ -21,7 +21,9 @@ The MCTs start with an initial condition (SEED which is a single message) and pe
 
 NOTE: The MCTs were updated, 3/2023, to support the case where !SupportedMessageLengths.Contains(3*digestSize), a limitation of the original MCT design. The change is backwards compatible. 
 
-SHA-1 and SHA-2 Monte Carlo Test (Original):
+NEW NOTE: The MCTs were updated, 7/_/2023, to support the case where !SupportedMessageLengths.Contains(3*digestSize), a limitation of the original MCT design. As part of this change, a new property, mctVersion was added to the MCT test case JSON (See ___ section of this spec). When a value of "standard" is provided in the prompt file, the standard MCT test is run. When a value of "conistent" is provided in the prompt file, the consistent MCT test is run. When the standard test is run, the MSG hashed will always be 3 * the length of the SEED. When the consistent test is run, the MSG hashed will always be the length of the SEED.
+
+SHA-1 and SHA-2 Standard Monte Carlo Test:
 [source, code]
 ----
 For j = 0 to 99
@@ -36,36 +38,23 @@ For j = 0 to 99
     SEED = MD
 ----
 
-SHA-1 and SHA-2 Monte Carlo Test (Updated):
+SHA-1 and SHA-2 Consistent Monte Carlo Test:
 [source, code]
 ----
-if SupportedMessageLengths.Contains(3*digestSize):
-    For j = 0 to 99
-        A = B = C = SEED
-        For i = 0 to 999
-            MSG = A || B || C
-            MD = SHA(MSG)
-            A = B
-            B = C
-            C = MD
-        Output MD
-        SEED = MD
- else 
-    For j = 0 to 99
-        A = B = C = SEED
-        For i = 0 to 999
-            MSG = A || B || C
-            If  !SupportedMessageLengths.Contains(LEN(MSG)):
-                MSG = TruncateToSize(MSG, LEN(SEED))
-            MD = SHA(MSG)
-            A = B
-            B = C
-            If LEN(SEED) >= digestSize:
-                C = MD || CreateZeroBitStringOfLength(LEN(SEED) - digestSize)
-            Else:
-                C = TruncateToSize(MD, LEN(SEED))
-        Output MD
-        SEED = C
+For j = 0 to 99
+    A = B = C = SEED
+    For i = 0 to 999
+        MSG = A || B || C
+        if LEN(MSG) >= LEN(SEED):
+            MSG = TruncateToSize(MSG, LEN(SEED))                
+        else:
+            MSG = MSG || CreateZeroBitStringOfLength(LEN(SEED) - LEN(MSG))
+        MD = SHA(MSG)
+        A = B
+        B = C
+        C = MD
+    Output MD
+    SEED = MD
 ----
 
 [[LD_test]]
