@@ -24,45 +24,34 @@ There are four types of tests for these hash functions: functional tests, Monte 
 
 The MCTs start with an initial condition (SEED which is a single message) and perform a series of chained computations. The algorithm is shown below.
 
-NOTE: The MCTs were updated, 5/2023, to support the case where !SupportedMessageLengths.Contains(digestSize), a limitation of the original MCT design. The change is backwards compatible. 
+NOTE: The MCTs were updated, 7/2023, to support the case where !SupportedMessageLengths.Contains(digestSize), a limitation of the original MCT design. As part of this change, a new property, mctVersion was added to the MCT test case JSON (See ___ section of this spec). When a value of "standard" is provided in the prompt file, the standard MCT test is run. When a value of "conistent" is provided in the prompt file, the consistent MCT test is run. When the standard test is run, the MSG hashed will always be either the length of the SEED or the length of the digest size. When the consistent test is run, the MSG hashed will always be the length of the SEED.
 
-SHA-3 Monte Carlo Test (Original):
+SHA-3 Standard Monte Carlo Test:
 [source, code]
 ----
 For j = 0 to 99
 MD[0] = SEED;
     For i = 1 to 1000
-        MSG[i] = MD[i-1]
-        MD[i] = SHA3(MSG[i])
+        MSG = MD[i-1]
+        MD[i] = SHA3(MSG)
     Output MD[1000]
     SEED = MD[1000]
 ----
 
-SHA-3 Monte Carlo Test (Updated):
+SHA-3 Consistent Monte Carlo Test:
 [source, code]
 ----
-if SupportedMessageLengths.Contains(digestSize):
-    For j = 0 to 99
-    MD[0] = SEED;
-        For i = 1 to 1000
-            MSG[i] = MD[i-1]
-            MD[i] = SHA3(MSG[i])
-        Output MD[1000]
-        SEED = MD[1000]
-else
-    MD[0] = SEED
-    For 100 iterations
-        For 1000 iterations (i = 1)
-            M[i] = MD[i-1];
-            If  !SupportedMessageLengths.Contains(LEN(M[i])):
-                M[i] = TruncateToSize(M[i], MinimumSupportedMessageLengthGreaterThanZero)
-            MD[i] = SHA3(M[i])
-            If MinimumSupportedMessageLengthGreaterThanZero >= digestSize:
-                MD[i] = MD[i] || CreateZeroBitStringOfLength(MinimumSupportedMessageLengthGreaterThanZero - digestSize)
-            Else:
-                MD[i] = TruncateToSize(MD[i], MinimumSupportedMessageLengthGreaterThanZero)
-        MD[0] = MD[1000]
-        Output MD[0]
+MD[0] = SEED
+For 100 iterations
+    For i = 1 to 1000
+        MSG = MD[i-1];
+        if LEN(MSG) >= LEN(SEED):
+            MSG = leftmost LEN(SEED) bits of MSG
+        else:
+            MSG = MSG || LEN(SEED) - LEN(MSG) 0 bits
+        MD[i] = SHA3(MSG)            
+    MD[0] = MD[1000]
+    Output MD[0]
 ----
 
 [[SHAKE-MCT]]
