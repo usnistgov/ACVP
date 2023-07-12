@@ -6,11 +6,11 @@ This section describes the design of the tests used to validate implementations 
 
 === Test Types
 
-There are two types of tests for SHA-1 and SHA-2: functional tests and Monte Carlo tests. Each has a specific value to be used in the testType field. The testType field definitions are:
+There are three types of tests for SHA-1 and SHA-2: functional tests, Monte Carlo tests and Large Data tests. Each has a specific value to be used in the testType field. The testType field definitions are:
 
 * "AFT" - Algorithm Functional Test. These tests can be processed by the client using a normal 'hash' operation.  AFTs cause the implementation under test to exercise normal operations on a single block, multiple blocks, or partial blocks. In all cases, random data is used. The functional tests are designed to verify that the logical components of the hash function (block chunking, block padding etc.) are operating correctly.
 
-* "MCT" - Monte Carlo Test. These tests exercise the implementation under test under stenuous circumstances. The implementation under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect potential memory leaks over time, and problems in allocation of resources, addressing variables, error handling, and generally improper behavior in response to random inputs. Each MCT processes 100 pseudorandom tests. Each algorithm and mode SHOULD have at least one MCT group. See <<MC_test>> for implementation details.
+* "MCT" - Monte Carlo Test. These tests exercise the implementation under test under strenuous circumstances. The implementation under test must process the test vectors according to the correct algorithm and mode in this document. MCTs can help detect potential memory leaks over time, and problems in allocation of resources, addressing variables, error handling, and generally improper behavior in response to random inputs. Each MCT processes 100 pseudorandom tests. Each algorithm and mode SHOULD have at least one MCT group. See <<MC_test>> for implementation details.
 
 * "LDT" - Large Data Test. This test performs the hash function on a message that is multiple gigabytes in length. This pushes the bounds of 32-bit data types to ensure an implementation can handle all types of data. See <<LDT>> for more information motivating the LDT. As a multiple gigabyte message cannot be communicated naturally via ACVP, a specific structure is outlined in <<LD_test>>.
 
@@ -19,7 +19,7 @@ There are two types of tests for SHA-1 and SHA-2: functional tests and Monte Car
 
 The MCTs start with an initial condition (SEED which is a single message) and perform a series of chained computations. The algorithm is shown below.
 
-NOTE: The MCTs were updated, 7/2023, to support the case where !SupportedMessageLengths.Contains(3*digestSize), a limitation of the original MCT design. As part of this change, a new property, mctVersion was added to the MCT test case JSON (See ___ section of this spec). When a value of "standard" is provided in the prompt file, the standard MCT test is run. When a value of "conistent" is provided in the prompt file, the consistent MCT test is run. When the standard test is run, the MSG hashed will always be 3 * the length of the SEED. When the consistent test is run, the MSG hashed will always be the length of the SEED.
+NOTE: The MCTs were updated, 7/2023, to support the case where !SupportedMessageLengths.Contains(3*digestSize), a limitation of the original MCT design. As part of this change, a new property, mctVersion, was added to the MCT test group JSON (See <<vs_tg_table>>). When a value of "standard" is provided for mctVersion in the prompt file, the standard MCT test is run. When a value of "alternate" is provided for mctVersion in the prompt file, the alternate MCT test is run. When the standard test is run, the MSG hashed will always be 3 * the length of the SEED. When the alternate test is run, the MSG hashed will always be the length of the SEED.
 
 SHA-1 and SHA-2 Standard Monte Carlo Test:
 [source, code]
@@ -36,7 +36,7 @@ For j = 0 to 99
     SEED = MD
 ----
 
-SHA-1 and SHA-2 Consistent Monte Carlo Test:
+SHA-1 and SHA-2 Alternate Monte Carlo Test:
 [source, code]
 ----
 For j = 0 to 99
