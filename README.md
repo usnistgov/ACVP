@@ -1,7 +1,7 @@
 # ACVP
 The [Automated Cryptographic Validation Protocol](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html) (ACVP) is a protocol to support a new National Voluntary Laboratory Accreditation Program (NVLAP) testing scope at the [National Institute of Standards and Technology (NIST)](https://www.nist.gov).  
 
-The new testing scope, 17ACVT, is available, and defined in [NIST Handbook 150-17](https://www.nist.gov/system/files/documents/2020/05/12/NIST-HB-150-17-2020.pdf).
+The new testing scope, 17ACVT, is available, and defined in [NIST Handbook 150-17](https://nvlpubs.nist.gov/nistpubs/hb/2021/NIST.HB.150-17-2021.pdf).
 
 All current information about ACVP protocol may be found within this Github project at https://github.com/usnistgov/ACVP. View the protocol documents at https://pages.nist.gov/ACVP/.
 
