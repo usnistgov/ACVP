@@ -340,9 +340,9 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [LMS sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
 * [LMS sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
 
-The prod server supports all of the above except for AES-FF3-1, and AES-GCM-SIV. Some of these algorithms have NIST SP800 series drafts in progress and will be available on the prod server when the draft becomes a standard.
+See [the algorithm endpoint](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html#name-algorithms) to learn which algorithms are available on a given ACVP server.
 
-# Accessing the Server
+# Accessing the Demo Server
 
 To access the demo server one needs a TLS credential **and** a one-time password (OTP). The [protocol specification](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html) and other development information are available in this repository. You may want to use the companion [ACVP client](https://github.com/cisco/libacvp) to jump-start your work.
 
@@ -352,7 +352,7 @@ To access the prod server, first you must demonstrate compentency on the demo se
 
 ## Obtaining TLS credentials
 
-To access the [demo environment](https://demo.acvts.nist.gov/acvp/home) you will need to send your CSR to us. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send a request to acvts-demo@nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR.
+To access the demo environment you will need to send your CSR to NIST. Please use a 2048-bit RSA key pair and sign using at least a SHA-256 hash. Please send the request to acvts-demo@nist.gov with 'CSR REQUEST FOR ACCESS TO DEMO' in the subject line. You will receive instructions for how to upload your CSR.
 
 You are expected to protect the key pair from unauthorized use and to notify NIST in the event the keypair becomes compromised. Also, since we do not have a formal login page the following notice applies when accessing the ACVP system:
 
@@ -366,6 +366,10 @@ You are accessing a U.S. Government information system, which includes: 1) this 
 
 TOTP has been configured on all servers. See details [here](https://github.com/usnistgov/ACVP/wiki#second-factor-authentication-and-authorization-schema-for-accessing-and-working-with-the-nist-automated-cryptographic-validation-services).
 
+## Renewing TLS credentials
+
+Credentials are valid for a period of two years and will then expire. To renew your credentials, please send an email to acvts-demo@nist.gov with the subject 'ACVTS DEMO CREDENTIAL RENEWAL REQUEST' in the subject line. You will receive further instructions via email regarding the renewal process.
+
 # Contribution Guidelines
 
 If you want to contribute, please follow the simple rules below and send us pull requests.
@@ -375,8 +379,7 @@ If you want to contribute, please follow the simple rules below and send us pull
 - Create a Pull Request with the updated ADOC files. GitHub Actions will verify the files can compile.
 - Once approved by a NIST member, GitHub Actions will rebuild the `nist-pages` branch to be reflected on https://pages.nist.gov/ACVP
 
-If you would like to talk to our developers, you may want to send email to our mailing list algotest@list.nist.gov. You may also report bugs or request new tests.
-
+If you would like to talk to our developers, you may want to send email to our mailing list cavp (at) nist.gov. You may also report bugs or request new tests.
 
 # Related Projects
 - [ACVP Server](https://github.com/usnistgov/ACVP-Server/) (Release/Issue tracking for NIST's implementation of the ACVP protocol)
