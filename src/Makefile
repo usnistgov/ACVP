@@ -10,7 +10,7 @@ update:
 	bundle install
 
 clean:
-	rm -rf *.err *.html *.xml *.txt documents/
+	rm -rf *.err *.html *.xml *.txt *.abort documents/
 
 %.html %.txt: %.adoc
 	bundle exec metanorma compile $<
