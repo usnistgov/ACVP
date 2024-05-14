@@ -1,0 +1,1288 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                               14 May 2024
+Intended status: Informational                                          
+Expires: 15 November 2024
+
+
+                     ACVP ML-DSA JSON Specification
+                       draft-celi-acvp-ml-dsa-01
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 15 November 2024.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Celi                    Expires 15 November 2024                [Page 1]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   4
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported ML-DSA Algorithms . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   5
+       6.2.1.  Requirements Covered  . . . . . . . . . . . . . . . .   5
+       6.2.2.  Requirements Not Covered  . . . . . . . . . . . . . .   5
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   5
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   6
+     7.2.  Required Prerequisite Algorithms for ML-DSA
+           Validations . . . . . . . . . . . . . . . . . . . . . . .   7
+     7.3.  ML-DSA Algorithm Registration Properties  . . . . . . . .   7
+       7.3.1.  ML-DSA keyGen Mode Capabilities Example . . . . . . .   8
+       7.3.2.  ML-DSA sigGen Mode Capabilities Example . . . . . . .   9
+       7.3.3.  ML-DSA sigVer Mode Capabilities Example . . . . . . .   9
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.1.  ML-DSA keyGen Test Vectors  . . . . . . . . . . . . . . .  11
+       8.1.1.  ML-DSA keyGen Test Groups JSON Schema . . . . . . . .  11
+       8.1.2.  ML-DSA keyGen Test Case JSON Schema . . . . . . . . .  12
+     8.2.  ML-DSA sigGen Test Vectors  . . . . . . . . . . . . . . .  13
+       8.2.1.  ML-DSA sigGen Test Groups JSON Schema . . . . . . . .  13
+       8.2.2.  ML-DSA sigGen Test Groups JSON Schema . . . . . . . .  13
+     8.3.  ML-DSA sigVer Test Vectors  . . . . . . . . . . . . . . .  15
+       8.3.1.  ML-DSA sigVer Test Groups JSON Schema . . . . . . . .  15
+       8.3.2.  ML-DSA sigVer Test Groups JSON Schema . . . . . . . .  16
+   9.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  17
+     9.1.  ML-DSA keyGen Test Vector Responses . . . . . . . . . . .  19
+     9.2.  ML-DSA sigGen Test Vector Responses . . . . . . . . . . .  19
+     9.3.  ML-DSA sigVer Test Vector Responses . . . . . . . . . . .  21
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  22
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  22
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  22
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  23
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing Module Lattice-
+   based Digital Signature Algorithm (ML-DSA) implementations with the
+   ACVP specification.
+
+
+
+
+
+Celi                    Expires 15 November 2024                [Page 2]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing Module
+   Lattice-based Digital Signature Algorithm (ML-DSA) implementations
+   using ACVP.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+
+
+
+
+Celi                    Expires 15 November 2024                [Page 3]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported ML-DSA Algorithms
+
+   The following ML-DSA algorithms MAY be advertised by the ACVP
+   compliant cryptographic module.  The list is in the form "algorithm /
+   mode / revision".
+
+   *  ML-DSA / keyGen / FIPS204
+
+   *  ML-DSA / sigGen / FIPS204
+
+   *  ML-DSA / sigVer / FIPS204
+
+6.  Test Types and Test Coverage
+
+6.1.  Test Types
+
+   The ACVP server performs a set of tests on the specified ML-DSA
+   algorithm in order to assess the correctness and robustness of the
+   implementation.  A typical ACVP validation session SHALL require
+   multiple tests to be performed for every supported permutation of ML-
+   DSA capabilities.  This section describes the design of the tests
+   used to validate implementations of the ML-DSA algorithms.
+
+   *  ML-DSA / keyGen / * "AFT" - Algorithm Functional Test.  The IUT is
+      REQUIRED for each test case provided, to generate a key pair from
+      a provided seed.  The key pair is communicated to the ACVP server
+      and validated.
+
+   *  ML-DSA / sigGen / * "AFT" - Algorithm Functional Test.  This
+      testing mode expects the IUT to generate valid signatures based on
+      the ACVP provided message.  The signature is then compared to the
+      known result by the ACVP server given the IUT's communicated
+      parameter set, public key, and signature.
+
+
+
+Celi                    Expires 15 November 2024                [Page 4]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+   *  ML-DSA / sigGen / * "GDT" - Generated Data Test.  This testing
+      mode expects the IUT to generate a valid signature and key pair
+      for the ACVP provided message.  The client SHALL communicate the
+      public key and signature back to the server.  The signature is
+      then validated by the ACVP server using the defined signature
+      verification routine.
+
+   *  ML-DSA / sigVer / * "AFT" - Algorithm Functional Test.  The ACVP
+      server generates a series of signatures to communicate to the IUT.
+      The IUT is REQUIRED to determine the validity of the signature
+      given the parameter set, key, and message.
+
+6.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [FIPS204].
+
+6.2.1.  Requirements Covered
+
+   *  The tests will ensure conformity and correctness of an
+      implementation of the algorithms supported.
+
+6.2.2.  Requirements Not Covered
+
+   *  FIPS 204 Section 3.5.  Additional Requirements.  Requirements
+      outlined in this section are not testable by an ACVP server.  An
+      ACVP server will not test the zeroization of intermediate values,
+      security strength of the deterministic random bit generators
+      (DRBGs), or incorrect length signatures or public keys.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of ML-DSA algorithms to the
+   ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+
+
+
+
+Celi                    Expires 15 November 2024                [Page 5]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024                [Page 6]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+7.2.  Required Prerequisite Algorithms for ML-DSA Validations
+
+   Each ML-DSA implementation relies on other cryptographic primitives.
+   For example, ML-DSA keyGen uses an underlying SHA algorithm.  Each of
+   these underlying algorithm primitives must be validated, either
+   separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
+
+    +==============+================+=====================+===========+
+    | JSON Value   | Description    | JSON Type           | Valid     |
+    |              |                |                     | Values    |
+    +==============+================+=====================+===========+
+    | algorithm    | a prerequisite | string              | SHA, or   |
+    |              | algorithm      |                     | DRBG      |
+    +--------------+----------------+---------------------+-----------+
+    | valValue     | algorithm      | string              | Actual    |
+    |              | validation     |                     | number or |
+    |              | number         |                     | "same"    |
+    +--------------+----------------+---------------------+-----------+
+    | prereqAlgVal | prerequisite   | object with         | See above |
+    |              | algorithm      | algorithm and       |           |
+    |              | validation     | valValue properties |           |
+    +--------------+----------------+---------------------+-----------+
+
+        Table 2: Required ML-DSA Prerequisite Algorithms JSON Values
+
+7.3.  ML-DSA Algorithm Registration Properties
+
+   Each ML-DSA algorithm capability advertised is a self-contained JSON
+   object using the following values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024                [Page 7]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+     +===============+=================+==============+==============+
+     | JSON Value    | Description     | JSON Type    | Valid Values |
+     +===============+=================+==============+==============+
+     | algorithm     | The ML-DSA      | string       | See          |
+     |               | algorithm to be |              | Section 5    |
+     |               | validated       |              |              |
+     +---------------+-----------------+--------------+--------------+
+     | mode          | The ML-DSA mode | string       | See          |
+     |               | to be validated |              | Section 5    |
+     +---------------+-----------------+--------------+--------------+
+     | revision      | The algorithm   | string       | See          |
+     |               | testing         |              | Section 5    |
+     |               | revision to use |              |              |
+     +---------------+-----------------+--------------+--------------+
+     | prereqVals    | Prerequisite    | array of     | See          |
+     |               | algorithm       | prereqAlgVal | Section 7.2  |
+     |               | validations     | objects      |              |
+     +---------------+-----------------+--------------+--------------+
+     | parameterSets | The ML-DSA      | array of     | "ML-DSA-44", |
+     |               | parameter sets  | strings      | "ML-DSA-65", |
+     |               | supported       |              | "ML-DSA-87"  |
+     +---------------+-----------------+--------------+--------------+
+     | deterministic | The ML-DSA      | array of     | true, false  |
+     |               | signature       | booleans     |              |
+     |               | generation      |              |              |
+     |               | modes supported |              |              |
+     +---------------+-----------------+--------------+--------------+
+
+             Table 3: ML-DSA Algorithm Capabilities JSON Values
+
+   Note: The deterministic property is only applicable to ML-DSA /
+   sigGen / FIPS204.
+
+7.3.1.  ML-DSA keyGen Mode Capabilities Example
+
+   Below is an example of the registration for ML-DSA / keyGen / FIPS204
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024                [Page 8]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+   {
+       "algorithm": "ML-DSA",
+       "mode": "keyGen",
+       "revision": "FIPS204",
+       "prereqVals": [
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           }
+       ],
+       "parameterSets": ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"]
+   }
+
+7.3.2.  ML-DSA sigGen Mode Capabilities Example
+
+   Below is an example of the registration for ML-DSA / sigGen / FIPS204
+
+   {
+       "algorithm": "ML-DSA",
+       "mode": "sigGen",
+       "revision": "FIPS204",
+       "prereqVals": [
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           }
+       ],
+       "parameterSets": ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"],
+       "deterministic": [true, false]
+   }
+
+7.3.3.  ML-DSA sigVer Mode Capabilities Example
+
+   Below is an example of the registration for ML-DSA / sigVer / FIPS204
+
+   {
+       "algorithm": "ML-DSA",
+       "mode": "sigVer",
+       "revision": "FIPS204",
+       "prereqVals": [
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           }
+       ],
+       "parameterSets": ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"]
+   }
+
+
+
+
+Celi                    Expires 15 November 2024                [Page 9]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual algorithm defined during the
+   capability exchange.  This section describes the JSON schema for a
+   test vector set used with Module Lattice-based Digital Signature
+   Algorithm (ML-DSA) algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test groups containing test | array     |
+    |             | data, see Section 8, Paragraph 6     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 4: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 10]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+   ==
+
+8.1.  ML-DSA keyGen Test Vectors
+
+8.1.1.  ML-DSA keyGen Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The test group for ML-DSA / keyGen / FIPS204 is as follows:
+
+         +==============+==============================+========+
+         | JSON Value   | Description                  | JSON   |
+         |              |                              | type   |
+         +==============+==============================+========+
+         | testType     | The test operation performed | string |
+         +--------------+------------------------------+--------+
+         | parameterSet | The ML-DSA parameter set     | string |
+         |              | used                         |        |
+         +--------------+------------------------------+--------+
+         | tests        | Array of individual test     | array  |
+         |              | vector JSON objects, which   |        |
+         |              | are defined in Section 8.1.2 |        |
+         +--------------+------------------------------+--------+
+
+              Table 5: ML-DSA keyGen Test Group JSON Object
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 11]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+8.1.2.  ML-DSA keyGen Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ML-DSA test vector.
+
+    +============+=======================================+===========+
+    | JSON Value | Description                           | JSON type |
+    +============+=======================================+===========+
+    | tcId       | Numeric identifier for the test case, | integer   |
+    |            | unique across the entire vector set   |           |
+    +------------+---------------------------------------+-----------+
+    | seed       | The seed used to generate the key     | hex       |
+    |            | pair                                  |           |
+    +------------+---------------------------------------+-----------+
+
+               Table 6: ML-DSA keyGen Test Case JSON Object
+
+   The following is an example JSON object sent from the server to the
+   client for ML-DSA / keyGen / FIPS204.
+
+   [
+       {
+           "acvVersion": <acvp-version>
+       },
+       {
+           "vsId": 1564,
+           "algorithm": "ML-DSA",
+           "mode": "keyGen",
+           "revision": "FIPS204",
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "testType": "AFT",
+                   "parameterSet": "ML-DSA-44",
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "seed": "C105DC2..."
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 12]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+8.2.  ML-DSA sigGen Test Vectors
+
+8.2.1.  ML-DSA sigGen Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The test group for ML-DSA / sigGen / FIPS204 is as follows:
+
+      +===============+===================================+=========+
+      | JSON Value    | Description                       | JSON    |
+      |               |                                   | type    |
+      +===============+===================================+=========+
+      | testType      | The test operation performed      | string  |
+      +---------------+-----------------------------------+---------+
+      | parameterSet  | The ML-DSA parameter set used     | string  |
+      +---------------+-----------------------------------+---------+
+      | deterministic | Whether the signatures should be  | boolean |
+      |               | generated using the deterministic |         |
+      |               | or non-deterministic routine      |         |
+      +---------------+-----------------------------------+---------+
+      | tests         | Array of individual test vector   | array   |
+      |               | JSON objects, which are defined   |         |
+      |               | in Section 8.2.2                  |         |
+      +---------------+-----------------------------------+---------+
+
+               Table 7: ML-DSA sigGen Test Group JSON Object
+
+8.2.2.  ML-DSA sigGen Test Groups JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ML-DSA test vector.
+
+
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 13]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+    +=========+=============================================+=========+
+    | JSON    | Description                                 | JSON    |
+    | Value   |                                             | type    |
+    +=========+=============================================+=========+
+    | tcId    | Numeric identifier for the test case,       | integer |
+    |         | unique across the entire vector set         |         |
+    +---------+---------------------------------------------+---------+
+    | message | The message used to generate the signature  | hex     |
+    +---------+---------------------------------------------+---------+
+    | sk      | When the test group property "testType":    | hex     |
+    |         | "AFT", the secret key that should be used   |         |
+    |         | to generate a signature                     |         |
+    +---------+---------------------------------------------+---------+
+    | rnd     | When the test group properties "testType":  | hex     |
+    |         | "AFT" and "deterministic": false, the       |         |
+    |         | random value used to generate the signature |         |
+    +---------+---------------------------------------------+---------+
+
+                Table 8: ML-DSA sigGen Test Case JSON Object
+
+   The following is an example JSON object sent from the server to the
+   client for ML-DSA / sigGen / FIPS204.
+
+   [
+       {
+           "acvVersion": <acvp-version>
+       },
+       {
+           "vsId": 0,
+           "algorithm": "ML-DSA",
+           "mode": "sigGen",
+           "revision": "FIPS204",
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "testType": "GDT",
+                   "parameterSet": "ML-DSA-44",
+                   "deterministic": true,
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "message": "0D873AEFD..."
+                       }
+                   ]
+               },
+               {
+                   "tgId": 2,
+                   "testType": "AFT",
+
+
+
+Celi                    Expires 15 November 2024               [Page 14]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+                   "parameterSet": "ML-DSA-44",
+                   "deterministic": true,
+                   "tests": [
+                       {
+                           "tcId": 61,
+                           "sk": "E94EB...",
+                           "message": "00E959E..."
+                       }
+                   ]
+               },
+               {
+                   "tgId": 3,
+                   "testType": "AFT",
+                   "parameterSet": "ML-DSA-44",
+                   "deterministic": false,
+                   "tests": [
+                       {
+                           "tcId": 71,
+                           "sk": "D4E36A5...",
+                           "message": "34F4B...",
+                           "rnd": "7AFF2F22A..."
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+8.3.  ML-DSA sigVer Test Vectors
+
+8.3.1.  ML-DSA sigVer Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The test group for ML-DSA / sigVer / FIPS204 is as follows:
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 15]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+         +==============+==============================+========+
+         | JSON Value   | Description                  | JSON   |
+         |              |                              | type   |
+         +==============+==============================+========+
+         | testType     | The test operation performed | string |
+         +--------------+------------------------------+--------+
+         | parameterSet | The ML-DSA parameter set     | string |
+         |              | used                         |        |
+         +--------------+------------------------------+--------+
+         | pk           | The public key used to       | hex    |
+         |              | generate the signature       |        |
+         +--------------+------------------------------+--------+
+         | tests        | Array of individual test     | array  |
+         |              | vector JSON objects, which   |        |
+         |              | are defined in Section 8.3.2 |        |
+         +--------------+------------------------------+--------+
+
+              Table 9: ML-DSA sigVer Test Group JSON Object
+
+8.3.2.  ML-DSA sigVer Test Groups JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ML-DSA test vector.
+
+    +============+=======================================+===========+
+    | JSON Value | Description                           | JSON type |
+    +============+=======================================+===========+
+    | tcId       | Numeric identifier for the test case, | integer   |
+    |            | unique across the entire vector set   |           |
+    +------------+---------------------------------------+-----------+
+    | message    | The message used to verify with the   | hex       |
+    |            | signature                             |           |
+    +------------+---------------------------------------+-----------+
+    | signature  | The signature to verify               | hex       |
+    +------------+---------------------------------------+-----------+
+
+              Table 10: ML-DSA sigVer Test Case JSON Object
+
+   The following is an example JSON object sent from the server to the
+   client for ML-DSA / sigVer / FIPS204.
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 16]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+   [
+       {
+           "acvVersion": <acvp-version>
+       },
+       {
+           "vsId": 0,
+           "algorithm": "ML-DSA",
+           "mode": "sigVer",
+           "revision": "FIPS204",
+           "isSample": false,
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "testType": "AFT",
+                   "parameterSet": "ML-DSA-44",
+                   "publicKey": "3FE65294...",
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "message": "4F0D7...",
+                           "signature": "C29A11B6C..."
+                       },
+                       {
+                           "tcId": 2,
+                           "message": "84793...",
+                           "signature": "6A99215FC2..."
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+9.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 17]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+        +===============+============================+===========+
+        | JSON Property | Description                | JSON Type |
+        +===============+============================+===========+
+        | acvVersion    | The ACVP version used      | string    |
+        +---------------+----------------------------+-----------+
+        | vsId          | The vector set identifier  | integer   |
+        +---------------+----------------------------+-----------+
+        | testGroups    | The test group objects in  | array     |
+        |               | the response, see Table 12 |           |
+        +---------------+----------------------------+-----------+
+
+                      Table 11: Response JSON Object
+
+   An example of this is the following
+
+   {
+       "acvVersion": "version",
+       "vsId": 1,
+       "testGroups": [ ... ]
+   }
+
+   The 'testGroups' section is used to organize the ACVP client response
+   in a similar manner to how it distributes vectors.
+
+       +==========+======================================+=========+
+       | JSON     | Description                          | JSON    |
+       | Property |                                      | Type    |
+       +==========+======================================+=========+
+       | tgId     | The test group identifier            | integer |
+       +----------+--------------------------------------+---------+
+       | tests    | The test case objects in the         | array   |
+       |          | response, depending on the algorithm |         |
+       |          | see Table 13, Table 15, or Table 16  |         |
+       +----------+--------------------------------------+---------+
+
+                      Table 12: Response Group Objects
+
+   An example of this is the following
+
+   {
+       "tgId": 1,
+       "tests": [ ... ]
+   }
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 18]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+9.1.  ML-DSA keyGen Test Vector Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ML-DSA / keyGen / FIPS204 test vector.
+
+           +============+==========================+===========+
+           | JSON Value | Description              | JSON type |
+           +============+==========================+===========+
+           | tcId       | The test case identifier | integer   |
+           +------------+--------------------------+-----------+
+           | pk         | The computed public key  | hex       |
+           +------------+--------------------------+-----------+
+           | sk         | The computed secret key  | hex       |
+           +------------+--------------------------+-----------+
+
+              Table 13: ML-DSA keyGen Test Case Response JSON
+                                   Object
+
+   The following is an example JSON test vector response object for ML-
+   DSA / keyGen / FIPS204.
+
+   [
+       {
+           "acvVersion": <acvp-version>
+       },
+       {
+           "vsId": 0,
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "pk": "1012798...",
+                           "sk": "1012798..."
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+9.2.  ML-DSA sigGen Test Vector Responses
+
+   The test groups for ML-DSA / sigGen / FIPS204 contain public key
+   properties.  The groups can be described using the following table.
+
+
+
+Celi                    Expires 15 November 2024               [Page 19]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+     +=======+=============================================+=========+
+     | JSON  | Description                                 | JSON    |
+     | Value |                                             | type    |
+     +=======+=============================================+=========+
+     | tgId  | The test group identifier                   | integer |
+     +-------+---------------------------------------------+---------+
+     | pk    | The public key the IUT used when the prompt | hex     |
+     |       | test group property "testType": "GDT"       |         |
+     +-------+---------------------------------------------+---------+
+     | tests | The individual test cases for the group     | array   |
+     +-------+---------------------------------------------+---------+
+
+          Table 14: ML-DSA sigGen Test Group Response JSON Object
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ML-DSA / sigGen / FIPS204 test vector.
+
+           +============+==========================+===========+
+           | JSON Value | Description              | JSON type |
+           +============+==========================+===========+
+           | tcId       | The test case identifier | integer   |
+           +------------+--------------------------+-----------+
+           | signature  | The generated signature  | hex       |
+           +------------+--------------------------+-----------+
+
+              Table 15: ML-DSA sigGen Test Case Response JSON
+                                   Object
+
+   The following is an example JSON test vector response object for ML-
+   DSA / sigGen / FIPS204.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 20]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+   [
+       {
+           "acvVersion": <acvp-version>
+       },
+       {
+           "vsId": 1564,
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "pk": "A9ADC1E82...",
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "signature": "D7D4275..."
+                       }
+                   ]
+               },
+               {
+                   "tgId": 2,
+                   "tests": [
+                       {
+                           "tcId": 2,
+                           "signature": "75300EBBB6C..."
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+9.3.  ML-DSA sigVer Test Vector Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ML-DSA / sigVer / FIPS204 test vector.
+
+    +============+=======================================+===========+
+    | JSON Value | Description                           | JSON type |
+    +============+=======================================+===========+
+    | tcId       | The test case identifier              | integer   |
+    +------------+---------------------------------------+-----------+
+    | testPassed | Whether or not the signature verified | boolean   |
+    +------------+---------------------------------------+-----------+
+
+          Table 16: ML-DSA sigVer Test Case Response JSON Object
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 21]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+   The following is an example JSON test vector response object for ML-
+   DSA / sigVer / FIPS204.
+
+   [
+       {
+           "acvVersion": <acvp-version>
+       },
+       {
+           "vsId": 0,
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "testPassed": false
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [FIPS204]  "", NIST FIPS 204.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 22]
+
+Internet-Draft                 ACVP ML-DSA                      May 2024
+
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                    Expires 15 November 2024               [Page 23]
