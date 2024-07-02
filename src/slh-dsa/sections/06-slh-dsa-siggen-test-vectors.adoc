@@ -1,0 +1,86 @@
+[[SLH-DSA_sigGen_test_vectors]]
+=== SLH-DSA sigGen Test Vectors
+
+[[SLH-DSA_sigGen_tgjs]]
+==== SLH-DSA sigGen Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {algo-short-name} JSON elements of the Test Group JSON object.
+
+The test group for SLH-DSA / sigGen / FIPS205 is as follows:
+
+[[SLH-DSA_sigGen_vs_tg_table]]
+.SLH-DSA sigGen Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | Numeric identifier for the test group, unique across the entire vector set | integer
+| testType | The test operation performed | string
+| parameterSet | The SLH-DSA parameter set used | string
+| deterministic | Whether the signatures should be generated using the deterministic or non-deterministic signature generation variant | boolean
+| tests | Array of individual test vector JSON objects, which are defined in <<SLH-DSA_sigGen_tvjs>> | array
+|===
+
+[[SLH-DSA_sigGen_tvjs]]
+==== SLH-DSA sigGen Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each SLH-DSA / sigGen / FIPS205 test vector.
+
+[[SLH-DSA_sigGen_vs_tc_table]]
+.SLH-DSA sigGen Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| sk | The secret key that should be used to generate a signature | hex
+| additionalRandomness | Additional randomness used by the non-deterministic SLH-DSA signature generation variant. Only present for test groups where `"deterministic": false`. | hex
+| messageLength | The length of message in bits | integer
+| message | The message used to generate the signature | hex
+|===
+
+The following is an example JSON object sent from the server to the client for SLH-DSA / sigGen / FIPS205.
+
+[source, json]
+----
+[
+    {
+        "acvVersion": <acvp-version>
+    },
+    {
+        "vsId": 0,
+        "algorithm": "SLH-DSA",
+        "mode": "sigGen",
+        "revision": "FIPS205",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "testType": "AFT",
+                "parameterSet": "SLH-DSA-SHA2-192s",
+                "deterministic": true,
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "sk": "68A103...",
+                        "messageLength": 65536,
+                        "message": "EC1EF9E3B24E..."
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "testType": "AFT",
+                "parameterSet": "SLH-DSA-SHA2-192s",
+                "deterministic": false,
+                "tests": [
+                    {
+                        "tcId": 15,
+                        "sk": "D4E36A5...",
+                        "additionalRandomness": "FAFF13...",
+                        "messageLength": 46336,
+                        "message": "34F4B...",
+                    }
+                ]
+            }
+        ]
+    }
+]
+----
