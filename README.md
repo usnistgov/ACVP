@@ -25,6 +25,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [Safe Primes](#safe-primes)
   * [Conditioning Components](#conditioning-components)
   * [Stateful Hash-Based Signatures](#stateful-hash-based-signatures)
+  * [Stateless Hash-Based Signatures](#stateless-hash-based-signatures)
   * [Module-Lattice Algorithms](#module-lattice-algorithms)
 * [Accessing the Server](#accessing-the-demo-server)
 * [Contribution Guidelines](contribution-guidelines)
@@ -340,6 +341,11 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [LMS keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
 * [LMS sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
 * [LMS sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+
+### Stateless Hash-Based Signatures
+* [SLH-DSA keyGen](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.html)
+* [SLH-DSA sigGen](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.html)
+* [SLH-DSA sigVer](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.html)
 
 ### Module-Lattice Algorithms
 * [ML-DSA keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-dsa.html)
