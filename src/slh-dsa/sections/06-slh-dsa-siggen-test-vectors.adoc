@@ -17,8 +17,12 @@ The test group for SLH-DSA / sigGen / FIPS205 is as follows:
 | testType | The test operation performed | string
 | parameterSet | The SLH-DSA parameter set used | string
 | deterministic | Whether the signatures should be generated using the deterministic or non-deterministic signature generation variant | boolean
+| signatureInterface | Whether the signature is generated using the internal or external routine | string
+| preHash | Whether the signature is generated using the prehash or pure routine | string
 | tests | Array of individual test vector JSON objects, which are defined in <<SLH-DSA_sigGen_tvjs>> | array
 |===
+
+NOTE: The "preHash" property will only be present if "signatureInterface" is set to "external". 
 
 [[SLH-DSA_sigGen_tvjs]]
 ==== SLH-DSA sigGen Test Case JSON Schema
@@ -33,8 +37,9 @@ Each test group contains an array of one or more test cases. Each test case is a
 | tcId | Numeric identifier for the test case, unique across the entire vector set | integer
 | sk | The secret key that should be used to generate a signature | hex
 | additionalRandomness | Additional randomness used by the non-deterministic SLH-DSA signature generation variant. Only present for test groups where `"deterministic": false`. | hex
-| messageLength | The length of message in bits | integer
 | message | The message used to generate the signature | hex
+| context | When the test group property `"signatureInterface": "external"`, the context used to construct the signed message | hex
+| hashAlg | When the test group property `"preHash": "preHash"`, the hash function used to construct the signed message | string
 |===
 
 The following is an example JSON object sent from the server to the client for SLH-DSA / sigGen / FIPS205.
@@ -55,12 +60,12 @@ The following is an example JSON object sent from the server to the client for S
                 "tgId": 1,
                 "testType": "AFT",
                 "parameterSet": "SLH-DSA-SHA2-192s",
+                "signatureInterface": "internal",
                 "deterministic": true,
                 "tests": [
                     {
                         "tcId": 1,
                         "sk": "68A103...",
-                        "messageLength": 65536,
                         "message": "EC1EF9E3B24E..."
                     }
                 ]
@@ -70,13 +75,33 @@ The following is an example JSON object sent from the server to the client for S
                 "testType": "AFT",
                 "parameterSet": "SLH-DSA-SHA2-192s",
                 "deterministic": false,
+                "signatureInterface": "external",
+                "preHash": "pure",
                 "tests": [
                     {
                         "tcId": 15,
                         "sk": "D4E36A5...",
                         "additionalRandomness": "FAFF13...",
-                        "messageLength": 46336,
                         "message": "34F4B...",
+                        "context": "ABCD"
+                    }
+                ]
+            },
+            {
+                "tgId": 3,
+                "testType": "AFT",
+                "parameterSet": "SLH-DSA-SHA2-192s",
+                "deterministic": false,
+                "signatureInterface": "external",
+                "preHash": "preHash",
+                "tests": [
+                    {
+                        "tcId": 15,
+                        "sk": "D4E36A5...",
+                        "additionalRandomness": "FAFF13...",
+                        "message": "34F4B...",
+                        "context": "01",
+                        "hashAlg": "SHA2-256"
                     }
                 ]
             }

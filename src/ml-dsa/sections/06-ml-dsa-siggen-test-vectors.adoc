@@ -17,8 +17,13 @@ The test group for ML-DSA / sigGen / FIPS204 is as follows:
 | testType | The test operation performed | string
 | parameterSet | The ML-DSA parameter set used | string
 | deterministic | Whether the signatures should be generated using the deterministic or non-deterministic routine | boolean
+| signatureInterface | Whether the signature is generated using the internal or external routine | string
+| preHash | Whether the signature is generated using the prehash or pure routine | string
+| externalMu | Whether mu is computed internally or externally to the module under test | string
 | tests | Array of individual test vector JSON objects, which are defined in <<ML-DSA_sigGen_tvjs>> | array
 |===
+
+NOTE: The "preHash" property will only be present if "signatureInterface" is set to "external". The "externalMu" property will only be present if "signatureInterface" is set to "internal".
 
 [[ML-DSA_sigGen_tvjs]]
 ==== ML-DSA sigGen Test Case JSON Schema
@@ -32,9 +37,14 @@ Each test group contains an array of one or more test cases. Each test case is a
 
 | tcId | Numeric identifier for the test case, unique across the entire vector set | integer
 | message | The message used to generate the signature | hex
+| mu | The mu used to generate the signature | hex
 | sk | When the test group property `"testType": "AFT"`, the secret key that should be used to generate a signature | hex
 | rnd | When the test group properties `"testType": "AFT"` and `"deterministic": false`, the random value used to generate the signature | hex
+| context | When the test group property `"signatureInterface": "external"`, the context used to construct the signed message | hex
+| hashAlg | When the test group property `"preHash": "preHash"`, the hash function used to construct the signed message | string
 |===
+
+NOTE: When "signatureInterface" is set to "internal" for the test group, the "message" will only be present when "externalMu" is false, while "mu" will only be present when "externalMu" is true.
 
 The following is an example JSON object sent from the server to the client for ML-DSA / sigGen / FIPS204.
 
@@ -52,8 +62,10 @@ The following is an example JSON object sent from the server to the client for M
         "testGroups": [
             {
                 "tgId": 1,
-                "testType": "GDT",
+                "testType": "AFT",
                 "parameterSet": "ML-DSA-44",
+                "signatureInterface": "internal",
+                "externalMu": false,
                 "deterministic": true,
                 "tests": [
                     {
@@ -66,12 +78,15 @@ The following is an example JSON object sent from the server to the client for M
                 "tgId": 2,
                 "testType": "AFT",
                 "parameterSet": "ML-DSA-44",
-                "deterministic": true,
+                "signatureInterface": "internal",
+                "externalMu": true,
+                "deterministic": false,
                 "tests": [
                     {
-                        "tcId": 61,
-                        "sk": "E94EB...",
-                        "message": "00E959E..."
+                        "tcId": 71,
+                        "sk": "D4E36A5...",
+                        "mu": "34F4B...",
+                        "rnd": "7AFF2F22A..."
                     }
                 ]
             },
@@ -79,13 +94,31 @@ The following is an example JSON object sent from the server to the client for M
                 "tgId": 3,
                 "testType": "AFT",
                 "parameterSet": "ML-DSA-44",
+                "signatureInterface": "external",
+                "preHash": "pure",
+                "deterministic": true,
+                "tests": [
+                    {
+                        "tcId": 71,
+                        "sk": "D4E36A5...",
+                        "message": "34F4B..."
+                    }
+                ]
+            },
+            {
+                "tgId": 4,
+                "testType": "AFT",
+                "parameterSet": "ML-DSA-44",
+                "signatureInterface": "external",
+                "preHash": "preHash",
                 "deterministic": false,
                 "tests": [
                     {
                         "tcId": 71,
                         "sk": "D4E36A5...",
                         "message": "34F4B...",
-                        "rnd": "7AFF2F22A..."
+                        "rnd": "7AFF2F22A...",
+                        "hashAlg": "SHA2-256"
                     }
                 ]
             }
