@@ -5,13 +5,35 @@
 [#ttypes]
 === Test Types
 
-The ACVP server performs a set of tests on the specified SLH-DSA algorithm in order to assess the correctness and robustness of the implementation. A typical ACVP validation session *SHALL* require multiple tests to be performed for every supported permutation of SLH-DSA capabilities. This section describes the design of the tests used to validate implementations of the SLH-DSA algorithms.
+The ACVP server performs a set of tests on the specified SLH-DSA algorithm in order to assess the correctness and robustness of the implementation. A typical ACVP validation session *SHALL* require multiple tests to be performed for every supported permutation of SLH-DSA capabilities. This section describes the design of the tests used to validate implementations of the SLH-DSA algorithms. The number of tests *MAY* vary but the minimum number required by each test type *SHALL* be included by the server. The test type describes the format of the test rather than the intention of the test. Multiple tests of the same test type *MAY* cover different assurances regarding the implementation. 
 
-* SLH-DSA / keyGen / * "AFT" - Algorithm Functional Test. The IUT is *REQUIRED* for each test case provided, to generate a key pair from provided seed and key values, i.e., SK.seed, SK.prf, and PK.seed. The key pair is communicated to the ACVP server and validated. This tests the implementation of Algorithm 18 slh_keygen_internal() from <<FIPS205>> Section 9.1.
+==== SLH-DSA KeyGen Test Types
 
-* SLH-DSA / sigGen / * "AFT" - Algorithm Functional Test. This testing mode *REQUIRES* the IUT to generate a valid signature for each test case given the ACVP-provided private key, message and a selected parameter set. The signature is then compared to the known result by the ACVP server. This tests the implementation of Algorithm 19 slh_sign_internal() from <<FIPS205>> Section 9.2.
+* SLH-DSA / keyGen / * "AFT" - Algorithm Functional Test. 
 
-* SLH-DSA / sigVer / * "AFT" - Algorithm Functional Test. The ACVP server generates a series of signatures to communicate to the IUT. The IUT is *REQUIRED* to determine the validity of the signature given the parameter set, key, and message. This tests the implementation of Algorithm 20 slh_verify_internal() from <<FIPS205>> Section 9.3.
+For each test case provided the IUT *SHALL* generate a key pair from provided seed and key values, i.e., SK.seed, SK.prf, and PK.seed. The IUT-computed key pair is communicated to the ACVP server and compared to the expected key pair. This tests the implementation of Algorithm 18 `slh_keygen_internal()` from <<FIPS205>> Section 9.1. The server *SHALL* provide at least 10 tests for each combination of capabilities.
+
+==== SLH-DSA SigGen Test Types
+
+* SLH-DSA / sigGen / * "AFT" - Algorithm Functional Test. 
+
+For each test case provided the IUT *SHALL* generate a valid signature given the ACVP-provided private key, message, context (for external interface testing) and randomness (for non-deterministic signature testing). The signature is then compared to the known result by the ACVP server. This tests the implementation of Algorithm 19 `slh_sign_internal()`, Algorithm 22 `slh_sign()`, and Algorithm 23 `hash_slh_sign()` from <<FIPS205>>. The server *SHALL* provide at least 13 tests generated for each combination of capabilities. The `"hashAlg"` capability *MAY* be excluded from the combination of capabilities due to the number of supported hash functions. Each `"hashAlg"` provided by the IUT *SHALL* be covered within the at least 13 tests generated for each combination of capabilities. 
+
+==== SLH-DSA SigVer Test Types
+
+* SLH-DSA / sigVer / * "AFT" - Algorithm Functional Test. 
+
+The ACVP server generates a series of messages, public keys, and signatures to communicate to the IUT. The IUT *SHALL* determine the validity of the signature. This tests the implementation of Algorithm 20 `slh_verify_internal()`, Algorithm 24 `slh_verify()`, and Algorithm 25 `hash_slh_verify()` from <<FIPS205>>. Tests for signature verification are performed by the server modifying a valid signature to obtain specific assurances from the implementation. The server *SHALL* include at least 2 tests for each modification type (including the no modification valid signature case) for all combinations of capabilities. The `"hashAlg"` capability *MAY* be excluded from the combination of capabilities due to the number of supported hash functions. Each `"hashAlg"` provided by the IUT *SHALL* be covered within the at least 14 tests generated for each combination of capabilities. 
+
+The signature modifications are:
+
+* "valid signature and message - signature should verify successfully" - No modification is made and the signature is valid.
+* "modified message" - The message that was signed has been changed. The signature is not valid.
+* "modified signature - R" - The signature component R has been changed. The signature is not valid.
+* "modified signature - SIGFORS" - The signature component SIGFORS has been changed. The signature is not valid.
+* "modified signature - SIGHT" - The signature component SIGHT has been changed. The signature is not valid.
+* "invalid signature - too long" - The signature is not a valid size due to extra bytes. The signature is not valid.
+* "invalid signature - too short" - The signature is not a valid size due to missing bytes. The signature is not valid.
 
 [[test_coverage]]
 === Test Coverage

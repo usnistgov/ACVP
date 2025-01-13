@@ -1,5 +1,38 @@
 
 [[ml-dsa_sigGen_capabilities]]
+=== ML-DSA sigGen Registration Properties
+
+Each ML-DSA sigGen algorithm capability advertised is a self-contained JSON object using the following values.
+
+[[ML-DSA_siggen_caps_table]]
+.ML-DSA sigGen Algorithm Capabilities JSON Values
+|===
+| JSON Value | Description | JSON Type | Valid Values
+
+| algorithm | The ML-DSA algorithm to be validated | string | "ML-DSA"
+| mode | The ML-DSA mode to be validated | string | "sigGen"
+| revision | The algorithm testing revision to use | string | "FIPS204"
+| prereqVals | Prerequisite algorithm validations | array of prereqAlgVal objects | See <<prereq_algs>>
+| capabilities | An array of individual capability objects | array of capability objects | See <<ml-dsa-siggen-capabilities-table>>
+| deterministic | The ML-DSA signature generation modes supported | array of booleans | true, false
+| signatureInterfaces | The ML-DSA signature interfaces supported | array of strings | "internal", "external"
+| preHash | Whether ML-DSA and HashML-DSA are supported. Only required when `"signatureInterfaces"` contains "external". | array of strings | "pure", "preHash"
+| externalMu | Whether mu is computed internally to the module or externally from the module under test. Only applicable when `"signatureInterfaces"` contains `"internal"`. | array of booleans | true, false
+|===
+
+The capability objects use the following properties.
+
+[[ml-dsa-siggen-capabilities-table]]
+.ML-DSA sigGen Capability Property JSON Values
+|===
+| JSON Value | Description | JSON Type | Valid Values
+
+| parameterSets | The ML-DSA parameter sets supported | array of strings | "ML-DSA-44", "ML-DSA-65", "ML-DSA-87"
+| messageLength | The supported message lengths in bits | domain | Min: 8, Max: 65536, Incr: 8
+| hashAlgs | The hash algorithms used if preHash ML-DSA is used | array of strings | "SHA2-224", "SHA2-256", "SHA2-384", "SHA2-512", "SHA2-512/224", "SHA2-512/256", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHAKE-128", "SHAKE-256"
+| contextLength | The supported context lengths if the external interface is used | domain | Min: 0, Max: 2040, Incr: 8
+|===
+
 ==== ML-DSA sigGen Mode Capabilities Example
 
 Below is an example of the registration for ML-DSA / sigGen / FIPS204
@@ -7,17 +40,67 @@ Below is an example of the registration for ML-DSA / sigGen / FIPS204
 [source, json]
 ----
 {
-    "algorithm": "ML-DSA",
-    "mode": "sigGen",
-    "revision": "FIPS204",
-    "prereqVals": [
+  "algorithm": "ML-DSA",
+  "mode": "sigGen",
+  "revision": "FIPS204",
+  "prereqVals": [
+    {
+      "algorithm": "SHA",
+      "valValue": "123456"
+    }
+  ],
+  "capabilities": [
+    {
+      "parameterSets": [
+        "ML-DSA-44",
+        "ML-DSA-65",
+        "ML-DSA-87"
+      ],
+      "messageLength": [
         {
-            "algorithm": "SHA",
-            "valValue": "123456"
+          "min": 8,
+          "max": 65536,
+          "increment": 8
         }
-    ],
-    "parameterSets": ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"],
-    "deterministic": [true, false],
-    "messageLength": [{"min": 8, "max": 65536", "increment": 8}]
+      ],
+      "hashAlgs": [
+        "SHA2-224",
+        "SHA2-256",
+        "SHA2-384",
+        "SHA2-512",
+        "SHA2-512/224",
+        "SHA2-512/256",
+        "SHA3-224",
+        "SHA3-256",
+        "SHA3-384",
+        "SHA3-512",
+        "SHAKE-128",
+        "SHAKE-256"
+      ],
+      "contextLength": [
+        {
+          "min": 0,
+          "max": 2040,
+          "increment": 8
+        }
+      ]
+    }
+  ],
+  "deterministic": [
+    true,
+    false
+  ],
+  "externalMu": [
+    true,
+    false
+  ],
+  "signatureInterfaces": [
+    "external",
+    "internal"
+  ],
+  "preHash": [
+    "pure",
+    "preHash"
+  ]
 }
 ----

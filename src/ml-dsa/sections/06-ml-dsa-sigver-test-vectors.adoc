@@ -16,9 +16,12 @@ The test group for ML-DSA / sigVer / FIPS204 is as follows:
 | tgId | Numeric identifier for the test group, unique across the entire vector set | integer
 | testType | The test operation performed | string
 | parameterSet | The ML-DSA parameter set used | string
-| pk | The public key used to generate the signature | hex
+| signatureInterface | Whether the signature is generated using the internal or external routine | string
+| preHash | Whether the signature is generated using the prehash or pure routine | string
 | tests | Array of individual test vector JSON objects, which are defined in <<ML-DSA_sigVer_tvjs>> | array
 |===
+
+NOTE: The "preHash" property will only be present if "signatureInterface" is set to "external". The "externalMu" property will only be present if "signatureInterface" is set to "internal".
 
 [[ML-DSA_sigVer_tvjs]]
 ==== ML-DSA sigVer Test Case JSON Schema
@@ -31,44 +34,101 @@ Each test group contains an array of one or more test cases. Each test case is a
 | JSON Value | Description | JSON type
 
 | tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| pk | The public key used to verify the signature | hex
 | message | The message used to verify with the signature | hex
+| mu | The mu used to generate the signature | hex
 | signature | The signature to verify | hex
+| context | When the test group property `"signatureInterface": "external"`, the context used to construct the signed message | hex
+| hashAlg | When the test group property `"preHash": "preHash"`, the hash function used to construct the signed message | string
 |===
+
+NOTE: When "signatureInterface" is set to "internal" for the test group, the "message" will only be present when "externalMu" is false, while "mu" will only be present when "externalMu" is true.
 
 The following is an example JSON object sent from the server to the client for ML-DSA / sigVer / FIPS204.
 
 [source, json]
 ----
 [
-    {
-        "acvVersion": <acvp-version>
-    },
-    {
-        "vsId": 0,
-        "algorithm": "ML-DSA",
-        "mode": "sigVer",
-        "revision": "FIPS204",
-        "isSample": false,
-        "testGroups": [
-            {
-                "tgId": 1,
-                "testType": "AFT",
-                "parameterSet": "ML-DSA-44",
-                "publicKey": "3FE65294...",
-                "tests": [
-                    {
-                        "tcId": 1,
-                        "message": "4F0D7...",
-                        "signature": "C29A11B6C..."
-                    },
-                    {
-                        "tcId": 2,
-                        "message": "84793...",
-                        "signature": "6A99215FC2..."
-                    }
-                ]
-            }
+  {
+    "acvVersion": <acvp-version>
+  },
+  {
+    "vsId": 0,
+    "algorithm": "ML-DSA",
+    "mode": "sigVer",
+    "revision": "FIPS204",
+    "isSample": false,
+    "testGroups": [
+      {
+        "tgId": 1,
+        "testType": "AFT",
+        "parameterSet": "ML-DSA-44",
+        "signatureInterface": "internal",
+        "externalMu": false,
+        "tests": [
+          {
+            "tcId": 1,
+            "pk": "3FE65294...",
+            "message": "4F0D7...",
+            "signature": "C29A11B6C..."
+          },
+          {
+            "tcId": 2,
+            "pk": "3FE65294...",
+            "message": "84793...",
+            "signature": "6A99215FC2..."
+          }
         ]
-    }
+      },
+      {
+        "tgId": 2,
+        "testType": "AFT",
+        "parameterSet": "ML-DSA-44",
+        "signatureInterface": "internal",
+        "externalMu": true,
+        "tests": [
+          {
+            "tcId": 3,
+            "pk": "3FE65294...",
+            "mu": "4F0D7...",
+            "signature": "C29A11B6C..."
+          }
+        ]
+      },
+      {
+        "tgId": 3,
+        "testType": "AFT",
+        "parameterSet": "ML-DSA-44",
+        "signatureInterface": "external",
+        "preHash": "pure",
+        "tests": [
+          {
+            "tcId": 4,
+            "pk": "4C7029A9...",
+            "message": "75E...",
+            "context": "548...",
+            "signature": "04D1B8..."
+          },
+        ]
+      },
+      {
+        "tgId": 4,
+        "testType": "AFT",
+        "parameterSet": "ML-DSA-44",
+        "signatureInterface": "external",
+        "preHash": "preHash",
+        "tests": [
+          {
+            "tcId": 5,
+            "pk": "5FB42D9CF5EE...",
+            "message": "8740606...",
+            "context": "0710CE7...",
+            "hashAlg": "SHA2-224",
+            "signature": "C0D60..."
+          }
+        ]
+      }
+    ]
+  }
 ]
 ----

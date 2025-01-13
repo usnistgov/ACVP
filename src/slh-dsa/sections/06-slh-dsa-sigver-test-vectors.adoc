@@ -16,8 +16,12 @@ The test group for SLH-DSA / sigVer / FIPS205 is as follows:
 | tgId | Numeric identifier for the test group, unique across the entire vector set | integer
 | testType | The test operation performed | string
 | parameterSet | The SLH-DSA parameter set used | string
+| signatureInterface | Whether the signature is generated using the internal or external routine | string
+| preHash | Whether the signature is generated using the prehash or pure routine | string
 | tests | Array of individual test vector JSON objects, which are defined in <<SLH-DSA_sigVer_tvjs>> | array
 |===
+
+NOTE: The "preHash" property will only be present if "signatureInterface" is set to "external". 
 
 [[SLH-DSA_sigVer_tvjs]]
 ==== SLH-DSA sigVer Test Case JSON Schema
@@ -31,8 +35,9 @@ Each test group contains an array of one or more test cases. Each test case is a
 
 | tcId | Numeric identifier for the test case, unique across the entire vector set | integer
 | pk | The public key to use to verify the signature | hex
-| messageLength | The length of message in bits | integer
 | message | The message used to verify with the signature | hex
+| context | When the test group property `"signatureInterface": "external"`, the context used to construct the signed message | hex
+| hashAlg | When the test group property `"preHash": "preHash"`, the hash function used to construct the signed message | string
 | signature | The signature to verify | hex
 |===
 
@@ -54,19 +59,66 @@ The following is an example JSON object sent from the server to the client for S
                 "tgId": 1,
                 "testType": "AFT",
                 "parameterSet": "SLH-DSA-SHA2-192s",
+                "signatureInterface": "internal",
                 "tests": [
                     {
                         "tcId": 1,
                         "pk": "6CB59...",
-                        "messageLength": 34592,
                         "message": "4F0D7...",
                         "signature": "C29A11B6C..."
                     },
                     {
                         "tcId": 2,
                         "pk": "123ABC...",
-                        "messageLength": 16,
                         "message": "8479",
+                        "signature": "6A99215FC2..."
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "testType": "AFT",
+                "parameterSet": "SLH-DSA-SHA2-192s",
+                "signatureInterface": "external",
+                "preHash": "preHash",
+                "tests": [
+                    {
+                        "tcId": 3,
+                        "pk": "6CB59...",
+                        "message": "4F0D7...",
+                        "context": "ABCD",
+                        "hashAlg": "SHA2-256",
+                        "signature": "C29A11B6C..."
+                    },
+                    {
+                        "tcId": 4,
+                        "pk": "123ABC...",
+                        "message": "8479",
+                        "context": "ABCD",
+                        "hashAlg": "SHA2-256",
+                        "signature": "6A99215FC2..."
+                    }
+                ]
+            },
+            {
+                "tgId": 3,
+                "testType": "AFT",
+                "parameterSet": "SLH-DSA-SHA2-192s",
+                "signatureInterface": "external",
+                "preHash": "pure",
+                "tests": [
+                    {
+                        "tcId": 5,
+                        "pk": "6CB59...",
+                        "message": "4F0D7...",
+                        "context": "ABCD",
+                        "signature": "C29A11B6C..."
+                    },
+                    {
+                        "tcId": 6,
+                        "pk": "123ABC...",
+                        "message": "8479",
+                        "context": "ABCD",
                         "signature": "6A99215FC2..."
                     }
                 ]
