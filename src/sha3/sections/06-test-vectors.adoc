@@ -14,6 +14,8 @@ Test vector sets *MUST* contain one or many test groups, each sharing similar pr
 | tgId| Numeric identifier for the test group, unique across the entire vector set.| integer
 | testType| Test category type. AFT, MCT or VOT as defined in <<testtypes>>| value
 | mctVersion | When testType is MCT, the type of MCT being run, i.e., "standard" or "alternate" | string
+| maxOutLen | When testType is MCT and the algorithm is SHAKE, the largest supported output length as provided via the outputLen property in the registration.  | integer
+| minOutLen | When testType is MCT and the algorithm is SHAKE, the smallest supported output length as provided via the outputLen property in the registration.  | integer
 | tests| Array of individual test case JSON objects, which are defined in	<<tcjs>>| array of testCase objects
 |===
 
@@ -30,13 +32,11 @@ Each test group *SHALL* contain an array of one or more test cases.  Each test c
 | JSON Value| Description| JSON type
 
 | tcId| Numeric identifier for the test case, unique across the entire vector set.| integer
-| len| Length of the message or seed| integer
-| outLen| Length of the digest| integer
-| msg| Value of the message or seed.  Messages are represented as little-endian hex for all SHA3 variations.| string (hex)
+| len| Length of the message or seed. Applicable to AFT, VOT, and MCT test types. | integer
+| outLen| Length of the digest. Only applicable when the algorithm is SHAKE-128 or SHAKE-256 and the test type is AFT or VOT. | integer
+| msg| Value of the message or seed.  Messages are represented as little-endian hex for all SHA3 variations. Applicable to AFT, VOT, and MCT test types. | string (hex)
 | largeMsg | Object describing the message for an LDT group | large data object, see <<LD_test>> for more information
 |===
-
-NOTE: All properties listed in the above table are *REQUIRED* except for outLen which is only *REQUIRED* when the algorithm is SHAKE-128 or SHAKE-256.
 
 NOTE: The maximum value for SHAKE-128 for 'len' is 65,904 bits when the inBit parameter is set to true in the capabilities registration and 66,240 bits when it is set to false. The maximum value for SHAKE-256 for 'len' is 66,428 bits when the inBit parameter is set to true in the capabilities registration and 65,752 bits when it is set to false.
 
@@ -44,12 +44,13 @@ The following are example JSON objects for secure hash test vectors sent from th
 
 [source, json]
 ----
+
 [
     { "acvVersion": <acvp-version> },
     {
-        "vsId": 1564,
+        "vsId": 1565,
         "algorithm": "SHA3-512",
-        "revision": "1.0",
+        "revision": "2.0",
         "testGroups": [
         {
             "tgId": 1,
@@ -94,56 +95,6 @@ The following are example JSON objects for secure hash test vectors sent from th
         }]
     }
 ]
-
-[
-    { "acvVersion": <acvp-version> },
-    {
-        "vsId": 1565,
-        "algorithm": "SHA3-512",
-        "revision": "2.0",
-        "testGroups": [
-        {
-            "tgId": 1,
-            "testType": "AFT",
-            "tests": [
-            {
-                "tcId": 1,
-                "len": 0,
-                "msg": "00"
-            },
-            {
-                "tcId": 2,
-                "len": 1,
-                "msg": "01"
-            }]
-        },
-        {
-            "tgId": 2,
-            "testType": "MCT",
-            "tests": [
-            {
-                "tcId": 3,
-                "len": 512,
-                "msg": "30850bd984b14ff5aff18993329...",
-            }]
-        },
-        {
-            "tgId": 3,
-            "testType": "LDT",
-            "tests": [
-                {
-                    "tcId": 4,
-                    "largeMsg": {
-                        "content": "DE26",
-                        "contentLength": 16,
-                        "fullLength": 42949672960,
-                        "expansionTechnique": "repeating"
-                    }
-                }
-            ]
-        }]
-    }
-]
 ----
 
 The following is an example JSON object for SHAKE.
@@ -164,20 +115,20 @@ The following is an example JSON object for SHAKE.
             {
                 "tcId": 1,
                 "len": 0,
-                "msg": "00"
+                "msg": "00",
+                "outLen": 128
             },
             {
                 "tcId": 2,
                 "len": 1,
-                "msg": "01"
+                "msg": "01",
+                "outLen": 128
             }]
         },
         {
             "tgId": 2,
             "testType": "MCT",
-            "inBit": true,
-            "outBit": true,
-            "inEmpty": false,
+            "mctVersion": "standard",
             "maxOutLen": 4096,
             "minOutLen": 128,
             "tests": [
