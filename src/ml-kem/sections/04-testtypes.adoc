@@ -11,7 +11,25 @@ The ACVP server performs a set of tests on the specified ML-KEM algorithm in ord
 
 * ML-KEM / encapDecap / * "AFT" - Algorithm Functional Test. The server will generate a random `m` and encapsulation key `ek`. The IUT *SHALL* generate the corresponding shared secret `k` and ciphertext `c`. This tests the implementation of Algorithm 17 ML-KEM.Encaps_internal() from <<FIPS203>> Section 6.2.
 
-* ML-KEM /encapDecap / * "VAL" - Validation Test. The server will generate a decapsulation key `dk` and a potentially valid or invalid ciphertext `c`. The IUT *SHALL* generate the corresponding shared secret `k` whether the `k` is provided from the valid decapsulation route or from the implicit rejection present in <<FIPS203>> Algorithm 17. This tests the implementation of Algorithm 18 ML-KEM.Decaps_internal() from <<FIPS203>> Section 6.3.
+* ML-KEM / encapDecap / * "VAL" - Validation Test. There are several variations for this test type depending on the function being tested. 
+    ** For decapsulation, the server will generate a decapsulation key `dk` and a potentially valid or invalid ciphertext `c`. The IUT *SHALL* generate the corresponding shared secret `k` whether the `k` is provided from the valid decapsulation route or from the implicit rejection present in <<FIPS203>> Algorithm 17. This tests the implementation of Algorithm 18 ML-KEM.Decaps_internal() from <<FIPS203>> Section 6.3.
+    ** For the encapsulation key check, the server will generate a potentially valid or invalid encapsulation key `ek`. The IUT *SHALL* determine if the provided `ek` is valid based on <<FIPS203>> Section 7.2. 
+    ** For the decapsulation key check, the server will generate a potentially valid or invalid decapsulation key `dk`. The IUT *SHALL* determine if the provided `dk` is valid based on <<FIPS203>> Section 7.3. 
+
+The decapsulation modifications are: 
+
+* "valid decapsulation" - No modification to the ciphertext is made and the decapsulation will follow the valid path to generate a shared key `k`.
+* "modified ciphertext" - The ciphertext is randomly modified and the decapsulation will follow the implicit rejection path to geenrate a shared key `k`.
+
+The encapsulation key check modifications are:
+
+* "valid encapsulation key" - No modification to the encapsulation key is made. The encapsulation key will pass the encapsulation key check.
+* "noisy linear system values too large" - The encapsulation key is modified such that a value in the noisy linear system is encoded into the key as a value greater than Q. This encapsulation key will not pass the encapsulation key check. 
+
+The decapsulation key check modifications are:
+
+* "valid decapsulation key" - No modification to the decapsulation key is made. The decapsulation key will pass the decapsulation key check.
+* "modified H" - The decapsulation key is modified such that the concatenated values ek || H(ek) will no longer match by modifying H(ek) to be a different value. This decapsulation key will not pass the decapsulation key check. 
 
 [[test_coverage]]
 === Test Coverage
