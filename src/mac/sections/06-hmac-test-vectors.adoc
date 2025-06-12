@@ -4,11 +4,13 @@
 [[hmac_tgjs]]
 ==== HMAC Test Groups JSON Schema
 
-The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure HMAC JSON elements of the Test Group JSON object.
+In HMAC revision 1.0, the testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the secure HMAC JSON elements of the Test Group JSON object.
+
+In HMAC revision 2.0, there *SHALL* be one single test group that contains all of the test cases for the test vector object. 
 
 [[hmac_vs_tg_table]]
 [cols="<,<,<"]
-.HMAC Test Group JSON Object
+.HMAC revision 1.0 Test Group JSON Object
 |===
 | JSON Value | Description | JSON type
 
@@ -20,15 +22,25 @@ The testGroups element at the top level in the test vector JSON object is an arr
 | tests | Array of individual test vector JSON objects, which are defined in <<hmac_tvjs>> | array
 |===
 
+[[hmac_vs_tg_table2]]
+[cols="<,<,<"]
+.HMAC revision 2.0 Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | Numeric identifier for the test group, unique across the entire vector set | integer
+| testType | Test category type | string
+| tests | Array of individual test vector JSON objects, which are defined in <<hmac_tvjs>> | array
+|===
+
 [[hmac_tvjs]]
 ==== HMAC Test Case JSON Schema
 
 Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each secure MAC test vector.
 
 [[hmac_vs_tc_table2]]
-
 [cols="<,<,<"]
-.HMAC Test Case JSON Object
+.HMAC Revision 1.0 Test Case JSON Object
 |===
 | JSON Value | Description | JSON type
 
@@ -37,10 +49,24 @@ Each test group contains an array of one or more test cases. Each test case is a
 | msg | Value of the message | hex
 |===
 
+[[hmac_vs_tc_table3]]
+[cols="<,<,<"]
+.HMAC Revision 2.0 Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| key | The value of the key | hex
+| msg | Value of the message | hex
+| msgLen | Length of msg in bits | integer
+| keyLen | Length of key in bits | integer
+| macLen | Length of MAC in bits to generate | integer
+|===
+
 [[hmac_test_vector_json]]
 ==== Example HMAC Test Vector JSON Object
 
-The following is an example JSON test vector object for HMAC, truncated for brevity.
+The following is an example JSON test vector object for HMAC revision 1.0, truncated for brevity.
 
 [source, json]
 ----
@@ -68,6 +94,46 @@ The following is an example JSON test vector object for HMAC, truncated for brev
                 "tcId": 3,
                 "key": "3834463234DA39",
                 "msg": "F0FA740D261D5916B06F09AFBB04C94E"
+            }
+        ]
+    }]
+}
+----
+
+The following is an example JSON test vector object for HMAC revision 2.0, truncated for brevity.
+
+[source, json]
+----
+{
+    "vsId": 1,
+    "algorithm": "HMAC-SHA-1",
+    "revision": "2.0",
+    "testGroups": [{
+        "tgId": 1,
+        "testType": "AFT",
+        "tests": [{
+                "tcId": 1,
+                "key": "0CBB3AA866",
+                "msg": "28CD4091D45F28CD",
+                "msgLen": 64,
+                "keyLen": 40,
+                "macLen": 128
+            },
+            {
+                "tcId": 2,
+                "key": "7FB3F60ACB9FB7",
+                "msg": "9F224BF653F9BE143FF8D12761F7",
+                "msgLen": 112,
+                "keyLen": 56,
+                "macLen": 80,
+            },
+            {
+                "tcId": 3,
+                "key": "3834463234DA",
+                "msg": "F0FA740D261D5916B06F09AFBB04C94E",
+                "msgLen": 128,
+                "keyLen": 48,
+                "macLen": 160
             }
         ]
     }]
