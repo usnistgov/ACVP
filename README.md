@@ -194,6 +194,8 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [HMAC-SHA3-256 2.0](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.html)
 * [HMAC-SHA3-384 2.0](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.html)
 * [HMAC-SHA3-512 2.0](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.txt) - [HTML](https://pages.nist.gov/ACVP/draft-fussell-acvp-mac.html)
+* [KMAC-128](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.html)
+* [KMAC-256](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.html)
 
 ### DRBG
 * [ctrDRBG-AES-128](https://pages.nist.gov/ACVP/draft-vassilev-acvp-drbg.txt) - [HTML](https://pages.nist.gov/ACVP/draft-vassilev-acvp-drbg.html)
