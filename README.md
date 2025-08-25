@@ -120,7 +120,6 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [AES-XTS 2.0](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-FF1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [AES-FF3-1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html) - DEMO only
-* [Ascon-AEAD128](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.html)
 * [TDES-CBC](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CBCI](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 * [TDES-CFB1](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
@@ -136,7 +135,6 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [TDES-OFBI](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-symmetric.html)
 
 ### Secure Hash
-* [Ascon-Hash256](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.html)
 * [SHA-1](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.html)
 * [SHA-224](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.html)
 * [SHA-256](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha.html)
@@ -154,8 +152,6 @@ The prod server (acvts.nist.gov) also supports ACVP version 1.0, with the same e
 * [SHA3-512 2.0](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
 
 ### XOFs
-* [Ascon-XOF128](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.html)
-* [Ascon-CXOF128](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ross-acvp-ascon.html)
 * [SHAKE-128](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
 * [SHAKE-256](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-sha3.html)
 * [cSHAKE-128](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-xof.html)
@@ -370,6 +366,11 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [ML-DSA sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-dsa.html)
 * [ML-KEM keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.html)
 * [ML-KEM encapDecap](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.html)
+
+### NTRU Lattice-Based Signatures
+* [FN-DSA keyGen](https://pages.nist.gov/ACVP/draft-ciadoux-acvp-fn-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ciadoux-acvp-fn-dsa.html)
+* [FN-DSA sigGen](https://pages.nist.gov/ACVP/draft-ciadoux-acvp-fn-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ciadoux-acvp-fn-dsa.html)
+* [FN-DSA sigVer](https://pages.nist.gov/ACVP/draft-ciadoux-acvp-fn-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ciadoux-acvp-fn-dsa.html)
 
 See [the algorithm endpoint](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html#name-algorithms) to learn which algorithms are available on a given ACVP server.
 
