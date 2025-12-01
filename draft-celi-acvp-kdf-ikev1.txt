@@ -1,0 +1,1400 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+         ACVP IKEv1 Key Derivation Function JSON Specification
+                      draft-gold-acvp-kdf-ikev1-01
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   3
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported KDFs  . . . . . . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   4
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   4
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   5
+     7.2.  Property Registration . . . . . . . . . . . . . . . . . .   5
+     7.3.  Registration Example  . . . . . . . . . . . . . . . . . .   6
+       7.3.1.  Valid Hash Functions  . . . . . . . . . . . . . . . .   9
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.1.  Test Groups . . . . . . . . . . . . . . . . . . . . . . .  11
+     8.2.  Test Cases  . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  Responses . . . . . . . . . . . . . . . . . . . . . . . . . .  15
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  18
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+   12. Example IKEv1 Capabilities JSON Object  . . . . . . . . . . .  18
+   13. Example Vector Set Request/Responses JSON Object  . . . . . .  22
+   14. Example Test Results JSON Object  . . . . . . . . . . . . . .  23
+   15. Normative References  . . . . . . . . . . . . . . . . . . . .  24
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  25
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing SP800-135 IKEv1 KDF
+   implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing SP800-135
+   IKEv1 KDF implementations using ACVP.
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported KDFs
+
+   The following key derivation functions MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  kdf-components / ikev1
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   SP800-135 IKEv1 KDF implementations.  There is only one test type:
+   functional tests.  Each has a specific value to be used in the
+   testType field.  The testType field definitions are:
+
+   "AFT" - Algorithm Functional Test.  These tests can be processed by
+   the client using a normal 'derive_key' operation.  AFTs cause the
+   implementation under test to exercise normal operations on a single
+   block, multiple blocks, or partial blocks.  In all cases, random data
+   is used.  The functional tests are designed to verify that the
+   logical components of the key deriviation process are operating
+   correctly.
+
+6.1.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to XXX.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of IKEv1 KDF algorithms to the
+   ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  Property Registration
+
+   The IKEv1 KDF mode capabilities are advertised as JSON objects within
+   the 'capabilities_exchange' property.
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+7.3.  Registration Example
+
+   A registration SHALL use these properties
+
+   +===============================+==============+======+======================+
+   |JSON Property                  |Description   |JSON  |Valid Values          |
+   |                               |              |Type  |                      |
+   +===============================+==============+======+======================+
+   |algorithm                      |Name of the   |string|"kdf-components"      |
+   |                               |algorithm to  |      |                      |
+   |                               |be validated  |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |mode                           |Mode of the   |string|"ikev1"               |
+   |                               |algorithm to  |      |                      |
+   |                               |be validated  |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |revision                       |ACVP Test     |string|"1.0"                 |
+   |                               |version       |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |capabilities                   |Array of      |array |Contains each of the  |
+   |                               |objects       |      |below properties      |
+   |                               |describing    |      |                      |
+   |                               |capabilities  |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |authenticationMethod           |The mode of   |string|"dsa", "psk", or "pke"|
+   |                               |authentication|      |                      |
+   |                               |used by the   |      |                      |
+   |                               |IUT           |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |initiatorNonceLength           |The supported |domain|Min: 64, Max: 2048    |
+   |                               |initiator     |      |                      |
+   |                               |nonce lengths |      |                      |
+   |                               |used by the   |      |                      |
+   |                               |IUT in bits   |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |responderNonceLength           |The lengths of|domain|Min: 64, Max: 2048    |
+   |                               |data the IUT  |      |                      |
+   |                               |supports in   |      |                      |
+   |                               |bits          |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |diffieHellmanSharedSecretLength|The lengths of|domain|Min: 224, Max: 8192   |
+   |                               |Diffie Hellman|      |                      |
+   |                               |shared secrets|      |                      |
+   |                               |the IUT       |      |                      |
+   |                               |supports in   |      |                      |
+   |                               |bits          |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+   |preSharedKeyLength             |The lengths of|domain|Min: 8, Max: 8192.    |
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+   |                               |pre-shared key|      |Note this property is |
+   |                               |the IUT       |      |only required when    |
+   |                               |supports in   |      |"authenticationMethod"|
+   |                               |bits          |      |is "psk"              |
+   +-------------------------------+--------------+------+----------------------+
+   |hashAlg                        |Valid hash    |array |See Section 7.3.1     |
+   |                               |algorithms    |      |                      |
+   |                               |used by the   |      |                      |
+   |                               |IUT           |      |                      |
+   +-------------------------------+--------------+------+----------------------+
+
+              Table 2: IKEv1 KDF Mode Capabilities JSON Values
+
+   An example registration within an algorithm capability exchange looks
+   like this
+
+   "capability_exchange":
+   [
+       {
+           "algorithm": "kdf-components",
+           "mode": "ikev1",
+           "revision": "1.0",
+           "prereqVals": [
+               {
+                   "algorithm": "SHA",
+                   "valValue": "same"
+               }
+           ],
+           "capabilities": [
+               {
+                   "authenticationMethod": "dsa",
+                   "initiatorNonceLength": [
+                       {
+                           "min": 64,
+                           "max": 2048,
+                           "increment": 1
+                       }
+                   ],
+                   "responderNonceLength": [
+                       {
+                           "min": 64,
+                           "max": 2048,
+                           "increment": 1
+                       }
+                   ],
+                   "diffieHellmanSharedSecretLength": [
+                       {
+                           "min": 224,
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+                           "max": 8192,
+                           "increment": 1
+                       }
+                   ],
+                   "hashAlg": [
+                       "sha-1",
+                       "sha2-224",
+                       "sha2-256",
+                       "sha2-384",
+                       "sha2-512"
+                   ]
+               },
+               {
+                   "authenticationMethod": "psk",
+                   "initiatorNonceLength": [
+                       {
+                           "min": 64,
+                           "max": 2048,
+                           "increment": 1
+                       }
+                   ],
+                   "responderNonceLength": [
+                       {
+                           "min": 64,
+                           "max": 2048,
+                           "increment": 1
+                       }
+                   ],
+                   "preSharedKeyLength": [
+                       {
+                           "min": 8,
+                           "max": 8192,
+                           "increment": 1
+                       }
+                   ],
+                   "diffieHellmanSharedSecretLength": [
+                       {
+                           "min": 224,
+                           "max": 8192,
+                           "increment": 1
+                       }
+                   ],
+                   "hashAlg": [
+                       "sha-1",
+                       "sha2-224",
+                       "sha2-256",
+                       "sha2-384",
+                       "sha2-512"
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+                   ]
+               },
+               {
+                   "authenticationMethod": "pke",
+                   "initiatorNonceLength": [
+                       {
+                           "min": 64,
+                           "max": 2048,
+                           "increment": 1
+                       }
+                   ],
+                   "responderNonceLength": [
+                       {
+                           "min": 64,
+                           "max": 2048,
+                           "increment": 1
+                       }
+                   ],
+                   "diffieHellmanSharedSecretLength": [
+                       {
+                           "min": 224,
+                           "max": 8192,
+                           "increment": 1
+                       }
+                   ],
+                   "hashAlg": [
+                       "sha-1",
+                       "sha2-224",
+                       "sha2-256",
+                       "sha2-384",
+                       "sha2-512"
+                   ]
+               }
+           ]
+       }
+   ]
+
+7.3.1.  Valid Hash Functions
+
+   The following hash functions MAY be advertised by an ACVP compliant
+   client under the 'hashAlg' property
+
+   *  SHA-1
+
+   *  SHA2-224
+
+   *  SHA2-256
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+   *  SHA2-384
+
+   *  SHA2-512
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with SP800-135 IKEv1 KDF
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 3: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+8.1.  Test Groups
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the SP800-135 IKEv1 KDF JSON elements of
+   the Test Group JSON object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+     +======================+==============================+=========+
+     | JSON Value           | Description                  | JSON    |
+     |                      |                              | Type    |
+     +======================+==============================+=========+
+     | tgId                 | Test group identifier        | integer |
+     +----------------------+------------------------------+---------+
+     | testType             | Test operations to be        | string  |
+     |                      | performed                    |         |
+     +----------------------+------------------------------+---------+
+     | authenticationMethod | The method used for the test | string  |
+     |                      | vectors.  See Section 7.3    |         |
+     |                      | for possible values          |         |
+     +----------------------+------------------------------+---------+
+     | dhLength             | Diffie-Hellman shared secret | integer |
+     |                      | length in bits               |         |
+     +----------------------+------------------------------+---------+
+     | hashAlg              | The SHA value used           | string  |
+     +----------------------+------------------------------+---------+
+     | nInitLength          | Length of initiator nonce in | integer |
+     |                      | bits                         |         |
+     +----------------------+------------------------------+---------+
+     | nRespLength          | Length of responder nonce in | integer |
+     |                      | bits                         |         |
+     +----------------------+------------------------------+---------+
+     | preSharedKeyLength   | Pre-shared key length in     | integer |
+     |                      | bits                         |         |
+     +----------------------+------------------------------+---------+
+     | tests                | Array of individual test     | array   |
+     |                      | cases                        |         |
+     +----------------------+------------------------------+---------+
+
+                      Table 4: Test Group JSON Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+   The 'preSharedKeyLength' SHALL only be present when the
+   'authenticationMethod' is "psk".
+
+8.2.  Test Cases
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each SP800-135 IKEv1 KDF test vector.
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+        +==============+==============================+===========+
+        | JSON Value   | Description                  | JSON Type |
+        +==============+==============================+===========+
+        | tcId         | Test case idenfitier         | integer   |
+        +--------------+------------------------------+-----------+
+        | ckyInit      | Initiator's cookie           | hex       |
+        +--------------+------------------------------+-----------+
+        | ckyResp      | Responder's cookie           | hex       |
+        +--------------+------------------------------+-----------+
+        | nInit        | Value of the initiator nonce | hex       |
+        +--------------+------------------------------+-----------+
+        | nResp        | Value of the responder nonce | hex       |
+        +--------------+------------------------------+-----------+
+        | gxy          | Diffie-Hellman shared secret | hex       |
+        +--------------+------------------------------+-----------+
+        | preSharedKey | Value of the pre-shared key  | hex       |
+        +--------------+------------------------------+-----------+
+
+                       Table 5: Test Case JSON Object
+
+   The 'preSharedKey' SHALL only be present when the
+   'authenticationMethod' is "psk".
+
+   Here is an abbreviated yet fully constructed example of the prompt
+   with all possible 'authenticationMethod' values.
+
+   {
+     "vsId": 1,
+     "algorithm": "kdf-components",
+     "mode": "IKEv1",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "hashAlg": "SHA-1",
+         "authenticationMethod": "dsa",
+         "dhLength": 6660,
+         "nInitLength": 2048,
+         "nRespLength": 2048,
+         "testType": "AFT",
+         "tests": [
+           {
+             "tcId": 1,
+             "ckyInit": "F16761897EFB81E5",
+             "ckyResp": "4F3BA0B9C946172D",
+             "nInit": "6F85B4C66C71791...",
+             "nResp": "EAE7F83DBD83C18...",
+             "gxy": "9BA5CEDAE8B3FD641..."
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+           },
+           {
+             "tcId": 2,
+             "ckyInit": "0CE83D37791E6EFD",
+             "ckyResp": "8FA2F406395E8110",
+             "nInit": "739D1D7AB9D1878...",
+             "nResp": "BF3450BFCF442D1...",
+             "gxy": "8810324F9E3405F23..."
+           }
+         ]
+       },
+       {
+         "tgId": 2,
+         "hashAlg": "SHA-1",
+         "authenticationMethod": "psk",
+         "dhLength": 8192,
+         "nInitLength": 989,
+         "nRespLength": 64,
+         "preSharedKeyLength": 8,
+         "testType": "AFT",
+         "tests": [
+           {
+             "tcId": 3,
+             "ckyInit": "AF501BE6A9CFDA3D",
+             "ckyResp": "5D493412A02AC0B0",
+             "nInit": "8C4F7093000AEC0...",
+             "nResp": "049FBB8AD5DC5D20",
+             "gxy": "A0DE670D5D668E930...",
+             "preSharedKey": "C1"
+           },
+           {
+             "tcId": 4,
+             "ckyInit": "0186060C1B45404E",
+             "ckyResp": "205F3A38BFC363E1",
+             "nInit": "B22CC4105FA8947...",
+             "nResp": "3CCC6D447E8BC305",
+             "gxy": "A281621748E344135...",
+             "preSharedKey": "01"
+           }
+         ]
+       },
+       {
+         "tgId": 3,
+         "hashAlg": "SHA-1",
+         "authenticationMethod": "pke",
+         "dhLength": 2165,
+         "nInitLength": 142,
+         "nRespLength": 64,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+         "testType": "AFT",
+         "tests": [
+           {
+             "tcId": 5,
+             "ckyInit": "D4B54A5C60ACD6A7",
+             "ckyResp": "CA7528CD8DD8B254",
+             "nInit": "D36A36DD6C69210...",
+             "nResp": "AB4A4695F4866699",
+             "gxy": "F04CDFA8A03E74481..."
+           },
+           {
+             "tcId": 6,
+             "ckyInit": "14CA6041304FE168",
+             "ckyResp": "71D6F8110638EB79",
+             "nInit": "230F3C54635B3E8...",
+             "nResp": "0C5A851874EE4131",
+             "gxy": "ACFF1F744BB3D2415..."
+           }
+         ]
+       }
+     ]
+   }
+
+9.  Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | acvVersion    | The version of the protocol | string    |
+        +---------------+-----------------------------+-----------+
+        | vsId          | The vector set identifier   | integer   |
+        +---------------+-----------------------------+-----------+
+        | testGroups    | The test group data         | array     |
+        +---------------+-----------------------------+-----------+
+
+                  Table 6: Vector Set Response JSON Object
+
+   An example of this is the following
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 15]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+   {
+       "acvVersion": "version",
+       "vsId": 1,
+       "testGroups": [ ... ]
+   }
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+         +===============+===========================+===========+
+         | JSON Property | Description               | JSON Type |
+         +===============+===========================+===========+
+         | tgId          | The test group identifier | integer   |
+         +---------------+---------------------------+-----------+
+         | tests         | The test case data        | array     |
+         +---------------+---------------------------+-----------+
+
+               Table 7: Vector Set Group Response JSON Object
+
+   An example of this is the following
+
+   {
+       "tgId": 1,
+       "tests": [ ... ]
+   }
+
+   The following table describes the JSON object that represents a test
+   case response for a SP800-135 IKEv1 KDF.
+
+      +===============+================================+===========+
+      | JSON Property | Description                    | JSON Type |
+      +===============+================================+===========+
+      | tcId          | The test case identifier       | integer   |
+      +---------------+--------------------------------+-----------+
+      | sKeyId        | Results of the extraction step | hex       |
+      +---------------+--------------------------------+-----------+
+      | sKeyIdD       | Results of the expansion step  | hex       |
+      +---------------+--------------------------------+-----------+
+      | sKeyIdA       | Results of the expansion step  | hex       |
+      +---------------+--------------------------------+-----------+
+      | sKeyIdE       | Results of the expansion step  | hex       |
+      +---------------+--------------------------------+-----------+
+
+                  Table 8: Test Case Results JSON Object
+
+   Here is an abbreviated example of the response
+
+
+
+Celi                       Expires 4 June 2026                 [Page 16]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+   {
+     "vsId": 1,
+     "algorithm": "kdf-components",
+     "mode": "IKEv1",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "sKeyId": "FC3A8E843CC28415C6113CEAAA763CD486615465",
+             "sKeyIdD": "27A3DF58BF1CADF914CDCCB0F975D62486EA12BF",
+             "sKeyIdA": "4D49AF6F8F23F4068FDDD53D505667BE54AAB91C",
+             "sKeyIdE": "D0A2F20796D66A2875477F33DEA577F98A0C2F7B"
+           },
+           {
+             "tcId": 2,
+             "sKeyId": "7E1DB4F5571B9CC856DA9DA442431A50AA9799AD",
+             "sKeyIdD": "65D6E37837A89C21D4DE1D6AA36CEBF103BA51F3",
+             "sKeyIdA": "B9D7E7DBDBEA0203BFE7EC073BB140FE129A0D72",
+             "sKeyIdE": "FCB7F5662704E89F1B151512F5B555D95F29B356"
+           }
+         ]
+       },
+       {
+         "tgId": 2,
+         "tests": [
+           {
+             "tcId": 3,
+             "sKeyId": "1E7A2129CF7D0E3FC22E32BF1DFF414258342BA9",
+             "sKeyIdD": "4B2E07B4C446DF40C90C06F294C9F05B2A174A8B",
+             "sKeyIdA": "90682451AA897E7F9BC6E670F205929D2EBA2FD8",
+             "sKeyIdE": "2B138E6AB5FFCE8D345F9C69313DC4798A14E709"
+           },
+           {
+             "tcId": 4,
+             "sKeyId": "DCF270CE93FDD59B903CD60434AF075C8F9547A5",
+             "sKeyIdD": "E5DF0DE718321B9C7A0BEB953B05D7B088699F3F",
+             "sKeyIdA": "64816D06241E98E0B18945112CBDB17B48BB3310",
+             "sKeyIdE": "63E7A74ACD8B9549182C06E37D01CB82B8DC6B44"
+           },
+         ]
+       },
+       {
+         "tgId": 3,
+         "tests": [
+           {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 17]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+             "tcId": 5,
+             "sKeyId": "CA0226BF4066CA296DCC3EDB9A84F14A3F2B72B1",
+             "sKeyIdD": "77EAE9AAB8E9CD74B5A423A3D3C7D271FB192CA4",
+             "sKeyIdA": "5BCFA7A2A116DB14F003DC3EDC169D4FABDE8AF7",
+             "sKeyIdE": "27C368F57B4219D989DBB52FDFF0999B34E29787"
+           },
+           {
+             "tcId": 7,
+             "sKeyId": "BD7120223435EF4E8A818F1322CC9DDAF9675682",
+             "sKeyIdD": "87DB18ED75177847B1F7FE63B0C4C8AB5715EBFF",
+             "sKeyIdA": "844EE67A460FF7F0F9EA36A5308DA4108C7A6434",
+             "sKeyIdE": "2094E6217E39224B8D2C98BE3FE24959632F1BAF"
+           },
+         ]
+       }
+     ]
+   }
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  Example IKEv1 Capabilities JSON Object
+
+   The following is a example JSON object advertising support for SHA-
+   256.
+
+   {
+          "algorithm": "kdf-components",
+          "mode": "ikev1",
+          "revision": "1.0",
+          "prereqVals": [
+              {
+                  "algorithm": "SHA",
+                  "valValue": "123456"
+              },
+              {
+                  "algorithm": "HMAC",
+                  "valValue": "123456"
+              }
+          ],
+          "capabilities": [
+              {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 18]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+                  "authenticationMethod": "dsa",
+                  "initiatorNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                                    "increment": 1
+                      }
+                  ],
+                  "responderNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "diffieHellmanSharedSecretLength": [
+                      {
+                          "min": 224,
+                          "max": 8192,
+                          "increment": 1
+                      }
+                  ],
+                  "hashAlg": [
+                      "SHA-1",
+                      "SHA2-224",
+                      "SHA2-256",
+                      "SHA2-384",
+                      "SHA2-512"
+                  ]
+              },
+              {
+                  "authenticationMethod": "psk",
+                  "initiatorNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "responderNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "preSharedKeyLength": [
+                      {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 19]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+                          "min": 8,
+                          "max": 8192,
+                          "increment": 1
+                      }
+                  ],
+                            "increment": 1
+                      }
+                  ],
+                  "responderNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "diffieHellmanSharedSecretLength": [
+                      {
+                          "min": 224,
+                          "max": 8192,
+                          "increment": 1
+                      }
+                  ],
+                  "hashAlg": [
+                      "SHA-1",
+                      "SHA2-224",
+                      "SHA2-256",
+                      "SHA2-384",
+                      "SHA2-512"
+                  ]
+              },
+              {
+                  "authenticationMethod": "psk",
+                  "initiatorNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "responderNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "preSharedKeyLength": [
+                      {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 20]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+                          "min": 8,
+                          "max": 8192,
+                          "increment": 1
+                      }
+                  ],
+                   "diffieHellmanSharedSecretLength": [
+                      {
+                          "min": 224,
+                          "max": 8192,
+                          "increment": 1
+                      }
+                  ],
+                  "hashAlg": [
+                      "sha-1",
+                      "SHA2-224",
+                      "SHA2-256",
+                      "SHA2-384",
+                      "SHA2-512"
+                  ]
+              },
+              {
+                  "authenticationMethod": "pke",
+                  "initiatorNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "responderNonceLength": [
+                      {
+                          "min": 64,
+                          "max": 2048,
+                          "increment": 1
+                      }
+                  ],
+                  "diffieHellmanSharedSecretLength": [
+                      {
+                          "min": 224,
+                          "max": 8192,
+                          "increment": 1
+                      }
+                  ],
+                  "hashAlg": [
+                      "SHA-1",
+                      "SHA2-224",
+                      "SHA2-256",
+                      "SHA2-384",
+
+
+
+Celi                       Expires 4 June 2026                 [Page 21]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+                      "SHA2-512"
+                  ]
+              }
+          ]
+      }
+
+                                  Figure 1
+
+13.  Example Vector Set Request/Responses JSON Object
+
+   The following is a example JSON object for SP800-135 IKEv1 KDF test
+   vectors sent from the ACVP server to the crypto module.
+
+[{
+                "acvVersion": <acvp-version>
+        },
+        {
+                "vsId": 1564,
+                "algorithm": "kdf-components",
+                "mode": "ikev1",
+                "revision": "1.0",
+                "testGroups": [{
+                                "tgId": 1,
+                                "authenticationMethod": "dsa",
+                                "hashAlg": "SHA-1",
+                                "nInitLength": 64,
+                                "nRespLength": 64,
+                                "dhLength": 3794,
+                                "tests": [{
+                                        "tcId": 1,
+                                        "nInit": "D7965167F186B5C1",
+                                        "nResp": "F3B1CD728B9BE97D",
+                                        "ckyInit": "D93E766AC69F5B3C",
+                                        "ckyResp": "E6552343EF4C3676",
+                                        "gxy": "648A4DF592307C667D9EE9F286EFF27B7C3A3E1313C2CBEE595FCF24877A4CCFF64A847E1FA20990A7152A6A93C55DC8903FD992D39B84E8C86D579B81237BA7C9BDB824F8427B558D11EE98EBD45BF13B9007C2E2564DAE6F7C805AF7D6A295AE167EEFB65958D7C2FBE9210A346588884F7263B929BE086D6E7E511A7E51B632F8CD115D2400ADF3C0ECA09EFADCEDCDDA99494CD54EBB67DBD3F6C74C98EF9C87DC272233A36198FF3907A525E4416545DDF32DEE3E0F1FEF450045D96D2CC89186833C4233AB8DC7378B24AEAAACDC59D074B96141630B1869159F3168D08A1DB60F9280DB35BA5714AF51492789052431AEE9F74A7EA15943D7B7EDC2E27688D44C37AFD10E08BA6BC3E022BC4F302103A1D39F599EA9EDFF63CEE3F0265AF4920DD857AA48C6054E4395F42C60FD12FBA7D41D970896ECA3E1F89713973DC1F7CC43B961EB8917FFAAE8304B0D8FB7FAE27B2DE812C115873A03336085F07673E0C1FC18F8357695FC70981E1DE6A715191D03CDB1A2F9889C7157221ED43003064E71B4A4D11826489F8ACC89F23891255234B6337C8212B66129D01BBF35473D21D056B7CC674D93374A33B570298641B2E1541B6D2516A4E9810C1EEB1D92D3007CB3787A0406A64FE3185366FC37AD48BB7951C84780"
+                                }]
+                        },
+                        {
+                                "tgId": 2,
+                                "authenticationMethod": "psk",
+                                "hashAlg": "SHA-1",
+                                "nInitLength": 227,
+                                "nRespLength": 64,
+                                "dhLength": 224,
+                                "preSharedKeyLength": 8,
+                                "tests": [{
+                                        "tcId": 1501,
+                                        "nInit": "42C0DE5D47C2CF363EBFE6847D4B55D8F8EC1F58867B51070EC0E0BB00",
+
+
+
+Celi                       Expires 4 June 2026                 [Page 22]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+                                        "nResp": "3192D20E80961883",
+                                        "ckyInit": "0745FD92564BE166",
+                                        "ckyResp": "2C59CB8F0199A372",
+                                        "gxy": "4F7837D07B1E9EB353BDB8C7DCB947CAE24049C382458BC8EE5EB46E",
+                                        "preSharedKey": "6C"
+                                }]
+                        },
+                        {
+                                "tgId": 3,
+                                "authenticationMethod": "pke",
+                                "hashAlg": "SHA-1",
+                                "nInitLength": 784,
+                                "nRespLength": 64,
+                                "dhLength": 224,
+                                "tests": [{
+                                        "tcId": 3001,
+                                        "nInit": "1FD16DF313FAE5942265310E8D0061478DC77B62D76FB65DA278AB8A2C3503B0809DC54921B42BC2334785B38AA65E48D1FE077111071FE41B8EA73FBC18DCA819BCB4EB48334694388D6AF654D1EC4AB868A309DD1C6C35890E7C6749644F9D3ED9",
+                                        "nResp": "9C47D2D26D608781",
+                                        "ckyInit": "46D07016FC2D03E5",
+                                        "ckyResp": "7E7110C5E8D92764",
+                                        "gxy": "CCAFB314240C68040AA7641975BA591ADA5650E4EFAE65B1A597129D"
+                                }]
+                        }
+                ]
+        }
+]
+
+                               Figure 2
+
+14.  Example Test Results JSON Object
+
+   The following is a example JSON object for SP800-135 IKEv1 KDF test
+   results sent from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 23]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+[{
+                "acvVersion": <acvp-version>
+        },
+        {
+                "vsId": 1564,
+                "testGroups": [{
+                                "tgId": 1,
+                                "tests": [{
+                                        "tcId": 1,
+                                        "sKeyId": "F4818718FC105FACF05F5C77ED7648531FA3CBD9",
+                                        "sKeyIdD": "2416325BA038A28B8263060A8C33B0DAB0C369BD",
+                                        "sKeyIdA": "514EEBEF3A8135ADB8FF3514ED1F6E524BBBEBB9",
+                                        "sKeyIdE": "6AC021B419C196EA83E9052DCC0DF87B0F19BDD6"
+                                }]
+                        },
+                        {
+                                "tgId": 2,
+                                "tests": [{
+                                        "tcId": 1501,
+                                        "sKeyId": "01EACF38DE6D5FC8BBF36D7D8EB8075DF0B462BF",
+                                        "sKeyIdD": "8AD25FBE26F21C0E3ADA9ECA02999BB666E1A4E4",
+                                        "sKeyIdA": "F8820DC28C0ABCF87DF32630A69AE51394291495",
+                                        "sKeyIdE": "B9E283B6DA93A875A43BDD28FCD0CAE7B452C1B9"
+                                }]
+                        },
+                        {
+                                "tgId": 3,
+                                "tests": [{
+                                        "tcId": 3001,
+                                        "sKeyId": "3DB972E5BECC0382FBE8A8E373F6560541D78394",
+                                        "sKeyIdD": "0A962B834E0FF947ADD64596C6291B8614D2C7C0",
+                                        "sKeyIdA": "A82E520D6DA16DEF41B0C75A5B92F5FD31A5EFBA",
+                                        "sKeyIdE": "65A1254642B871147BB4D1EABCD6286F3CF131E6"
+                                }]
+                        }
+                ]
+        }
+]
+
+                               Figure 3
+
+15.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 24]
+
+Internet-Draft               ACVP KDF IKEv1                December 2025
+
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 25]

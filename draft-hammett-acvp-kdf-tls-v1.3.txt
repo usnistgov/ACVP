@@ -1,0 +1,896 @@
+
+
+
+
+Network Working Group                                    R. Hammett, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+          ACVP TLS Key Derivation Function JSON Specification
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 1]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   4
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported KDFs  . . . . . . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   4
+       6.2.1.  Requirements Covered  . . . . . . . . . . . . . . . .   4
+       6.2.2.  Requirements Not Covered  . . . . . . . . . . . . . .   5
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   5
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   5
+     7.2.  Property Registration . . . . . . . . . . . . . . . . . .   6
+     7.3.  Registration Example  . . . . . . . . . . . . . . . . . .   6
+       7.3.1.  Valid HMAC Functions  . . . . . . . . . . . . . . . .   7
+       7.3.2.  Valid Running Modes . . . . . . . . . . . . . . . . .   7
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.1.  Test Groups . . . . . . . . . . . . . . . . . . . . . . .   9
+     8.2.  Test Cases  . . . . . . . . . . . . . . . . . . . . . . .  10
+   9.  Responses . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  15
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing RFC8446 TLS v1.3
+   KDF implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 2]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   sub-specification defines the JSON constructs for testing RFC8446 TLS
+   v1.3 KDF implementations using ACVP.
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 3]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported KDFs
+
+   The following key derivation functions MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  TLS-v1.3 / KDF / RFC8446
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   RFC8446 TLS v1.3 KDF implementations.
+
+6.1.  Test Types
+
+   There is only one test type: functional tests.  Each has a specific
+   value to be used in the testType field.  The testType field
+   definition is:
+
+   *  "AFT" - Algorithm Functional Test.  These tests can be processed
+      by the client using a normal 'derive_key' operation.  AFTs cause
+      the implementation under test to exercise normal operations on a
+      single block, multiple blocks, or partial blocks.  In all cases,
+      random data is used.  The functional tests are designed to verify
+      that the logical components of the key deriviation process are
+      operating correctly.
+
+6.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [RFC8446].
+
+6.2.1.  Requirements Covered
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 4]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   *  RFC8446 - 7.1 Key Schedule.  This section of the document
+      encapsulates the bulk of ACVP testing; any functions involved in
+      the computation of the TLS v1.3 KDF *SHALL BE* tested as a part of
+      the vector set.  Note that message construction that is defined by
+      the protocol for messages such as ClientHello, ServerHello, etc
+      SHALL NOT be within the scope of ACVP testing.
+
+   *  RFC8446 - 4.4.1 The Transcript Hash.  The transcript hash is used
+      within section 7.1 for deriving keying material and as such *SHALL
+      BE* tested as a part of ACVP testing.
+
+6.2.2.  Requirements Not Covered
+
+   *  RFC8446 - ACVP testing for the TLS v1.3 KDF is done to ensure
+      proper implementation of the KDF portion of the RFC; as such TLS
+      protocol specific pieces are not tested.  Protocol specific
+      construction of messages such as the ClientHello, ServerHello, etc
+      SHALL NOT be within the scope of ACVP testing.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of TLS v1.3 KDF algorithms to
+   the ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 5]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  Property Registration
+
+7.3.  Registration Example
+
+   A registration SHALL use these properties
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 6]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   +=============+==============================+========+============+
+   | JSON        | Description                  | JSON   | Valid      |
+   | Property    |                              | Type   | Values     |
+   +=============+==============================+========+============+
+   | algorithm   | Name of the algorithm to be  | string | "TLS-v1.3" |
+   |             | validated                    |        |            |
+   +-------------+------------------------------+--------+------------+
+   | mode        | Mode of the algorithm to be  | string | "KDF"      |
+   |             | validated                    |        |            |
+   +-------------+------------------------------+--------+------------+
+   | revision    | ACVP Test version            | string | "RFC8446"  |
+   +-------------+------------------------------+--------+------------+
+   | hmacAlg     | HMAC functions supported     | array  | See        |
+   |             |                              |        | Section    |
+   |             |                              |        | 7.3.1      |
+   +-------------+------------------------------+--------+------------+
+   | runningMode | The supported key exchange   | array  | See        |
+   |             | modes for the KDF            |        | Section    |
+   |             | https://tools.ietf.org/html/ |        | 7.3.2      |
+   |             | rfc8446#section-2            |        |            |
+   +-------------+------------------------------+--------+------------+
+
+                  Table 2: TLS Registration JSON Values
+
+7.3.1.  Valid HMAC Functions
+
+   The following hash functions MAY be advertised by an ACVP compliant
+   client under the 'hmacAlg' property
+
+   *  SHA2-256
+
+   *  SHA2-384
+
+7.3.2.  Valid Running Modes
+
+   The KDF modes MAY be advertised by an ACVP compliant client under the
+   'runningMode' property
+
+   *  PSK
+
+   *  DHE
+
+   *  PSK-DHE
+
+   An example registration within an algorithm capability exchange looks
+   like this
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 7]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   {
+     "algorithm": "TLS-v1.3",
+     "mode": "KDF",
+     "revision": "RFC8446",
+     "hmacAlg": [
+       "SHA2-256",
+       "SHA2-384",
+       ],
+     "runningMode": [
+       "PSK-DHE"
+     ]
+   }
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with RFC8446 TLS v1.3 KDF
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 8]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 3: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+8.1.  Test Groups
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the RFC8446 TLS v1.3 KDF JSON elements of
+   the Test Group JSON object
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 9]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+       +=============+=================================+===========+
+       | JSON Value  | Description                     | JSON Type |
+       +=============+=================================+===========+
+       | tgId        | Test group identifier           | integer   |
+       +-------------+---------------------------------+-----------+
+       | testType    | Test operations to be performed | string    |
+       +-------------+---------------------------------+-----------+
+       | hmacAlg     | SHA version used                | string    |
+       +-------------+---------------------------------+-----------+
+       | runningMode | The key exchange mode used      | string    |
+       +-------------+---------------------------------+-----------+
+       | tests       | Array of individual test cases  | array     |
+       +-------------+---------------------------------+-----------+
+
+                      Table 4: Test Group JSON Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+8.2.  Test Cases
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RFC8446 TLS v1.3 KDF test vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 10]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+     +======================+==============================+=========+
+     | JSON Value           | Description                  | JSON    |
+     |                      |                              | Type    |
+     +======================+==============================+=========+
+     | tcId                 | Test case identifier         | integer |
+     +----------------------+------------------------------+---------+
+     | psk                  | Random pre-shared key,       | hex     |
+     |                      | included for PSK and PSK-DHE |         |
+     |                      | running modes.               |         |
+     +----------------------+------------------------------+---------+
+     | dhe                  | Random Diffie-Hellman shared | hex     |
+     |                      | secret, included for DHE and |         |
+     |                      | PSK-DHE running modes.       |         |
+     +----------------------+------------------------------+---------+
+     | helloClientRandom    | Randomly generated Client    | hex     |
+     |                      | Hello message                |         |
+     +----------------------+------------------------------+---------+
+     | helloServerRandom    | Randomly generated Server    | hex     |
+     |                      | Hello message                |         |
+     +----------------------+------------------------------+---------+
+     | finishedClientRandom | Randomly generated Client    | hex     |
+     |                      | Finished message             |         |
+     +----------------------+------------------------------+---------+
+     | finishedServerRandom | Randomly generated Server    | hex     |
+     |                      | Finished message             |         |
+     +----------------------+------------------------------+---------+
+
+                       Table 5: Test Case JSON Object
+
+   Note that when the PSK or DHE are not included in the test case, it
+   is assumed they are the digest size of the group's hash set to zero.
+   As an example, for a test group using SHA2-256, with a running mode
+   of "DHE", the "PSK" would be represented by a BitString of 256 bits
+   or 32 bytes, all being "0".
+
+   Here is an abbreviated yet fully constructed example of the prompt.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 11]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   {
+       "vsId": 1,
+       "algorithm": "TLS-v1.3",
+       "mode": "KDF",
+       "revision": "RFC8446",
+       "testGroups": [
+           {
+               "tgId": 1,
+               "testType": "AFT",
+               "hmacAlg": "SHA2-256",
+               "runningMode": "PSK-DHE",
+               "tests": [{
+                   "tcId": 1,
+                   "psk": "C2A39E5D172C7D147B5FD3752E4C0840EDDF7C5684B00E7B1AA20B7F56CF64F1EE05",
+                   "dhe": "EE6ADDBC8BDF014254051D78D7A0ECE35AAB230024647E871B375C257E23FC814235",
+                   "helloClientRandom": "7613AA5EAC7D233CCFF764C95D22B6BB026C087DF017E04C5AF6F0E2C1C9E3FA134F",
+                   "helloServerRandom": "A1CDA1FC4A72BF85FAEC964AF1CBB421BA1FD683513C24D11EE0B0092190C729ECD4",
+                   "finishedClientRandom": "F77C6488E63463FEDACA4CEF38F66E1957BDCB1F9A6719029F75590687487AF7F235",
+                   "finishedServerRandom": "9B562F22963D4A9C96DA93A1E3AA5F88A48CA7A0EA92D293AA7C72AD9A71A4DF911B"
+               }]
+           }
+       ]
+   }
+
+9.  Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | acvVersion    | The version of the protocol | string    |
+        +---------------+-----------------------------+-----------+
+        | vsId          | The vector set identifier   | integer   |
+        +---------------+-----------------------------+-----------+
+        | testGroups    | The test group data         | array     |
+        +---------------+-----------------------------+-----------+
+
+                  Table 6: Vector Set Response JSON Object
+
+   An example of this is the following
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 12]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   {
+       "acvVersion": "version",
+       "vsId": 1,
+       "testGroups": [ ... ]
+   }
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+         +===============+===========================+===========+
+         | JSON Property | Description               | JSON Type |
+         +===============+===========================+===========+
+         | tgId          | The test group identifier | integer   |
+         +---------------+---------------------------+-----------+
+         | tests         | The test case data        | array     |
+         +---------------+---------------------------+-----------+
+
+               Table 7: Vector Set Group Response JSON Object
+
+   An example of this is the following
+
+   {
+       "tgId": 1,
+       "tests": [ ... ]
+   }
+
+   The following table describes the JSON object that represents a test
+   case response for a RFC8446 TLS v1.3 KDF.
+
+   +================================+==========================+=======+
+   | JSON Property                  |Description               |JSON   |
+   |                                |                          |Type   |
+   +================================+==========================+=======+
+   | tcId                           |The test case identifier  |integer|
+   +--------------------------------+--------------------------+-------+
+   | clientEarlyTrafficSecret       |The client early traffic  |hex    |
+   |                                |secret.  Derive-Secret(., |       |
+   |                                |"c e traffic",            |       |
+   |                                |ClientHello)              |       |
+   +--------------------------------+--------------------------+-------+
+   | earlyExporterMasterSecret      |The early exporter master |hex    |
+   |                                |secret.  Derive-Secret(., |       |
+   |                                |"e exp master",           |       |
+   |                                |ClientHello)              |       |
+   +--------------------------------+--------------------------+-------+
+   | clientHandshakeTrafficSecret   |The client handshake      |hex    |
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 13]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   |                                |traffic secret.  Derive-  |       |
+   |                                |Secret(., "c hs traffic", |       |
+   |                                |ClientHello...ServerHello)|       |
+   +--------------------------------+--------------------------+-------+
+   | serverHandshakeTrafficSecret   |The server handshake      |hex    |
+   |                                |traffic secret.  Derive-  |       |
+   |                                |Secret(., "s hs traffic", |       |
+   |                                |ClientHello...ServerHello)|       |
+   +--------------------------------+--------------------------+-------+
+   | clientApplicationTrafficSecret |The client application    |hex    |
+   |                                |traffic secret.  Derive-  |       |
+   |                                |Secret(., "c ap traffic", |       |
+   |                                |ClientHello...server      |       |
+   |                                |Finished)                 |       |
+   +--------------------------------+--------------------------+-------+
+   | serverApplicationTrafficSecret |The server application    |hex    |
+   |                                |traffic secret.  Derive-  |       |
+   |                                |Secret(., "s ap traffic", |       |
+   |                                |ClientHello...server      |       |
+   |                                |Finished)                 |       |
+   +--------------------------------+--------------------------+-------+
+   | exporterMasterSecret           |The exporter master       |hex    |
+   |                                |secret.  Derive-Secret(., |       |
+   |                                |"exp master",             |       |
+   |                                |ClientHello...server      |       |
+   |                                |Finished)                 |       |
+   +--------------------------------+--------------------------+-------+
+   | resumptionMasterSecret         |The resumption master     |hex    |
+   |                                |secret.  Derive-Secret(., |       |
+   |                                |"res master",             |       |
+   |                                |ClientHello...client      |       |
+   |                                |Finished)                 |       |
+   +--------------------------------+--------------------------+-------+
+
+                   Table 8: Test Case Results JSON Object
+
+   Here is an abbreviated example of the response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 14]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   {
+     "vsId": 1,
+     "testGroups": [{
+       "tgId": 1,
+       "tests": [{
+         "tcId": 1,
+         "clientEarlyTrafficSecret": "6C4A2365493D1AF0F654D59A181EDD2510205F6AE3F22B6EE765B8208C99C66C",
+         "earlyExporterMasterSecret": "3C7204D21F2C10CD744915221CD46B8CF914E5E3124C87A822959C4EB58F13B9",
+         "clientHandshakeTrafficSecret": "C017D71DB97422E10BF950C1B530AB754A11D4FCF562DDBB47EE6DBAAD72CBA3",
+         "serverHandshakeTrafficSecret": "42D17CF61E98CA182AF677E13D40EA513627D950156BC8D80E749AB789930DE7",
+         "clientApplicationTrafficSecret": "52E4E879CA4AA2314AE5F2CCF3870BA879AE2644DB96BEC71493ADEAEE8EA121",
+         "serverApplicationTrafficSecret": "D4D3C87A5B5F165E90807BA7954734BA733668E9858CCE3F34B1A3E4965681F8",
+         "exporterMasterSecret": "7880C0A3BC51A1B2FE4013DB481B17B3D0A1DC6C3688EB178BF6FCD3D306AE9A",
+         "resumptionMasterSecret": "753DB3A1743DAA17AE52E2B6AA6E00AA07DA46111A43653325C98D69079E7BF4"
+       }]
+     }]
+   }
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 8446, RFC 8446, DOI 10.17487/RFC8446,
+              August 2018, <https://www.rfc-editor.org/info/rfc8446>.
+
+   [ACVP]     Fussell, B., Vassilev, A., Booth, H., Celi, C., and R.
+              Hammett, "Automatic Cryptographic Validation Protocol", 1
+              July 2019.
+
+Author's Address
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 15]
+
+Internet-Draft              ACVP KDF TLS v1.3              December 2025
+
+
+   Russ Hammett (editor)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 16]

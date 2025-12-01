@@ -1,0 +1,784 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+          ACVP SRTP Key Derivation Function JSON Specification
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   3
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported KDFs  . . . . . . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   4
+       6.2.1.  SRTP Requirements Covered . . . . . . . . . . . . . .   4
+       6.2.2.  SRTP Requirements Not Covered . . . . . . . . . . . .   4
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   5
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   5
+     7.2.  Property Registration . . . . . . . . . . . . . . . . . .   6
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   9
+     8.1.  Test Groups . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.2.  Test Cases  . . . . . . . . . . . . . . . . . . . . . . .  11
+   9.  Responses . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  14
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing SP800-135 SRTP KDF
+   implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing SP800-135
+   SRTP KDF implementations using ACVP.
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported KDFs
+
+   The following key derivation functions MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  kdf-components / srtp / 1.0
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   SP800-135 SRTP KDF implementations.
+
+6.1.  Test Types
+
+   There is only one test type: functional tests.  Each has a specific
+   value to be used in the testType field.  The testType field
+   definition is:
+
+   *  "AFT" - Algorithm Functional Test.  These tests can be processed
+      by the client using a normal 'derive_key' operation.  AFTs cause
+      the implementation under test to exercise normal operations on a
+      single block, multiple blocks, or partial blocks.  In all cases,
+      random data is used.  The functional tests are designed to verify
+      that the logical components of the key deriviation process are
+      operating correctly.
+
+6.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [SP800-135].
+
+6.2.1.  SRTP Requirements Covered
+
+   In [SP800-135], TBD.
+
+6.2.2.  SRTP Requirements Not Covered
+
+   Some requirements in the outlined specification are not easily
+   tested.  Often they are not ideal for black-box testing such as the
+   ACVP.  In [SP800-135], TBD.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of SRTP KDF algorithms to the
+   ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  Property Registration
+
+   The SRTP KDF mode capabilities are advertised as JSON objects within
+   the 'capabilities_exchange' property.
+
+   A registration SHALL use these properties
+
+   +========================+===========+=======+===========+==========+
+   |JSON Value              |Description|JSON   |Valid      |Optional  |
+   |                        |           |Type   |Values     |          |
+   +========================+===========+=======+===========+==========+
+   |algorithm               |Name of the|string |"kdf-      |No        |
+   |                        |algorithm  |       |components"|          |
+   |                        |to be      |       |           |          |
+   |                        |validated  |       |           |          |
+   +------------------------+-----------+-------+-----------+----------+
+   |mode                    |Mode of the|string |"srtp"     |No        |
+   |                        |algorithm  |       |           |          |
+   |                        |to be      |       |           |          |
+   |                        |validated  |       |           |          |
+   +------------------------+-----------+-------+-----------+----------+
+   |revision                |ACVP Test  |string |"1.0"      |No        |
+   |                        |version    |       |           |          |
+   +------------------------+-----------+-------+-----------+----------+
+   |aesKeyLength            |AES Key    |array  |Any non-   |No        |
+   |                        |sizes the  |       |empty      |          |
+   |                        |IUT        |       |subset of  |          |
+   |                        |supports   |       |{128, 192, |          |
+   |                        |           |       |256}       |          |
+   +------------------------+-----------+-------+-----------+----------+
+   |supportsZeroKdr         |Whether or |boolean|true, false|No        |
+   |                        |not the IUT|       |           |          |
+   |                        |supports an|       |           |          |
+   |                        |empty KDR  |       |           |          |
+   +------------------------+-----------+-------+-----------+----------+
+   |kdrExponent             |Key        |array  |[0, .., 24]|Yes (if   |
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+   |                        |Derivation |       |           |none of   |
+   |                        |Rate as an |       |           |the valid |
+   |                        |exponent of|       |           |values are|
+   |                        |2          |       |           |supported)|
+   +------------------------+-----------+-------+-----------+----------+
+   |supports48BitSrtcpIndex |Whether or |boolean|true, false|Yes       |
+   |                        |not the IUT|       |           |          |
+   |                        |uses a     |       |           |          |
+   |                        |48-bit     |       |           |          |
+   |                        |quantity,  |       |           |          |
+   |                        |i.e.,      |       |           |          |
+   |                        |000...0 || |       |           |          |
+   |                        |0 || SRTCP |       |           |          |
+   |                        |index, in  |       |           |          |
+   |                        |the SRTCP  |       |           |          |
+   |                        |key        |       |           |          |
+   |                        |derivation |       |           |          |
+   |                        |vs a 32-bit|       |           |          |
+   |                        |quantity,  |       |           |          |
+   |                        |i.e., 0 || |       |           |          |
+   |                        |SRTCP index|       |           |          |
+   +------------------------+-----------+-------+-----------+----------+
+
+              Table 2: SRTP KDF Mode Capabilities JSON Values
+
+      |  NOTE 1: In the "kdrExponent" array a supported value of 3
+      |  corresponds to an actual KDF of 2\^3 or "04" in hex, as the
+      |  third least significant bit is a 1.  If no elements of this
+      |  array are supported, then it MAY be excluded.  If this is the
+      |  case, then the IUT MUST support an empty KDR via
+      |  "supportsEmptyKdr" set to true.
+
+      |  NOTE 2: When the "supports48BitSrtcpIndex" property is present
+      |  and set to true, the tests SHALL assume that the IUT uses a
+      |  48-bit quantity, i.e., 000...0 || 0 || SRTCP index, in the
+      |  SRTCP key derivation in line with IETF RFC Errata ID 3712 and
+      |  https://csrc.nist.gov/csrc/media/publications/sp/800-135/rev-
+      |  1/final/documents/sp800-135r1-informative-note-20160919.pdf.
+      |  When "supports48BitSrtcpIndex" is ommited or set to false, the
+      |  tests SHALL assume that the IUT uses a 32-bit quantity, i.e.,
+      |  0 || SRTCP index, in the SRTCP key derivation as per the
+      |  original RFC 3711.
+
+   An example registration within an algorithm capability exchange looks
+   like this.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+   "capability_exchange":
+   [
+       {
+           "algorithm": "kdf-components",
+           "mode": "srtp",
+           "revision": "1.0",
+           "aesKeyLength": [
+               128,
+               192,
+               256
+           ],
+           "supportsZeroKdr": true,
+           "kdrExponent": [
+               0,
+               1,
+               2,
+               3,
+               4,
+               5,
+               6,
+               7,
+               8,
+               9,
+               10,
+               11,
+               12,
+               13,
+               14,
+               15,
+               16,
+               17,
+               18,
+               19,
+               20,
+               21,
+               22,
+               23,
+               24
+           ],
+           "supports48BitSrtcpIndex": true
+       }
+   ]
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with SP800-135 SRTP KDF
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 3: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+8.1.  Test Groups
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the SP800-135 SRTP KDF JSON elements of the
+   Test Group JSON object
+
+      +==============+=================================+===========+
+      | JSON Value   | Description                     | JSON Type |
+      +==============+=================================+===========+
+      | tgId         | Test group identifier           | integer   |
+      +--------------+---------------------------------+-----------+
+      | testType     | Test operations to be performed | string    |
+      +--------------+---------------------------------+-----------+
+      | aesKeyLength | The AES Key Length used in the  | integer   |
+      |              | CMAC within the test group      |           |
+      +--------------+---------------------------------+-----------+
+      | kdr          | The Key Derivation Rate used    | hex       |
+      +--------------+---------------------------------+-----------+
+      | tests        | Array of individual test cases  | array     |
+      +--------------+---------------------------------+-----------+
+
+                     Table 4: Test Group JSON Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+8.2.  Test Cases
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each SP800-135 SRTP KDF test vector.
+
+   +============+==========================================+===========+
+   | JSON Value | Description                              | JSON Type |
+   +============+==========================================+===========+
+   | tcId       | Test case idenfitier                     | integer   |
+   +------------+------------------------------------------+-----------+
+   | masterKey  | Master key value                         | hex       |
+   +------------+------------------------------------------+-----------+
+   | masterSalt | Master salt value                        | hex       |
+   +------------+------------------------------------------+-----------+
+   | index      | Index value for the SRTP key derivation  | hex       |
+   +------------+------------------------------------------+-----------+
+   | srtcpIndex | Index value for the SRTCP key            | hex       |
+   |            | derivation                               |           |
+   +------------+------------------------------------------+-----------+
+
+                       Table 5: Test Case JSON Object
+
+   Here is an abbreviated yet fully constructed example of the prompt.
+
+   {
+       "vsId": 1,
+       "algorithm": "kdf-components",
+       "mode": "srtp",
+       "revision": "1.0",
+       "testGroups": [
+           {
+               "tgId": 1,
+               "kdr": "00",
+               "aesKeyLength": 128,
+               "tests": [
+                   {
+                       "tcId": 1,
+                       "masterKey": "AD16913E52D9C2A6D8E1D3CB90E4FDAD",
+                       "masterSalt": "2AB06C2BCC07C7AF364F3BE6EAEC",
+                       "index": "B18C1C4ED637",
+                       "srtcpIndex": "000020FB9BB3"
+                   }
+               ]
+           }
+       ]
+   }
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+9.  Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | acvVersion    | The version of the protocol | string    |
+        +---------------+-----------------------------+-----------+
+        | vsId          | The vector set identifier   | integer   |
+        +---------------+-----------------------------+-----------+
+        | testGroups    | The test group data         | array     |
+        +---------------+-----------------------------+-----------+
+
+                  Table 6: Vector Set Response JSON Object
+
+   An example of this is the following:
+
+   {
+       "acvVersion": "version",
+       "vsId": 1,
+       "testGroups": [ ... ]
+   }
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+         +===============+===========================+===========+
+         | JSON Property | Description               | JSON Type |
+         +===============+===========================+===========+
+         | tgId          | The test group identifier | integer   |
+         +---------------+---------------------------+-----------+
+         | tests         | The test case data        | array     |
+         +---------------+---------------------------+-----------+
+
+               Table 7: Vector Set Group Response JSON Object
+
+   An example of this is the following:
+
+   {
+       "tgId": 1,
+       "tests": [ ... ]
+   }
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+   The following table describes the JSON object that represents a test
+   case response for a SP800-135 SRTP KDF.
+
+         +===============+==========================+===========+
+         | JSON Property | Description              | JSON Type |
+         +===============+==========================+===========+
+         | tcId          | The test case identifier | integer   |
+         +---------------+--------------------------+-----------+
+         | srtpKe        | SRTP encryption key      | hex       |
+         +---------------+--------------------------+-----------+
+         | srtpKa        | SRTP authentication key  | hex       |
+         +---------------+--------------------------+-----------+
+         | srtpKs        | SRTP salting key         | hex       |
+         +---------------+--------------------------+-----------+
+         | srtcpKe       | SRTCP encryption key     | hex       |
+         +---------------+--------------------------+-----------+
+         | srtcpKa       | SRTCP authentication key | hex       |
+         +---------------+--------------------------+-----------+
+         | srtcpKs       | SRTCP salting key        | hex       |
+         +---------------+--------------------------+-----------+
+
+                  Table 8: Test Case Results JSON Object
+
+   Here is an abbreviated example of the response:
+
+   {
+     "vsId": 1,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "srtpKe": "94AD7DB37D198F049375BD461E90D9E5",
+             "srtpKa": "51E18978366B7EFF4E3EE57DCBC50636AAF19F39",
+             "srtpKs": "7157797656C383BD69192B036C0A",
+             "srtcpKe": "5707D07782D6FE0030635106A487D97C",
+             "srtcpKa": "097ECF3E2965DF071180F5F126C2D54A548B902F",
+             "srtcpKs": "72DF8546DDB209875A5209786E4B"
+           }
+         ]
+       }
+     ]
+   }
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft                ACVP KDF SRTP                December 2025
+
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [SP800-135]
+              Dang, Q. H., "Recommendation for Existing Application-
+              Specific Key Derivation Functions", NIST SP 800-135 Rev.
+              1, December 2011,
+              <https://csrc.nist.gov/pubs/sp/800/135/r1/final>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]

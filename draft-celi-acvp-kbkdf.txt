@@ -1,0 +1,1512 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+       ACVP SP800-108 Key Derivation Function JSON Specification
+                         draft-gold-acvp-kdf-01
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   4
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported SP 800-108 KDFs . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   4
+       6.2.1.  Requirements Covered  . . . . . . . . . . . . . . . .   5
+       6.2.2.  Requirements Not Covered  . . . . . . . . . . . . . .   5
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   5
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   5
+     7.2.  Required Prerequisite Algorithms for SP 800-108r1 KDF
+           Validations . . . . . . . . . . . . . . . . . . . . . . .   6
+     7.3.  Property Registration . . . . . . . . . . . . . . . . . .   7
+       7.3.1.  Supported SP 800-108r1 KDF Modes  . . . . . . . . . .   8
+       7.3.2.  Supported KDF Modes Capabilities  . . . . . . . . . .   9
+       7.3.3.  Supported SP 800-108r1 KDF MACs . . . . . . . . . . .  11
+     7.4.  Registration Example  . . . . . . . . . . . . . . . . . .  12
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  16
+     8.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  18
+     8.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  19
+     8.3.  Example Test Vector JSON Object . . . . . . . . . . . . .  20
+   9.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  22
+     9.1.  Example Test Vector Response JSON . . . . . . . . . . . .  25
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  26
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  26
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  27
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing SP 800-108 KDF
+   implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing SP 800-108
+   KDF implementations using ACVP.
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported SP 800-108 KDFs
+
+   The following key derivation functions MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  KDF / / 1.0
+
+   *  KDF / KMAC / Sp800-108r1
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate SP
+   800-108 KDF implementations.
+
+6.1.  Test Types
+
+   There is only one test type: functional tests.  Each has a specific
+   value to be used in the testType field.  The testType field
+   definition is:
+
+   *  "AFT" - Algorithm Functional Test.  These tests can be processed
+      by the client using a normal 'derive_key' operation.  AFTs cause
+      the implementation under test to exercise normal operations on a
+      single block, multiple blocks, or partial blocks.  In all cases,
+      random data is used.  The functional tests are designed to verify
+      that the logical components of the key deriviation process are
+      operating correctly.
+
+6.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [SP800-108r1].
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+6.2.1.  Requirements Covered
+
+   *  The ACVP server tests the IUT's ability to derive keying material
+      using the "modes of iteration" defined in sections 5.1, 5.2 and
+      5.3 of [SP800-108r1].  The server supports testing the IUT against
+      the various MACs or PRFs listed in Section 7.3.3.  It also
+      supports testing varying 1) the location of the counter within the
+      input data, 2) the length of the derived keying material, and 3)
+      the counter length.
+
+6.2.2.  Requirements Not Covered
+
+   *  The tests described in this document do not validate the
+      construction of the fixed input data string described in
+      [SP800-108r1] Sections 5, 7.5 and 7.6.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of SP 800-108 KDF algorithms
+   to the ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  Required Prerequisite Algorithms for SP 800-108r1 KDF Validations
+
+   Each SP800-108r1 KDF implementation relies on other cryptographic
+   primitives.  For example, the KDF must utilize an underlying MAC
+   algorithm.  Each of these underlying algorithm primitives must be
+   validated, either separately or as part of the same submission.  ACVP
+   provides a mechanism for specifying the required prerequisites:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   +==============+================+=====================+============+
+   | JSON Value   | Description    | JSON Type           | Valid      |
+   |              |                |                     | Values     |
+   +==============+================+=====================+============+
+   | algorithm    | A prerequisite | string              | AES, DRBG, |
+   |              | algorithm      |                     | CMAC, HMAC |
+   +--------------+----------------+---------------------+------------+
+   | valValue     | Algorithm      | string              | Actual     |
+   |              | validation     |                     | number or  |
+   |              | number         |                     | "same"     |
+   +--------------+----------------+---------------------+------------+
+   | prereqAlgVal | Prerequisite   | object with         | See above  |
+   |              | algorithm      | algorithm and       |            |
+   |              | validation     | valValue properties |            |
+   +--------------+----------------+---------------------+------------+
+   | prereqVals   | Prerequisite   | array of            | See above  |
+   |              | algorithm      | prereqAlgVal        |            |
+   |              | validations    | objects             |            |
+   +--------------+----------------+---------------------+------------+
+
+             Table 2: SP800-108r1 KDF Required Prerequisites
+
+7.3.  Property Registration
+
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+   Two algorithm registrations are possible to test SP 800-108r1 KDFs.
+   The first is for the "KDF" / "1.0" which covers the counter,
+   feedback, and double pipeline iteration key derivation functions.
+   The second is for "KDF" / "KMAC" / "Sp800-108r1" which covers the
+   KMAC function when used as a key derivation function, introduced in
+   the new revision, SP 800-108r1.  A registration SHALL use these
+   properties:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   +==============+=====================+==============+===============+
+   | JSON         | Description         | JSON Type    | Valid Values  |
+   | Property     |                     |              |               |
+   +==============+=====================+==============+===============+
+   | algorithm    | The KDF to be       | string       | "KDF"         |
+   |              | validated.          |              |               |
+   +--------------+---------------------+--------------+---------------+
+   | mode         | The KDF mode to be  | string       | "KMAC" or ""  |
+   |              | validated.          |              |               |
+   +--------------+---------------------+--------------+---------------+
+   | revision     | The algorithm       | string       | "1.0" when    |
+   |              | testing revision    |              | "mode" is not |
+   |              | to use.             |              | included, or  |
+   |              |                     |              | "Sp800-108r1" |
+   |              |                     |              | when "mode"   |
+   |              |                     |              | is set to     |
+   |              |                     |              | "KMAC"        |
+   +--------------+---------------------+--------------+---------------+
+   | prereqVals   | Prerequisite        | array of     | See           |
+   |              | algorithm           | prereqAlgVal | Section 7.2   |
+   |              | validations         | objects      |               |
+   +--------------+---------------------+--------------+---------------+
+   | capabilities | Array of JSON       | array of     | See           |
+   |              | objects, each with  | JSON objects | Section 7.3.2 |
+   |              | fields pertaining   |              |               |
+   |              | to the KDF mode     |              |               |
+   |              | identified          |              |               |
+   |              | uniquely by the     |              |               |
+   |              | combination of the  |              |               |
+   |              | "kdfMode" and       |              |               |
+   |              | indicated           |              |               |
+   |              | properties          |              |               |
+   +--------------+---------------------+--------------+---------------+
+
+                      Table 3: Registration Properties
+
+7.3.1.  Supported SP 800-108r1 KDF Modes
+
+   The following SP800-108 KDF modes or "modes of iteration" may be
+   advertised by the ACVP compliant crypto module as the "kdfMode"
+   property:
+
+   *  counter
+
+   *  feedback
+
+   *  double pipeline iteration
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+7.3.2.  Supported KDF Modes Capabilities
+
+   The KDF mode capabilities are advertised as JSON objects within the
+   'capabilities' value of the ACVP registration message - see Table 2.
+   The 'capabilities' value is an array, where each array element is a
+   JSON object corresponding to a particular KDF mode defined in this
+   section.  The 'capabilities' value is part of the
+   'capability_exchange' element of the ACVP JSON registration message.
+   See the ACVP specification [ACVP] for details on the registration
+   message.
+
+   Each KDF mode's capabilities are advertised as JSON objects.
+
+   The following table describes the capabilities that may be advertised
+   by the ACVP compliant crypto module for "KDF" / / "1.0":
+
+   +===================+======================+=========+==============+
+   | JSON Value        | Description          | JSON    | Valid Values |
+   |                   |                      | Type    |              |
+   +===================+======================+=========+==============+
+   | kdfMode           | The type of          | string  | See Section  |
+   |                   | SP800-108r1 KDF or   |         | 7.3.1        |
+   |                   | "mode of iteration"  |         |              |
+   +-------------------+----------------------+---------+--------------+
+   | macMode           | The MAC or PRF       | array   | See Section  |
+   |                   | algorithm used       | of      | 7.3.3        |
+   |                   |                      | string  |              |
+   +-------------------+----------------------+---------+--------------+
+   | supportedLengths  | The supported        | domain  | Min: 1, Max: |
+   |                   | derived keying       |         | 4096         |
+   |                   | material lengths in  |         |              |
+   |                   | bits                 |         |              |
+   +-------------------+----------------------+---------+--------------+
+   | fixedDataOrder    | Describes where the  | array   | Any non-     |
+   |                   | counter appears in   |         | empty subset |
+   |                   | the fixed data       |         | of {"none",  |
+   |                   |                      |         | "after fixed |
+   |                   |                      |         | data",       |
+   |                   |                      |         | "before      |
+   |                   |                      |         | fixed data", |
+   |                   |                      |         | "middle      |
+   |                   |                      |         | fixed data", |
+   |                   |                      |         | "before      |
+   |                   |                      |         | iterator"}   |
+   +-------------------+----------------------+---------+--------------+
+   | counterLength     | The length of the    | array   | Any non-     |
+   |                   | counter in bits      |         | empty subset |
+   |                   |                      |         | of {0, 8,    |
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   |                   |                      |         | 16, 24, 32}  |
+   +-------------------+----------------------+---------+--------------+
+   | supportsEmptyIv   | Whether or not the   | boolean | true/false   |
+   |                   | IUT supports an      |         |              |
+   |                   | empty IV             |         |              |
+   +-------------------+----------------------+---------+--------------+
+   | requiresEmptyIv   | Whether or not the   | boolean | true/false   |
+   |                   | IUT requires an      |         |              |
+   |                   | empty IV             |         |              |
+   +-------------------+----------------------+---------+--------------+
+   | customKeyInLength | Optional value used  | integer | 112-4096     |
+   |                   | to control the       |         |              |
+   |                   | length of the keyIn  |         |              |
+   |                   | produced by the      |         |              |
+   |                   | ACVP server for the  |         |              |
+   |                   | capability.  This    |         |              |
+   |                   | field cannot be      |         |              |
+   |                   | used to alter the    |         |              |
+   |                   | keyIn length for     |         |              |
+   |                   | AES/TDES based       |         |              |
+   |                   | macModes, as the     |         |              |
+   |                   | keyIns expected by   |         |              |
+   |                   | those algorithms is  |         |              |
+   |                   | fixed.               |         |              |
+   +-------------------+----------------------+---------+--------------+
+
+                       Table 4: KDF Mode Capabilities
+
+      |  NOTE 1: The 'fixedDataOrder' options "none" and "before
+      |  iterator" are not valid for "counter" KDF.  The
+      |  'fixedDataOrder' option "middle fixed data" is not valid for
+      |  "feedback" nor "double pipeline iteration" KDF.
+
+      |  NOTE 2: A 'counterLength' of 0 describes that there is no
+      |  counter used.  The 0 option is not valid for "counter" KDF.
+
+      |  NOTE 3: When 'counterLength' contains a value of "0",
+      |  'fixedDataOrder' must contain a value of "none" and vice
+      |  versus.
+
+   The following table describes the capabilities that may be advertisd
+   by the ACVP compliant crypto module for "KDF" / "KMAC" /
+   "Sp800-108r1":
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   +========================+====================+========+===========+
+   | JSON Value             | Description        | JSON   | Valid     |
+   |                        |                    | Type   | Values    |
+   +========================+====================+========+===========+
+   | macMode                | The MAC or PRF     | array  | See       |
+   |                        | algorithm used     | of     | Section   |
+   |                        |                    | string | 7.3.3     |
+   +------------------------+--------------------+--------+-----------+
+   | keyDerivationKeyLength | The lengths of the | domain | Min: 112, |
+   |                        | key derivation key |        | Max:      |
+   |                        | in bits            |        | 4096,     |
+   |                        |                    |        | Inc: 8    |
+   +------------------------+--------------------+--------+-----------+
+   | contextLength          | The lengths of the | domain | Min: 8,   |
+   |                        | context field in   |        | Max:      |
+   |                        | bits               |        | 4096,     |
+   |                        |                    |        | Inc: 8    |
+   +------------------------+--------------------+--------+-----------+
+   | labelLength            | The lengths of the | domain | Min: 8,   |
+   |                        | label field in     |        | Max:      |
+   |                        | bits.  This field  |        | 4096,     |
+   |                        | can be excluded if |        | Inc: 8    |
+   |                        | no label is used.  |        |           |
+   +------------------------+--------------------+--------+-----------+
+   | derivedKeyLength       | The lengths of the | domain | Min: 112, |
+   |                        | derived keys in    |        | Max:      |
+   |                        | bits               |        | 4096,     |
+   |                        |                    |        | Inc: 8    |
+   +------------------------+--------------------+--------+-----------+
+
+                   Table 5: KDF KMAC Mode Capabilities
+
+7.3.3.  Supported SP 800-108r1 KDF MACs
+
+   The following MAC or PRF functions MAY be advertised by an ACVP
+   compliant client
+
+   *  CMAC-AES128
+
+   *  CMAC-AES192
+
+   *  CMAC-AES256
+
+   *  CMAC-TDES
+
+   *  HMAC-SHA1
+
+   *  HMAC-SHA2-224
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   *  HMAC-SHA2-256
+
+   *  HMAC-SHA2-384
+
+   *  HMAC-SHA2-512
+
+   *  HMAC-SHA2-512/224
+
+   *  HMAC-SHA2-512/256
+
+   *  HMAC-SHA3-224
+
+   *  HMAC-SHA3-256
+
+   *  HMAC-SHA3-384
+
+   *  HMAC-SHA3-512
+
+   *  KMAC-128
+
+   *  KMAC-256
+
+      |  NOTE: The "KMAC-128" and "KMAC-256" options are only allowed
+      |  for, and are the only options allowed for, "KDF" / "KMAC" /
+      |  "Sp800-108r1".
+
+7.4.  Registration Example
+
+   The following is a example JSON object advertising support for "KDF"
+   / / "1.0".
+
+   {
+       "algorithm": "KDF",
+       "revision": "1.0",
+       "prereqVals": [
+           {
+               "algorithm": "SHA",
+               "valValue": "123456"
+           },
+           {
+               "algorithm": "DRBG",
+               "valValue": "123456"
+           }
+       ],
+       "capabilities": [
+           {
+               "kdfMode": "counter",
+               "macMode": [
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+                   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "after fixed data",
+                   "before fixed data",
+                   "middle fixed data"
+               ],
+               "counterLength": [
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": false
+           },
+           {
+               "kdfMode": "feedback",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+                   "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+                   }
+               ],
+               "fixedDataOrder": [
+                   "none",
+                   "after fixed data",
+                   "before fixed data",
+                   "before iterator"
+               ],
+               "counterLength": [
+                   0,
+                   8,
+                   16,
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": true,
+               "requiresEmptyIv": false
+           },
+           {
+               "kdfMode": "double pipeline iteration",
+               "macMode": [
+                   "CMAC-AES128",
+                   "CMAC-AES192",
+                   "CMAC-AES256",
+                   "CMAC-TDES",
+                   "HMAC-SHA-1",
+                    "HMAC-SHA2-224",
+                   "HMAC-SHA2-256",
+                   "HMAC-SHA2-384",
+                   "HMAC-SHA2-512"
+               ],
+               "supportedLengths": [
+                   {
+                       "min": 8,
+                       "max": 1024,
+                       "increment": 1
+                   }
+               ],
+               "fixedDataOrder": [
+                   "none",
+                   "after fixed data",
+                   "before fixed data",
+                   "before iterator"
+               ],
+               "counterLength": [
+                   0,
+                   8,
+                   16,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+                   24,
+                   32
+               ],
+               "supportsEmptyIv": false
+           }
+       ]
+   }
+
+                                  Figure 1
+
+   The following is a example JSON object advertising support for a
+   "KDF" / "KMAC" / "Sp800-108r1".
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 15]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   {
+       "algorithm": "KDF",
+       "mode": "KMAC",
+       "revision": "Sp800-108r1",
+       "macMode": [
+           "KMAC-128",
+           "KMAC-256"
+       ],
+       "keyDerivationKeyLength": [
+           {
+               "min": 112,
+               "max": 4096,
+               "increment": 8
+           }
+       ],
+       "contextLength": [
+           {
+               "min": 8,
+               "max": 4096,
+               "increment": 8
+           }
+       ],
+       "labelLength": [
+           {
+               "min": 8,
+               "max": 4096,
+               "increment": 8
+           }
+       ],
+       "derivedKeyLength": [
+           {
+               "min": 112,
+               "max": 4096,
+               "increment": 8
+           }
+       ]
+   }
+
+                                  Figure 2
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+
+
+
+Celi                       Expires 4 June 2026                 [Page 16]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   JSON schema for a test vector set used with SP 800-108 KDF
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 6: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 17]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+8.1.  Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the SP 800-108 KDF JSON elements of the
+   Test Group JSON object for "KDF" / / "1.0".
+
+     +=================+===================================+=========+
+     | JSON Values     | Description                       | JSON    |
+     |                 |                                   | Type    |
+     +=================+===================================+=========+
+     | tgId            | Test group identifier             | integer |
+     +-----------------+-----------------------------------+---------+
+     | kdfMode         | The kdfMode used for the test     | string  |
+     |                 | group                             |         |
+     +-----------------+-----------------------------------+---------+
+     | macMode         | Psuedorandom function (PRF) HMAC, | string  |
+     |                 | CMAC, or KMAC used                |         |
+     +-----------------+-----------------------------------+---------+
+     | counterLocation | "none", "after fixed data",       | string  |
+     |                 | "before fixed data", "middle      |         |
+     |                 | fixed data", or "before iterator" |         |
+     +-----------------+-----------------------------------+---------+
+     | keyOutLength    | Expected length of the derived    | integer |
+     |                 | keying material or key in bits    |         |
+     +-----------------+-----------------------------------+---------+
+     | counterLength   | Expected length of the counter in | integer |
+     |                 | bits                              |         |
+     +-----------------+-----------------------------------+---------+
+     | zeroLengthIv    | Whether or not the group utilizes | boolean |
+     |                 | a null IV                         |         |
+     +-----------------+-----------------------------------+---------+
+     | testType        | Describes the operation being     | string  |
+     |                 | performed                         |         |
+     +-----------------+-----------------------------------+---------+
+     | tests           | Array of individual test cases    | array   |
+     +-----------------+-----------------------------------+---------+
+
+                      Table 7: Test Group JSON Object
+
+      |  NOTE: The feedback mode KDF counter location of "counter after
+      |  iterator" is referenced with the option "before fixed data" in
+      |  the 'counterLocation' specification.
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 18]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   For "KDF" / "KMAC" / "Sp800-108r1" the following table describes the
+   JSON elements of the Test Group JSON object.
+
+   +=============+=========================================+===========+
+   | JSON Values | Description                             | JSON Type |
+   +=============+=========================================+===========+
+   | tgId        | Test group identifier                   | integer   |
+   +-------------+-----------------------------------------+-----------+
+   | macMode     | Psuedorandom function (PRF) KMAC used   | string    |
+   +-------------+-----------------------------------------+-----------+
+   | testType    | Describes the operation being           | string    |
+   |             | performed                               |           |
+   +-------------+-----------------------------------------+-----------+
+   | tests       | Array of individual test cases          | array     |
+   +-------------+-----------------------------------------+-----------+
+
+     Table 8: Test Group JSON Object for "KDF" / "KMAC" / "Sp800-108r1"
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' the
+   group is addressing.
+
+8.2.  Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each SP 800-108 KDF "KDF" / / "1.0" test vector.
+
+         +=============+=============================+===========+
+         | JSON Values | Description                 | JSON Type |
+         +=============+=============================+===========+
+         | tcId        | Test case idenfitier        | integer   |
+         +-------------+-----------------------------+-----------+
+         | keyIn       | Input key                   | hex       |
+         +-------------+-----------------------------+-----------+
+         | iv          | The initialization vector   | hex       |
+         |             | used only for feedback KDFs |           |
+         +-------------+-----------------------------+-----------+
+
+                       Table 9: Test Case JSON Object
+
+   The following table describes the JSON elements for each "KDF" /
+   "KMAC" / "Sp800-108r1" test vector.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 19]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+         +==================+========================+===========+
+         | JSON Values      | Description            | JSON Type |
+         +==================+========================+===========+
+         | tcId             | Test case idenfitier   | integer   |
+         +------------------+------------------------+-----------+
+         | keyDerivationKey | Input key              | hex       |
+         +------------------+------------------------+-----------+
+         | context          | The context value used | hex       |
+         +------------------+------------------------+-----------+
+         | label            | The label value used   | hex       |
+         +------------------+------------------------+-----------+
+         | derivedKeyLength | The expected length of | integer   |
+         |                  | the derived key        |           |
+         +------------------+------------------------+-----------+
+
+                      Table 10: Test Case JSON Object
+
+8.3.  Example Test Vector JSON Object
+
+   The following is a example JSON object for SP 800-108r1 KDF "KDF" / /
+   "1.0" test vectors sent from the ACVP server to the crypto module.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 20]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   [
+       {
+           "acvVersion": "v1.0"
+       },
+       {
+           "vsId": 1564,
+           "algorithm": "counterMode",
+           "revision": "1.0",
+           "testGroups": [{
+               "tgId": 1,
+               "kdfMode": "counter",
+               "macMode": "CMAC-AES128",
+               "counterLocation": "after fixed data",
+               "keyOutLength": 1024,
+               "counterLength": 8,
+               "tests": [{
+                       "tcId": 1,
+                       "keyIn": "5DA38931E8D9174BC3279C8942D2DB82",
+                       "deferred": false
+                   },
+                   {
+                       "tcId": 2,
+                       "keyIn": "58F5426A40E3D5D2C94F0F97EB30C739",
+                       "deferred": false
+                   }
+               ]
+           }]
+       }
+   ]
+
+                                  Figure 3
+
+   The following is a example JSON object for "KDF" / "KMAC" /
+   "Sp800-108r1" test vectors sent from the ACVP server to the crypto
+   module.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 21]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   [
+       {
+           "acvVersion": "v1.0"
+       },
+   {
+       "vsId": 0,
+       "algorithm": "KDF",
+       "mode": "KMAC",
+       "revision": "Sp800-108r1",
+       "isSample": false,
+       "testGroups": [
+           {
+               "tgId": 1,
+               "testType": "AFT",
+               "macMode": "KMAC-128",
+               "tests": [
+                   {
+                       "tcId": 1,
+                       "keyDerivationKey": "FA4E...",
+                       "context": "4476...",
+                       "label": "146EE...",
+                       "derivedKeyLength": 112
+                   },
+                   {
+                       "tcId": 2,
+                       "keyDerivationKey": "2BE6...",
+                       "context": "5E2E...",
+                       "label": "0DD6...",
+                       "derivedKeyLength": 112
+                   }
+               ]
+           }
+       }
+   ]
+
+                                  Figure 4
+
+9.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 22]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | acvVersion    | The version of the protocol | string    |
+        +---------------+-----------------------------+-----------+
+        | vsId          | The vector set identifier   | integer   |
+        +---------------+-----------------------------+-----------+
+        | testGroups    | The test group data         | array     |
+        +---------------+-----------------------------+-----------+
+
+                  Table 11: Vector Set Response Properties
+
+   An example of this is the following
+
+   {
+           "acvVersion": "version",
+           "vsId": 1,
+           "testGroups": [ ... ]
+   }
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+         +===============+===========================+===========+
+         | JSON Property | Description               | JSON Type |
+         +===============+===========================+===========+
+         | tgId          | The test group identifier | integer   |
+         +---------------+---------------------------+-----------+
+         | tests         | The test case data        | array     |
+         +---------------+---------------------------+-----------+
+
+               Table 12: Vector Set Group Response Properties
+
+   An example of this is the following
+
+   {
+       "tgId": 1,
+       "tests": [ ... ]
+   }
+
+   The testCase section is used to organize the ACVP client response in
+   a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 23]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   The following table describes the JSON properties that represent a
+   test case response for "KDF" / / "1.0".
+
+   +===============+=========================================+=========+
+   | JSON Property | Description                             | JSON    |
+   |               |                                         | Type    |
+   +===============+=========================================+=========+
+   | tcId          | The test case identifier                | integer |
+   +---------------+-----------------------------------------+---------+
+   | breakLocation | The bit location in the fixed           | integer |
+   |               | data where the counter is placed.       |         |
+   |               | breakLocation is only applicable        |         |
+   |               | and SHALL be included for test          |         |
+   |               | cases where counterLocation is          |         |
+   |               | "middle fixed data".                    |         |
+   +---------------+-----------------------------------------+---------+
+   | fixedData     | The fixed input data used by the        | hex     |
+   |               | IUT                                     |         |
+   +---------------+-----------------------------------------+---------+
+   | keyOut        | The outputted keying material or        | hex     |
+   |               | key                                     |         |
+   +---------------+-----------------------------------------+---------+
+
+                Table 13: Test Case Results JSON Properties
+
+      |  NOTE: the fixedData or fixed input data string that is used by
+      |  the IUT is needed by the ACVP server to verify that the IUT
+      |  correctly derived the keying material.  The server does not
+      |  validate the correct construction of the fixed input data
+      |  string.  For guidance on constructing a valid fixed input data
+      |  string, please consult [SP800-108r1] Sections 5, 7.5 and 7.6.
+
+   The following table describes the JSON properties that represent a
+   test case response for "KDF" / "KMAC" / "Sp800-108r1".
+
+   +===============+======================================+===========+
+   | JSON Property | Description                          | JSON Type |
+   +===============+======================================+===========+
+   | tcId          | The test case identifier             | integer   |
+   +---------------+--------------------------------------+-----------+
+   | derivedKey    | The outputted keying material or key | hex       |
+   +---------------+--------------------------------------+-----------+
+
+     Table 14: Test Case Results JSON Properties for "KDF" / "KMAC" /
+                              "Sp800-108r1"
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 24]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+9.1.  Example Test Vector Response JSON
+
+   The following is an abbreviated example of a JSON object for "KDF" /
+   / "1.0" test results sent from the crypto module to the ACVP server.
+
+ [
+     {
+         "acvVersion": <acvp-version>
+     },
+     {
+         "vsId": 1564,
+         "testGroups": [
+             {
+                 "tgId": 1,
+                 "tests": [
+                     {
+                         "tcId": 1,
+                         "keyOut": "94D58F...",
+                         "fixedData": "FBF14DF02EE6C7DABCA6EF9AF59BB9A2"
+                     }
+                 ]
+             }
+         ]
+     }
+ ]
+
+                                Figure 5
+
+      |  NOTE: Please note that the values used in the example JSON
+      |  object are not real values.  In particular, the value for the
+      |  fixedData property is not an example of a validly formed fixed
+      |  input data string.
+
+   The following is an example of a JSON object for "KDF" / "KMAC" /
+   "Sp800-108r1" test results sent from the crypto module to the ACVP
+   server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 25]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   [
+       {
+           "acvVersion": <acvp-version>
+       },
+       {
+           "vsId": 0,
+           "algorithm": "KDF",
+           "mode": "KMAC",
+           "revision": "Sp800-108r1",
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "derivedKey": "A639..."
+                       },
+                       {
+                           "tcId": 2,
+                           "derivedKey": "A328..."
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+                                  Figure 6
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+
+
+Celi                       Expires 4 June 2026                 [Page 26]
+
+Internet-Draft                  ACVP KDFs                  December 2025
+
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [SP800-108]
+              Chen, L., "Recommendation for Key Derivation Using
+              Pseudorandom Functions (Revised)", NIST SP 800-108,
+              October 2009,
+              <https://csrc.nist.gov/pubs/sp/800/108/upd1/final>.
+
+   [SP800-108r1]
+              Chen, L., "Recommendation for Key Derivation Using
+              Pseudorandom Functions", NIST SP 800-108 Rev. 1, February
+              2024,
+              <https://csrc.nist.gov/pubs/sp/800/108/r1/upd1/final>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 27]

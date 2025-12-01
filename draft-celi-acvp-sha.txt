@@ -1,0 +1,952 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+          ACVP Secure Hash Algorithm (SHA) JSON Specification
+                       draft-ietf-acvp-sub-sha-01
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   3
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported Hash Algorithms . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Monte Carlo tests for SHA-1 and SHA-2 . . . . . . . . . .   5
+     6.3.  Large Data tests for SHA-1 and SHA-2  . . . . . . . . . .   6
+     6.4.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   7
+       6.4.1.  SHA Requirements Covered  . . . . . . . . . . . . . .   7
+       6.4.2.  SHA Requirements Not Covered  . . . . . . . . . . . .   7
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   7
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   8
+     7.2.  HASH Algorithm Capabilities Registration  . . . . . . . .   9
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.1.  Test Groups . . . . . . . . . . . . . . . . . . . . . . .  11
+     8.2.  Test Case . . . . . . . . . . . . . . . . . . . . . . . .  12
+     8.3.  Test Vector Responses . . . . . . . . . . . . . . . . . .  14
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
+   11. Normative References  . . . . . . . . . . . . . . . . . . . .  16
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  17
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing Secure Hash
+   Algorithm (SHA) implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing Secure Hash
+   Algorithm (SHA) implementations using ACVP.
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported Hash Algorithms
+
+   The following hash algorithms MAY be advertised by the ACVP compliant
+   cryptographic module:
+
+   *  SHA-1
+
+   *  SHA2-224
+
+   *  SHA2-256
+
+   *  SHA2-384
+
+   *  SHA2-512
+
+   *  SHA2-512/224
+
+   *  SHA2-512/256
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   implementations of SHA-1 and SHA-2.
+
+6.1.  Test Types
+
+   There are three types of tests for SHA-1 and SHA-2: functional tests,
+   Monte Carlo tests and Large Data tests.  Each has a specific value to
+   be used in the testType field.  The testType field definitions are:
+
+   *  "AFT" - Algorithm Functional Test.  These tests can be processed
+      by the client using a normal 'hash' operation.  AFTs cause the
+      implementation under test to exercise normal operations on a
+      single block, multiple blocks, or partial blocks.  In all cases,
+      random data is used.  The functional tests are designed to verify
+      that the logical components of the hash function (block chunking,
+      block padding etc.) are operating correctly.
+
+   *  "MCT" - Monte Carlo Test.  These tests exercise the implementation
+      under test under strenuous circumstances.  The implementation
+      under test must process the test vectors according to the correct
+      algorithm and mode in this document.  MCTs can help detect
+      potential memory leaks over time, and problems in allocation of
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+      resources, addressing variables, error handling, and generally
+      improper behavior in response to random inputs.  Each MCT
+      processes 100 pseudorandom tests.  Each algorithm and mode SHOULD
+      have at least one MCT group.  See Section 6.2 for implementation
+      details.
+
+   *  "LDT" - Large Data Test.  This test performs the hash function on
+      a message that is multiple gigabytes in length.  This pushes the
+      bounds of 32-bit data types to ensure an implementation can handle
+      all types of data.  See [LDT] for more information motivating the
+      LDT.  As a multiple gigabyte message cannot be communicated
+      naturally via ACVP, a specific structure is outlined in
+      Section 6.3.
+
+6.2.  Monte Carlo tests for SHA-1 and SHA-2
+
+   The MCTs start with an initial condition (SEED which is a single
+   message) and perform a series of chained computations.  The algorithm
+   is shown below.
+
+      |  NOTE: The MCTs were updated, 7/2023, to support the case where
+      |  !SupportedMessageLengths.Contains(3*digestSize), a limitation
+      |  of the original MCT design.  As part of this change, a new
+      |  property, mctVersion, was added to the MCT test group JSON (See
+      |  Table 4).  When a value of "standard" is provided for
+      |  mctVersion in the prompt file, the standard MCT test is run.
+      |  When a value of "alternate" is provided for mctVersion in the
+      |  prompt file, the alternate MCT test is run.  When the standard
+      |  test is run, the MSG hashed will always be 3 * the length of
+      |  the SEED.  When the alternate test is run, the MSG hashed will
+      |  always be the length of the SEED.
+
+   SHA-1 and SHA-2 Standard Monte Carlo Test:
+
+   For j = 0 to 99
+       A = B = C = SEED
+       For i = 0 to 999
+           MSG = A || B || C
+           MD = SHA(MSG)
+           A = B
+           B = C
+           C = MD
+       Output MD
+       SEED = MD
+
+   SHA-1 and SHA-2 Alternate Monte Carlo Test:
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+   INITIAL_SEED_LENGTH = LEN(SEED)
+   For j = 0 to 99
+       A = B = C = SEED
+       For i = 0 to 999
+           MSG = A || B || C
+           if LEN(MSG) >= INITIAL_SEED_LENGTH:
+               MSG = leftmost INITIAL_SEED_LENGTH bits of MSG
+           else:
+               MSG = MSG || INITIAL_SEED_LENGTH - LEN(MSG) 0 bits
+           MD = SHA(MSG)
+           A = B
+           B = C
+           C = MD
+       Output MD
+       SEED = MD
+
+6.3.  Large Data tests for SHA-1 and SHA-2
+
+   The large data tests are intended to test the ability of a module to
+   hash multiple gigabytes of data at once.  This much information
+   cannot be communicated via the JSON files as a normal message
+   property.  Instead a new type is defined as a large data type.  It is
+   an object that contains a small content hex string, a content length
+   in bits, a full length in bits and an expansion technique string.
+   The following is an example of this structure.
+
+   "largeMsg": {
+       "content": "DE26",
+       "contentLength": 16,
+       "fullLength": 42949672960,
+       "expansionTechnique": "repeating"
+   }
+
+   The 'contentLength' property describes the number of bits in the
+   'content' property.  The 'content' property is the hex string that
+   can be expanded to the full large message.  The 'expansionTechnique'
+   describes the process used to obtain the full large message.  The
+   'fullLength' is the final length of the full large message.
+
+   There may be multiple 'expansionTechnique' types defined.  Here are
+   the types defined for SHA-1 and SHA-2 testing.
+
+   *  "repeating" - Append the number of content bits specified in
+      'contentLength' to itself as many times as needed until a hex
+      string of exactly 'fullLength' bits is acquired.  In the example
+      shown, the final large message would have the form
+      "DE26DE26DE26...DE26".
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+   There are multiple ways hash functions can be implemented in an IUT.
+   The most common are via a single Hash() call on the message or via a
+   series of Init(), any number of Update(), Final() calls.  As noted in
+   [LDT], the difference between these hashing techniques can have
+   consequences in the cryptographic module.  If the hash function is
+   implemented in the IUT via a series of Init(), Update(), and Final()
+   calls, the IUT MUST process the large input message in its entirety
+   in a single Update() call.
+
+6.4.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [FIPS180-4].
+
+6.4.1.  SHA Requirements Covered
+
+   Section 1 in [FIPS180-4] outlines the maximum message sizes for each
+   hash function.  Due to the large size (either 2^64 or 2^128 bits) of
+   these maximums, they are tested by special request in this
+   specification.  These tests are performed by the optional LDTs.
+
+   Sections 3 and 4 in [FIPS180-4] outline the core functions used
+   within the hash algorithms.  Normal AFTs test these operations.
+
+   Section 5 outlines the hash function preprocessing.  It is worth
+   noting that not all test cases will cover the message padding
+   process, but through the entire vector set, this operation will be
+   fully tested.
+
+6.4.2.  SHA Requirements Not Covered
+
+   Section 7 outlines digest truncation for applications where a
+   shortened digest is needed.  These operations are not tested via this
+   specification.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of SHA algorithms to the ACVP
+   server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+7.2.  HASH Algorithm Capabilities Registration
+
+   This section describes the constructs for advertising support of hash
+   algorithms to the ACVP server.
+
+   +======================+=================================+=========+
+   | JSON Value           | Description                     | JSON    |
+   |                      |                                 | type    |
+   +======================+=================================+=========+
+   | algorithm            | The hash algorithm and mode to  | string  |
+   |                      | be validated.                   |         |
+   +----------------------+---------------------------------+---------+
+   | revision             | The algorithm testing revision  | string  |
+   |                      | to use.                         |         |
+   +----------------------+---------------------------------+---------+
+   | messageLength        | The message lengths in bits     | domain  |
+   |                      | supported by the IUT.  Minimum  |         |
+   |                      | allowed is 0, maximum allowed   |         |
+   |                      | is 65536.                       |         |
+   +----------------------+---------------------------------+---------+
+   | performLargeDataTest | Determines if the server should | integer |
+   |                      | include the large data test     | array   |
+   |                      | group defined in Section 6.3.   |         |
+   |                      | This property is OPTIONAL, and  |         |
+   |                      | shall include the lengths in    |         |
+   |                      | GiB being tested.  Valid        |         |
+   |                      | options are {1, 2, 4, 8}.       |         |
+   +----------------------+---------------------------------+---------+
+
+             Table 2: Hash Algorithm Capabilities JSON Values
+
+   The value of the algorithm property MUST be one of the elements from
+   the list in Section 5.
+
+      |  NOTE 1: The lengths provided in the 'performLargeDataTest'
+      |  property are in gibibytes. 1GiB is equivalent to 2^30 bytes.
+
+      |  NOTE 2: At least one messageLength > 0 must be supported by an
+      |  IUT in order to accommodate MCT testing.
+
+   The following is a example JSON object advertising support for SHA-
+   256.
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+   {
+       "algorithm": "SHA2-256",
+       "revision": "1.0",
+       "messageLength": [{"min": 0, "max": 65535, "increment": 1}],
+       "performLargeDataTest": [1, 2]
+   }
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with Secure Hash Algorithm
+   (SHA) algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 3: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+8.1.  Test Groups
+
+   Test vector sets MUST contain one or many test groups, each sharing
+   similar properties.  For instance, all test vectors that use the same
+   testType would be grouped together.  The testGroups element at the
+   top level of the test vector JSON object SHALL be the array of test
+   groups.  The Test Group JSON object MUST contain meta-data that
+   applies to all test cases within the group.  The following table
+   describes the JSON elements that MAY appear from the server in the
+   Test Group JSON object:
+
+    +============+========================================+==========+
+    | JSON Value | Description                            | JSON     |
+    |            |                                        | type     |
+    +============+========================================+==========+
+    | tgId       | Numeric identifier for the test group, | integer  |
+    |            | unique across the entire vector set    |          |
+    +------------+----------------------------------------+----------+
+    | testType   | Test category type (AFT, MCT or LDT).  | string   |
+    |            | See Section 6 for more information     |          |
+    +------------+----------------------------------------+----------+
+    | mctVersion | When testType is MCT, the type of MCT  | string   |
+    |            | being run, i.e., "standard" or         |          |
+    |            | "alternate"                            |          |
+    +------------+----------------------------------------+----------+
+    | tests      | Array of individual test case JSON     | array of |
+    |            | objects, which are defined in          | testCase |
+    |            | Section 8.2                            | objects  |
+    +------------+----------------------------------------+----------+
+
+                     Table 4: Test Group JSON Object
+
+   All properties described in the previous table MUST appear in the
+   prompt file from the server for every testGroup object.
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+8.2.  Test Case
+
+   Each test group SHALL contain an array of one or more test cases.
+   Each test case is a JSON object that represents a single case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each test case.
+
+      +==========+============================+=====================+
+      | JSON     | Description                | JSON type           |
+      | Value    |                            |                     |
+      +==========+============================+=====================+
+      | tcId     | Numeric identifier for the | integer             |
+      |          | test case, unique across   |                     |
+      |          | the entire vector set      |                     |
+      +----------+----------------------------+---------------------+
+      | len      | Length of the message or   | integer             |
+      |          | MCT seed                   |                     |
+      +----------+----------------------------+---------------------+
+      | msg      | Value of the message or    | integer             |
+      |          | MCT seed in big-endian hex |                     |
+      +----------+----------------------------+---------------------+
+      | largeMsg | Object describing the      | large data object,  |
+      |          | message for an LDT group   | see Section 6.3 for |
+      |          |                            | more information    |
+      +----------+----------------------------+---------------------+
+
+                       Table 5: Test Case JSON Object
+
+   All properties described in the previous table MUST appear in the
+   prompt file from the server for every testCase object.
+
+   The following is an example JSON object for secure hash test vectors
+   sent from the ACVP server to the crypto module.  Note the single bit
+   message is represented as "80".  This complies with SHA1 and SHA2
+   being big-endian by nature.  All hex strings associated with SHA1 and
+   SHA2 SHALL be big-endian.
+
+   [
+       { "acvVersion": <acvp-version> },
+       {
+           "vsId": 1564,
+           "algorithm": "SHA2-512/224",
+           "revision": "1.0",
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "testType": "AFT",
+                   "tests": [
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+                       {
+                           "tcId": 0,
+                           "len": 0,
+                           "msg": "00"
+                       },
+                       {
+                           "tcId": 1,
+                           "len": 1,
+                           "msg": "80"
+                       }
+                   ]
+               },
+               {
+                   "tgId": 2,
+                   "testType": "MCT",
+                   "mctVersion": "standard",
+                   "tests": [
+                       {
+                           "tcId": 2175,
+                           "len": 20,
+                           "msg": "331b04d56f6e3ed5af349bf1fd9f9591b6ec886e",
+                       }
+                   ]
+               },
+               {
+                   "tgId": 3,
+                   "testType": "LDT",
+                   "tests": [
+                       {
+                           "tcId": 1029,
+                           "largeMsg": {
+                               "content": "DE26",
+                               "contentLength": 16,
+                               "fullLength": 42949672960,
+                               "expansionTechnique": "repeating"
+                           }
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+8.3.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it SHALL
+   send the response vectors back to the ACVP server within the alloted
+   timeframe.  The following table describes the JSON object that
+   represents a vector set response.
+
+       +============+==================================+===========+
+       | JSON Value | Description                      | JSON type |
+       +============+==================================+===========+
+       | acvVersion | Protocol version identifier      | string    |
+       +------------+----------------------------------+-----------+
+       | vsId       | Unique numeric identifier for    | integer   |
+       |            | the vector set                   |           |
+       +------------+----------------------------------+-----------+
+       | testGroups | Array of JSON objects that       | array of  |
+       |            | represent each test vector       | testGroup |
+       |            | result, which uses the same JSON | objects   |
+       |            | schema as defined in Section 8.2 |           |
+       +------------+----------------------------------+-----------+
+
+                  Table 6: Vector Set Response JSON Object
+
+   The testGroup Response section is used to organize the ACVP client
+   response in a similar manner to how it receives vectors.  Several
+   algorithms SHALL require the client to send back group level
+   properties in its response.  This structure helps accommodate that.
+
+      +============+=============================+==================+
+      | JSON Value | Description                 | JSON type        |
+      +============+=============================+==================+
+      | tgId       | The test group identifier   | integer          |
+      +------------+-----------------------------+------------------+
+      | tests      | The tests associated to the | array of         |
+      |            | group specified in tgId     | testCase objects |
+      +------------+-----------------------------+------------------+
+
+               Table 7: Vector Set Group Response JSON Object
+
+   Each test case is a JSON object that represents a single test object
+   to be processed by the ACVP client.
+
+   The following table describes the JSON elements for each test case
+   object.
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+    +==============+=====================================+============+
+    | JSON Value   | Description                         | JSON type  |
+    +==============+=====================================+============+
+    | tcId         | Numeric identifier for the test     | integer    |
+    |              | case, unique across the entire      |            |
+    |              | vector set.                         |            |
+    +--------------+-------------------------------------+------------+
+    | md           | The IUT's message digest response   | string     |
+    |              | to an AFT or LDT test               | (hex)      |
+    +--------------+-------------------------------------+------------+
+    | resultsArray | Array of JSON objects that          | array of   |
+    |              | represent each iteration of an MCT. | objects    |
+    |              | Each iteration will output the md   | containing |
+    |              |                                     | the md     |
+    +--------------+-------------------------------------+------------+
+
+                   Table 8: Test Case Results JSON Object
+
+   Note: The tcId MUST be included in every test case object sent
+   between the client and the server.
+
+   The following is a example JSON object for secure hash test results
+   sent from the crypto module to the ACVP server.  The group identified
+   by tgId 1 is a group of AFTs.  The group identified by tgId 2 is a
+   group of MCTs.  The group identified by tgId 3 is a group of LDTs.
+
+   {
+       "vsId": 0,
+       "algorithm": "SHA2-224",
+       "revision": "1.0",
+       "testGroups": [
+           {
+               "tgId": 1,
+               "tests": [
+                   {
+                       "tcId": 1,
+                       "md": "D14A028C2A3A2BC9476102BB288234C415A2B01F828EA62AC5B3E42F"
+                   },
+                   {
+                       "tcId": 2,
+                       "md": "D14A028C2A3A2BC9476102BB288234C415A2B01F828EA62AC5B3E42F"
+                   }
+               ]
+           },
+           {
+               "tgId": 2,
+               "tests": [
+                   {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 15]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+                       "tcId": 1028,
+                       "resultsArray": [
+                           {
+                               "md": "E82B1FA3D510C2E423D03CEDF01F66C995CDD573EB63D5A33FDAE640"
+                           },
+                           {
+                               "md": "00179AE4CE57DCBD156B981A414370B5089FA8E1098A05443DF3CD62"
+                           },
+                           {
+                               "md": "8F6C7F546940352613E8389D4F4B87473A57CACD7E289A27E4F51965"
+                           }
+                       ]
+                   }
+               ]
+           },
+           {
+               "tgId": 3,
+               "tests": [
+                   {
+                       "tcId": 1029,
+                       "md": "E4F8B44B32F5A25D1F4784601BF095CF5F7C6F4E9EAA1005AD19F09A"
+                   }
+               ]
+           }
+       ]
+   }
+
+9.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+10.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+11.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 16]
+
+Internet-Draft                  ACVP SHA                   December 2025
+
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [FIPS180-4]
+              National Institute of Standards and Technology, "Secure
+              Hash Standard (SHS)", NIST FIPS 180-4, August 2015,
+              <https://csrc.nist.gov/pubs/fips/180-4/upd1/final>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+   [SHAVS]    "The Secure Hash Algorithm Validation System (SHAVS)",
+              NIST SHAVS.
+
+   [LDT]      "Extending NIST's CAVP Testing of Cryptographic Hash
+              Function Implementations", LDT.
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 17]

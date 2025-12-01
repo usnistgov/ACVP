@@ -1,0 +1,784 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+     ACVP Password-based Key Derivation Function JSON Specification
+                        draft-gold-acvp-pbkdf-01
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   3
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported KDFs  . . . . . . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   4
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   4
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   5
+     7.2.  Property Registration . . . . . . . . . . . . . . . . . .   6
+     7.3.  Registration Example  . . . . . . . . . . . . . . . . . .   6
+       7.3.1.  Valid Hash Functions  . . . . . . . . . . . . . . . .   8
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.1.  Test Groups . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.2.  Test Cases  . . . . . . . . . . . . . . . . . . . . . . .  10
+   9.  Responses . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  13
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  13
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing Password-based KDF
+   implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing Password-
+   based KDF implementations using ACVP.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported KDFs
+
+   The following key derivation functions MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  PBKDF / 1.0
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   Password-based KDF implementations.
+
+6.1.  Test Types
+
+   There is only one test type: functional tests.  Each has a specific
+   value to be used in the testType field.  The testType field
+   definitions are:
+
+   *  "AFT" - Algorithm Functional Test.  These tests can be processed
+      by the client using a normal derive_key operation.  AFTs cause the
+      implementation under test to exercise normal operations on a
+      single block, multiple blocks, or partial blocks.  In all cases,
+      random data is used.  The functional tests are designed to verify
+      that the logical components of the key derivation process are
+      operating correctly.
+
+6.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to XXX.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of PBKDF algorithms to the
+   ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+7.2.  Property Registration
+
+   The Password-based KDF mode capabilities are advertised as JSON
+   objects within the 'capabilities_exchange' property.
+
+7.3.  Registration Example
+
+   A registration SHALL use these properties
+
+   +================+===================+========+====================+
+   | JSON Property  | Description       | JSON   | Valid Values       |
+   |                |                   | Type   |                    |
+   +================+===================+========+====================+
+   | algorithm      | Name of the       | string | "PBKDF"            |
+   |                | algorithm to be   |        |                    |
+   |                | validated         |        |                    |
+   +----------------+-------------------+--------+--------------------+
+   | revision       | ACVP Test version | string | "1.0"              |
+   +----------------+-------------------+--------+--------------------+
+   | prereqVals     | Prerequisites of  | object | See Section 7.1    |
+   |                | the algorithm     |        |                    |
+   +----------------+-------------------+--------+--------------------+
+   | capabilities   | Array of          | array  | Each object in the |
+   |                | capabilities      |        | array contains the |
+   |                |                   |        | below properties   |
+   +----------------+-------------------+--------+--------------------+
+   | iterationCount | Number of hash    | domain | Min: 1, Max:       |
+   |                | interations       |        | 10000000           |
+   +----------------+-------------------+--------+--------------------+
+   | keyLen         | The length of the | domain | Min: 112, Max:     |
+   |                | output key in     |        | 4096               |
+   |                | bits              |        |                    |
+   +----------------+-------------------+--------+--------------------+
+   | passwordLen    | The length of the | domain | Min: 8, Max: 128   |
+   |                | password in bytes |        |                    |
+   |                | (characters)      |        |                    |
+   +----------------+-------------------+--------+--------------------+
+   | saltLen        | The length of the | domain | Min: 128, Max:     |
+   |                | salt in bits      |        | 4096               |
+   +----------------+-------------------+--------+--------------------+
+   | hmacAlg        | The supported     | array  | See Section 7.3.1  |
+   |                | hash algorithms   |        |                    |
+   |                | used for HMAC     |        |                    |
+   +----------------+-------------------+--------+--------------------+
+
+            Table 2: PBKDF Algorithm Capabilities JSON Values
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+   An example registration within an algorithm capability exchange looks
+   like this
+
+   {
+     "algorithm":"PBKDF",
+     "revision":"1.0",
+     "prereqVals":[
+       {
+         "algorithm":"SHA",
+         "valValue":"same"
+       }
+     ],
+     "capabilities": [
+       {
+         "iterationCount":[
+           {
+             "min":10,
+             "max":1000,
+             "increment":1
+           }
+         ],
+         "keyLen":[
+           {
+             "min":8,
+             "max":4096,
+             "increment":8
+           }
+         ],
+         "passwordLen":[
+           {
+             "min":8,
+             "max":128,
+             "increment":1
+           }
+         ],
+         "saltLen":[
+           {
+             "min":128,
+             "max":4096,
+             "increment":8
+           }
+         ],
+         "hmacAlg":[
+           "SHA-1",
+           "SHA2-224",
+           "SHA2-256",
+           "SHA2-384",
+           "SHA2-512",
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+           "SHA3-224",
+           "SHA3-256",
+           "SHA3-384",
+           "SHA3-512"
+         ]
+       }
+     ]
+   }
+
+7.3.1.  Valid Hash Functions
+
+   The following hash functions MAY be advertised by an ACVP compliant
+   client under the 'hmacAlg' property
+
+   *  SHA-1
+
+   *  SHA2-224
+
+   *  SHA2-256
+
+   *  SHA2-384
+
+   *  SHA2-512
+
+   *  SHA2-512/224
+
+   *  SHA2-512/256
+
+   *  SHA3-224
+
+   *  SHA3-256
+
+   *  SHA3-384
+
+   *  SHA3-512
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with Password-based KDF
+   algorithms.
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 3: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+8.1.  Test Groups
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the Password-based KDF JSON elements of the
+   Test Group JSON object
+
+     +=============+====================================+===========+
+     | JSON Values | Description                        | JSON Type |
+     +=============+====================================+===========+
+     | tgId        | Test group identifier              | integer   |
+     +-------------+------------------------------------+-----------+
+     | hmacAlg     | The hash algorithm used in HMAC    | string    |
+     +-------------+------------------------------------+-----------+
+     | testType    | Describes the operation the client | string    |
+     |             | should perform on the tests data   |           |
+     +-------------+------------------------------------+-----------+
+     | tests       | Array of individual test cases     | array     |
+     +-------------+------------------------------------+-----------+
+
+                     Table 4: Test Group JSON Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' the
+   group is addressing.
+
+8.2.  Test Cases
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each Password-based KDF test vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+         +================+==========================+===========+
+         | JSON Values    | Description              | JSON Type |
+         +================+==========================+===========+
+         | tcId           | Test case idenfitier     | integer   |
+         +----------------+--------------------------+-----------+
+         | keyLen         | Length of the output key | integer   |
+         +----------------+--------------------------+-----------+
+         | salt           | Salt value               | hex       |
+         +----------------+--------------------------+-----------+
+         | password       | Password value           | string    |
+         +----------------+--------------------------+-----------+
+         | iterationCount | Number of iterations     | integer   |
+         +----------------+--------------------------+-----------+
+
+                       Table 5: Test Case JSON Object
+
+   Here is an abbreviated yet fully constructed example of the prompt
+
+   {
+     "vsId": 1,
+     "algorithm": "PBKDF",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "hmacAlg": "SHA2-224",
+         "tests": [
+           {
+             "tcId": 1,
+             "keyLen": 143,
+             "salt": "BC902BA1EB3BD8519B68022F0FC15600D5D27A",
+             "password": "FSLuCqOV",
+             "iterationCount": 955
+           },
+           {
+             "tcId": 2,
+             "keyLen": 188,
+             "salt": "8120C1DED77061BC5ED637DD51174F12",
+             "password": "HCmKuigqgFlqpJv",
+             "iterationCount": 269
+           }
+         ]
+       }
+     ]
+   }
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+9.  Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | acvVersion    | The version of the protocol | string    |
+        +---------------+-----------------------------+-----------+
+        | vsId          | The vector set identifier   | integer   |
+        +---------------+-----------------------------+-----------+
+        | testGroups    | The test group data         | array     |
+        +---------------+-----------------------------+-----------+
+
+                  Table 6: Vector Set Response JSON Object
+
+   An example of this is the following
+
+   {
+           "acvVersion": "version",
+           "vsId": 1,
+           "testGroups": [ ... ]
+   }
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+         +===============+===========================+===========+
+         | JSON Property | Description               | JSON Type |
+         +===============+===========================+===========+
+         | tgId          | The test group identifier | integer   |
+         +---------------+---------------------------+-----------+
+         | tests         | The test case data        | array     |
+         +---------------+---------------------------+-----------+
+
+               Table 7: Vector Set Group Response JSON Object
+
+   An example of this is the following
+
+   {
+           "tgId": 1,
+           "tests": [ ... ]
+   }
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+   The following table describes the JSON object that represents a test
+   case response for a Password-based KDF.
+
+         +===============+==========================+===========+
+         | JSON Property | Description              | JSON Type |
+         +===============+==========================+===========+
+         | tcId          | The test case identifier | integer   |
+         +---------------+--------------------------+-----------+
+         | derivedKey    | The outputted key        | hex       |
+         +---------------+--------------------------+-----------+
+
+                  Table 8: Test Case Results JSON Object
+
+   Here is an abbreviated example of the response
+
+   {
+     "vsId": 1,
+     "algorithm": "PBKDF",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "derivedKey": "986B212420E3B977068244E6BD..."
+           },
+           {
+             "tcId": 2,
+             "derivedKey": "B8F3EEC6B5FA270FB05644DE40..."
+           }
+         ]
+       }
+     ]
+   }
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  Normative References
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft                 ACVP PBKDF                  December 2025
+
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]

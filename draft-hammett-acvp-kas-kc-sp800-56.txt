@@ -1,0 +1,1120 @@
+
+
+
+
+Network Working Group                                    R. Hammett, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+                ACVP KAS KC SP800-56 JSON Specification
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 1]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   4
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported KAS-KCs . . . . . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   4
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   4
+     6.2.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   4
+       6.2.1.  Requirements Covered  . . . . . . . . . . . . . . . .   4
+       6.2.2.  KAS-FFC Requirements Not Covered  . . . . . . . . . .   5
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   5
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   6
+     7.2.  Prerequisite Algorithms . . . . . . . . . . . . . . . . .   7
+     7.3.  Algorithm Capabilities JSON Values  . . . . . . . . . . .   8
+       7.3.1.  Supported KeyConfirmation Method  . . . . . . . . . .   8
+       7.3.2.  Supported MAC Methods . . . . . . . . . . . . . . . .   9
+     7.4.  Example Registration  . . . . . . . . . . . . . . . . . .  11
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  12
+     8.1.  Test Groups JSON Schema . . . . . . . . . . . . . . . . .  13
+     8.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  15
+     8.3.  Example Test Vectors JSON Object  . . . . . . . . . . . .  15
+   9.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  17
+     9.1.  Example Test Results JSON Object  . . . . . . . . . . . .  18
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  19
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  19
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  20
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing SP800-56 KAS KC
+   implementations with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 2]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   sub-specification defines the JSON constructs for testing SP800-56
+   KAS KC implementations using ACVP.
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 3]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported KAS-KCs
+
+   The following key derivation functions MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  KAS-KC / null / Sp800-56
+
+6.  Test Types and Test Coverage
+
+   The ACVP server performs a set of tests on the KAS protocol in order
+   to assess the correctness and robustness of the implementation.  A
+   typical ACVP validation session SHALL require multiple tests to be
+   performed for every supported permutation of KAS capabilities.  This
+   section describes the design of the tests used to validate
+   implementations of KAS algorithms.
+
+6.1.  Test Types
+
+   There are two test types for KAS testing:
+
+   *  "AFT" - Algorithm Function Test.  In the AFT test mode, the IUT
+      SHALL act as a party in the Key Confirmation with the ACVP server.
+      The server SHALL generate and provide all necessary information
+      for the IUT to perform a successful key confirmation; both the
+      server and IUT MAY act as party U/V, as well as recipient/provider
+      to key confirmation.
+
+6.2.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [SP800-56Ar3] and [SP800-56Br2]
+   Key Confirmation.
+
+6.2.1.  Requirements Covered
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 4]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   *  SP 800-56Ar3 / SP 800-56Br2 - 5.1 Cryptographic Hash Functions.
+      SHA1, SHA2, and SHA3 hash functions SHALL be available for the
+      various pieces of KAS requiring use of a hash function; such as
+      approved MACs and OneStep KDF.
+
+   *  SP 800-56Ar3 / SP 800-56Br2 - 5.2 Message Authentication Code
+      (MAC) Algorithms.  AES-CMAC, HMAC, and KMAC algorithms SHALL be
+      available for testing under Key Confirmation as the specification
+      states.
+
+   *  SP 800-56Ar3 - 5.3 Random Number Generation / SP800-56Br2 - 5.3
+      Random Bit Generators.  Though random values are used, the testing
+      of the construction of those random values SHALL NOT be in scope
+      of ACVP testing.
+
+   *  SP 800-56Ar3 / SP800-56Br2 - 5.4 Nonces.  Though nonces are used,
+      the testing of the construction of those nonces SHALL NOT be in
+      scope of ACVP testing.
+
+   *  SP 800-56Ar3 - 5.9 KeyConfirmation / SP 800-56Br2 - 5.6 Key
+      Confirmation.  The ACVP server SHALL support key confirmation for
+      applicable KAS and KTS schemes.
+
+6.2.2.  KAS-FFC Requirements Not Covered
+
+   *  SP 800-56Ar3 / SP 800-56Br2 Sections that aren't applicable to Key
+      Confirmation SHALL NOT be in the scope of testing covered under
+      this document, for this algorithm.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of KAS KC algorithms to the
+   ACVP server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 5]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 6]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+7.2.  Prerequisite Algorithms
+
+   Some algorithm implementations rely on other cryptographic
+   primitives.  For example, IKEv2 uses an underlying SHA algorithm.
+   Each of these underlying algorithm primitives must be validated,
+   either separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
+
+   +==============+==============+============+=============+==========+
+   | JSON Value   |Description   |JSON type   |Valid Values | Optional |
+   +==============+==============+============+=============+==========+
+   | algorithm    |a prerequisite|value       |CMAC, DRBG,  | No       |
+   |              |algorithm     |            |DSA, HMAC,   |          |
+   |              |              |            |KMAC,        |          |
+   |              |              |            |SafePrimes,  |          |
+   |              |              |            |SHA,         |          |
+   |              |              |            |SP800-108    |          |
+   +--------------+--------------+------------+-------------+----------+
+   | valValue     |algorithm     |value       |actual number| No       |
+   |              |validation    |            |or "same"    |          |
+   |              |number        |            |             |          |
+   +--------------+--------------+------------+-------------+----------+
+   | prereqAlgVal |prerequistie  |object with |see above    | Yes      |
+   |              |algorithm     |algorithm   |             |          |
+   |              |validation    |and valValue|             |          |
+   |              |              |properties  |             |          |
+   +--------------+--------------+------------+-------------+----------+
+
+                Table 2: Prerequisite Algorithms JSON Values
+
+   KAS has conditional prerequisite algorithms, depending on the
+   capabilities registered:
+
+   +==============+===================================================+
+   | Prerequisite | Condition                                         |
+   | Algorithm    |                                                   |
+   +==============+===================================================+
+   | CMAC         | CMAC validation REQUIRED when IUT is performing   |
+   |              | KeyConfirmation (KC) or a KDF and utilizing CMAC. |
+   +--------------+---------------------------------------------------+
+   | HMAC         | HMAC validation REQUIRED when IUT is performing   |
+   |              | KeyConfirmation (KC) or a KDF and utilizing HMAC. |
+   +--------------+---------------------------------------------------+
+   | KMAC         | KMAC validation REQUIRED when IUT is performing   |
+   |              | KeyConfirmation (KC) or a KDF and utilizing KMAC. |
+   +--------------+---------------------------------------------------+
+
+               Table 3: Prerequisite requirement conditions
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 7]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+7.3.  Algorithm Capabilities JSON Values
+
+   Each algorithm capability advertised is a self-contained JSON object
+   using the following values.
+
+   +=====================+===============+============+==========+========+
+   |JSON Value           |Description    |JSON type   |Valid     |Optional|
+   |                     |               |            |Values    |        |
+   +=====================+===============+============+==========+========+
+   |algorithm            |The algorithm  |string      |"KAS-KC"  |No      |
+   |                     |under test     |            |          |        |
+   +---------------------+---------------+------------+----------+--------+
+   |revision             |The algorithm  |string      |"Sp800-56"|No      |
+   |                     |testing        |            |          |        |
+   |                     |revision to    |            |          |        |
+   |                     |use.           |            |          |        |
+   +---------------------+---------------+------------+----------+--------+
+   |prereqVals           |Prerequisite   |array of    |See       |No      |
+   |                     |algorithm      |prereqAlgVal|Section   |        |
+   |                     |validations    |objects     |7.2       |        |
+   +---------------------+---------------+------------+----------+--------+
+   |kasRole              |Roles supported|array       |initiator |No      |
+   |                     |for key        |            |and/or    |        |
+   |                     |agreement      |            |responder |        |
+   +---------------------+---------------+------------+----------+--------+
+   |keyConfirmationMethod|The            |object      |Section   |Yes     |
+   |                     |KeyConfirmation|            |7.3.1     |        |
+   |                     |capabilities   |            |          |        |
+   |                     |supported.     |            |          |        |
+   +---------------------+---------------+------------+----------+--------+
+
+                     Table 4: Capabilities JSON Values
+
+7.3.1.  Supported KeyConfirmation Method
+
+   +=========================+=============+======+===========+========+
+   |JSON Value               |Description  |JSON  |Valid      |Optional|
+   |                         |             |type  |Values     |        |
+   +=========================+=============+======+===========+========+
+   |macMethods               |The MAC      |object|Section    |No      |
+   |                         |methods to   |      |7.3.2      |        |
+   |                         |use when     |      |           |        |
+   |                         |testing KAS  |      |           |        |
+   |                         |or KTS       |      |           |        |
+   |                         |schemes with |      |           |        |
+   |                         |key          |      |           |        |
+   |                         |confirmation.|      |           |        |
+   +-------------------------+-------------+------+-----------+--------+
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 8]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   |keyConfirmationDirections|The          |array |unilateral,|No      |
+   |                         |directions in|      |bilateral  |        |
+   |                         |which key    |      |           |        |
+   |                         |confirmation |      |           |        |
+   |                         |is supported.|      |           |        |
+   +-------------------------+-------------+------+-----------+--------+
+   |keyConfirmationRoles     |The roles in |array |provider,  |No      |
+   |                         |which key    |      |recipient  |        |
+   |                         |confirmation |      |           |        |
+   |                         |is supported.|      |           |        |
+   +-------------------------+-------------+------+-----------+--------+
+
+         Table 5: KAS FFC KeyConfirmation Capabilities JSON Values
+
+7.3.2.  Supported MAC Methods
+
+   Note that AT LEAST one mac method must be supplied when making use of
+   Key Confirmation.
+
+   +===================+===================+======+=========+==========+
+   | JSON Value        |Description        |JSON  |Valid    | Optional |
+   |                   |                   |type  |Values   |          |
+   +===================+===================+======+=========+==========+
+   | CMAC              |Utilizes CMAC as   |object|See      | Yes      |
+   |                   |the MAC algorithm. |      |Section  |          |
+   |                   |                   |      |7.3.2.1. |          |
+   |                   |                   |      |Note that|          |
+   |                   |                   |      |the      |          |
+   |                   |                   |      |keyLen   |          |
+   |                   |                   |      |must be  |          |
+   |                   |                   |      |128, 192,|          |
+   |                   |                   |      |or 256   |          |
+   |                   |                   |      |for this |          |
+   |                   |                   |      |MAC.     |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA-1        |Utilizes HMAC-SHA-1|object|See      | Yes      |
+   |                   |as the MAC         |      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA2-224     |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA2-224 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA2-256     |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA2-256 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA2-384     |Utilizes HMAC-     |object|See      | Yes      |
+
+
+
+Hammett                    Expires 4 June 2026                  [Page 9]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   |                   |SHA2-384 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA2-512     |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA2-512 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA2-512/224 |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA2-512/224 as the|      |Section  |          |
+   |                   |MAC algorithm.     |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA2-512/256 |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA2-512/256 as the|      |Section  |          |
+   |                   |MAC algorithm.     |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA3-224     |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA3-224 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA3-256     |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA3-256 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA3-384     |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA3-384 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | HMAC-SHA3-512     |Utilizes HMAC-     |object|See      | Yes      |
+   |                   |SHA3-512 as the MAC|      |Section  |          |
+   |                   |algorithm.         |      |7.3.2.1  |          |
+   +-------------------+-------------------+------+---------+----------+
+   | KMAC-128          |Utilizes KMAC-128  |object|See      | Yes      |
+   |                   |as the MAC         |      |Section  |          |
+   |                   |algorithm.  Note   |      |7.3.2.1  |          |
+   |                   |that a             |      |         |          |
+   |                   |customization      |      |         |          |
+   |                   |string of "KC" is  |      |         |          |
+   |                   |used for the       |      |         |          |
+   |                   |function when KMAC |      |         |          |
+   |                   |is utilized for Key|      |         |          |
+   |                   |Confirmation.      |      |         |          |
+   +-------------------+-------------------+------+---------+----------+
+   | KMAC-256          |Utilizes KMAC-256  |object|See      | Yes      |
+   |                   |as the MAC         |      |Section  |          |
+   |                   |algorithm.  Note   |      |7.3.2.1  |          |
+   |                   |that a             |      |         |          |
+   |                   |customization      |      |         |          |
+   |                   |string of "KC" is  |      |         |          |
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 10]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   |                   |used for the       |      |         |          |
+   |                   |function when KMAC |      |         |          |
+   |                   |is utilized for Key|      |         |          |
+   |                   |Confirmation.      |      |         |          |
+   +-------------------+-------------------+------+---------+----------+
+
+                        Table 6: MAC Method Options
+
+7.3.2.1.  Supported MAC Options
+
+   +========+=================+=========+===================+==========+
+   | JSON   | Description     | JSON    | Valid Values      | Optional |
+   | Value  |                 | type    |                   |          |
+   +========+=================+=========+===================+==========+
+   | keyLen | The amount of   | integer | 128 - 512.  Note  | No       |
+   |        | bits from the   |         | that the DKM is   |          |
+   |        | DKM to pass     |         | *Required* to     |          |
+   |        | into the        |         | have at least 8   |          |
+   |        | KeyConfirmation |         | bits available    |          |
+   |        | MAC function.   |         | after             |          |
+   |        |                 |         | subtracting the   |          |
+   |        |                 |         | keyLen            |          |
+   |        |                 |         | specified.        |          |
+   +--------+-----------------+---------+-------------------+----------+
+   | macLen | The amount of   | integer | 64 - 512.         | No       |
+   |        | bits to use as  |         |                   |          |
+   |        | the tag from    |         |                   |          |
+   |        | the MAC         |         |                   |          |
+   |        | function.       |         |                   |          |
+   +--------+-----------------+---------+-------------------+----------+
+
+                      Table 7: MAC Method Base Options
+
+7.4.  Example Registration
+
+   The following is a example JSON object advertising support for KAS
+   FFC.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 11]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   {
+     "algorithm": "KAS-KC",
+     "revision": "Sp800-56",
+     "kasRole": [
+       "initiator",
+       "responder"
+     ],
+     "keyConfirmationMethod": {
+       "macMethods": {
+         "KMAC-128": {
+           "keyLen": 128,
+           "macLen": 128
+         }
+       },
+       "keyConfirmationDirections": [
+         "unilateral",
+         "bilateral"
+       ],
+       "keyConfirmationRoles": [
+         "provider",
+         "recipient"
+       ]
+     }
+   }
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with SP800-56 KAS KC
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 12]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 8: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+8.1.  Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the secure hash JSON elements of the Test
+   Group JSON object.
+
+   The test group for KAS/KTS FFC is as follows:
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 13]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   +==========================+=================+==========+==========+
+   | JSON Value               | Description     | JSON     | Optional |
+   |                          |                 | type     |          |
+   +==========================+=================+==========+==========+
+   | tgId                     | Numeric         | value    | No       |
+   |                          | identifier for  |          |          |
+   |                          | the test group, |          |          |
+   |                          | unique across   |          |          |
+   |                          | the entire      |          |          |
+   |                          | vector set.     |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | testType                 | The type of     | value    | No       |
+   |                          | test for the    |          |          |
+   |                          | group (AFT or   |          |          |
+   |                          | VAL).           |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | kasRole                  | The group role  | value    | No       |
+   |                          | from the        |          |          |
+   |                          | perspective of  |          |          |
+   |                          | the IUT.        |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | keyConfirmationDirection | The key         | value    | No       |
+   |                          | confirmation    |          |          |
+   |                          | direction.      |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | keyConfirmationRole      | The key         | value    | No       |
+   |                          | confirmation    |          |          |
+   |                          | role.           |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | keyAgreementMacType      | The MAC being   | value    | No       |
+   |                          | used for key    |          |          |
+   |                          | confirmation.   |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | keyLen                   | The length of   | value    | No       |
+   |                          | the key to be   |          |          |
+   |                          | used as the     |          |          |
+   |                          | macKey.         |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | macLen                   | The length of   | value    | No       |
+   |                          | the MAC to be   |          |          |
+   |                          | produced.       |          |          |
+   +--------------------------+-----------------+----------+----------+
+   | tests                    | The tests for   | Array of | No       |
+   |                          | the group.      | objects, |          |
+   |                          |                 | See      |          |
+   |                          |                 | Section  |          |
+   |                          |                 | 8.2.     |          |
+   +--------------------------+-----------------+----------+----------+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 14]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+                    Table 9: Vector Group JSON Object
+
+8.2.  Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each test vector.
+
+    +===============+=============================+=======+==========+
+    | JSON Value    | Description                 | JSON  | Optional |
+    |               |                             | type  |          |
+    +===============+=============================+=======+==========+
+    | tcId          | Numeric identifier for the  | value | No       |
+    |               | test case, unique across    |       |          |
+    |               | the entire vector set.      |       |          |
+    +---------------+-----------------------------+-------+----------+
+    | macDataServer | The partyId and ephemeral   | value | No       |
+    |               | data to be used from the    |       |          |
+    |               | ACVP server perspective.    |       |          |
+    +---------------+-----------------------------+-------+----------+
+    | macDataIut    | The partyId and ephemeral   | value | No       |
+    |               | data to be used from the    |       |          |
+    |               | IUT perspective.            |       |          |
+    +---------------+-----------------------------+-------+----------+
+    | macKey        | The macKey portion of the   | value | No       |
+    |               | key confirmation.           |       |          |
+    +---------------+-----------------------------+-------+----------+
+    | tag           | The tag generated as a part | value | Yes      |
+    |               | of key confirmation (from   |       |          |
+    |               | the IUT perspective).       |       |          |
+    +---------------+-----------------------------+-------+----------+
+
+                     Table 10: Test Case JSON Object
+
+8.3.  Example Test Vectors JSON Object
+
+   The following is a example JSON object for test vectors sent from the
+   ACVP server to the crypto module.
+
+   {
+     "vsId": 0,
+     "algorithm": "KAS-KC",
+     "revision": "Sp800-56",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 15]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+         "testType": "AFT",
+         "kasRole": "initiator",
+         "keyConfirmationDirection": "bilateral",
+         "keyConfirmationRole": "provider",
+         "keyAgreementMacType": "CMAC",
+         "keyLen": 256,
+         "macLen": 64,
+         "tests": [
+           {
+             "tcId": 1,
+             "macDataServer": {
+               "partyId": "3590EA2B8D8EE994684A0CE4385DD2D2",
+               "ephemeralData": "3139B09E09434C5F294F20115C7EE97B5716C9188CA39D08807F3809ADD8AD05"
+             },
+             "macDataIut": {
+               "partyId": "910C6FE518C33A22380BCD33EAA34A79",
+               "ephemeralData": "AA380D7E3E49563B006DE8F224336B421137D3CB50BD69472FDD5299885F9637"
+             },
+             "macKey": "08E276F4BC4EAE5DE47C4DB92402E7338D2373CA4BE9A4B43338635E25C5C212"
+           },
+           {
+             "tcId": 2,
+             "macDataServer": {
+               "partyId": "C19FE731C14EBB0EDE8ECF2C60086CEA"
+             },
+             "macDataIut": {
+               "partyId": "88E6C06D57E5EAC600DDE7246AAF7408"
+             },
+             "macKey": "234ADECE1B99695BD1E539BED042ABC51C9B0D348ECBCF9C0E46F7B885857D71"
+           },
+           {
+             "tcId": 3,
+             "macDataServer": {
+               "partyId": "5345535892D86B3BE9C57D57E6EB4EA6"
+             },
+             "macDataIut": {
+               "partyId": "022376FC5CBDE150D754BE6C78D2C653"
+             },
+             "macKey": "6A9BFC7FC2E6013CE901D59C1DF7297B61FB6B945FF1D7C55217FA5FB54FC5BB"
+           },
+           {
+             "tcId": 4,
+             "macDataServer": {
+               "partyId": "F30A8967854FED4C423ABBCAC2190D65"
+             },
+             "macDataIut": {
+               "partyId": "B1B0408807E22EB93EFEF2FAFB418EEB",
+               "ephemeralData": "242FD779A30DAEFE542F6832348640A2A8FC824990CFC5E5F1DA881237C7452D"
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 16]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+             },
+             "macKey": "950E78377B63387216C45BBF8349C4DD536B03B26BF6E4D03E855379E9FA5B79"
+           }
+         ]
+       }
+     ]
+   }
+
+9.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it MUST
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+      +============+============================+=======+==========+
+      | JSON Value | Description                | JSON  | Optional |
+      |            |                            | type  |          |
+      +============+============================+=======+==========+
+      | acvVersion | Protocol version           | value | No       |
+      |            | identifier                 |       |          |
+      +------------+----------------------------+-------+----------+
+      | vsId       | Unique numeric identifier  | value | No       |
+      |            | for the vector set         |       |          |
+      +------------+----------------------------+-------+----------+
+      | testGroups | Array of JSON objects that | array | No       |
+      |            | represent each test vector |       |          |
+      |            | group.  See Table 12.      |       |          |
+      +------------+----------------------------+-------+----------+
+
+                Table 11: Vector Set Response JSON Object
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 17]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   +=======+========================================+=======+==========+
+   | JSON  | Description                            | JSON  | Optional |
+   | Value |                                        | type  |          |
+   +=======+========================================+=======+==========+
+   | tgId  | The test group Id                      | value | No       |
+   +-------+----------------------------------------+-------+----------+
+   | tests | Array of JSON objects that             | array | No       |
+   |       | represent each test vector             |       |          |
+   |       | group.  See Table 13.                  |       |          |
+   +-------+----------------------------------------+-------+----------+
+
+              Table 12: Vector Set Group Response JSON Object
+
+   The testCase section is used to organize the ACVP client response in
+   a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.
+
+        +=======+=============================+=======+==========+
+        | JSON  | Description                 | JSON  | Optional |
+        | Value |                             | type  |          |
+        +=======+=============================+=======+==========+
+        | tcId  | The test case Id            | value | No       |
+        +-------+-----------------------------+-------+----------+
+        | tag   | The tag generated as a part | value | No       |
+        |       | of key confirmation (from   |       |          |
+        |       | the IUT perspective).       |       |          |
+        +-------+-----------------------------+-------+----------+
+
+           Table 13: Vector Set Test Case Response JSON Object
+
+9.1.  Example Test Results JSON Object
+
+   The following is a example JSON object for test results sent from the
+   crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 18]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   {
+     "vsId": 0,
+     "algorithm": "KAS-KC",
+     "revision": "Sp800-56",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "tag": "35FA16A8F7CE4DD6"
+           },
+           {
+             "tcId": 2,
+             "tag": "7FD1AF7F1FF82F6C"
+           },
+           {
+             "tcId": 3,
+             "tag": "A1ABD89925631AC1"
+           },
+           {
+             "tcId": 4,
+             "tag": "BAABCDE5BFA9F3FA"
+           }
+         ]
+       }
+     ]
+   }
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 19]
+
+Internet-Draft            ACVP KAS KC SP800-56             December 2025
+
+
+   [RFC3526]  Kivinen, T. and M. Kojo, "More Modular Exponential (MODP)
+              Diffie-Hellman groups for Internet Key Exchange (IKE)",
+              RFC 3526, RFC 3526, DOI 10.17487/RFC3526, May 2003,
+              <https://www.rfc-editor.org/info/rfc3526>.
+
+   [RFC7919]  Gillmor, D., "Negotiated Finite Field Diffie-Hellman
+              Ephemeral Parameters for Transport Layer Security (TLS)",
+              RFC 7919, RFC 7919, DOI 10.17487/RFC7919, August 2016,
+              <https://www.rfc-editor.org/info/rfc7919>.
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [SP800-56Ar3]
+              Barker, E. B., Chen, L., Roginsky, A., Vassilev, A., and
+              R. Davis, "Recommendation for Pair-Wise Key-Establishment
+              Schemes Using Discrete Logarithm Cryptography", NIST SP
+              800-56A Rev. 3, April 2018,
+              <https://csrc.nist.gov/pubs/sp/800/56/a/r3/final>.
+
+   [SP800-56Br2]
+              Barker, E. B., Chen, L., Roginsky, A., Vassilev, A.,
+              Davis, R., and S. Simon, "Recommendation for Pair-Wise
+              Key-Establishment Using Integer Factorization
+              Cryptography", NIST SP 800-56B Rev. 2, March 2019,
+              <https://csrc.nist.gov/pubs/sp/800/56/b/r2/final>.
+
+   [ACVP]     Hammett, R., Fussell, B., Vassilev, A., and H. Booth,
+              "Automatic Cryptographic Validation Protocol", 1 July
+              2019.
+
+Author's Address
+
+   Russell Hammett (editor)
+
+
+
+
+
+
+
+
+
+
+
+
+Hammett                    Expires 4 June 2026                 [Page 20]

@@ -1,0 +1,1904 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+        ACVP Extendable Output Function (XOF) JSON Specification
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   4
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported Algorithms  . . . . . . . . . . . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   5
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   5
+     6.2.  Monte Carlo tests for XOFs  . . . . . . . . . . . . . . .   5
+       6.2.1.  cSHAKE Monte Carlo Test . . . . . . . . . . . . . . .   5
+       6.2.2.  ParallelHash Monte Carlo Test . . . . . . . . . . . .   6
+       6.2.3.  TupleHash Monte Carlo Test  . . . . . . . . . . . . .   7
+       6.2.4.  Functions Used in the Monte Carlo Tests for XOFs  . .   8
+     6.3.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   9
+       6.3.1.  XOF Requirements Covered  . . . . . . . . . . . . . .   9
+       6.3.2.  XOF Requirements Not Covered  . . . . . . . . . . . .   9
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   9
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .  10
+     7.2.  XOF Algorithm Capabilities Registration . . . . . . . . .  11
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  14
+     8.1.  Test Groups . . . . . . . . . . . . . . . . . . . . . . .  15
+     8.2.  Test Case JSON Schema . . . . . . . . . . . . . . . . . .  16
+     8.3.  Test Vector Responses . . . . . . . . . . . . . . . . . .  17
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
+   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
+   Appendix A.  Example Capabilities JSON Objects  . . . . . . . . .  20
+   Appendix B.  Example Test Vectors JSON Objects  . . . . . . . . .  23
+   Appendix C.  Example Test Results JSON Objects  . . . . . . . . .  28
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  34
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing Extendable Output
+   Function implementations with the ACVP specification.
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing Extendable
+   Output Function implementations using ACVP.
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported Algorithms
+
+   The following XOFs may be advertised by this ACVP compliant crypto
+   module:
+
+   *  cSHAKE-128
+
+   *  cSHAKE-256
+
+   *  ParallelHash-128
+
+   *  ParallelHash-256
+
+   *  TupleHash-128
+
+   *  TupleHash-256
+
+   *  KMAC-128
+
+   *  KMAC-256
+
+   Other XOFs may be advertised by the ACVP elsewhere.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   Extendable Output Function implementations.
+
+6.1.  Test Types
+
+   This section describes the design of the tests used to validate
+   implementations of XOFs.  There are three types of tests for these
+   algorithms: Algorithm Functional Tests (AFT), Monte Carlo Tests (MCT)
+   and MAC Verification Tests (MVT).  Each has a specific value to be
+   used in the testType field.  The testType field definitions are:
+
+   *  "AFT" - Algorithm Functional Tests.  These tests can be processed
+      by the client using a normal 'encrypt' or 'decrypt' operation.
+      AFTs cause the implementation under test to exercise normal
+      operations on a single block, multiple blocks, or (where
+      applicable) partial blocks.  In some cases random data is used, in
+      others, static, predetermined tests are provided.
+
+   *  "MCT" - Monte Carlo Tests.  These tests exercise the
+      implementation under test under strenuous circumstances.  The
+      implementation under test must process the test vectors according
+      to the correct algorithm and mode in this document.  MCTs can help
+      detect potential memory leaks over time, and problems in
+      allocation of resources, addressing variables, error handling and
+      generally improper behavior in response to random inputs.  Each
+      MCT processes 100 pseudorandom tests.  Not every algorithm and
+      mode combination has an MCT.  See Section 6.2 for implementation
+      details.
+
+   *  "MVT" - MAC Verification Tests.  XXX
+
+6.2.  Monte Carlo tests for XOFs
+
+6.2.1.  cSHAKE Monte Carlo Test
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   INPUT: The initial Msg is the length of the digest size
+
+   MCT(Msg, MaxOutLen, MinOutLen, OutLenIncrement)
+   {
+     Range = (MaxOutLen - MinOutLen + 1);
+     OutputLen = MaxOutLen;
+     FunctionName = "";
+     Customization = "";
+
+     Output[0] = Msg;
+     for (j = 0; j < 100; j++)
+     {
+       for (i = 1; i < 1001; i++)
+       {
+         InnerMsg = Left(Output[i-1] || ZeroBits(128), 128);
+         Output[i] = CSHAKE(InnerMsg, OutputLen, FunctionName, Customization);
+         Rightmost_Output_bits = Right(Output[i], 16);
+         OutputLen = MinOutLen + (floor((Rightmost_Output_bits % Range) / OutLenIncrement) * OutLenIncrement);
+         Customization = BitsToString(InnerMsg || Rightmost_Output_bits);
+       }
+
+       OutputJ[j] = Output[1000];
+       Output[i] = Output[1000];
+     }
+
+     return OutputJ;
+   }
+
+      |  NOTE: For the "Rightmost_Output_bits % Range" operation, the
+      |  Rightmost_Output_bits bit string should be interpreted as a
+      |  little endian-encoded number, where the first 8-bits are the
+      |  most-siginicant byte.
+
+6.2.2.  ParallelHash Monte Carlo Test
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   INPUT: The initial Msg is the length of the digest size
+
+   MCT(Msg, MaxOutLen, MinOutLen, OutLenIncrement, MaxBlockSize, MinBlockSize)
+   {
+     Range = (MaxOutLen - MinOutLen + 1);
+     OutputLen = MaxOutLen;
+     BlockRange = (MaxBlockSize - MinBlockSize + 1);
+     BlockSize = MinBlockSize;
+     Customization = "";
+
+     Output[0] = Msg;
+     for (j = 0; j < 100; j++)
+     {
+       for (i = 1; i < 1001; i++)
+       {
+         InnerMsg = Left(Output[i-1] || ZeroBits(128), 128);
+         Output[i] = ParallelHash(InnerMsg, OutputLen, BlockSize, FunctionName, Customization);
+         Rightmost_Output_bits = Right(Output[i], 16);
+         OutputLen = MinOutLen + (floor((Rightmost_Output_bits % Range) / OutLenIncrement) * OutLenIncrement);
+         BlockSize = MinBlockSize + Right(Rightmost_Output_bits, 8) % BlockRange;
+         Customization = BitsToString(InnerMsg || Rightmost_Output_bits);
+       }
+
+       OutputJ[j] = Output[1000];
+       Output[i] = Output[1000];
+     }
+
+     return OutputJ;
+   }
+
+      |  NOTE: For the "Rightmost_Output_bits % Range" operation, the
+      |  Rightmost_Output_bits bit string should be interpreted as a
+      |  little endian-encoded number, where the first 8-bits are the
+      |  most-siginicant byte.  For "Right(Rightmost_Output_bits, 8) %
+      |  BlockRange", the bit string resulting from the
+      |  "Right(Rightmost_Output_bits, 8)" operation should be
+      |  interpreted as a little endian-encoded number.
+
+6.2.3.  TupleHash Monte Carlo Test
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   INPUT: The initial Single-Tuple of a random length between 0 and 65536 bits.
+
+   MCT(Tuple, MaxOutLen, MinOutLen, OutLenIncrement)
+   {
+     Range = (MaxOutLen - MinOutLen + 1);
+     OutputLen = MaxOutLen;
+     Customization = "";
+
+     T[0][0] = Tuple;
+
+     for (j = 0; j < 100; j++)
+     {
+       for (i = 1; i < 1001; i++)
+       {
+         workingBits = Left(T[i-1][0] || ZeroBits(288), 288);
+         tupleSize = Left(workingBits, 3) % 4 + 1; // never more than 4 tuples to a round
+         for (k = 0; k < tupleSize; k++)
+         {
+           T[i][k] = Substring of workingBits from (k * 288 / tupleSize) to ((k+1) * 288 / tupleSize - 1);
+         }
+         Output[i] = TupleHash(T[i], OutputLen, Customization);
+         Rightmost_Output_bits = Right(Output[i], 16);
+         OutputLen = MinOutLen + (floor((Rightmost_Output_bits % Range) / OutLenIncrement) * OutLenIncrement);
+         Customization = BitsToString(T[i][0] || Rightmost_Output_bits);
+       }
+
+       OutputJ[j] = Output[1000];
+     }
+
+     return OutputJ;
+   }
+
+      |  NOTE: For "Left(workingBits, 3) % 4", the bit string resulting
+      |  from the "Left(workingBits, 3)" operation should be interpreted
+      |  as a little endian-encoded number.  For the
+      |  "Rightmost_Output_bits % Range" operation, the
+      |  Rightmost_Output_bits bit string should be interpreted as a
+      |  little endian-encoded number, where the first 8-bits are the
+      |  most-siginicant byte.
+
+6.2.4.  Functions Used in the Monte Carlo Tests for XOFs
+
+6.2.4.1.  BitsToString Function
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   BitsToString(bits)
+   {
+     string = "";
+     foreach byte in bits
+     {
+         string = string + ASCII((byte % 26) + 65);
+     }
+   }
+
+6.2.4.2.  Left() Function
+
+   The function Left(bitString, numberOfBits) returns the leftmost
+   numberOfBits bits of bitString.
+
+6.2.4.3.  Right() Function
+
+   The function Right(bitString, numberOfBits) returns the rightmost
+   numberOfBits bits of bitString.
+
+6.2.4.4.  ZeroBits() Function
+
+   The function ZeroBits(numberOfBits) returns an all-zero bit string of
+   length numberOfBits bits.
+
+6.3.  Test Coverage
+
+   The tests described in this document have the intention of ensuring
+   an implementation is conformant to [SP800-185].
+
+6.3.1.  XOF Requirements Covered
+
+   In TBD.
+
+6.3.2.  XOF Requirements Not Covered
+
+   Some requirements in the outlined specification are not easily
+   tested.  Often they are not ideal for black-box testing such as the
+   ACVP.  In TBD.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of XOF algorithms to the ACVP
+   server.
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  XOF Algorithm Capabilities Registration
+
+   This section describes the constructs for advertising support of XOFs
+   to the ACVP server.  ACVP *REQUIRES* cryptographic modules to
+   register their capabilities in a registration.  This allows the
+   cryptographic module to advertise support for specific algorithms,
+   notifying the ACVP server which algorithms need test vectors
+   generated for the validation process.
+
+   The XOF capabilities MUST be advertised as JSON objects within the
+   'algorithms' value of the ACVP registration message.  The
+   'algorithms' value MUST be an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value MUST be part of the 'capability_exchange' element of the ACVP
+   JSON registration message.
+
+   Each XOF algorithm capability advertised SHALL be a self-contained
+   JSON object.
+
+   Each algorithm capability advertised is a self-contained JSON object.
+   The following JSON values are used for XOF algorithm capabilities:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+    +==================+===================================+=========+
+    | JSON Value       | Description                       | JSON    |
+    |                  |                                   | type    |
+    +==================+===================================+=========+
+    | algorithm        | The algorithm and mode to be      | string  |
+    |                  | validated.                        |         |
+    +------------------+-----------------------------------+---------+
+    | revision         | The algorithm testing revision to | string  |
+    |                  | use.                              |         |
+    +------------------+-----------------------------------+---------+
+    | xof              | Implementation has the ability to | array   |
+    |                  | act as an XOF or a non-XOF        | of      |
+    |                  | algorithm                         | boolean |
+    +------------------+-----------------------------------+---------+
+    | hexCustomization | An optional feature to the        | boolean |
+    |                  | implementation.  When true, "hex" |         |
+    |                  | customization strings are         |         |
+    |                  | supported, otherwise they aren't. |         |
+    |                  | ASCII strings SHALL be tested     |         |
+    |                  | regardless of the value within    |         |
+    |                  | the hexCustomization property.    |         |
+    +------------------+-----------------------------------+---------+
+    | msgLen           | Input length for the XOF          | domain  |
+    +------------------+-----------------------------------+---------+
+    | outputLen        | Output length for the XOF         | domain  |
+    +------------------+-----------------------------------+---------+
+    | keyLen           | Supported key lengths             | domain  |
+    +------------------+-----------------------------------+---------+
+    | macLen           | Supported MAC lengths             | domain  |
+    +------------------+-----------------------------------+---------+
+    | blockSize        | block size (in bytes) to be used  | domain  |
+    |                  | with ParallelHash                 |         |
+    +------------------+-----------------------------------+---------+
+
+             Table 2: XOF Algorithm Capabilities JSON Values
+
+   The following grid outlines which properties are REQUIRED, as well as
+   all the possible values a server MAY support for XOF algorithms:
+
+   +=============+======+================+==========+==========+==========+==========+==========+
+   |algorithm    |xof   |hexCustomization|msgLen    |outputLen |keyLen    |macLen    |blockSize |
+   +=============+======+================+==========+==========+==========+==========+==========+
+   |cSHAKE-128   |      |true, false     |{Min: 0,  |{Min: 16, |          |          |          |
+   |             |      |                |Max:      |Max:      |          |          |          |
+   |             |      |                |65536,    |65536,    |          |          |          |
+   |             |      |                |Increment:|Increment:|          |          |          |
+   |             |      |                |any}      |any}      |          |          |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   |cSHAKE-256   |      |true, false     |{Min: 0,  |{Min: 16, |          |          |          |
+   |             |      |                |Max:      |Max:      |          |          |          |
+   |             |      |                |65536,    |65536,    |          |          |          |
+   |             |      |                |Increment:|Increment:|          |          |          |
+   |             |      |                |any}      |any}      |          |          |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+   |KMAC-128     |[true,|true, false     |{Min: 0,  |          |{Min: 128,|{Min: 32, |          |
+   |             |false]|                |Max:      |          |Max:      |Max:      |          |
+   |             |      |                |65536,    |          |524288,   |65536,    |          |
+   |             |      |                |Increment:|          |Increment:|Increment:|          |
+   |             |      |                |any}      |          |8}        |8}        |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+   |KMAC-256     |[true,|true, false     |{Min: 0,  |          |{Min: 128,|{Min: 32, |          |
+   |             |false]|                |Max:      |          |Max:      |Max:      |          |
+   |             |      |                |65536,    |          |524288,   |65536,    |          |
+   |             |      |                |Increment:|          |Increment:|Increment:|          |
+   |             |      |                |any}      |          |8}        |8}        |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+   |ParallelHash-|[true,|true, false     |{Min: 0,  |{Min: 16, |          |          |{Min: 1,  |
+   |128          |false]|                |Max:      |Max:      |          |          |Max: 128, |
+   |             |      |                |65536,    |65536,    |          |          |Increment:|
+   |             |      |                |Increment:|Increment:|          |          |1}        |
+   |             |      |                |any}      |any}      |          |          |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+   |ParallelHash-|[true,|true, false     |{Min: 0,  |{Min: 16, |          |          |{Min: 1,  |
+   |256          |false]|                |Max:      |Max:      |          |          |Max: 128, |
+   |             |      |                |65536,    |65536,    |          |          |Increment:|
+   |             |      |                |Increment:|Increment:|          |          |1}        |
+   |             |      |                |any}      |any}      |          |          |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+   |TupleHash-128|[true,|true, false     |{Min: 0,  |{Min: 16, |          |          |          |
+   |             |false]|                |Max:      |Max:      |          |          |          |
+   |             |      |                |65536,    |65536,    |          |          |          |
+   |             |      |                |Increment:|Increment:|          |          |          |
+   |             |      |                |any}      |any}      |          |          |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+   |TupleHash-256|[true,|true, false     |{Min: 0,  |{Min: 16, |          |          |          |
+   |             |false]|                |Max:      |Max:      |          |          |          |
+   |             |      |                |65536,    |65536,    |          |          |          |
+   |             |      |                |Increment:|Increment:|          |          |          |
+   |             |      |                |any}      |any}      |          |          |          |
+   +-------------+------+----------------+----------+----------+----------+----------+----------+
+
+                Table 3: XOF Capabilities Applicability Grid
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+      |  NOTE: For cSHAKE, ParallelHash, and TupleHash, the value for
+      |  the outputLen property must consist either of a single range
+      |  object or a single literal value.  This restriction is made to
+      |  simplify the implementation of the Monte Carlo Tests for these
+      |  algorithms (see Section 6.2).
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with Extendable Output
+   Function algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 8.1     |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 4: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+8.1.  Test Groups
+
+   Test vector sets MUST contain one or many test groups, each sharing
+   similar properties.  For instance, all test vectors that use the same
+   key size would be grouped together.  The testGroups element at the
+   top level of the test vector JSON object SHALL be the array of test
+   groups.  The Test Group JSON object MUST contain meta-data that
+   applies to all test cases within the group.  The following table
+   describes the JSON elements that MUST appear from the server in the
+   Test Group JSON object:
+
+   +==================+====================================+==========+
+   | JSON Value       | Description                        | JSON     |
+   |                  |                                    | type     |
+   +==================+====================================+==========+
+   | tgId             | Numeric identifier for the test    | integer  |
+   |                  | group, unique across the entire    |          |
+   |                  | vector set                         |          |
+   +------------------+------------------------------------+----------+
+   | testType         | Test category type.  AFT, MCT or   | string   |
+   |                  | MVT as defined in Section 6        |          |
+   +------------------+------------------------------------+----------+
+   | xof              | Whether or not the group uses the  | boolean  |
+   |                  | arbitrary output (XOF) version of  |          |
+   |                  | the algorithm                      |          |
+   +------------------+------------------------------------+----------+
+   | hexCustomization | Whether or not the group uses      | boolean  |
+   |                  | customization strings in hex       |          |
+   |                  | (true) or ASCII (false)            |          |
+   +------------------+------------------------------------+----------+
+   | tests            | Array of individual test case JSON | array of |
+   |                  | objects, which are defined in      | testCase |
+   |                  | Section 8.2                        | objects  |
+   +------------------+------------------------------------+----------+
+   | minOutLen        | The minimum outputLen as specified | integer  |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 15]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   |                  | in the capabilities registration   |          |
+   |                  | (used in monte carlo tests).       |          |
+   +------------------+------------------------------------+----------+
+   | maxOutLen        | The maximum outputLen as specified | integer  |
+   |                  | in the capabilities registration   |          |
+   |                  | (used in monte carlo tests).       |          |
+   +------------------+------------------------------------+----------+
+   | outLenIncrement  | The outputLen increment as         | integer  |
+   |                  | specified in the capabilities      |          |
+   |                  | registration (used in monte carlo  |          |
+   |                  | tests).                            |          |
+   +------------------+------------------------------------+----------+
+   | minBlockSize     | The minimum blockSize as specified | integer  |
+   |                  | in the capabilities registration   |          |
+   |                  | (used in ParallelHash monte carlo  |          |
+   |                  | tests).                            |          |
+   +------------------+------------------------------------+----------+
+   | maxBlockSize     | The maximum blockSize as specified | integer  |
+   |                  | in the capabilities registration   |          |
+   |                  | (used in ParallelHash monte carlo  |          |
+   |                  | tests).                            |          |
+   +------------------+------------------------------------+----------+
+
+                     Table 5: Test Group JSON Object
+
+8.2.  Test Case JSON Schema
+
+   Each test group SHALL contain an array of one or more test cases.
+   Each test case is a JSON object that represents a single case to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each test case.
+
+    +==================+====================================+=========+
+    | JSON Value       | Description                        | JSON    |
+    |                  |                                    | type    |
+    +==================+====================================+=========+
+    | tcId             | Numeric identifier for the test    | integer |
+    |                  | case, unique across the entire     |         |
+    |                  | vector set                         |         |
+    +------------------+------------------------------------+---------+
+    | len              | Length of the message or seed for  | integer |
+    |                  | cSHAKE, KMAC and ParallelHash      |         |
+    +------------------+------------------------------------+---------+
+    | len              | Length of each tuple for TupleHash | array   |
+    |                  |                                    | of      |
+    |                  |                                    | integer |
+    +------------------+------------------------------------+---------+
+    | outLen           | Length of the digest               | integer |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 16]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+    +------------------+------------------------------------+---------+
+    | functionName     | Only applies to cSHAKE.  The value | string  |
+    |                  | to use for the function-name input |         |
+    |                  | to cSHAKE, denoted as _N_ in       |         |
+    |                  | Section 3.2 of [SP800-185].        |         |
+    +------------------+------------------------------------+---------+
+    | customization    | The ASCII customization string     | string  |
+    |                  | used (between 0 and 161 ASCII      |         |
+    |                  | characters in length)              |         |
+    +------------------+------------------------------------+---------+
+    | customizationHex | The hex customization string used  | hex     |
+    |                  | (between 0 and 322 hex characters  |         |
+    |                  | in length)                         |         |
+    +------------------+------------------------------------+---------+
+    | msg              | Value of the message or seed.      | hex     |
+    |                  | Messages are represented as        |         |
+    |                  | little-endian hex for all SHA3     |         |
+    |                  | variations                         |         |
+    +------------------+------------------------------------+---------+
+    | keyLen           | Length of the key used in KMAC     | integer |
+    +------------------+------------------------------------+---------+
+    | key              | The key used in KMAC               | hex     |
+    +------------------+------------------------------------+---------+
+    | macLen           | Length of the MAC                  | integer |
+    +------------------+------------------------------------+---------+
+    | mac              | The MAC used in KMAC               | hex     |
+    +------------------+------------------------------------+---------+
+    | blockSize        | The blockSize used in ParallelHash | integer |
+    +------------------+------------------------------------+---------+
+    | tuple            | The tuple of messages used in      | array   |
+    |                  | TupleHash                          | of hex  |
+    +------------------+------------------------------------+---------+
+
+                       Table 6: Test Case JSON Object
+
+8.3.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it SHALL
+   send the response vectors back to the ACVP server within the alloted
+   timeframe.  The following table describes the JSON object that
+   represents a vector set response.
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 17]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+       +============+==================================+===========+
+       | JSON Value | Description                      | JSON type |
+       +============+==================================+===========+
+       | acvVersion | Protocol version identifier      | string    |
+       +------------+----------------------------------+-----------+
+       | vsId       | Unique numeric identifier for    | integer   |
+       |            | the vector set                   |           |
+       +------------+----------------------------------+-----------+
+       | testGroups | Array of JSON objects that       | array of  |
+       |            | represent each test vector       | testGroup |
+       |            | result, which uses the same JSON | objects   |
+       |            | schema as defined in Section 8.2 |           |
+       +------------+----------------------------------+-----------+
+
+                  Table 7: Vector Set Response JSON Object
+
+   The testGroup Response section is used to organize the ACVP client
+   response in a similar manner to how it receives vectors.  Several
+   algorithms SHALL require the client to send back group level
+   properties in its response.  This structure helps accommodate that.
+
+      +============+=============================+==================+
+      | JSON Value | Description                 | JSON type        |
+      +============+=============================+==================+
+      | tgId       | The test group identifier   | integer          |
+      +------------+-----------------------------+------------------+
+      | tests      | The tests associated to the | array of         |
+      |            | group specified in tgId     | testCase objects |
+      +------------+-----------------------------+------------------+
+
+               Table 8: Vector Set Group Response JSON Object
+
+   Each test case is a JSON object that represents a single test object
+   to be processed by the ACVP client.  The following table describes
+   the JSON elements for each test case object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 18]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+     +==============+==============================+================+
+     | JSON Value   | Description                  | JSON type      |
+     +==============+==============================+================+
+     | tcId         | Numeric identifier for the   | integer        |
+     |              | test case, unique across the |                |
+     |              | entire vector set            |                |
+     +--------------+------------------------------+----------------+
+     | mac          | The IUT's MAC response to an | hex            |
+     |              | AFT for KMAC                 |                |
+     +--------------+------------------------------+----------------+
+     | testPassed   | The IUT's reponse to an MVT  | boolean        |
+     |              | for KMAC                     |                |
+     +--------------+------------------------------+----------------+
+     | md           | The IUT's digest response to | hex            |
+     |              | an AFT                       |                |
+     +--------------+------------------------------+----------------+
+     | outLen       | The output length of the     | integer        |
+     |              | digest                       |                |
+     +--------------+------------------------------+----------------+
+     | resultsArray | Array of JSON objects that   | array of       |
+     |              | represent each iteration of  | objects        |
+     |              | an MCT.  Each iteration will | containing the |
+     |              | contain the md and outLen    | md and outLen  |
+     +--------------+------------------------------+----------------+
+
+                  Table 9: Test Case Results JSON Object
+
+      |  NOTE: The tcId MUST be included in every test case object sent
+      |  between the client and the server.
+
+9.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+10.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+11.  References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 19]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [SP800-185]
+              Kelsey, J. M., Chang, S. H., and R. A. Perlner, "SHA-3
+              Derived Functions - cSHAKE, KMAC, TupleHash, and
+              ParallelHash", NIST SP 800-185, December 2016,
+              <https://csrc.nist.gov/pubs/sp/800/185/final>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Appendix A.  Example Capabilities JSON Objects
+
+   The following is an example JSON object advertising support for
+   cSHAKE-128.
+
+   {
+     "algorithm": "cSHAKE-128",
+     "revision": "1.0",
+     "hexCustomization": false,
+     "outputLen": [
+       {
+         "min": 256,
+         "max": 4096,
+         "increment": 1
+       }
+     ],
+     "msgLen": [
+       {
+         "min": 0,
+         "max": 65536,
+         "increment": 1
+       }
+     ]
+   }
+
+   The following is an example JSON object advertising support for KMAC-
+   128.
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 20]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   {
+     "algorithm": "KMAC-128",
+     "revision": "1.0",
+     "xof": [true, false],
+     "hexCustomization": false,
+     "msgLen": [
+       {
+         "min": 0,
+         "max": 65536,
+         "increment": 1
+       }
+     ],
+     "keyLen": [
+       {
+         "min": 256,
+         "max": 4096,
+         "increment": 1
+       }
+     ],
+     "macLen": [
+       {
+         "min": 256,
+         "max": 4096,
+         "increment": 1
+       }
+     ]
+   }
+
+   The following is an example JSON object advertising support for
+   ParallelHash-128.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 21]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   {
+     "algorithm": "ParallelHash-128",
+     "revision": "1.0",
+     "xof": [true, false],
+     "hexCustomization": false,
+     "blockSize": [
+       {
+         "min": 1,
+         "max": 16,
+         "increment": 1
+       }
+     ],
+     "outputLen": [
+       {
+         "min": 256,
+         "max": 4096,
+         "increment": 1
+       }
+     ],
+     "msgLen": [
+       {
+         "min": 0,
+         "max": 65536,
+         "increment": 1
+       }
+     ]
+   }
+
+   The following is an example JSON object advertising support for
+   TupleHash-128.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 22]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   {
+     "algorithm": "TupleHash-128",
+     "revision": "1.0",
+     "xof": [true, false],
+     "hexCustomization": false,
+     "outputLen": [
+       {
+         "min": 256,
+         "max": 4096,
+         "increment": 1
+       }
+     ],
+     "msgLen": [
+       {
+         "min": 0,
+         "max": 65536,
+         "increment": 1
+       }
+     ]
+   }
+
+Appendix B.  Example Test Vectors JSON Objects
+
+   The following is an example JSON object for cSHAKE test vectors sent
+   from the ACVP server to the crypto module.
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "cSHAKE-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "hexCustomization": false,
+         "tests": [
+           {
+             "tcId": 1,
+             "msg": "",
+             "len": 0,
+             "functionName": "",
+             "customization": "",
+             "outLen": 256
+           },
+           {
+             "tcId": 2,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 23]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+             "msg": "",
+             "len": 0,
+             "functionName": "",
+             "customization": "[",
+             "outLen": 323
+           }
+         ]
+       },
+       {
+         "tgId": 2,
+         "testType": "MCT",
+         "hexCustomization": false,
+         "minOutLen": 256,
+         "maxOutLen": 4096,
+         "outLenIncrement": 1,
+         "tests": [
+           {
+             "tcId": 101,
+             "msg": "EDAF0D79E36F13461FE18B098F77A76B",
+             "len": 128,
+             "functionName": "",
+             "customization": ""
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+   The following is an example JSON object for KMAC test vectors sent
+   from the ACVP server to the crypto module.
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "KMAC-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "xof": false,
+         "hexCustomization": false,
+         "tests": [
+           {
+             "tcId": 1,
+             "key": "57F9E51E6EE790EA224F33B09184980EC53D4ADC437269BC64CAD4E0BF43FC72",
+
+
+
+Celi                       Expires 4 June 2026                 [Page 24]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+             "keyLen": 256,
+             "msg": "",
+             "msgLen": 0,
+             "macLen": 256,
+             "customization": ""
+           },
+           {
+             "tcId": 2,
+             "key": "BBEA88A07BD90177E199E488D8725CF926F4702A3703E53CF8E4EF19C10B8A6F80",
+             "keyLen": 257,
+             "msg": "C0",
+             "msgLen": 4,
+             "macLen": 264,
+             "customization": "i"
+           }
+         ]
+       },
+       {
+             "tgId": 3,
+         "testType": "MVT",
+         "xof": false,
+         "hexCustomization": false,
+         "tests": [
+           {
+             "tcId": 501,
+             "key": "4389AD97264009279AD996F6BCFE30BBCF73644DBEFA109A60B3B9E3E3B29520",
+             "keyLen": 256,
+             "msg": "572C482D8B06A9F1493B1DB1D82621D5",
+             "msgLen": 128,
+             "mac": "DF47909B75ADB5DC4B508B8C6CEFB9D2CA28F8C36BC5677CB0FCC06C7F5021...",
+             "macLen": 4089,
+             "customization": ""
+           },
+           {
+             "tcId": 502,
+             "key": "71E9CAE4EA9FE46DA380B387A4F4C6A0E343B1117812E7252FDC73DB8BDC9437",
+             "keyLen": 256,
+             "msg": "7CA0261C96E9FEE41B2A855FC2765D2A",
+             "msgLen": 128,
+             "mac": "CF0A761E9AB2D7A5CB8B6CD437541AB1F1F74FAA28F6D7896631EF9B79E93...",
+             "macLen": 831,
+             "customization": "."
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+
+
+Celi                       Expires 4 June 2026                 [Page 25]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   The following is an example JSON object for ParallelHash test vectors
+   sent from the ACVP server to the crypto module.
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "ParallelHash-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "function": "ParallelHash",
+         "xof": true,
+         "hexCustomization": false,
+         "tests": [
+           {
+             "tcId": 1,
+             "msg": "",
+             "len": 0,
+             "blockSize": 64,
+             "customization": "",
+             "outLen": 256
+           },
+           {
+             "tcId": 2,
+             "msg": "8B30",
+             "len": 12,
+             "blockSize": 64,
+             "customization": "O",
+             "outLen": 289
+           }
+         ]
+       },
+       {
+         "tgId": 3,
+         "testType": "MCT",
+         "function": "ParallelHash",
+         "xof": true,
+         "minBlockSize": 1,
+         "maxBlockSize": 16,
+         "hexCustomization": false,
+         "minOutLen": 256,
+         "maxOutLen": 4096,
+         "outLenIncrement": 1,
+         "tests": [
+           {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 26]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+             "tcId": 201,
+             "msg": "8A4609316F3BCB102CBBD6428E7E1FC8",
+             "len": 128,
+             "blockSize": 256,
+             "customization": ""
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+   The following is an example JSON object for TupleHash test vectors
+   sent from the ACVP server to the crypto module.
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "TupleHash-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "xof": true,
+         "tests": [
+           {
+             "tcId": 1,
+             "tuple": [],
+             "len": [],
+             "customization": "",
+             "outLen": 256
+           },
+           {
+             "tcId": 2,
+             "tuple": [
+               ""
+             ],
+             "len": [
+               0
+             ],
+             "customization": "",
+             "outLen": 256
+           }
+         ]
+       },
+       {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 27]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+         "tgId": 3,
+         "testType": "MCT",
+         "xof": true,
+         "minOutLen": 256,
+         "maxOutLen": 512,
+         "outLenIncrement": 8,
+         "tests": [
+           {
+             "tcId": 201,
+             "tuple": [
+               ""
+             ],
+             "len": [
+               0
+             ],
+             "customization": ""
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+Appendix C.  Example Test Results JSON Objects
+
+   The following is an example JSON object for cSHAKE test results sent
+   from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 28]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "cSHAKE-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "md": "7F9C2BA4E88F827D616045507605853ED73B8093F6EFBC88EB1A6EACFA66EF26",
+             "outLen": 256
+           },
+           {
+             "tcId": 2,
+             "md": "4DF7FFE48F76B1083A35A28D8580B15E9910BBC7C1E55B4986B7C257A1F62E36317180B322D0BFAFC0",
+             "outLen": 323
+           },
+         ]
+       },
+       {
+         "tgId": 2,
+         "tests": [
+           {
+             "tcId": 251,
+             "resultsArray": [
+               {
+                 "md": "59A04B1AF85FA05A1B830B04257A382119CCE8815C29C02EFCEA0A...",
+                 "outLen": 2864
+               },
+               {
+                 "md": "B9C5B6D1CF00B17F39B5D8688F187BF974E567FA42E89221C230EF...",
+                 "outLen": 2176
+               },
+               {
+                 "md": "FEFAB0000CC69905FF217BA2E8CABB45CE9AE46AC9E8AECAC7BEA5...",
+                 "outLen": 1128
+               }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 29]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   The following is an example JSON object for KMAC test results sent
+   from the crypto module to the ACVP server.
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "KMAC-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+             "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "mac": "5D3138562EBFFB47C88261CDDD988D077A3010EBE48AD01B75DFE5547F96963A"
+           },
+           {
+             "tcId": 2,
+             "mac": "FFC6F9C7D02D6D9F55434CE9301E5F6E0374EB64D11D2DCB596BEC894EB22E0787"
+           }
+         ]
+       },
+       {
+         "tgId": 4,
+         "tests": [
+           {
+             "tcId": 516,
+             "testPassed": true
+           },
+           {
+             "tcId": 517,
+             "testPassed": false
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+   The following is an example JSON object for ParallelHash test results
+   sent from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 30]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "ParallelHash-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "md": "332D7D2860A08CB47E1B6B4256BA01749570D6D36A0A9C9F544A8BA3472BFF5DA40AE98320",
+             "outLen": 291
+           },
+           {
+             "tcId": 2,
+             "md": "0DFE7A0350FE2D309B5929516B03946480D0818733D99ADDD508C3FCE8E73D136920",
+             "outLen": 269
+           }
+         ]
+       },
+       {
+         "tgId": 2,
+         "tests": [
+           {
+             "tcId": 251,
+             "resultsArray": [
+               {
+                 "md": "2F36BCFCA14850E589DD5F1DC82A8B543E18E52F6BA832B560BA46FD7CDC4E19654177E7BA88F808FAFD5E1DC2E6F1C16B42CC968D1DE1E37B145BD2978ED509B2F8B1871F86D566263BFE093D8AC37C634820CC92D6DF3F30EAE2810FFFA1FC12E2853ABF047F4E2CA2307736831AC9A7FCA4255577424800CF058AF83C65DABBE0CA0C36385D60266DD5F0C9EFE795AA5ECA13D76E72B36138DECCB2C6220FBEA5B56D6044EA06B57ACDA3D32938DBC909DF4FAA5213AA2E5A6A7580069131724529C28E2A3176A7CFEC5FD9BAF660",
+                 "outLen": 1661
+               },
+               {
+                 "md": "F1B1D2D5B6C554F75FE0C46E9623E005219E29EBB7ED718DAA7C6A40F92BF2B1DFF9EDF1D03F15883A8EAABA7972AC6202D8B64915C1A82FD75FF7B6E50015B2226583BC93CE3CD73F964D2CA0B03E5FBD4FB2D4920520C15B835E0F6183882A74989B88F3A768A5820DE3F17CC9EB7C99E0E90B9799C233D140BA3F0F30E69228B5E1CE63FA7F6ACA63CF697613223B9E238978AEA3F617298D0C07CA",
+                 "outLen": 1256
+               },
+               {
+                 "md": "A4CC42F5F3CD731400A84349C3F5DA2CCAD193EFADEF1BE6F80E0B27B4FA35A82606C709F96822224B6389008701653689658BA8436DC92631EBF99537113223D1B96BC98A8C7B20D31A2BC2BF031470BDCAA8362720ACB54F6287F9884224B15471EEE6A46534D01763CCCEEFC16C3A00E6323E7E6DBABFD35000FEAC985049BE5D239EB7F4FCAD1B497390D9C779B5E2255B40B4CD2FAD9D4B59A535A48BF334AF5F76F1F23C786D17F96D5B7D4FF5A8BA08614879DD7F62B0D53DA223CB5D21B44BEB6DFA04708CDEE4D3B98FCDCFB8011BC80649BC4B1DE3F181C4A3B0D457C8B8A057E5F0D22CD08309AE9B89521FA1038046576C8BA59D91932F382FD129CAEB318793D68632D785C0",
+                 "outLen": 2138
+               }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 31]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   The following is an example JSON object for TupleHash test results
+   sent from the crypto module to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 32]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+   [
+   { "acvVersion": <acvp-version> },
+   {
+     "vsId": 0,
+     "algorithm": "TupleHash-128",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "md": "1768DE4C4000C9407A4A743F66EA85DFF33DEC126C9C66B731019142A0349CF39743617DF39F2D38801536BA69B62C9AC4C800C89BC63445",
+             "outLen": 448
+           },
+           {
+             "tcId": 2,
+             "md": "33C1112658241D2197EA99F0559A22D35E22C07F2690F5A2111A9168DBA6692810AAEA9A27F89DA1",
+             "outLen": 320
+           }
+         ]
+       },
+       {
+         "tgId": 2,
+         "tests": [
+           {
+             "tcId": 251,
+             "resultsArray": [
+               {
+                 "md": "FD07E27A3C29C9A26109A4643905D42BD7312F21E2ED0D161B2B83D39EF12DF26C54FD9F3F9D484FD42B5EA2",
+                 "outLen": 352
+               },
+               {
+                 "md": "2FAEAABC915EC7372600AB935F4038FFF6E068606460CDA0859A963CBFE5D9DB51DFB4420C4108C4AAD6DD9FA8065ED720EB39",
+                 "outLen": 408
+               },
+               {
+                 "md": "446695F0DA537AA98A74480263BA9E990F9E45702A12FD0E8746EC307C2372C1BE796815FFD9256FEFD6A2D5D1DF650F54BCC73DAB7049",
+                 "outLen": 440
+               }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+   ]
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 33]
+
+Internet-Draft                  ACVP XOF                   December 2025
+
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 34]

@@ -1,0 +1,1400 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+             ACVP ConditioningComponents JSON Specification
+              draft-ietf-acvp-sub-conditioning-components
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   3
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   3
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   3
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   3
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   4
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   4
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported Conditioning Components . . . . . . . . . . . . . .   4
+     5.1.  Supported Hash Functions for Hash_DF  . . . . . . . . . .   4
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   5
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   5
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   5
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   6
+     7.2.  Conditioning Component Algorithm Capabilities
+           Registration  . . . . . . . . . . . . . . . . . . . . . .   7
+       7.2.1.  Block Cipher Based Conditioning Component
+               Capabilities  . . . . . . . . . . . . . . . . . . . .   7
+       7.2.2.  Hash Based Conditioning Component Capabilities  . . .  10
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  13
+     9.1.  Conditioning Component AES-CBC-MAC Test Groups JSON
+           Schema  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+     9.2.  Conditioning Component AES-CBC-MAC Test Case JSON
+           Schema  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+     9.3.  Conditioning Component BlockCipher_DF Test Groups JSON
+           Schema  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+     9.4.  Conditioning Component BlockCipher_DF Test Case JSON
+           Schema  . . . . . . . . . . . . . . . . . . . . . . . . .  17
+     9.5.  Conditioning Component Hash_DF Test Groups JSON Schema  .  18
+     9.6.  Conditioning Component Hash_DF Test Case JSON Schema  . .  19
+   10. Test Vector Responses . . . . . . . . . . . . . . . . . . . .  20
+     10.1.  Conditioning Component AES-CBC-MAC Test Responses  . . .  21
+     10.2.  Conditioning Component BlockCipher_DF Test Responses . .  22
+     10.3.  Conditioning Component Hash_DF Test Responses  . . . . .  23
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .  24
+   12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  25
+   13. Normative References  . . . . . . . . . . . . . . . . . . . .  25
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  25
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing Conditioning
+   Component implementations with the ACVP specification.
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing
+   Conditioning Component implementations using ACVP.
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported Conditioning Components
+
+   Conditioning is an optional process during entropy collection shown
+   in Section 2.2.2 of [SP800-90B].  There are two types of conditioning
+   components supported by [SP800-90B]: vetted and non-vetted.  A vetted
+   conditioning component comes from a specific list of options.  All
+   [SP800-90B] vetted conditioning components are available via ACVP.
+   This document rounds out the list with options not covered in other
+   algorithm testing.
+
+   The following conditioning components MAY be advertised by the ACVP
+   compliant cryptographic module:
+
+   *  ConditioningComponents / AES-CBC-MAC / SP800-90B
+
+   *  ConditioningComponents / BlockCipher_DF / SP800-90B
+
+   *  ConditioningComponents / Hash_DF / SP800-90B
+
+5.1.  Supported Hash Functions for Hash_DF
+
+   For the Hash Derivation Function, Hash_DF, the following hash
+   functions MAY be advertised by the ACVP compliant cryptographic
+   module:
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   *  SHA-1
+
+   *  SHA2-224
+
+   *  SHA2-256
+
+   *  SHA2-384
+
+   *  SHA2-512
+
+   *  SHA2-512/224
+
+   *  SHA2-512/256
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate
+   implementations of Conditioning Components.
+
+6.1.  Test Types
+
+   There is one test-type for Conditioning Components: Algorithm
+   Functional Tests.  The testType field definitions are:
+
+   *  "AFT" - Algorithm Functional Test.  These tests can be processed
+      by the client using a normal 'MAC', or 'derive' operation.  AFTs
+      cause the implementation under test to exercise nomral operations
+      on a single block, multiple blocks, or partial blocks.  In all
+      cases,random data is used.  The functional tests are designed to
+      verify that the logical components of the cryptographic
+      implementation (block chunking, block padding etc.) are operating
+      correctly.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of Conditioning Component
+   algorithms to the ACVP server.
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 1: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  Conditioning Component Algorithm Capabilities Registration
+
+   This section describes the constructs for advertising support of
+   conditioning component algorithms to the ACVP server.
+
+7.2.1.  Block Cipher Based Conditioning Component Capabilities
+
+   The following ConditioningComponent / AES-CBC-MAC / SP800-90B and
+   ConditioningComponent / BlockCipher_DF / SP800-90B capabilities MAY
+   be advertised by the ACVP compliant crypto module:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+    +============+=================+========+=========================+
+    | JSON Value | Description     | JSON   | Valid Values            |
+    |            |                 | type   |                         |
+    +============+=================+========+=========================+
+    | algorithm  | The algorithm   | string | "ConditioningComponent" |
+    |            | to be validated |        |                         |
+    +------------+-----------------+--------+-------------------------+
+    | mode       | The specific    | string | "AES-CBC-MAC" or        |
+    |            | conditioning    |        | "BlockCipher_DF"        |
+    |            | component to be |        |                         |
+    |            | validated       |        |                         |
+    +------------+-----------------+--------+-------------------------+
+    | revision   | The algorithm   | string | "SP800-90B"             |
+    |            | testing         |        |                         |
+    |            | revision to use |        |                         |
+    +------------+-----------------+--------+-------------------------+
+    | keyLen     | The length of   | array  | [128, 192, 256]         |
+    |            | keys supported  |        |                         |
+    |            | in bits         |        |                         |
+    +------------+-----------------+--------+-------------------------+
+    | keys       | User-defined    | array  | Must have matching      |
+    |            | keys used to    |        | keyLen support          |
+    |            | generate, AES-  |        |                         |
+    |            | CBC-MAC only    |        |                         |
+    +------------+-----------------+--------+-------------------------+
+    | payloadLen | The lengths in  | domain | [{"min": 8, "max":      |
+    |            | bits supported  |        | 65536, "inc": 8}]       |
+    |            | by the IUT      |        |                         |
+    +------------+-----------------+--------+-------------------------+
+    | outputLen  | The lengths in  | domain | [{"min": 128, "max":    |
+    |            | bits suppoerted |        | 512, "inc": 8}]         |
+    |            | by the IUT as   |        |                         |
+    |            | output only for |        |                         |
+    |            | BlockCipher_DF  |        |                         |
+    +------------+-----------------+--------+-------------------------+
+
+           Table 2: Block Cipher Conditioning Component Algorithm
+                          Capabilities JSON Values
+
+      |  NOTE: For ConditioningComponent / AES-CBC-MAC / SP800-90B, the
+      |  payload itself is processed through the encryption engine.
+      |  Therefore the minimum 'payloadLen' is 128 bits and the minimum
+      |  increment is 128 bits.  In other words, all values within the
+      |  'payloadLen' must correspond to complete AES blocks in bits (a
+      |  multiple of 128).
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   Note: For ConditioningComponent / AES-CBC-MAC / SP800-90B, 'keys'
+   must have a matching supported 'keyLen', i.e., if submitting a key of
+   128-bits, 'keyLen' must have 128 supported as well.  The opposite is
+   true as well, every kenLen must include a matching Key. When uder-
+   defined keys are utilized, random keys will not be generated.
+
+   The following is an example of a registration for
+   ConditioningComponents / AES-CBC-MAC / SP800-90B
+
+   {
+     "algorithm": "ConditioningComponent",
+     "mode": "AES-CBC-MAC",
+     "revision": "SP800-90B",
+     "keyLen": [
+       128,
+       192,
+       256
+     ],
+     "payloadLen": [
+       {
+         "min": 128,
+         "max": 65536,
+         "increment": 128
+       }
+     ]
+   }
+
+   The following is an example of a registration for
+   ConditioningComponents / BlockCipher_DF / SP800-90B
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   {
+     "algorithm": "ConditioningComponent",
+     "mode": "BlockCipher_DF",
+     "revision": "SP800-90B",
+     "keyLen": [
+       128
+     ],
+     "keys": [
+       D1C1B7FFB2CCE0BBF13D4F7B4A246A8D
+     ],
+     "payloadLen": [
+       {
+         "min": 8,
+         "max": 65536,
+         "increment": 8
+       }
+     ],
+     "outputLen": [
+       {
+         "min": 128,
+         "max": 512,
+         "increment": 8
+       }
+     ]
+   }
+
+7.2.2.  Hash Based Conditioning Component Capabilities
+
+   The following ConditioningComponent / Hash_DF / SP800-90B
+   capabilities MAY be advertised by the ACVP compliant crypto module:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   +==============+===============+=========+==========================+
+   | JSON Value   | Description   | JSON    | Valid Values             |
+   |              |               | type    |                          |
+   +==============+===============+=========+==========================+
+   | algorithm    | The algorithm | string  | "ConditioningComponent"  |
+   |              | to be         |         |                          |
+   |              | validated     |         |                          |
+   +--------------+---------------+---------+--------------------------+
+   | mode         | The specific  | string  | "Hash_DF"                |
+   |              | conditioning  |         |                          |
+   |              | component to  |         |                          |
+   |              | be validated  |         |                          |
+   +--------------+---------------+---------+--------------------------+
+   | revision     | The algorithm | string  | "SP800-90B"              |
+   |              | testing       |         |                          |
+   |              | revision to   |         |                          |
+   |              | use           |         |                          |
+   +--------------+---------------+---------+--------------------------+
+   | capabilities | An array of   | array   | Each element in the      |
+   |              | supported     | of      | array is made of         |
+   |              | capability    | objects | exactly one              |
+   |              | objects       |         | 'payloadLen' field and   |
+   |              |               |         | one 'hashAlg' field      |
+   +--------------+---------------+---------+--------------------------+
+   | payloadLen   | The lengths   | domain  | [{"min": 1, "max":       |
+   |              | in bits       |         | 65536, "inc": 1}]        |
+   |              | supported by  |         |                          |
+   |              | the IUT       |         |                          |
+   +--------------+---------------+---------+--------------------------+
+   | hashAlg      | The hash      | array   | Any non-zero number of   |
+   |              | algorithm     |         | elements from            |
+   |              | that supports |         | Section 5.1              |
+   |              | the specific  |         |                          |
+   |              | lengths       |         |                          |
+   +--------------+---------------+---------+--------------------------+
+
+      Table 3: Hash Conditioning Component Algorithm Capabilities JSON
+                                   Values
+
+   The following is an example of a registration for
+   ConditioningComponents / Hash_DF / SP800-90B
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   {
+     "algorithm": "ConditioningComponent",
+     "mode": "Hash_DF",
+     "revision": "SP800-90B",
+     "capabilities": [
+       {
+         "payloadLen": [
+           {
+             "min": 1,
+             "max": 65536,
+             "increment": 1
+           }
+         ],
+         "hashAlg": [
+           "SHA-1",
+           "SHA2-224",
+           "SHA2-256",
+           "SHA2-384",
+           "SHA2-512",
+           "SHA2-512/224",
+           "SHA2-512/256"
+         ]
+       }
+     ]
+   }
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation test session would require multiple test
+   vector sets to be downloaded and processed by the ACVP client.  Each
+   test vector set represents an individual cryptographic algorithm
+   defined during the capability exchange.  This section describes the
+   JSON schema for a test vector set used with Conditioning Component
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+    +=============+======================================+===========+
+    | JSON Values | Description                          | JSON Type |
+    +=============+======================================+===========+
+    | acvVersion  | Protocol version identifier          | string    |
+    +-------------+--------------------------------------+-----------+
+    | vsId        | Unique numeric vector set identifier | integer   |
+    +-------------+--------------------------------------+-----------+
+    | algorithm   | Algorithm defined in the capability  | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | mode        | Mode defined in the capability       | string    |
+    |             | exchange                             |           |
+    +-------------+--------------------------------------+-----------+
+    | revision    | Protocol test revision selected      | string    |
+    +-------------+--------------------------------------+-----------+
+    | testGroups  | Array of test group JSON objects,    | array     |
+    |             | which are defined in Section 9       |           |
+    +-------------+--------------------------------------+-----------+
+
+               Table 4: Top Level Test Vector JSON Elements
+
+   An example of this would look like this
+
+   [
+     {
+       "acvVersion": <version>
+     },
+     {
+       "vsId": 1,
+       "algorithm": "Alg1",
+       "mode": "Mode1",
+       "revision": "Revision1.0",
+       "testGroups": [ ... ]
+     }
+   ]
+
+9.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual crypto algorithm, such as
+   ConditioningComponent / AES-CBC-MAC / SP800-90B,
+   ConditioningComponent / Hash_DF / SP800-90B, etc.  This section
+   describes the JSON schema for a test vector set used with
+   Conditioning Component crypto algorithms.
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+   +============+===========================================+=========+
+   | JSON Value | Description                               | JSON    |
+   |            |                                           | type    |
+   +============+===========================================+=========+
+   | acvVersion | Protocol version identifier               | string  |
+   +------------+-------------------------------------------+---------+
+   | vsId       | Unique numeric identifier for the vector  | integer |
+   |            | set                                       |         |
+   +------------+-------------------------------------------+---------+
+   | algorithm  | The algorithm used for the test vectors   | string  |
+   +------------+-------------------------------------------+---------+
+   | mode       | The mode used for the test vectors        | string  |
+   +------------+-------------------------------------------+---------+
+   | revision   | The algorithm testing revision to use     | string  |
+   +------------+-------------------------------------------+---------+
+   | testGroups | Array of test group JSON objects, which   | array   |
+   |            | are defined in Section 9.1, Section 9.3,  |         |
+   |            | or Section 9.5 depending on the algorithm |         |
+   +------------+-------------------------------------------+---------+
+
+          Table 5: Conditioning Component Vector Set JSON Object
+
+9.1.  Conditioning Component AES-CBC-MAC Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  The Test Group JSON object contains meta data that
+   applies to all test vectors within the group.  The following table
+   describes the ConditioningComponent / AES-CBC-MAC / SP800-90B JSON
+   elements of the Test Group JSON object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+      +============+====================================+===========+
+      | JSON Value | Description                        | JSON type |
+      +============+====================================+===========+
+      | tgId       | The unique group identifier        | integer   |
+      +------------+------------------------------------+-----------+
+      | testType   | Describes the operation the client | string    |
+      |            | should perform on the test data    |           |
+      +------------+------------------------------------+-----------+
+      | keyLen     | The length of the key used in the  | integer   |
+      |            | group                              |           |
+      +------------+------------------------------------+-----------+
+      | tests      | Array of individual test cases,    | array     |
+      |            | see Section 9.2                    |           |
+      +------------+------------------------------------+-----------+
+
+        Table 6: Conditioning Component AES-CBC-MAC Test Group JSON
+                                   Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.
+
+9.2.  Conditioning Component AES-CBC-MAC Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ConditioningComponent / AES-CBC-MAC / SP800-90B
+   test vector.
+
+             +============+======================+===========+
+             | JSON Value | Description          | JSON Type |
+             +============+======================+===========+
+             | tcId       | Test case identifier | integer   |
+             +------------+----------------------+-----------+
+             | pt         | The plaintext        | hex       |
+             +------------+----------------------+-----------+
+             | key        | The key              | hex       |
+             +------------+----------------------+-----------+
+
+                Table 7: Conditioning Component AES-CBC-MAC
+                           Test Case JSON Object
+
+   Here is an abbreviated yet fully constructed example of the prompt
+   for ConditioningComponent / AES-CBC-MAC / SP800-90B
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 15]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   {
+     "vsId": 42,
+     "algorithm": "ConditioningComponent",
+     "mode": "AES-CBC-MAC",
+     "revision": "SP800-90B",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "testType": "AFT",
+         "keyLen": 128,
+         "tests": [
+           {
+             "tcId": 1,
+             "pt": "FE44418EF94E5DA8...",
+             "key": "E618ADF7E7CEBB46465C0B18A924768A"
+           },
+           {
+             "tcId": 2,
+             "pt": "6ABEED30F813C137D47BF1E9E837DAEE",
+             "key": "D1C1B7FFB2CCE0BBF13D4F7B4A246A8D"
+           }
+         ]
+       }
+     ]
+   }
+
+9.3.  Conditioning Component BlockCipher_DF Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  The Test Group JSON object contains meta data that
+   applies to all test vectors within the group.  The following table
+   describes the ConditioningComponent / BlockCipher_DF / SP800-90B JSON
+   elements of the Test Group JSON object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 16]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+      +============+====================================+===========+
+      | JSON Value | Description                        | JSON type |
+      +============+====================================+===========+
+      | tgId       | The unique group identifier        | integer   |
+      +------------+------------------------------------+-----------+
+      | testType   | Describes the operation the client | string    |
+      |            | should perform on the test data    |           |
+      +------------+------------------------------------+-----------+
+      | keyLen     | The length of the key used in the  | integer   |
+      |            | group                              |           |
+      +------------+------------------------------------+-----------+
+      | outputLen  | The expected length of the output  | integer   |
+      +------------+------------------------------------+-----------+
+      | tests      | Array of individual test cases,    | array     |
+      |            | see Section 9.4                    |           |
+      +------------+------------------------------------+-----------+
+
+         Table 8: Conditioning Component BlockCipher_DF Test Group
+                                JSON Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.
+
+9.4.  Conditioning Component BlockCipher_DF Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ConditioningComponent / BlockCipher_DF / SP800-90B
+   test vector.
+
+    +============+========================================+===========+
+    | JSON Value | Description                            | JSON Type |
+    +============+========================================+===========+
+    | tcId       | Test case identifier                   | integer   |
+    +------------+----------------------------------------+-----------+
+    | payload    | The input into the derivation function | hex       |
+    +------------+----------------------------------------+-----------+
+    | payloadLen | The length in bits of the input        | integer   |
+    +------------+----------------------------------------+-----------+
+
+       Table 9: Conditioning Component BlockCipher_DF Test Case JSON
+                                   Object
+
+   Here is an abbreviated yet fully constructed example of the prompt
+   for ConditioningComponent / BlockCipher_DF / SP800-90B
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 17]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   {
+     "vsId": 42,
+     "algorithm": "ConditioningComponent",
+     "mode": "BlockCipher_DF",
+     "revision": "SP800-90B",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "keyLen": 128,
+         "testType": "AFT",
+         "outputLen": 128,
+         "tests": [
+           {
+             "tcId": 1,
+             "payload": "2874215320DADAC...",
+             "payloadLen": 54112
+           },
+           {
+             "tcId": 2,
+             "payload": "36",
+             "payloadLen": 8
+           }
+         ]
+       }
+     ]
+   }
+
+9.5.  Conditioning Component Hash_DF Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  The Test Group JSON object contains meta data that
+   applies to all test vectors within the group.  The following table
+   describes the ConditioningComponent / Hash_DF / SP800-90B JSON
+   elements of the Test Group JSON object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 18]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+      +============+====================================+===========+
+      | JSON Value | Description                        | JSON type |
+      +============+====================================+===========+
+      | tgId       | The unique group identifier        | integer   |
+      +------------+------------------------------------+-----------+
+      | testType   | Describes the operation the client | string    |
+      |            | should perform on the test data    |           |
+      +------------+------------------------------------+-----------+
+      | hashAlg    | The hash algorithm used in the     | string    |
+      |            | derivation function                |           |
+      +------------+------------------------------------+-----------+
+      | tests      | Array of individual test cases,    | array     |
+      |            | see Section 9.6                    |           |
+      +------------+------------------------------------+-----------+
+
+      Table 10: Conditioning Component Hash_DF Test Group JSON Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.
+
+9.6.  Conditioning Component Hash_DF Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ConditioningComponent / Hash_DF / SP800-90B test
+   vector.
+
+    +============+========================================+===========+
+    | JSON Value | Description                            | JSON Type |
+    +============+========================================+===========+
+    | tcId       | Test case identifier                   | integer   |
+    +------------+----------------------------------------+-----------+
+    | payload    | The input into the derivation function | hex       |
+    +------------+----------------------------------------+-----------+
+    | payloadLen | The length in bits of the input        | integer   |
+    +------------+----------------------------------------+-----------+
+
+       Table 11: Conditioning Component Hash_DF Test Case JSON Object
+
+   Here is an abbreviated yet fully constructed example of the prompt
+   for ConditioningComponent / Hash_DF / SP800-90B
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 19]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   {
+     "vsId": 42,
+     "algorithm": "ConditioningComponent",
+     "mode": "Hash_DF",
+     "revision": "SP800-90B",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "hashAlg": "SHA2-256",
+         "testType": "AFT",
+         "tests": [
+           {
+             "tcId": 1,
+             "payload": "2874215320DADAC...",
+             "payloadLen": 54112
+           },
+           {
+             "tcId": 2,
+             "payload": "36",
+             "payloadLen": 8
+           }
+         ]
+       }
+     ]
+   }
+
+10.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+     +===============+===================================+===========+
+     | JSON Property | Description                       | JSON Type |
+     +===============+===================================+===========+
+     | acvVersion    | The version of the protocol       | string    |
+     +---------------+-----------------------------------+-----------+
+     | vsId          | The vector set identifier         | integer   |
+     +---------------+-----------------------------------+-----------+
+     | testGroups    | The test group data, see Table 13 | array     |
+     +---------------+-----------------------------------+-----------+
+
+                       Table 12: Response JSON Object
+
+   An example of this is the following
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 20]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   {
+       "acvVersion": "version",
+       "vsId": 1,
+       "testGroups": [ ... ]
+   }
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.  The following is a
+   skeleton for the test group structure.  Additional properties may be
+   included at this level depending on the algorithm, mode and revision.
+
+          +==========+================================+=========+
+          | JSON     | Description                    | JSON    |
+          | Property |                                | Type    |
+          +==========+================================+=========+
+          | tgId     | The test group identifier      | integer |
+          +----------+--------------------------------+---------+
+          | tests    | The test case data, depending  | array   |
+          |          | on the algorithm see Table 14, |         |
+          |          | Table 15, or Table 16          |         |
+          +----------+--------------------------------+---------+
+
+                 Table 13: Response Test Group JSON Objects
+
+   An example of this is the following
+
+   {
+       "tgId": 1,
+       "tests": [ ... ]
+   }
+
+10.1.  Conditioning Component AES-CBC-MAC Test Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ConditioningComponent / AES-CBC-MAC / SP800-90B
+   test vector.
+
+   The following table describes the JSON elements for the test case
+   responses for ConditioningComponent / AES-CBC-MAC / SP800-90B.
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 21]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+     +============+======================================+===========+
+     | JSON Value | Description                          | JSON type |
+     +============+======================================+===========+
+     | tcId       | Numeric identifier for the test case | integer   |
+     +------------+--------------------------------------+-----------+
+     | ct         | The ciphertext output                | hex       |
+     +------------+--------------------------------------+-----------+
+
+           Table 14: Conditioning Component AES-CBC-MAC Test Case
+                            Results JSON Object
+
+      |  NOTE: In the case of AES-CBC-MAC, the output is always 128-bits
+      |  regardless of the size of the input.
+
+   The following is an example of the response for ConditioningComponent
+   / AES-CBC-MAC / SP800-90B .
+
+   {
+     "vsId": 42,
+     "algorithm": "ConditioningComponent",
+     "mode": "AES-CBC-MAC",
+     "revision": "SP800-90B",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "ct": "4A8575F3EA300812C60B19678620CA9F"
+           },
+           {
+             "tcId": 2,
+             "ct": "2F85CD9748F4CEE2F9BAE939874D8321"
+           }
+         ]
+       }
+     ]
+   }
+
+10.2.  Conditioning Component BlockCipher_DF Test Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ConditioningComponent / BlockCipher_DF / SP800-90B
+   test vector.
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 22]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   The following table describes the JSON elements for the test case
+   responses for ConditioningComponent / BlockCipher_DF / SP800-90B.
+
+   +===============+=======================================+===========+
+   | JSON Value    | Description                           | JSON type |
+   +===============+=======================================+===========+
+   | tcId          | Numeric identifier for the test case  | integer   |
+   +---------------+---------------------------------------+-----------+
+   | requestedBits | The output of the derivation          | hex       |
+   |               | function                              |           |
+   +---------------+---------------------------------------+-----------+
+
+     Table 15: Conditioning Component BlockCipher_DF Test Case Results
+                                JSON Object
+
+   The following is an example of the response for ConditioningComponent
+   / BlockCipher_DF / SP800-90B .
+
+   {
+     "vsId": 42,
+     "algorithm": "ConditioningComponent",
+     "mode": "BlockCipher_DF",
+     "revision": "SP800-90B",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "requestedBits": "4A8575F3EA300812C60B19678620CA9F"
+           },
+           {
+             "tcId": 2,
+             "requestedBits": "2F85CD9748F4CEE2F9BAE939874D8321"
+           }
+         ]
+       }
+     ]
+   }
+
+10.3.  Conditioning Component Hash_DF Test Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each ConditioningComponent / Hash_DF / SP800-90B test
+   vector.
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 23]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+   The following table describes the JSON elements for the test case
+   responses for ConditioningComponent / Hash_DF / SP800-90B.
+
+   +===============+=======================================+===========+
+   | JSON Value    | Description                           | JSON type |
+   +===============+=======================================+===========+
+   | tcId          | Numeric identifier for the test case  | integer   |
+   +---------------+---------------------------------------+-----------+
+   | requestedBits | The output of the derivation          | hex       |
+   |               | function                              |           |
+   +---------------+---------------------------------------+-----------+
+
+      Table 16: Conditioning Component Hash_DF Test Case Results JSON
+                                   Object
+
+   The following is an example of the response for ConditioningComponent
+   / Hash_DF / SP800-90B .
+
+   {
+     "vsId": 42,
+     "algorithm": "ConditioningComponent",
+     "mode": "Hash_DF",
+     "revision": "SP800-90B",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "requestedBits": "4A8575F3EA300812C60B19678620CA9F"
+           },
+           {
+             "tcId": 2,
+             "requestedBits": "2F85CD9748F4CEE2F9BAE939874D8321"
+           }
+         ]
+       }
+     ]
+   }
+
+11.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 24]
+
+Internet-Draft         ACVP ConditioningComponents         December 2025
+
+
+12.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+13.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [SP800-90B]
+              Turan, M. S., Barker, E. B., Kelsey, J. M., McKay, K. A.,
+              Baish, M. L., and M. Boyle, "Recommendation for the
+              Entropy Sources Used for Random Bit Generation", NIST SP
+              800-90B, January 2018,
+              <https://csrc.nist.gov/pubs/sp/800/90/b/final>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 25]

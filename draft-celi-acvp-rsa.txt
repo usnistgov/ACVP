@@ -1,0 +1,4648 @@
+
+
+
+
+Network Working Group                                       C. Celi, Ed.
+Internet-Draft                                           1 December 2025
+Intended status: Informational                                          
+Expires: 4 June 2026
+
+
+                 ACVP RSA Algorithm JSON Specification
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.
+
+Table of Contents
+
+   1.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  Abstract  . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     4.1.  Notation conventions  . . . . . . . . . . . . . . . . . .   4
+     4.2.  Terms and Definitions . . . . . . . . . . . . . . . . . .   4
+       4.2.1.  Prompt  . . . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.2.  Registration  . . . . . . . . . . . . . . . . . . . .   4
+       4.2.3.  Response  . . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.4.  Test Case . . . . . . . . . . . . . . . . . . . . . .   4
+
+
+
+Celi                       Expires 4 June 2026                  [Page 1]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+       4.2.5.  Test Group  . . . . . . . . . . . . . . . . . . . . .   4
+       4.2.6.  Test Vector Set . . . . . . . . . . . . . . . . . . .   4
+       4.2.7.  Validation  . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Supported RSA Modes . . . . . . . . . . . . . . . . . . . . .   4
+     5.1.  Supported Conformances for RSA Algorithms . . . . . . . .   5
+   6.  Test Types and Test Coverage  . . . . . . . . . . . . . . . .   6
+     6.1.  Test Types  . . . . . . . . . . . . . . . . . . . . . . .   6
+     6.2.  Test Types Per Mode . . . . . . . . . . . . . . . . . . .   6
+     6.3.  Test Coverage . . . . . . . . . . . . . . . . . . . . . .   7
+       6.3.1.  Requirements Covered  . . . . . . . . . . . . . . . .   7
+       6.3.2.  Requirements Not Covered  . . . . . . . . . . . . . .   8
+   7.  Capabilities Registration . . . . . . . . . . . . . . . . . .   8
+     7.1.  Prerequisites . . . . . . . . . . . . . . . . . . . . . .   8
+     7.2.  Required Prerequisite Algorithms for RSA Validations  . .   9
+     7.3.  RSA Algorithm Registration Properties . . . . . . . . . .  10
+     7.4.  Property Registration RSA keyGen FIPS186-4  . . . . . . .  12
+       7.4.1.  keyGen Registration Table . . . . . . . . . . . . . .  12
+     7.5.  Property Registration RSA keyGen FIPS186-5  . . . . . . .  15
+       7.5.1.  keyGen Registration Table . . . . . . . . . . . . . .  15
+     7.6.  RSA sigGen Mode Capabilities  . . . . . . . . . . . . . .  18
+       7.6.1.  RSA sigGen FIPS186-4 Capabilities Table . . . . . . .  19
+       7.6.2.  RSA sigGen FIPS186-5 Capabilities Table . . . . . . .  22
+     7.7.  RSA sigVer Mode Capabilities  . . . . . . . . . . . . . .  25
+       7.7.1.  RSA sigVer FIPS186-2 Capabilities Table . . . . . . .  26
+       7.7.2.  RSA sigVer FIPS186-4 Capabilities Table . . . . . . .  28
+       7.7.3.  RSA sigVer FIPS186-5 Capabilities Table . . . . . . .  31
+     7.8.  RSA SignaturePrimitive Mode Capabilities  . . . . . . . .  35
+     7.9.  RSA DecryptionPrimitive v1.0 Mode Capabilities  . . . . .  37
+     7.10. RSA DecryptionPrimitive SP800-56Br2 Mode Capabilities . .  38
+   8.  Test Vectors  . . . . . . . . . . . . . . . . . . . . . . . .  40
+     8.1.  RSA keyGen Test Groups JSON Schema  . . . . . . . . . . .  41
+     8.2.  RSA keyGen Test Case JSON Schema  . . . . . . . . . . . .  43
+     8.3.  RSA sigGen Test Groups JSON Schema  . . . . . . . . . . .  46
+     8.4.  RSA sigGen Test Cases JSON Schema . . . . . . . . . . . .  48
+     8.5.  RSA sigVer Test Groups JSON Schema  . . . . . . . . . . .  49
+     8.6.  Test Cases for sigVer FIPS186-5, FIPS186-4, and
+            FIPS186-2  . . . . . . . . . . . . . . . . . . . . . . .  51
+     8.7.  Test Groups for RSA Signature Primitive 1.0 . . . . . . .  53
+     8.8.  Test Cases for RSA Signature Primitive 1.0  . . . . . . .  53
+     8.9.  Test Groups for RSA Signature Primitive v2.0  . . . . . .  55
+     8.10. Test Cases for RSA Signature Primitive 2.0  . . . . . . .  56
+     8.11. Test Groups for RSA Decryption Primitive 1.0  . . . . . .  59
+     8.12. Test Cases for RSA Decryption Primitive 1.0 . . . . . . .  59
+     8.13. Test Groups for RSA Decryption Primitive Sp800-56Br2  . .  61
+     8.14. Test Cases for RSA Decryption Primitive Sp800-56Br2 . . .  62
+   9.  Test Vector Responses . . . . . . . . . . . . . . . . . . . .  64
+     9.1.  RSA keyGen Test Group Responses . . . . . . . . . . . . .  65
+     9.2.  RSA sigGen Test Group Responses . . . . . . . . . . . . .  71
+
+
+
+Celi                       Expires 4 June 2026                  [Page 2]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+     9.3.  RSA sigVer Test Group Responses . . . . . . . . . . . . .  74
+     9.4.  RSA Signature Primitive Test Group Responses  . . . . . .  75
+     9.5.  RSA Decryption Primitive Test Group Responses . . . . . .  78
+     9.6.  RSA Decryption Primitive Sp800-56Br2 Test Group
+           Responses . . . . . . . . . . . . . . . . . . . . . . . .  80
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  82
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  82
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  82
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  83
+
+1.  Acknowledgements
+
+   There are no acknowledgements.
+
+2.  Abstract
+
+   This document defines the JSON schema for testing RSA implementations
+   with the ACVP specification.
+
+3.  Introduction
+
+   The Automated Crypto Validation Protocol (ACVP) defines a mechanism
+   to automatically verify the cryptographic implementation of a
+   software or hardware crypto module.  The ACVP specification defines
+   how a crypto module communicates with an ACVP server, including
+   crypto capabilities negotiation, session management, authentication,
+   vector processing and more.  The ACVP specification does not define
+   algorithm specific JSON constructs for performing the crypto
+   validation.  A series of ACVP sub-specifications define the
+   constructs for testing individual crypto algorithms.  Each sub-
+   specification addresses a specific class of crypto algorithms.  This
+   sub-specification defines the JSON constructs for testing RSA
+   implementations using ACVP.
+
+   This document is a work-product of the NIST (https://www.nist.gov/)
+   Cryptographic Algorithm Validation Program
+   (https://csrc.nist.gov/projects/cryptographic-algorithm-validation-
+   program) (CAVP).  Please communicate questions and feedback
+   concerning this document to the CAVP by opening an issue on the
+   usnistgov/ACVP GitHub repository at
+   https://github.com/usnistgov/ACVP/issues.
+
+4.  Conventions
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 3]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+4.1.  Notation conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "*NOT RECOMMENDED*", "MAY",
+   and "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 of [RFC2119] and [RFC8174] when, and only when, they appear in
+   all capitals, as shown here.
+
+4.2.  Terms and Definitions
+
+4.2.1.  Prompt
+
+   JSON sent from the server to the client describing the tests the
+   client performs
+
+4.2.2.  Registration
+
+   The initial request from the client to the server describing the
+   capabilities of one or several algorithm, mode and revision
+   combinations
+
+4.2.3.  Response
+
+   JSON sent from the client to the server in response to the prompt
+
+4.2.4.  Test Case
+
+   An individual unit of work within a prompt or response
+
+4.2.5.  Test Group
+
+   A collection of test cases that share similar properties within a
+   prompt or response
+
+4.2.6.  Test Vector Set
+
+   A collection of test groups under a specific algorithm, mode, and
+   revision
+
+4.2.7.  Validation
+
+   JSON sent from the server to the client that specifies the
+   correctness of the response
+
+5.  Supported RSA Modes
+
+   The following algorithms MAY be advertised by the ACVP compliant
+   cryptographic module:
+
+
+
+Celi                       Expires 4 June 2026                  [Page 4]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +===========+=======================+===============+===============+
+   | Algorithm | Mode                  | Revision      | Standard      |
+   +===========+=======================+===============+===============+
+   | "RSA"     | "keyGen"              | "FIPS186-4"   | [FIPS186-4]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "keyGen"              | "FIPS186-5"   | [FIPS186-5]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "sigGen"              | "FIPS186-4"   | [FIPS186-4]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "sigGen"              | "FIPS186-5"   | [FIPS186-5]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "sigVer"              | "FIPS186-5"   | [FIPS186-5]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "sigVer"              | "FIPS186-4"   | [FIPS186-4]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "sigVer"              | "FIPS186-2"   | [FIPS186-2]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "signaturePrimitive"  | "1.0"         | [FIPS186-5]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "signaturePrimitive"  | "2.0"         | [FIPS186-5]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "decryptionPrimitive" | "1.0"         | [SP800-56B]   |
+   +-----------+-----------------------+---------------+---------------+
+   | "RSA"     | "decryptionPrimitive" | "Sp800-56Br2" | [SP800-56Br2] |
+   +-----------+-----------------------+---------------+---------------+
+
+             Table 1: Supported RSA Algorithm Modes JSON Values
+
+   These will be refered to as algorithm / mode / revision throughout
+   the document, for example RSA / keyGen / 1.0.
+
+5.1.  Supported Conformances for RSA Algorithms
+
+   The following RSA algorithms MAY claim conformance to [SP800-106]:
+
+   *  RSA / sigGen / FIPS186-4
+
+   *  RSA / sigGen / FIPS186-5
+
+   *  RSA / sigVer / FIPS186-2
+
+   *  RSA / sigVer / FIPS186-4
+
+   *  RSA / sigVer / FIPS186-5
+
+   The following RSA algorithms MAY claim conformance to [SP800-56Br2]:
+
+   *  RSA / decryptionPrimitive / Sp800-56Br2
+
+
+
+Celi                       Expires 4 June 2026                  [Page 5]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+6.  Test Types and Test Coverage
+
+   This section describes the design of the tests used to validate RSA
+   implementations.
+
+6.1.  Test Types
+
+   There are multiple test types depending on the algorithm and mode.
+   Each has a specific value to be used in the testType field.  The
+   testType field definitions are:
+
+   "AFT" - Algorithm Functional Test.  These tests can be processed by
+   the client using a normal 'generate_key', 'sign', 'verify' or
+   'decrypt' operation depending on the mode.  AFTs cause the
+   implementation under test to exercise normal operations.  In all
+   cases, random data is used.  The functional tests are designed to
+   verify that the logical components of the process are operating
+   correctly.
+
+   "GDT" - Generated Data Test.  These tests require the client to
+   generate all inputs and outputs in order to demonstrate their full
+   capabilities in cases where input from the server might not be
+   applicable.
+
+   "KAT" - Known Answer Test.  These tests are staticly defined and are
+   included in every vector set that matches their capabilities.
+
+6.2.  Test Types Per Mode
+
+   As each mode requires different tests, how each test type is
+   processed may change depending on the mode.
+
+   ACVP servers that support RSA keyGen MAY support AFTs, GDTs, and
+   KATs.  The AFTs and GDTs *REQUIRE* the client to generate RSA key
+   pairs based on the test group properties provided.  The KATs
+   *REQUIRE* the client to attempt to generate a key with specific
+   starting 'p' and 'q' values via the Random Probable Prime method
+   defined in [FIPS186-4] and [FIPS186-5].
+
+   ACVP servers that support RSA sigGen MAY support GDTs.  The GDTs
+   *REQUIRE* the client to generate a key pair and sign a message
+   provided by the server based on the test group properties provided.
+   The client provides the signature and public key to the server for
+   verification.
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 6]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   ACVP servers that support RSA sigVer MAY support GDTs.  The GDTs
+   *REQUIRE* the client to verify provided signatures given a message
+   and public key.  The client provides the verification result back to
+   the server.
+
+   ACVP servers that support RSA LegacysigVer MAY support GDTs.  The
+   GDTs *REQUIRE* the client to verify provided signatures given a
+   message and public key.  The client provides the verification result
+   back to the server.
+
+   ACVP servers that support RSA SignaturePrimitive MAY support AFTs.
+   The AFTs *REQUIRE* the client to determine whether or not the
+   provided message can be signed with the provided public key.  If so,
+   also provide the signature for verification.
+
+   ACVP servers that support RSA DecryptionPrimitive MAY support AFTs.
+   The AFTs *REQUIRE* the client to determine whether or not the
+   provided ciphertext can be decrypted with the provided public key.
+   If so, also provide the plaintext for verification.
+
+6.3.  Test Coverage
+
+   The tests described in this document are intended to ensure an
+   implementation conformant with the requirements listed below.  For
+   clarity, related requirements not covered are also provided.
+
+6.3.1.  Requirements Covered
+
+   *  FIPS 186-4 Section 3 General Discussion.  Key generation,
+      signature generation, and signature validation are all within
+      scope of ACVP server testing.
+
+   *  FIPS 186-4 Section 5 The RSA Digital Signature Algorithm.  The
+      ACVP server provides a means of testing the generation of RSA
+      keys.  The ACVP server SHALL support a variety of RSA capabilities
+      functionS for the creation and delivery of tests to/from the IUT.
+      Key pair generation testing SHALL be provided by the ACVP server.
+      Both Signature Generation and Validation testing mechanisms SHALL
+      be provided by the ACVP server.
+
+   *  FIPS 186-2.  The ACVP server MAY provide a means of testing legacy
+      RSA functions such as RSA sigVer.  This testing is provided to
+      ensure an IUT is capable of verifying a signature that is no
+      longer approved for generation, given the same capabilities.
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 7]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   *  SP800-106 Section 3 Randomized Hashing and Section 4 Digital
+      Signatures Using Randomized Hashing.  The IUT SHALL be provided or
+      provide a random value that should be used to "randomize" a
+      message prior to signing and/or verifying an original message.
+
+6.3.2.  Requirements Not Covered
+
+   *  FIPS 186-4 Section 3 General Discussion.  Assurances of private
+      key secrecy and ownership SHALL NOT be within scope of ACVP
+      testing.
+
+   *  FIPS 186-4 Section 5 The RSA Digital Signature Algorithm.  Though
+      the ACVP server SHALL support a variety of parameter sizes hash
+      functions, the IUT's selection of these is out of scope of
+      testing.  Key pair management SHALL NOT be within scope of ACVP
+      testing.
+
+   *  SP800-106 Section 3.3 The Random Value.  DSA, ECDSA, and RSA have
+      random values generated as per their signing process, this random
+      value can be used as the input to the message randomization
+      function, doing so however is out of scope of this testing.
+
+7.  Capabilities Registration
+
+   ACVP requires crypto modules to register their capabilities.  This
+   allows the crypto module to advertise support for specific
+   algorithms, notifying the ACVP server which algorithms need test
+   vectors generated for the validation process.  This section describes
+   the constructs for advertising support of RSA algorithms to the ACVP
+   server.
+
+   The algorithm capabilities MUST be advertised as JSON objects within
+   the 'algorithms' value of the ACVP registration message.  The
+   'algorithms' value is an array, where each array element is an
+   individual JSON object defined in this section.  The 'algorithms'
+   value is part of the 'capability_exchange' element of the ACVP JSON
+   registration message.  See the ACVP specification [ACVP] for more
+   details on the registration message.
+
+7.1.  Prerequisites
+
+   Each algorithm implementation MAY rely on other cryptographic
+   primitives.  For example, RSA Signature algorithms depend on an
+   underlying hash function.  Each of these underlying algorithm
+   primitives must be validated, either separately or as part of the
+   same submission.  ACVP provides a mechanism for specifying the
+   required prerequisites:
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 8]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   Prerequisites, if applicable, MUST be submitted in the registration
+   as the prereqVals JSON property array inside each element of the
+   algorithms array.  Each element in the prereqVals array MUST contain
+   the following properties
+
+        +===============+=============================+===========+
+        | JSON Property | Description                 | JSON Type |
+        +===============+=============================+===========+
+        | algorithm     | a prerequisite algorithm    | string    |
+        +---------------+-----------------------------+-----------+
+        | valValue      | algorithm validation number | string    |
+        +---------------+-----------------------------+-----------+
+
+                      Table 2: Prerequisite Properties
+
+   A "valValue" of "same" SHALL be used to indicate that the
+   prerequisite is being met by a different algorithm in the capability
+   exchange in the same registration.
+
+   An example description of prerequisites within a single algorithm
+   capability exchange looks like this
+
+   "prereqVals":
+   [
+     {
+       "algorithm": "Alg1",
+       "valValue": "Val-1234"
+     },
+     {
+       "algorithm": "Alg2",
+       "valValue": "same"
+     }
+   ]
+
+7.2.  Required Prerequisite Algorithms for RSA Validations
+
+   Each RSA implementation relies on other cryptographic primitives.
+   For example, RSA keyGen often uses an underlying SHA algorithm.  Each
+   of these underlying algorithm primitives must be validated, either
+   separately or as part of the same submission.  ACVP provides a
+   mechanism for specifying the required prerequisites:
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                  [Page 9]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+    +==============+================+=====================+===========+
+    | JSON Value   | Description    | JSON type           | Valid     |
+    |              |                |                     | Values    |
+    +==============+================+=====================+===========+
+    | algorithm    | a prerequisite | string              | SHA, DRBG |
+    |              | algorithm      |                     |           |
+    +--------------+----------------+---------------------+-----------+
+    | valValue     | algorithm      | string              | Actual    |
+    |              | validation     |                     | number or |
+    |              | number         |                     | "same"    |
+    +--------------+----------------+---------------------+-----------+
+    | prereqAlgVal | prerequisite   | object with         | See above |
+    |              | algorithm      | algorithm and       |           |
+    |              | validation     | valValue properties |           |
+    +--------------+----------------+---------------------+-----------+
+
+         Table 3: Required RSA Prerequisite Algorithms JSON Values
+
+7.3.  RSA Algorithm Registration Properties
+
+   Each RSA algorithm capability advertised is a self-contained JSON
+   object using the following values.
+
+   +=======================+===============+==============+============+
+   | JSON Value            | Description   | JSON type    | Valid      |
+   |                       |               |              | Values     |
+   +=======================+===============+==============+============+
+   | algorithm             | The RSA       | string       | See        |
+   |                       | algorithm to  |              | Section 5  |
+   |                       | be validated  |              |            |
+   +-----------------------+---------------+--------------+------------+
+   | mode                  | The mode to   | string       | See        |
+   |                       | be validated  |              | Section 5  |
+   +-----------------------+---------------+--------------+------------+
+   | revision              | The           | string       | See        |
+   |                       | algorithm     |              | Section 5  |
+   |                       | testing       |              |            |
+   |                       | revision to   |              |            |
+   |                       | use           |              |            |
+   +-----------------------+---------------+--------------+------------+
+   | prereqVals            | Prerequisite  | array of     | See        |
+   |                       | algorithm     | prereqAlgVal | Section    |
+   |                       | validations   | objects      | 7.2        |
+   +-----------------------+---------------+--------------+------------+
+   | capabilities          | The           | array of     | See        |
+   |                       | individual    | capability   | Section    |
+   |                       | RSA           | objects      | 7.4,       |
+   |                       | capabilities  |              | Section    |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 10]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |                       |               |              | 7.6,       |
+   |                       |               |              | Section    |
+   |                       |               |              | 7.7,       |
+   |                       |               |              | Section    |
+   |                       |               |              | 7.9, or    |
+   |                       |               |              | Section    |
+   |                       |               |              | 7.8        |
+   +-----------------------+---------------+--------------+------------+
+   | infoGeneratedByServer | This flag     | boolean      | true/false |
+   |                       | indicates     |              |            |
+   |                       | that the      |              |            |
+   |                       | server is     |              |            |
+   |                       | responsible   |              |            |
+   |                       | for           |              |            |
+   |                       | generating    |              |            |
+   |                       | inputs for    |              |            |
+   |                       | Key           |              |            |
+   |                       | Generation    |              |            |
+   |                       | tests         |              |            |
+   +-----------------------+---------------+--------------+------------+
+   | pubExpMode            | Supports      | string       | "fixed" or |
+   |                       | fixed or      |              | "random"   |
+   |                       | random        |              |            |
+   |                       | public key    |              |            |
+   |                       | exponent e    |              |            |
+   +-----------------------+---------------+--------------+------------+
+   | fixedPubExp           | The value of  | hex          |            |
+   |                       | the public    |              |            |
+   |                       | key exponent  |              |            |
+   |                       | e in hex if   |              |            |
+   |                       | pubExpMode    |              |            |
+   |                       | is "fixed"    |              |            |
+   +-----------------------+---------------+--------------+------------+
+   | keyFormat             | The           | string       | "standard" |
+   |                       | preferred     |              | or "crt"   |
+   |                       | private key   |              |            |
+   |                       | format.  The  |              |            |
+   |                       | "standard"    |              |            |
+   |                       | format has    |              |            |
+   |                       | "p", "q",     |              |            |
+   |                       | and "d" as    |              |            |
+   |                       | the           |              |            |
+   |                       | components    |              |            |
+   |                       | of the        |              |            |
+   |                       | private key.  |              |            |
+   |                       | The "crt"     |              |            |
+   |                       | (Chinese      |              |            |
+   |                       | Remainder     |              |            |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 11]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |                       | Theorem)      |              |            |
+   |                       | format has    |              |            |
+   |                       | "p", "q",     |              |            |
+   |                       | "dmp1" (d     |              |            |
+   |                       | modulo p-1),  |              |            |
+   |                       | "dmq1" (d     |              |            |
+   |                       | modulo q-1),  |              |            |
+   |                       | and "iqmp"    |              |            |
+   |                       | (inverse q    |              |            |
+   |                       | modulo p) as  |              |            |
+   |                       | the           |              |            |
+   |                       | components    |              |            |
+   +-----------------------+---------------+--------------+------------+
+
+              Table 4: RSA Algorithm Capabilities JSON Values
+
+      |  NOTE 1: The 'infoGeneratedByServer' property is only valid for
+      |  RSA / keyGen / * registrations.
+
+      |  NOTE 2: The properties 'pubExpMode` and fixedPubExp are only
+      |  valid for RSA / decryptionPrimitive / Sp800-56Br2, RSA / keyGen
+      |  / * , and RSA / sigVer / * registrations.
+
+      |  NOTE 3: The 'keyFormat' property is only valid for RSA /
+      |  decryptionPrimitive / Sp800-56Br2, and RSA / keyGen / *
+      |  registrations.
+
+7.4.  Property Registration RSA keyGen FIPS186-4
+
+   The RSA keyGen FIPS186-4 capabilities are advertised as JSON objects
+   within the 'capabilities' property.
+
+7.4.1.  keyGen Registration Table
+
+   A registration for RSA / keyGen / FIPS186-4 SHALL use these
+   properties
+
+   +============+=========================+=========+=================+
+   | JSON Value | Description             | JSON    | Valid Values    |
+   |            |                         | type    |                 |
+   +============+=========================+=========+=================+
+   | randPQ     | Key Generation mode to  | string  | "B.3.2",        |
+   |            | be validated.  Random P |         | "B.3.3",        |
+   |            | and Q primes generated  |         | "B.3.4",        |
+   |            | as (see [FIPS186-4]):   |         | "B.3.5",        |
+   |            | provable primes         |         | "B.3.6"         |
+   |            | (Appendix B.3.2);       |         |                 |
+   |            | probable primes         |         |                 |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 12]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |            | (Appendix B.3.3);       |         |                 |
+   |            | provable primes with    |         |                 |
+   |            | conditions              |         |                 |
+   |            | (Appendix B.3.4);       |         |                 |
+   |            | provable/probable       |         |                 |
+   |            | primes with conditions  |         |                 |
+   |            | (Appendix B.3.5);       |         |                 |
+   |            | probable primes with    |         |                 |
+   |            | conditions              |         |                 |
+   |            | (Appendix B.3.6)        |         |                 |
+   +------------+-------------------------+---------+-----------------+
+   | properties | An array of objects     | array   |                 |
+   |            | containing properties   |         |                 |
+   |            | for all supported       |         |                 |
+   |            | moduli, primality test, |         |                 |
+   |            | and hash algorithms for |         |                 |
+   |            | a single key generation |         |                 |
+   |            | mode                    |         |                 |
+   +------------+-------------------------+---------+-----------------+
+   | modulo     | supported RSA modulo    | integer | 2048, 3072 or   |
+   |            | for the randPQ mode -   |         | 4096            |
+   |            | see [FIPS186-4],        |         |                 |
+   |            | Appendix B.3            |         |                 |
+   +------------+-------------------------+---------+-----------------+
+   | hashAlg    | Supported hash          | array   | any non-empty   |
+   |            | algorithms for the      |         | subset of       |
+   |            | randPQ mode - see       |         | {"SHA-1",       |
+   |            | [FIPS186-4],            |         | "SHA2-224",     |
+   |            | Appendix B.3.  Needed   |         | "SHA2-256",     |
+   |            | for "B.3.2", "B.3.4"    |         | "SHA2-384",     |
+   |            | and "B.3.5"             |         | "SHA2-512",     |
+   |            |                         |         | "SHA2-512/224", |
+   |            |                         |         | "SHA2-512/256"} |
+   +------------+-------------------------+---------+-----------------+
+   | primeTest  | Primality test rounds   | array   | any non-empty   |
+   |            | of Miller-Rabin from    |         | subset of       |
+   |            | Table C.2 or Table C.3  |         | {"tblC2",       |
+   |            | in [FIPS186-4],         |         | "tblC3"}.       |
+   |            | Appendix C.3            |         | Needed for      |
+   |            |                         |         | "B.3.3",        |
+   |            |                         |         | "B.3.5" and     |
+   |            |                         |         | "B.3.6"         |
+   +------------+-------------------------+---------+-----------------+
+
+          Table 5: RSA keyGen FIPS186-4 Capabilities JSON Values
+
+   An example of this is the following
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 13]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+       "algorithm": "RSA",
+       "mode": "keyGen",
+       "revision": "FIPS186-4",
+       "prereqVals": [{"algorithm": "DRBG", "valValue": "1234"}, {"algorithm": "SHA", "valValue": "5678"}],
+       "infoGeneratedByServer": false,
+       "pubExpMode": "random",
+       "keyFormat": "crt",
+       "capabilities": [
+           {
+               "randPQ": "B.3.2",
+               "properties": [
+                   {
+                       "modulo": 2048,
+                       "hashAlg": [
+                           "SHA2-224"
+                       ]
+                   }
+               ]
+           },
+           {
+               "randPQ": "B.3.4",
+               "properties": [
+                   {
+                       "modulo": 3072,
+                       "hashAlg": [
+                           "SHA2-224"
+                       ]
+                   }
+               ]
+           },
+           {
+               "randPQ": "B.3.3",
+               "properties": [
+                   {
+                       "modulo": 2048,
+                       "primeTest": [
+                           "tblC2"
+                       ]
+                   }
+               ]
+           },
+           {
+               "randPQ": "B.3.6",
+               "properties": [
+                   {
+                       "modulo": 3072,
+                       "primeTest": [
+
+
+
+Celi                       Expires 4 June 2026                 [Page 14]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+                           "tblC2",
+                           "tblC3"
+                       ]
+                   }
+               ]
+           },
+           {
+               "randPQ" : "B.3.5",
+               "properties" : [
+                   {
+                       "modulo" : 4096,
+                       "hashAlg" : [
+                           "SHA2-512"
+                       ],
+                       "primeTest": [
+                           "tblC3"
+                       ]
+                   }
+               ]
+           }
+       ]
+   }
+
+7.5.  Property Registration RSA keyGen FIPS186-5
+
+   The RSA / keyGen / FIPS186-5 capabilities are advertised as JSON
+   objects within the 'capabilities' property.
+
+7.5.1.  keyGen Registration Table
+
+   A registration for RSA / keyGen / FIPS186-5 SHALL use these
+   properties
+
+   +============+===============+=========+============================+
+   | JSON Value |Description    |JSON type|Valid Values                |
+   +============+===============+=========+============================+
+   | randPQ     |Key Generation |string   |"provable", "probable",     |
+   |            |mode to be     |         |"provableWithProvableAux",  |
+   |            |validated.     |         |"probableWithProvableAux",  |
+   |            |Random P and Q |         |"probableWithProbableAux"   |
+   |            |primes         |         |                            |
+   |            |generated as   |         |                            |
+   |            |(see           |         |                            |
+   |            |[FIPS186-5]):  |         |                            |
+   |            |provable       |         |                            |
+   |            |primes;        |         |                            |
+   |            |probable       |         |                            |
+   |            |primes;        |         |                            |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 15]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |            |provable primes|         |                            |
+   |            |with auxiliary |         |                            |
+   |            |provable       |         |                            |
+   |            |primes;        |         |                            |
+   |            |probable primes|         |                            |
+   |            |with auxiliary |         |                            |
+   |            |provable       |         |                            |
+   |            |primes;        |         |                            |
+   |            |probable primes|         |                            |
+   |            |with auxiliary |         |                            |
+   |            |probable primes|         |                            |
+   +------------+---------------+---------+----------------------------+
+   | properties |An array of    |array    |                            |
+   |            |objects        |         |                            |
+   |            |containing     |         |                            |
+   |            |properties for |         |                            |
+   |            |all supported  |         |                            |
+   |            |moduli,        |         |                            |
+   |            |primality test,|         |                            |
+   |            |and hash       |         |                            |
+   |            |algorithms for |         |                            |
+   |            |a single key   |         |                            |
+   |            |generation mode|         |                            |
+   +------------+---------------+---------+----------------------------+
+   | modulo     |supported RSA  |integer  |2048, 3072, 4096, 6144, or  |
+   |            |modulo for the |         |8192                        |
+   |            |randPQ mode -  |         |                            |
+   |            |see [FIPS186-5]|         |                            |
+   +------------+---------------+---------+----------------------------+
+   | hashAlg    |Supported hash |array    |any non-empty subset of     |
+   |            |algorithms for |         |{"SHA-1", "SHA2-224",       |
+   |            |the randPQ mode|         |"SHA2-256", "SHA2-384",     |
+   |            |- see          |         |"SHA2-512", "SHA2-512/224", |
+   |            |[FIPS186-5].   |         |"SHA2-512/256"}             |
+   |            |Needed for any |         |                            |
+   |            |'randPQ' with  |         |                            |
+   |            |provable primes|         |                            |
+   +------------+---------------+---------+----------------------------+
+   | primeTest  |Primality test |array    |any non-empty subset of     |
+   |            |rounds of      |         |{"2pow100", "2powSecStr"}   |
+   |            |Miller-Rabin   |         |                            |
+   |            |from           |         |                            |
+   |            |[FIPS186-5].   |         |                            |
+   |            |Needed for any |         |                            |
+   |            |'randPQ' with  |         |                            |
+   |            |probable primes|         |                            |
+   +------------+---------------+---------+----------------------------+
+   | pMod8      |The result of  |integer  |0, 1, 3, 5, 7               |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 16]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |            |the evaluation |         |                            |
+   |            |of the         |         |                            |
+   |            |generated p    |         |                            |
+   |            |prime, p % 8   |         |                            |
+   +------------+---------------+---------+----------------------------+
+   | qMod8      |The result of  |integer  |0, 1, 3, 5, 7               |
+   |            |the evaluation |         |                            |
+   |            |of the         |         |                            |
+   |            |generated q    |         |                            |
+   |            |prime, q % 8   |         |                            |
+   +------------+---------------+---------+----------------------------+
+
+           Table 6: RSA keyGen FIPS186-5 Capabilities JSON Values
+
+      |  NOTE 1: While 15360 is supported for modulo in 186-5, at this
+      |  time, it's not supported in ACVP due to system contraints.  We
+      |  apologize for any inconvenience.
+
+      |  NOTE 2: The properties 'pMod8' and 'qMod8' with a value of 0,
+      |  means that no modulus check will be performed on the generated
+      |  primes p and q.
+
+   The following is an example
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 17]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+       "algorithm": "RSA",
+       "mode": "keyGen",
+       "revision": "FIPS186-5",
+       "prereqVals": [{"algorithm": "DRBG", "valValue": "1234"}, {"algorithm": "SHA", "valValue": "5678"}],
+       "infoGeneratedByServer": false,
+       "pubExpMode": "random",
+       "keyFormat": "crt"
+       "capabilities": [
+           {
+               "randPQ": "provable",
+               "properties": [
+                   {
+                       "modulo": 2048,
+                       "hashAlg": [
+                           "SHA2-224"
+                       ],
+                       "pMod8": 1,
+                       "qMod8": 1
+                   }
+               ]
+           },
+           {
+               "randPQ": "probable",
+               "properties": [
+                   {
+                       "modulo": 2048,
+                       "primeTest": [
+                           "2pow100"
+                       ],
+                       "pMod8": 0,
+                       "qMod8": 3
+                   }
+               ]
+           }
+       ]
+   }
+
+7.6.  RSA sigGen Mode Capabilities
+
+   The RSA / sigGen / * mode capabilities are advertised as JSON objects
+   within the 'capabilities' array as part of the 'capability_exchange'
+   element of the ACVP JSON registration message.  See the ACVP
+   specification for details on the registration message.
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 18]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   Each RSA sigGen mode capability is advertised as a self-contained
+   JSON object consisting of the algorithm, mode, and capabilities
+   array.  The capabilities array may contain multiple elements, each
+   pertaining to a sigType that is supported by the client for the RSA
+   mode being advertised.
+
+   The following table defines the capabilities that may be advertised
+   by the ACVP compliant crypto modules.
+
+7.6.1.  RSA sigGen FIPS186-4 Capabilities Table
+
+   The following RSA / sigGen / FIPS186-4 capabilities MAY be advertised
+   by the ACVP compliant crypto module:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 19]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +============+=========================+=========+=================+
+   | JSON value | Description             | JSON    | Valid values    |
+   |            |                         | type    |                 |
+   +============+=========================+=========+=================+
+   | sigType    | supported RSA signature | string  | one of          |
+   |            | types - see             |         | {"ansx9.31",    |
+   |            | [FIPS186-4], Section 5  |         | "pkcs1v1.5",    |
+   |            |                         |         | "pss"}          |
+   +------------+-------------------------+---------+-----------------+
+   | properties | RSA signature           | array   | modulo,         |
+   |            | generation parameters - |         | hashAlg, and    |
+   |            | see [FIPS186-4],        |         | saltLen (when   |
+   |            | Section 5               |         | sigType is      |
+   |            |                         |         | "pss")          |
+   +------------+-------------------------+---------+-----------------+
+   | modulo     | supported RSA modulo    | integer | any one of the  |
+   |            | for signature           |         | supported       |
+   |            | generation - see        |         | modulo sizes    |
+   |            | [FIPS186-4], Section 5  |         | {2048, 3072,    |
+   |            |                         |         | 4096}           |
+   +------------+-------------------------+---------+-----------------+
+   | hashPair   | supported hash          | array   | an array of     |
+   |            | algorithms and optional |         | objects         |
+   |            | salt length for         |         | containing a    |
+   |            | signature generation    |         | hashAlg and an  |
+   |            | for this sigType and    |         | optional        |
+   |            | modulo - see            |         | saltLen         |
+   |            | [SP800-131A], Section 9 |         |                 |
+   +------------+-------------------------+---------+-----------------+
+   | hashAlg    | supported hash          | string  | one of          |
+   |            | algorithms for this     |         | {"SHA2-224",    |
+   |            | sigType and modulo -    |         | "SHA2-256",     |
+   |            | see [SP800-131A],       |         | "SHA2-384",     |
+   |            | Section 9               |         | "SHA2-512",     |
+   |            |                         |         | "SHA2-512/224", |
+   |            |                         |         | "SHA2-512/256"} |
+   +------------+-------------------------+---------+-----------------+
+   | saltLen    | supported salt lengths  | integer | See the note    |
+   |            | for PSS signature       |         | below           |
+   |            | generation - see        |         |                 |
+   |            | [FIPS186-4],            |         |                 |
+   |            | Section 5.5             |         |                 |
+   +------------+-------------------------+---------+-----------------+
+
+           Table 7: Supported RSA sigGen FIPS186-4 JSON Values
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 20]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+      |  NOTE: The 'saltLen' property for each hash algorithm SHALL only
+      |  be present if the 'sigType' is "pss".  The values allowed in
+      |  PSS signature generation is between 0 and the length of the
+      |  corresponding hash function output block (in bytes), the end
+      |  points included.
+
+   The following is an example of a registration for RSA / sigGen /
+   FIPS186-4
+
+   {
+       "algorithm": "RSA",
+       "mode": "sigGen",
+       "revision": "FIPS186-4",
+       "prereqVals": [{"algorithm": "DRBG", "valValue": "same"}, {"algorithm": "SHA", "valValue": "same"}],
+       "conformances": [
+           "SP800-106"
+       ],
+       "capabilities" :
+       [
+           {
+               "sigType" : "ansx9.31",
+               "properties" :
+               [
+                   {
+                       "modulo" : 2048,
+                       "hashPair" : [
+                           {
+                               "hashAlg" : "SHA2-224"
+                           }
+                       ]
+                   },
+                   {
+                       "modulo" : 3072,
+                       "hashPair" : [
+                           {
+                               "hashAlg" : "SHA2-256"
+                           },
+                           {
+                               "hashAlg" : "SHA2-512"
+                           }
+                       ]
+                   }
+               ]
+           },
+           {
+               "sigType" : "pkcs1v1.5",
+               "properties" :
+               [
+
+
+
+Celi                       Expires 4 June 2026                 [Page 21]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+                   {
+                       "modulo" : 4096,
+                       "hashPair" : [
+                           {
+                               "hashAlg" : "SHA2-224"
+                           },
+                           {
+                               "hashAlg" : "SHA2-256"
+                           }
+                       ]
+                   }
+               ]
+           },
+           {
+               "sigType" : "pss",
+               "properties" :
+               [
+                   {
+                       "modulo" : 3072,
+                       "hashPair" : [
+                           {
+                               "hashAlg" : "SHA2-224",
+                               "saltLen" : 28
+                           },
+                           {
+                               "hashAlg" : "SHA2-256",
+                               "saltLen" : 32
+                           },
+                           {
+                               "hashAlg" : "SHA2-512",
+                               "saltLen" : 64
+                           }
+                       ]
+                   }
+               ]
+           }
+       ]
+   }
+
+7.6.2.  RSA sigGen FIPS186-5 Capabilities Table
+
+   The following RSA / sigGen / FIPS186-5 capabilities MAY be advertised
+   by the ACVP compliant crypto module:
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 22]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +==============+================+=========+=========================+
+   | JSON value   | Description    | JSON    | Valid values            |
+   |              |                | type    |                         |
+   +==============+================+=========+=========================+
+   | sigType      | supported RSA  | string  | one of {"pkcs1v1.5",    |
+   |              | signature      |         | "pss"}                  |
+   |              | types - see    |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | properties   | RSA signature  | array   | modulo, hashAlg, and    |
+   |              | generation     |         | saltLen (when sigType   |
+   |              | parameters -   |         | is "pss")               |
+   |              | see            |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | modulo       | supported RSA  | integer | any one of the          |
+   |              | modulo for     |         | supported modulo sizes  |
+   |              | signature      |         | {2048, 3072, 4096}      |
+   |              | generation -   |         |                         |
+   |              | see            |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | maskFunction | the mask       | array   | any non-empty subset of |
+   |              | function       |         | {"mgf1", "shake-128",   |
+   |              | used, only     |         | "shake-256"}            |
+   |              | valid for PSS  |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | hashPair     | supported      | array   | an array of objects     |
+   |              | hash           |         | containing a hashAlg    |
+   |              | algorithms     |         | and an optional saltLen |
+   |              | and optional   |         |                         |
+   |              | salt length    |         |                         |
+   |              | for signature  |         |                         |
+   |              | generation     |         |                         |
+   |              | for this       |         |                         |
+   |              | sigType and    |         |                         |
+   |              | modulo - see   |         |                         |
+   |              | [SP800-131A],  |         |                         |
+   |              | Section 9      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | hashAlg      | supported      | string  | one of {"SHA2-224",     |
+   |              | hash           |         | "SHA2-256", "SHA2-384", |
+   |              | algorithms     |         | "SHA2-512",             |
+   |              | for this       |         | "SHA2-512/224",         |
+   |              | sigType and    |         | "SHA2-512/256",         |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 23]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |              | modulo - see   |         | "SHA3-224", "SHA3-256", |
+   |              | [SP800-131A],  |         | "SHA3-384", "SHA3-512", |
+   |              | Section 9      |         | "SHAKE-128", "SHAKE-    |
+   |              |                |         | 256"} NOTE: SHAKE-128   |
+   |              |                |         | and SHAKE-256 are only  |
+   |              |                |         | valid for pss.          |
+   +--------------+----------------+---------+-------------------------+
+   | saltLen      | supported      | integer | See the note below      |
+   |              | salt lengths   |         |                         |
+   |              | for PSS        |         |                         |
+   |              | signature      |         |                         |
+   |              | generation -   |         |                         |
+   |              | see            |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5.4    |         |                         |
+   +--------------+----------------+---------+-------------------------+
+
+            Table 8: Supported RSA sigGen FIPS186-5 JSON Values
+
+      |  NOTE: The 'saltLen' property for each hash algorithm SHALL only
+      |  be present if the 'sigType' is "pss".  The values allowed in
+      |  PSS signature generation is between 0 and the length of the
+      |  corresponding hash function output block (in bytes), the end
+      |  points included.
+
+   For an example of the RSA / sigGen / FIPS186-5 registration see the
+   following abbreviated example for PSS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 24]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+       "algorithm": "RSA",
+       "mode": "sigGen",
+       "revision": "FIPS186-5",
+       "prereqVals": [{"algorithm": "DRBG", "valValue": "same"}, {"algorithm": "SHA", "valValue": "same"}],
+       "conformances": [
+           "SP800-106"
+       ],
+       "capabilities" :
+       [
+           {
+               "sigType" : "pss",
+               "properties" :
+               [
+                   {
+                       "modulo" : 3072,
+                       "maskFunction": [
+                           "SHAKE-128", "MGF1"
+                       ]
+                       "hashPair" : [
+                           {
+                               "hashAlg" : "SHA2-224",
+                               "saltLen" : 28
+                           },
+                           {
+                               "hashAlg" : "SHA2-256",
+                               "saltLen" : 32
+                           },
+                           {
+                               "hashAlg" : "SHA2-512",
+                               "saltLen" : 64
+                           }
+                       ]
+                   }
+               ]
+           }
+       ]
+   }
+
+7.7.  RSA sigVer Mode Capabilities
+
+   The RSA / sigVer / * mode capabilities are advertised as JSON objects
+   within the array of 'capabilities' as part of the
+   'capability_exchange' element of the ACVP JSON registration message.
+   See the ACVP specification for details on the registration message.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 25]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   Each RSA / sigVer / * mode capability is advertised as a self-
+   contained JSON object consisting of the algorithm, mode, and
+   capabilities array.  The capabilities array may contain multiple
+   elements, each pertaining to a sigType that is supported by the
+   client for the RSA mode being advertised.
+
+   The following table defines the capabilities that may be advertised
+   by the ACVP compliant crypto modules.
+
+7.7.1.  RSA sigVer FIPS186-2 Capabilities Table
+
+   The following RSA / sigVer / FIPS186-2 capabilities MAY be advertised
+   by the ACVP compliant crypto module:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 26]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +============+===========================+=========+===============+
+   | JSON value | Description               | JSON    | Valid values  |
+   |            |                           | type    |               |
+   +============+===========================+=========+===============+
+   | sigType    | supported RSA signature   | string  | one of        |
+   |            | types - see [FIPS186-2],  |         | {"ansx9.31",  |
+   |            | Section 5                 |         | "pkcs1v1.5",  |
+   |            |                           |         | "pss"}        |
+   +------------+---------------------------+---------+---------------+
+   | properties | RSA signature             | array   | modulo,       |
+   |            | verification parameters - |         | hashAlg, and  |
+   |            | see [FIPS186-2],          |         | saltLen (when |
+   |            | Section 5                 |         | sigType is    |
+   |            |                           |         | "pss")        |
+   +------------+---------------------------+---------+---------------+
+   | modulo     | supported RSA modulo for  | integer | any one of    |
+   |            | signature verification    |         | the supported |
+   |            |                           |         | modulo sizes  |
+   |            |                           |         | {1024, 1536,  |
+   |            |                           |         | 2048, 3072,   |
+   |            |                           |         | 4096}         |
+   +------------+---------------------------+---------+---------------+
+   | hashPair   | supported hash algorithms | array   | an array of   |
+   |            | and optional salt length  |         | objects       |
+   |            | for signature             |         | containing a  |
+   |            | verification for this     |         | hashAlg and   |
+   |            | sigType and modulo - see  |         | an optional   |
+   |            | [SP800-131A], Section 9   |         | saltLen       |
+   +------------+---------------------------+---------+---------------+
+   | hashAlg    | supported hash algorithms | string  | one of {"SHA- |
+   |            | for this sigType and      |         | 1",           |
+   |            | modulo - see              |         | "SHA2-224",   |
+   |            | [SP800-131A], Section 9   |         | "SHA2-256",   |
+   |            |                           |         | "SHA2-384",   |
+   |            |                           |         | "SHA2-512"}   |
+   +------------+---------------------------+---------+---------------+
+   | saltLen    | supported salt lengths    | integer | See the note  |
+   |            | for PSS signature         |         | below         |
+   |            | verification - see        |         |               |
+   |            | [FIPS186-4], Section 5.5  |         |               |
+   +------------+---------------------------+---------+---------------+
+
+           Table 9: Supported RSA sigVer FIPS186-2 Capabilities
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 27]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+      |  NOTE: The 'saltLen' property for each hash algorithm SHALL only
+      |  be present of the 'sigType' is "pss".  The values allowed in
+      |  PSS signature generation is between 0 and the length of the
+      |  corresponding hash function output block (in bytes), the end
+      |  points included except for when 1024 is the modulo size.  In
+      |  this case, the maximum 'saltLen' for SHA2-512 is 62 bytes.
+
+   For an example of the registration for RSA / sigVer / FIPS186-2, see
+   the following example for RSA / sigVer / FIPS186-4.  The formats are
+   identical even though the individual allowed values might change.
+
+7.7.2.  RSA sigVer FIPS186-4 Capabilities Table
+
+   The following RSA / sigVer / FIPS186-4 capabilities MAY be advertised
+   by the ACVP compliant crypto module:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 28]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +============+=========================+=========+=================+
+   | JSON value | Description             | JSON    | Valid values    |
+   |            |                         | type    |                 |
+   +============+=========================+=========+=================+
+   | sigType    | supported RSA signature | string  | one of          |
+   |            | types - see             |         | {"ansx9.31",    |
+   |            | [FIPS186-4], Section 5  |         | "pkcs1v1.5",    |
+   |            |                         |         | "pss"}          |
+   +------------+-------------------------+---------+-----------------+
+   | properties | RSA signature           | array   | modulo,         |
+   |            | verification parameters |         | hashAlg, and    |
+   |            | - see [FIPS186-4],      |         | saltLen (when   |
+   |            | Section 5               |         | sigType is      |
+   |            |                         |         | "pss")          |
+   +------------+-------------------------+---------+-----------------+
+   | modulo     | supported RSA modulo    | integer | any one of the  |
+   |            | for signature           |         | supported       |
+   |            | verification - see      |         | modulo sizes    |
+   |            | [FIPS186-4], Section 5  |         | {1024, 2048,    |
+   |            |                         |         | 3072, 4096}     |
+   +------------+-------------------------+---------+-----------------+
+   | hashPair   | supported hash          | array   | an array of     |
+   |            | algorithms and optional |         | objects         |
+   |            | salt length for         |         | containing a    |
+   |            | signature verification  |         | hashAlg and an  |
+   |            | for this sigType and    |         | optional        |
+   |            | modulo - see            |         | saltLen         |
+   |            | [SP800-131A], Section 9 |         |                 |
+   +------------+-------------------------+---------+-----------------+
+   | hashAlg    | supported hash          | string  | one of {"SHA-   |
+   |            | algorithms for this     |         | 1", "SHA2-224", |
+   |            | sigType and modulo -    |         | "SHA2-256",     |
+   |            | see [SP800-131A],       |         | "SHA2-384",     |
+   |            | Section 9               |         | "SHA2-512",     |
+   |            |                         |         | "SHA2-512/224", |
+   |            |                         |         | "SHA2-512/256"} |
+   +------------+-------------------------+---------+-----------------+
+   | saltLen    | supported salt lengths  | integer | See the note    |
+   |            | for PSS signature       |         | below           |
+   |            | verification - see      |         |                 |
+   |            | [FIPS186-4],            |         |                 |
+   |            | Section 5.5             |         |                 |
+   +------------+-------------------------+---------+-----------------+
+
+          Table 10: Supported RSA sigVer FIPS186-4 Capabilities
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 29]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+      |  NOTE: The 'saltLen' property for each hash algorithm SHALL only
+      |  be present of the 'sigType' is "pss".  The values allowed in
+      |  PSS signature generation is between 0 and the length of the
+      |  corresponding hash function output block (in bytes), the end
+      |  points included except for when 1024 is the modulo size.  In
+      |  this case, the maximum 'saltLen' for SHA2-512 is 62 bytes.
+
+   The following is an example of the RSA / sigVer / FIPS186-4
+   registration
+
+   {
+     "algorithm": "RSA",
+     "mode": "sigVer",
+     "revision": "FIPS186-4",
+     "prereqVals": [
+       {
+         "algorithm": "DRBG",
+         "valValue": "123456"
+       },
+       {
+         "algorithm": "DRBG",
+         "valValue": "654321"
+       },
+       {
+         "algorithm": "SHA",
+         "valValue": "7890"
+       }
+     ],
+     "pubExpMode": "random",
+     "conformances": [
+       "SP800-106"
+     ],
+     "capabilities": [
+       {
+         "sigType": "ansx9.31",
+         "properties": [
+           {
+             "modulo": 2048,
+             "hashPair": [
+               {
+                 "hashAlg": "SHA2-512"
+               }
+             ]
+           }
+         ]
+       },
+       {
+         "sigType": "pkcs1v1.5",
+
+
+
+Celi                       Expires 4 June 2026                 [Page 30]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+         "properties": [
+           {
+             "modulo": 4096,
+             "hashPair": [
+               {
+                 "hashAlg": "SHA2-224"
+               }
+             ]
+           }
+         ]
+       },
+       {
+         "sigType": "pss",
+         "properties": [
+           {
+             "modulo": 3072,
+             "hashPair": [
+               {
+                 "hashAlg": "SHA2-224",
+                 "saltLen": 28
+               }
+               {
+                 "hashAlg": "SHA2-512",
+                 "saltLen": 64
+               }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+
+7.7.3.  RSA sigVer FIPS186-5 Capabilities Table
+
+   The following RSA / sigVer / FIPS186-5 capabilities MAY be advertised
+   by the ACVP compliant crypto module:
+
+   +==============+================+=========+=========================+
+   | JSON value   | Description    | JSON    | Valid values            |
+   |              |                | type    |                         |
+   +==============+================+=========+=========================+
+   | sigType      | supported RSA  | string  | one of {"pkcs1v1.5",    |
+   |              | signature      |         | "pss"}                  |
+   |              | types - see    |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | properties   | RSA signature  | array   | modulo, hashAlg, and    |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 31]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |              | verification   |         | saltLen (when sigType   |
+   |              | parameters -   |         | is "pss")               |
+   |              | see            |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | modulo       | supported RSA  | integer | any one of the          |
+   |              | modulo for     |         | supported modulo sizes  |
+   |              | signature      |         | {2048, 3072, 4096}      |
+   |              | verification   |         |                         |
+   |              | - see          |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | maskFunction | the mask       | array   | any subset of {"mgf1",  |
+   |              | function       |         | "shake-128", "shake-    |
+   |              | used, only     |         | 256"}                   |
+   |              | valid for PSS  |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | hashPair     | supported      | array   | an array of objects     |
+   |              | hash           |         | containing a hashAlg    |
+   |              | algorithms     |         | and an optional saltLen |
+   |              | and optional   |         |                         |
+   |              | salt length    |         |                         |
+   |              | for signature  |         |                         |
+   |              | verification   |         |                         |
+   |              | for this       |         |                         |
+   |              | sigType and    |         |                         |
+   |              | modulo - see   |         |                         |
+   |              | [SP800-131A],  |         |                         |
+   |              | Section 9      |         |                         |
+   +--------------+----------------+---------+-------------------------+
+   | hashAlg      | supported      | string  | one of {"SHA2-224",     |
+   |              | hash           |         | "SHA2-256", "SHA2-384", |
+   |              | algorithms     |         | "SHA2-512",             |
+   |              | for this       |         | "SHA2-512/224",         |
+   |              | sigType and    |         | "SHA2-512/256",         |
+   |              | modulo - see   |         | "SHA3-224", "SHA3-256", |
+   |              | [SP800-131A],  |         | "SHA3-384", "SHA3-512", |
+   |              | Section 9      |         | "SHAKE-128", "SHAKE-    |
+   |              |                |         | 256"} NOTE: SHAKE-128   |
+   |              |                |         | and SHAKE-256 are only  |
+   |              |                |         | valid for pss.          |
+   +--------------+----------------+---------+-------------------------+
+   | saltLen      | supported      | integer | See the note below      |
+   |              | salt lengths   |         |                         |
+   |              | for PSS        |         |                         |
+   |              | signature      |         |                         |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 32]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   |              | verification   |         |                         |
+   |              | - see          |         |                         |
+   |              | [FIPS186-5],   |         |                         |
+   |              | Section 5.5    |         |                         |
+   +--------------+----------------+---------+-------------------------+
+
+           Table 11: Supported RSA sigVer FIPS186-5 Capabilities
+
+      |  NOTE: The 'saltLen' property for each hash algorithm SHALL only
+      |  be present of the 'sigType' is "pss".  The values allowed in
+      |  PSS signature generation is between 0 and the length of the
+      |  corresponding hash function output block (in bytes), the end
+      |  points included.
+
+   See the following abbreviated example for a PSS registration for RSA
+   / sigVer / FIPS186-5.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 33]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+     "algorithm": "RSA",
+     "mode": "sigVer",
+     "revision": "FIPS186-5",
+     "prereqVals": [
+       {
+         "algorithm": "DRBG",
+         "valValue": "123456"
+       },
+       {
+         "algorithm": "DRBG",
+         "valValue": "654321"
+       },
+       {
+         "algorithm": "SHA",
+         "valValue": "7890"
+       }
+     ],
+     "pubExpMode": "random",
+     "conformances": [
+       "SP800-106"
+     ],
+     "capabilities": [
+       {
+         "sigType": "pss",
+         "properties": [
+           {
+             "modulo": 3072,
+             "maskFunction": [
+               "SHAKE-128", "MGF1"
+             ]
+             "hashPair": [
+               {
+                 "hashAlg": "SHA2-224",
+                 "saltLen": 28
+               }
+               {
+                 "hashAlg": "SHA2-512",
+                 "saltLen": 64
+               }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 34]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+7.8.  RSA SignaturePrimitive Mode Capabilities
+
+   The RSA signaturePrimitive mode capabilities (otherwise known as
+   RSASP1 in [RFC3447]) are advertised as JSON objects within the array
+   of 'capabilities' as part of the 'capability_exchange' element of the
+   ACVP JSON registration message.  See the ACVP specification for
+   details on the registration message.  In this mode, the only tested
+   capability is the correct exponentiation of 's = msg^d mod n', where
+   'msg' is a message between '0' and 'n - 1', 'd' is the private
+   exponent and 'n' is the modulus, all supplied by the testing ACVP
+   server.  In the event that 'keyFormat' is defined as 'crt', then 'd'
+   is replaced with 'dmp1', 'dmq1', and 'iqmp'.  For RSA /
+   SignaturePrimitive / 1.0, only 2048-bit RSA keys are allowed for this
+   capability.  For RSA / SignaturePrimitive / 2.0, 2048-bit, 3072-bit,
+   and 4096-bit modulus sizes are supported.  See Section 8.7 for
+   additional details on constraints for 'msg' and 'n'.  See the ACVP
+   specification for details on the registration message.
+
+   The following RSA / SignaturePrimitive / 1.0 capabilities MAY be
+   advertised by the ACVP compliant crypto module:
+
+   +=============+============================+========+==============+
+   | JSON value  | Description                | JSON   | Valid values |
+   |             |                            | type   |              |
+   +=============+============================+========+==============+
+   | keyFormat   | The format by which the    | string | "standard",  |
+   |             | client expects the private |        | "crt"        |
+   |             | key to be communicated.    |        |              |
+   |             | Standard refers to the     |        |              |
+   |             | default p, q, d values.    |        |              |
+   |             | Chinese Remainder Theorem  |        |              |
+   |             | uses decomposed values for |        |              |
+   |             | optimized decryption p, q, |        |              |
+   |             | dmp1, dmq1, iqmp           |        |              |
+   +-------------+----------------------------+--------+--------------+
+   | pubExpMode  | Whether the IUT can handle | string | "random",    |
+   |             | a random or fixed public   |        | "fixed"      |
+   |             | exponent                   |        |              |
+   +-------------+----------------------------+--------+--------------+
+   | fixedPubExp | The fixed public exponent  | hex    | Any value    |
+   |             | e                          |        | supported by |
+   |             |                            |        | [FIPS186-4]: |
+   |             |                            |        | 65537 -      |
+   |             |                            |        | 2^256-1, odd |
+   +-------------+----------------------------+--------+--------------+
+
+        Table 12: Supported RSA SignaturePrimitive 1.0 JSON Values
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 35]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   The following is an example of the registration
+
+   {
+       "algorithm": "RSA",
+       "mode": "signaturePrimitive",
+       "revision": "1.0",
+       "keyFormat": "crt",
+       "pubExpMode": "fixed",
+       "fixedPubExp": "010001"
+   }
+
+   The following RSA / SignaturePrimitive / 2.0 capabilities MAY be
+   advertised by the ACVP compliant crypto module:
+
+   +=============+============================+=========+==============+
+   | JSON value  | Description                | JSON    | Valid values |
+   |             |                            | type    |              |
+   +=============+============================+=========+==============+
+   | modulo      | supported RSA moduli for   | array   | any of the   |
+   |             | signature generation -     | of      | supported    |
+   |             | see [FIPS186-4],           | integer | modulus      |
+   |             | Section 5                  |         | sizes {2048, |
+   |             |                            |         | 3072, 4096}  |
+   +-------------+----------------------------+---------+--------------+
+   | keyFormat   | The format by which the    | array   | "standard",  |
+   |             | client expects the         | of      | "crt"        |
+   |             | private key to be          | string  |              |
+   |             | communicated.  Standard    |         |              |
+   |             | refers to the default p,   |         |              |
+   |             | q, d values.  Chinese      |         |              |
+   |             | Remainder Theorem uses     |         |              |
+   |             | decomposed values for      |         |              |
+   |             | optimized decryption p,    |         |              |
+   |             | q, dmp1, dmq1, iqmp        |         |              |
+   +-------------+----------------------------+---------+--------------+
+   | pubExpMode  | Whether the IUT can        | string  | "random",    |
+   |             | handle a random or fixed   |         | "fixed"      |
+   |             | public exponent            |         |              |
+   +-------------+----------------------------+---------+--------------+
+   | fixedPubExp | The fixed public           | hex     | Any value    |
+   |             | exponent e                 |         | supported by |
+   |             |                            |         | [FIPS186-4]: |
+   |             |                            |         | 65537 -      |
+   |             |                            |         | 2^256-1, odd |
+   +-------------+----------------------------+---------+--------------+
+
+         Table 13: Supported RSA SignaturePrimitive 2.0 JSON Values
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 36]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   The following is an example of the registration
+
+   {
+       "algorithm": "RSA",
+       "mode": "signaturePrimitive",
+       "revision": "2.0",
+       "pubExpMode": "fixed",
+       "fixedPubExp": "010001"
+       "keyFormat": [
+           "standard",
+           "crt"
+       ],
+       "modulo": [
+           2048,
+           3072,
+           4096
+       ]
+   }
+
+7.9.  RSA DecryptionPrimitive v1.0 Mode Capabilities
+
+   Note: RSA DecryptionPrimitive v1.0 should be used for PIV card
+   testing, and RSA DecryptionPrimitive Sp800-56Br2 for comforming to
+   Sp800-56Br2 requirements.
+
+   The RSA decryptionPrimitive mode capabilities are advertised as JSON
+   objects within the array of 'capabilities' as part of the
+   'capability_exchange' element of the ACVP JSON registration message.
+   A single property is allowed in the registration, 'modulo' with the
+   only approved value of 2048.  In this mode, the only tested
+   capability is the correct exponentiation 's = cipherText\^d mod n',
+   where 'cipherText' is a cipherText to be decrypted, 'd' is the
+   private exponent and 'n' is the modulus.  See [SP800-56B],
+   Section 7.1.2 for details.
+
+   In testing, only 'cipherText' is supplied by the ACVP server.  The
+   client is responsible for generating RSA key pairs of modulus 'n',
+   private key 'd', and calculates 's'.  If a client does not support
+   decryption with a standard RSA private exponent 'd', the equivalent
+   Chinese Remainder Theorem (CRT) private key values are allowed to be
+   used.  Only 2048-bit RSA keys are allowed for this capability.
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 37]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   See Section 8.11 for additional details on constraints for
+   'cipherText' and 'n'.  The client provides the public exponent 'e',
+   modulus 'n' and the computed result 's' in its response to the ACVP -
+   see Section 9.5.  The client must first check if '0 < cipherText <
+   n-1' and return an error if this is not the case.  The client returns
+   a value 's' only when 'cipherText' is in the proper range for the
+   size of the selected modulus 'n'.  See the ACVP specification for
+   details on the registration message.
+
+   An example registration is the following
+
+   {
+       "algorithm": "RSA",
+       "mode": "decryptionPrimitive",
+       "revision": "1.0",
+       "prereqVals":
+       [
+           {"algorithm": "DRBG", "valValue": "123456"},
+           {"algorithm": "DRBG", "valValue": "654321"},
+           {"algorithm": "SHA", "valValue": "7890"}
+       ]
+   }
+
+7.10.  RSA DecryptionPrimitive SP800-56Br2 Mode Capabilities
+
+   The RSA decryptionPrimitive mode capabilities are advertised as JSON
+   objects within the array of 'capabilities' as part of the
+   'capability_exchange' element of the ACVP JSON registration message.
+   Two properties are supported in the registration.  A 'modulo' array
+   supports three modulus values of 2048, 3072, and 4096.  For private
+   'keyFormat', the "standard" and "crt" (Chinese Remainder Theorem)
+   private key formats are supported. "standard" equates to the prime-
+   factor private key format described in [SP800-56Br2].  See the
+   descriptions of basic, CRT, and prime-factor private key formats in
+   Section 3.2 of [SP800-56Br2].
+
+   When testing the "standard"/prime-factor private key format, a
+   ciphertext (ct), along with private key p, q and d component values
+   are provided, see [SP800-56Br2], Section 7.1.2.2 for details.  If an
+   IUT supports the basic private key format, the p and q values
+   provided by the "standard"/prime-factor testing can be multiplied to
+   produce the needed n value.  When testing for the Chinese Remainder
+   Theorem private key format, a ciphertext (ct), the p, q, n, dmp1
+   (dP), dmq1 (dQ), and iqmp (qInv) values are provided, see
+   [SP800-56Br2], Section 7.1.2.3 for details.  See the ACVP
+   specification for details on the registration message.
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 38]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   Support was added for fixed public exponents, this is done through
+   two settings, 'pubExpMode' and fixedPubExp'.  When 'pubExpMode' is
+   set to 'fixed', a 'fixedPubExp' is required.  An omitted pubExpMode
+   will default to random.
+
+   +=============+============================+=========+==============+
+   | JSON value  | Description                | JSON    | Valid values |
+   |             |                            | type    |              |
+   +=============+============================+=========+==============+
+   | modulo      | supported RSA moduli for   | array   | any of the   |
+   |             | signature generation -     | of      | supported    |
+   |             | see [FIPS186-4],           | integer | modulus      |
+   |             | Section 5                  |         | sizes {2048, |
+   |             |                            |         | 3072, 4096}  |
+   +-------------+----------------------------+---------+--------------+
+   | keyFormat   | The format by which the    | array   | "standard",  |
+   |             | client expects the         | of      | "crt"        |
+   |             | private key to be          | string  |              |
+   |             | communicated.  Standard    |         |              |
+   |             | refers to the default p,   |         |              |
+   |             | q, d values.  Chinese      |         |              |
+   |             | Remainder Theorem uses     |         |              |
+   |             | decomposed values for      |         |              |
+   |             | optimized decryption p,    |         |              |
+   |             | q, dmp1, dmq1, iqmp        |         |              |
+   +-------------+----------------------------+---------+--------------+
+   | pubExpMode  | Whether the IUT can        | string  | "random",    |
+   |             | handle a random or fixed   |         | "fixed"      |
+   |             | public exponent            |         |              |
+   +-------------+----------------------------+---------+--------------+
+   | fixedPubExp | The fixed public           | hex     | Any value    |
+   |             | exponent e                 |         | supported by |
+   |             |                            |         | [FIPS186-4]: |
+   |             |                            |         | 65537 -      |
+   |             |                            |         | 2^256-1, odd |
+   +-------------+----------------------------+---------+--------------+
+
+        Table 14: Supported RSA DecryptionPrimitive 2.0 JSON Values
+
+   An example registration is the following
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 39]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   ----
+   {
+     "algorithm": "RSA",
+     "mode": "decryptionPrimitive",
+     "revision": "Sp800-56Br2",
+     "pubExpMode": "fixed",
+     "fixedPubExp": "010001",
+     "keyFormat": [
+       "standard",
+       "crt"
+     ],
+     "modulo": [
+       2048,
+       3072,
+       4096
+     ]
+   }
+   ----
+
+                                  Figure 1
+
+8.  Test Vectors
+
+   The ACVP server provides test vectors to the ACVP client, which are
+   then processed and returned to the ACVP server for validation.  A
+   typical ACVP validation session would require multiple test vector
+   sets to be downloaded and processed by the ACVP client.  Each test
+   vector set represents an individual crypto algorithm, such as RSA /
+   sigGen / FIPS186-4, RSA / keyVer / FIPS186-5, etc.  This section
+   describes the JSON schema for a test vector set used with RSA crypto
+   algorithms.
+
+   The test vector set JSON schema is a multi-level hierarchy that
+   contains meta data for the entire vector set as well as individual
+   test vectors to be processed by the ACVP client.  The following table
+   describes the JSON elements at the top level of the hierarchy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 40]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+    +============+==========================================+=========+
+    | JSON Value | Description                              | JSON    |
+    |            |                                          | type    |
+    +============+==========================================+=========+
+    | acvVersion | Protocol version identifier              | string  |
+    +------------+------------------------------------------+---------+
+    | vsId       | Unique numeric identifier for the vector | integer |
+    |            | set                                      |         |
+    +------------+------------------------------------------+---------+
+    | algorithm  | Algorithm defined in the capability      | string  |
+    |            | exchange                                 |         |
+    +------------+------------------------------------------+---------+
+    | mode       | Mode defined in the capability exchange  | string  |
+    +------------+------------------------------------------+---------+
+    | revision   | Protocol test revision selected          | string  |
+    +------------+------------------------------------------+---------+
+    | testGroups | Array of test group JSON objects, which  | array   |
+    |            | are defined in Section 8.1, Section 8.3, |         |
+    |            | Section 8.5, Section 8.7 or Section 8.11 |         |
+    +------------+------------------------------------------+---------+
+
+                    Table 15: RSA Vector Set JSON Object
+
+   An example of this would look like this
+
+   {
+     "acvVersion": "version",
+     "vsId": 1,
+     "algorithm": "Alg1",
+     "mode": "Mode1",
+     "revision": "Revision1.0",
+     "testGroups": [ ... ]
+   }
+
+8.1.  RSA keyGen Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  The Test Group JSON object contains meta data that
+   applies to all test vectors within the group.  The following table
+   describes the RSA / keyGen / * JSON elements of the Test Group JSON
+   object.
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 41]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+     +=======================+============================+=========+
+     | JSON Value            | Description                | JSON    |
+     |                       |                            | type    |
+     +=======================+============================+=========+
+     | tgId                  | Numeric identifier for the | integer |
+     |                       | test group, unique across  |         |
+     |                       | the entire vector set      |         |
+     +-----------------------+----------------------------+---------+
+     | modulo                | RSA modulus size           | integer |
+     +-----------------------+----------------------------+---------+
+     | hashAlg               | the hash algorithm         | string  |
+     +-----------------------+----------------------------+---------+
+     | primeTest             | Miller-Rabin constraint    | string  |
+     |                       | bound                      |         |
+     +-----------------------+----------------------------+---------+
+     | randPQ                | keyGen mode used           | string  |
+     +-----------------------+----------------------------+---------+
+     | infoGeneratedByServer | Whether or not the test    | boolean |
+     |                       | inputs are generated by    |         |
+     |                       | the server                 |         |
+     +-----------------------+----------------------------+---------+
+     | keyFormat             | The RSA private key format | string  |
+     |                       | used                       |         |
+     +-----------------------+----------------------------+---------+
+     | pubExp                | Fixed or random public     | string  |
+     |                       | exponent e                 |         |
+     +-----------------------+----------------------------+---------+
+     | testType              | Describes the operation    | string  |
+     |                       | the client should perform  |         |
+     |                       | on the test data           |         |
+     +-----------------------+----------------------------+---------+
+     | tests                 | Array of individual test   | array   |
+     |                       | cases, see Section 8.2     |         |
+     +-----------------------+----------------------------+---------+
+
+               Table 16: RSA keyGen Test Group JSON Object
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+   The impact of the 'infoGeneratedByServer' property depends on the
+   other properties identified in the keyGen registration.  For
+   'randPQs' of B.3.2, B.3.4, B.3.5, and B.3.6 (or the corresponding
+   FIPS186-5 values), 'infoGeneratedByServer' set to true will provide
+   the client with ALL the inputs and expect them to arrive at the same
+   output the server has already arrived at.
+
+
+
+Celi                       Expires 4 June 2026                 [Page 42]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   In the case of 'infoGeneratedByServer' being set to false during the
+   registration, the client will be provided with SOME of the inputs,
+   like an already agreed upon fixed public exponent.  However, in
+   general the server will send mostly empty test cases.  It is the
+   responsibility of the client to generate both the input properties
+   and output properties comprising the test cases and communicate ALL
+   of those back to the server.  The server will try to reach the same
+   output key.
+
+   For B.3.3 (or the corresponding FIPS186-5 value of probable),
+   'infoGeneratedByServer' set to true enables the KAT test groups if
+   the client supports a random public exponent.  The GDT are always
+   enabled as a bare minimum test for B.3.3 (or probable), independent
+   of the 'infoGeneratedByServer' setting.
+
+8.2.  RSA keyGen Test Case JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / keyGen / * test vector.
+
+   The difference between revision "FIPS186-4" and "FIPS186-5" within
+   the prompts lies in the strings used by the server to refer to the
+   various "randPQ", and "primeTest" modes.  Revision "FIPS186-4"
+   utilizes the section number from [FIPS186-4] to refer to the
+   algorithm used while revision "FIPS186-5" utilizes a description of
+   the algorithm.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 43]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +============+==========================================+===========+
+   | JSON Value | Description                              | JSON      |
+   |            |                                          | Type      |
+   +============+==========================================+===========+
+   | tcId       | Test case identifier                     | integer   |
+   +------------+------------------------------------------+-----------+
+   | e          | the public exponent                      | hex       |
+   +------------+------------------------------------------+-----------+
+   | seed       | the seed used in prime generation        | hex       |
+   +------------+------------------------------------------+-----------+
+   | bitlens    | the length of p1, p2, q1, and q2 for     | array of  |
+   |            | prime generation                         | integers  |
+   +------------+------------------------------------------+-----------+
+   | xP1        | xP1 from [FIPS186-4] B.3.6, step 4       | hex       |
+   +------------+------------------------------------------+-----------+
+   | xP2        | xP2 from [FIPS186-4] B.3.6, step 4       | hex       |
+   +------------+------------------------------------------+-----------+
+   | xP         | the random number used in auxiliary      | hex       |
+   |            | prime generation for p                   |           |
+   +------------+------------------------------------------+-----------+
+   | xQ1        | xQ1 from [FIPS186-4] B.3.6, step 5       | hex       |
+   +------------+------------------------------------------+-----------+
+   | xQ2        | xQ2 from [FIPS186-4] B.3.6, step 5       | hex       |
+   +------------+------------------------------------------+-----------+
+   | xQ         | the random number used in auxiliary      | hex       |
+   |            | prime generation for q                   |           |
+   +------------+------------------------------------------+-----------+
+   | pRand      | the random P for testing probable primes | hex       |
+   |            | according to [FIPS186-4] or [FIPS186-5]  |           |
+   +------------+------------------------------------------+-----------+
+   | qRand      | the random Q for testing probable primes | hex       |
+   |            | according to [FIPS186-4] or [FIPS186-5]  |           |
+   +------------+------------------------------------------+-----------+
+
+                 Table 17: RSA keyGen Test Case JSON Object
+
+   Here is an abbreviated yet fully constructed example of the prompt
+   for RSA / keyGen / FIPS186-5
+
+   {
+     "vsId": 2,
+     "algorithm": "RSA",
+     "mode": "keyGen",
+     "revision": "FIPS186-5",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "infoGeneratedByServer": true,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 44]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+         "modulo": 2048,
+         "testType": "AFT",
+         "keyFormat": "crt",
+         "randPQ": "provable",
+         "pubExp": "random",
+         "hashAlg": "SHA2-224",
+         "tests": [
+           {
+             "tcId": 1,
+             "seed": "5B174CA160...",
+             "e": "07D196B84395"
+           }
+         ]
+       },
+       {
+         "tgId": 3,
+         "infoGeneratedByServer": true,
+         "modulo": 2048,
+         "testType": "AFT",
+         "keyFormat": "crt",
+         "primeTest": "2powSecStr",
+         "randPQ": "probableWithProvableAux",
+         "pubExp": "random",
+         "tests": [
+           {
+             "tcId": 7,
+             "seed": "B392CFFD8E...",
+             "bitlens": [
+               142,
+               419,
+               400,
+               334
+             ],
+             "xp": "F06825A6B...",
+             "xq": "BD106DBE5...",
+             "e": "3691C632C2BBE7"
+           }
+         ]
+       },
+       {
+         "tgId": 5,
+         "infoGeneratedByServer": false,
+         "modulo": 3072,
+         "testType": "GDT",
+         "keyFormat": "crt",
+         "primeTest": "2pow100",
+         "randPQ": "probable",
+         "pubExp": "random",
+
+
+
+Celi                       Expires 4 June 2026                 [Page 45]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+         "tests": [
+           {
+             "tcId": 13
+           }
+         ]
+       }
+     ]
+   }
+
+8.3.  RSA sigGen Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the RSA / sigGen / * JSON elements of the
+   Test Group JSON object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 46]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+     +==============+=====================================+=========+
+     | JSON Values  | Description                         | JSON    |
+     |              |                                     | Type    |
+     +==============+=====================================+=========+
+     | tgId         | Test group identifier               | integer |
+     +--------------+-------------------------------------+---------+
+     | modulo       | RSA modulus size                    | integer |
+     +--------------+-------------------------------------+---------+
+     | hashAlg      | The hash algorithm                  | string  |
+     +--------------+-------------------------------------+---------+
+     | sigType      | Type of signature used in the group | string  |
+     +--------------+-------------------------------------+---------+
+     | saltLen      | The salt length for the group in    | integer |
+     |              | bytes                               |         |
+     +--------------+-------------------------------------+---------+
+     | conformance  | Signifies all test cases within the | string  |
+     |              | group should utilize random message |         |
+     |              | hashing as described in [SP800-106] |         |
+     +--------------+-------------------------------------+---------+
+     | maskFunction | The mask function used for PSS      | string  |
+     |              | signature scheme                    |         |
+     +--------------+-------------------------------------+---------+
+     | testType     | Describes the operation the client  | string  |
+     |              | should perform on the tests data    |         |
+     +--------------+-------------------------------------+---------+
+     | tests        | Array of individual test cases, see | array   |
+     |              | Section 8.4                         |         |
+     +--------------+-------------------------------------+---------+
+
+               Table 18: RSA sigGen Test Group JSON Objects
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+      |  NOTE 1: The 'saltLen' property will only be present in test
+      |  groups for the 'sigType' "pss".
+
+      |  NOTE 2: The 'maskFunction' property will only be present for
+      |  RSA / sigGen / FIPS186-5 inside of test groups for the
+      |  'sigType' "pss".
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 47]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+8.4.  RSA sigGen Test Cases JSON Schema
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / sigGen / * test vector.
+
+    +================+======================================+=========+
+    | JSON Values    | Description                          | JSON    |
+    |                |                                      | Type    |
+    +================+======================================+=========+
+    | tcId           | Test case idenfitier                 | integer |
+    +----------------+--------------------------------------+---------+
+    | message        | The message to be signed             | hex     |
+    +----------------+--------------------------------------+---------+
+    | randomValue    | The random value to be used as an    | hex     |
+    |                | input into the message randomization |         |
+    |                | function as described in [SP800-106] |         |
+    +----------------+--------------------------------------+---------+
+    | randomValueLen | The random value's bit length        | integer |
+    +----------------+--------------------------------------+---------+
+
+                Table 19: RSA sigGen Test Case JSON Objects
+
+   Here is an abbreviated yet fully constructed example of the prompt
+   for RSA / sigGen / FIPS186-4.  The only difference in the structure
+   between RSA / sigGen / FIPS186-4 and RSA / sigGen / FIPS186-5 is the
+   inclusion of the 'maskFunction' property in the 'testGroup' for RSA /
+   sigGen / FIPS186-5.
+
+   [
+     {
+       "acvVersion": " {acvp-version}"
+     },
+     {
+       "vsId": 1163,
+       "algorithm": "RSA",
+       "mode": "sigGen",
+       "revision": "FIPS186-4",
+       "testGroups": [
+         {
+           "tgId": 1,
+           "sigType": "ansx9.31",
+           "hashAlg": "SHA2-256",
+           "modulo": 2048,
+           "tests": [
+             {
+               "tcId": 1165,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 48]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+               "message": "f648ffc4ed748..."
+             }
+           ]
+         }
+         {
+           "tgId": 3,
+           "sigType": "pkcs1v1.5",
+           "hashAlg": "SHA2-256",
+           "modulo": 2048,
+           "tests": [
+             {
+               "tcId": 1167,
+               "message": "5af283b1b76ab..."
+             }
+           ]
+         }
+         {
+           "tgId": 5,
+           "sigType": "pss",
+           "hashAlg": "SHA2-256",
+           "saltLen": 20,
+           "modulo": 2048,
+           "tests": [
+             {
+               "tcId": 1169,
+               "message": "dfc22604b95d1..."
+             }
+           ]
+         }
+       ]
+     }
+   ]
+
+8.5.  RSA sigVer Test Groups JSON Schema
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the RSA / sigVer / * JSON elements of the
+   Test Group JSON object
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 49]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+     +==============+=====================================+=========+
+     | JSON Values  | Description                         | JSON    |
+     |              |                                     | Type    |
+     +==============+=====================================+=========+
+     | tgId         | Test group identifier               | integer |
+     +--------------+-------------------------------------+---------+
+     | modulo       | RSA modulus size                    | integer |
+     +--------------+-------------------------------------+---------+
+     | hashAlg      | The hash algorithm                  | string  |
+     +--------------+-------------------------------------+---------+
+     | sigType      | Type of signature used in the group | string  |
+     +--------------+-------------------------------------+---------+
+     | saltLen      | The salt length for the group in    | integer |
+     |              | bytes                               |         |
+     +--------------+-------------------------------------+---------+
+     | conformance  | Signifies all test cases within the | string  |
+     |              | group should utilize random message |         |
+     |              | hashing as described in [SP800-106] |         |
+     +--------------+-------------------------------------+---------+
+     | maskFunction | The mask function used for PSS      | string  |
+     |              | signature scheme                    |         |
+     +--------------+-------------------------------------+---------+
+     | n            | Public modulus value n for the      | hex     |
+     |              | group                               |         |
+     +--------------+-------------------------------------+---------+
+     | e            | Public exponent value e for the     | hex     |
+     |              | group                               |         |
+     +--------------+-------------------------------------+---------+
+     | maskFunction | The mask function used              | string  |
+     +--------------+-------------------------------------+---------+
+     | testType     | Describes the operation the client  | string  |
+     |              | should perform on the tests data    |         |
+     +--------------+-------------------------------------+---------+
+     | tests        | Array of individual test cases, see | array   |
+     |              | Section 9.3                         |         |
+     +--------------+-------------------------------------+---------+
+
+               Table 20: RSA sigVer Test Group JSON Objects
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+      |  NOTE: The 'maskFunction' property will only be present for RSA
+      |  / sigVer / FIPS186-5 inside of test groups for the 'sigType'
+      |  "pss".
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 50]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+8.6.  Test Cases for sigVer FIPS186-5, FIPS186-4, and FIPS186-2
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA test vector.
+
+    +================+======================================+=========+
+    | JSON Values    | Description                          | JSON    |
+    |                |                                      | Type    |
+    +================+======================================+=========+
+    | tcId           | Test case idenfitier                 | integer |
+    +----------------+--------------------------------------+---------+
+    | message        | The message to be signed             | hex     |
+    +----------------+--------------------------------------+---------+
+    | signature      | The signature of the message         | hex     |
+    +----------------+--------------------------------------+---------+
+    | randomValue    | The random value to be used as an    | hex     |
+    |                | input into the message randomization |         |
+    |                | function as described in [SP800-106] |         |
+    +----------------+--------------------------------------+---------+
+    | randomValueLen | The random value's bit length        | integer |
+    +----------------+--------------------------------------+---------+
+
+                Table 21: RSA sigVer Test Case JSON Objects
+
+   Here is an abbreviated yet fully constructed example of the prompt
+   for RSA / sigVer / FIPS186-4.  The only difference in the structure
+   between RSA / sigVer / FIPS186-4 and RSA / sigVer / FIPS186-5 is the
+   inclusion of the 'maskFunction' property in the 'testGroup' for RSA /
+   sigVer / FIPS186-5.
+
+   [
+     {
+       "acvVersion": "{acvp-version}"
+     },
+     {
+       "vsId": 1173,
+       "algorithm": "RSA",
+       "mode": "sigVer",
+       "revision": "FIPS186-4",
+       "testGroups": [
+         {
+           "tgId": 1,
+           "sigType": "ansx9.31",
+           "hashAlg": "SHA2-256",
+           "testType": "AFT",
+           "modulo": 2048,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 51]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+           "e": "166f67",
+           "n": "944ded6daaf602e17...",
+           "tests": [
+             {
+               "tcId": 1174,
+               "message": "ff17e5e...",
+               "signature": "299f1..."
+             }
+           ]
+         },
+         {
+           "tgId": 4,
+           "sigType": "pkcs1v1.5",
+           "modulo": 3072,
+           "hashAlg": "SHA2-256",
+           "testType": "AFT",
+           "e": "ac6db1",
+           "n": "9bbb099e1ec285594...",
+           "tests": [
+             {
+               "tcId": 1177,
+               "message": "921961e...",
+               "signature": "55362..."
+             }
+           ]
+         },
+         {
+           "tgId": 12,
+           "sigType": "pss",
+           "modulo": 3072,
+           "hashAlg": "SHA2-512",
+           "testType": "AFT",
+           "e": "fe3079",
+           "n": "ce4924ff470fb99d...",
+           "conformance": "SP800-106",
+           "tests": [
+             {
+               "tcId": 11179,
+               "message": "e49f585...",
+               "randomValue": "ab6a9b8b6a75ba76ab76a76b...",
+               "randomValueLen": 1024,
+               "signature": "4e85f..."
+             }
+           ]
+         }
+       ]
+     }
+   ]
+
+
+
+Celi                       Expires 4 June 2026                 [Page 52]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+8.7.  Test Groups for RSA Signature Primitive 1.0
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the RSA / signaturePrimitive / 1.0 JSON
+   elements of the Test Group JSON object
+
+     +=============+====================================+===========+
+     | JSON Values | Description                        | JSON Type |
+     +=============+====================================+===========+
+     | tgId        | Test group identifier              | integer   |
+     +-------------+------------------------------------+-----------+
+     | testType    | Describes the operation the client | string    |
+     |             | should perform on the tests data   |           |
+     +-------------+------------------------------------+-----------+
+     | tests       | Array of individual test cases     | array     |
+     +-------------+------------------------------------+-----------+
+
+       Table 22: RSA Signature Primitive 1.0 Test Group Properties
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+8.8.  Test Cases for RSA Signature Primitive 1.0
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / signaturePrimitive / 1.0 test vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 53]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+         +=============+=============================+===========+
+         | JSON Values | Description                 | JSON Type |
+         +=============+=============================+===========+
+         | tcId        | Test case idenfitier        | integer   |
+         +-------------+-----------------------------+-----------+
+         | n           | Modulus                     | hex       |
+         +-------------+-----------------------------+-----------+
+         | d           | Private key exponent, when  | hex       |
+         |             | the keyFormat is "standard" |           |
+         +-------------+-----------------------------+-----------+
+         | dmp1        | d mod p - 1, when the       | hex       |
+         |             | keyFormat is "crt"          |           |
+         +-------------+-----------------------------+-----------+
+         | dmq1        | d mod q - 1, when the       | hex       |
+         |             | keyFormat is "crt"          |           |
+         +-------------+-----------------------------+-----------+
+         | iqmp        | q\^-1 mod p, when the       | hex       |
+         |             | keyFormat is "crt"          |           |
+         +-------------+-----------------------------+-----------+
+         | p           | prime p, when the keyFormat | hex       |
+         |             | is "crt"                    |           |
+         +-------------+-----------------------------+-----------+
+         | q           | prime q, when the keyFormat | hex       |
+         |             | is "crt"                    |           |
+         +-------------+-----------------------------+-----------+
+         | message     | The message to sign         | hex       |
+         +-------------+-----------------------------+-----------+
+
+              Table 23: RSA Signature Primitive 1.0 Test Case
+                                 Properties
+
+      |  NOTE 1: Each test for which 'message' is not between '0' and 'n
+      |  - 1' should fail.
+
+      |  NOTE 2: Many private key properties are dependent on the
+      |  'keyFormat' property from the registration.
+
+   Here is an abbreviated yet fully constructed example of the prompt
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 54]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   [
+       { "acvVersion": "{acvp-version}" },
+       {
+           "vsId": 1193,
+           "algorithm": "RSA",
+           "mode": "signaturePrimitive",
+           "revision": "1.0",
+           "keyFormat": "standard",
+           "testGroups" : [
+               {
+                   "tgId": 1,
+                   "tests" : [
+                       {
+                           "tcId" : 1194,
+                           "n" : "d0c112f0bee36235d9f...",
+                           "d" : "2cde66ea08797aad3cf...",
+                           "e": "010001",
+                           "message" : "097e82fec7246..."
+                       },
+                       {
+                           "tcId" : 1195,
+                           "n" : "9cd5aa3f0c7c787ee38...",
+                           "d" : "0c520729a48d1728ada...",
+                           "e" : "010001",
+                           "message" : "ffd5aa3f0c7c7..."
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+8.9.  Test Groups for RSA Signature Primitive v2.0
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the RSA / signaturePrimitive / v2.0 JSON
+   elements of the Test Group JSON object
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 55]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+     +=============+====================================+===========+
+     | JSON Values | Description                        | JSON Type |
+     +=============+====================================+===========+
+     | tgId        | Test group identifier              | integer   |
+     +-------------+------------------------------------+-----------+
+     | testType    | Describes the operation the client | string    |
+     |             | should perform on the tests data   |           |
+     +-------------+------------------------------------+-----------+
+     | tests       | Array of individual test cases     | array     |
+     +-------------+------------------------------------+-----------+
+
+       Table 24: RSA Signature Primitive v2.0 Test Group Properties
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+8.10.  Test Cases for RSA Signature Primitive 2.0
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / signaturePrimitive / v2.0 test vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 56]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+         +=============+=============================+===========+
+         | JSON Values | Description                 | JSON Type |
+         +=============+=============================+===========+
+         | tcId        | Test case idenfitier        | integer   |
+         +-------------+-----------------------------+-----------+
+         | n           | Modulus                     | hex       |
+         +-------------+-----------------------------+-----------+
+         | d           | Private key exponent, when  | hex       |
+         |             | the keyFormat is "standard" |           |
+         +-------------+-----------------------------+-----------+
+         | dmp1        | d mod p - 1, when the       | hex       |
+         |             | keyFormat is "crt"          |           |
+         +-------------+-----------------------------+-----------+
+         | dmq1        | d mod q - 1, when the       | hex       |
+         |             | keyFormat is "crt"          |           |
+         +-------------+-----------------------------+-----------+
+         | iqmp        | q\^-1 mod p, when the       | hex       |
+         |             | keyFormat is "crt"          |           |
+         +-------------+-----------------------------+-----------+
+         | p           | prime p, when the keyFormat | hex       |
+         |             | is "crt"                    |           |
+         +-------------+-----------------------------+-----------+
+         | q           | prime q, when the keyFormat | hex       |
+         |             | is "crt"                    |           |
+         +-------------+-----------------------------+-----------+
+         | message     | The message to sign         | hex       |
+         +-------------+-----------------------------+-----------+
+
+              Table 25: RSA Signature Primitive v2.0 Test Case
+                                 Properties
+
+      |  NOTE 1: Each test for which 'message' is not between '0' and 'n
+      |  - 1' should fail.
+
+      |  NOTE 2: Many private key properties are dependent on the
+      |  'keyFormat' property from the registration.
+
+   Here is an abbreviated yet fully constructed example of the prompt
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 57]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   [
+       { "acvVersion": "{acvp-version}" },
+       {
+           "vsId": 0,
+           "algorithm": "RSA",
+           "mode": "signaturePrimitive",
+           "revision": "2.0",
+           "isSample": false,
+           "testGroups":
+           {
+               "tgId": 1,
+               "modulo": 2048,
+               "testType": "AFT",
+               "keyMode": "standard",
+               "tests": [
+                   {
+                       "tcId": 1,
+                       "message": "610EB23035CBF80373F282D9FCD8FCDAA411519BD9C2C889A6CDE09C1C8D4A188DF9781F1AA14...",
+                       "p": "EC7C9A50B4C9DC6D5CBED336D42FCB0F669A5D98EE16F01A2BE8AB5EDACADEAC5827F30E50AA4CC9C6F...",
+                       "q": "E1905BABFCA4135C62F4457FA9BD2ABA93FE1CE9401BF2F5708081752E8C962DE94CDCF9A35748DB4820...",
+                       "d": "0167BACAD1034759CF8B36C19C1B92A50E37703208E9F75291383478A58A65879A6578938B4FBBF80015BA3...",
+                       "n": "9A2C09A1A33F30802B872A1594CADBC6E182C62304027940C64601A9FD56ED171576DCC84F1C0DCC8359...",
+                       "e": "010001"
+                   }
+               ]
+           },
+           {
+               "tgId": 2,
+               "modulo": 4096,
+               "testType": "AFT",
+               "keyMode": "crt",
+               "tests": [
+                   {
+                       "tcId": 2,
+                       "message": "95B5BCDCCAE9802BFFB562D5CA8CC027C33178952CD02AECCA122D1AAF24CD703930EA511E27BD1393C...",
+                       "dmp1": "D69E5464B2DFD07BBA23B90684BAEC522EE997F3F805077EB00BB76FFD3FF5D053C39384035C75D6CDA6FC0...",
+                       "dmq1": "A5A23DC4E454DEB6CB2466910BB65BAD1EA65FD2E1CAADD3FB83AB0DCE407B25F4257A038EACC5909AD...",
+                       "iqmp": "4B3702BB2BDAD984047633F0B0DD4C6C619791CD7B280D15E1DADB08FDDBFFA546EC926F40A54D38E682B90B...",
+                       "p": "BE16AAAF143547FBFB7EDE29B113FE372CB5A41D801AAB69A1AED4A525586792688ECDD651443A602FB7321AA48B...",
+                       "q": "EBFF6C434973F5FBDBAE74D59C6AF26B2CBD2BCBB815E78FAC87B1C86FE8252F7DE499D966A362D9209685A98D08...",
+                       "n": "AF3C77A6426D2401164839FE93AF3F0227EDA4675434BD5785EE7A4F44E687E714B63E99F143B1A28E28DB06B3...",
+                       "e": "010001"
+                   }
+               ]
+           }
+       }
+   ]
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 58]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+8.11.  Test Groups for RSA Decryption Primitive 1.0
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the RSA JSON elements of the Test Group
+   JSON object
+
+   +===================+====================================+=========+
+   | JSON Values       | Description                        | JSON    |
+   |                   |                                    | Type    |
+   +===================+====================================+=========+
+   | tgId              | Test group identifier              | integer |
+   +-------------------+------------------------------------+---------+
+   | testType          | Describes the operation the client | string  |
+   |                   | should perform on the tests data   |         |
+   +-------------------+------------------------------------+---------+
+   | totalTests        | The total number of elements in    | integer |
+   |                   | the "resultsArray"                 |         |
+   +-------------------+------------------------------------+---------+
+   | totalFailingTests | The number of tests that the       | integer |
+   |                   | client should force to fail in the |         |
+   |                   | "resultsArray"                     |         |
+   +-------------------+------------------------------------+---------+
+   | tests             | Array of individual test cases     | array   |
+   +-------------------+------------------------------------+---------+
+
+       Table 26: RSA Decryption Primitive 1.0 Test Group Properties
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+8.12.  Test Cases for RSA Decryption Primitive 1.0
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / DecryptionPrimitive / 1.0 test vector.
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 59]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+          +==============+==========================+===========+
+          | JSON Values  | Description              | JSON Type |
+          +==============+==========================+===========+
+          | tcId         | Test case identifier     | integer   |
+          +--------------+--------------------------+-----------+
+          | resultsArray | An array of ciphertexts  | array     |
+          +--------------+--------------------------+-----------+
+          | ciphertext   | An individual ciphertext | hex       |
+          +--------------+--------------------------+-----------+
+
+              Table 27: RSA Decryption Primitive 1.0 Test Case
+                                 Properties
+
+      |  NOTE: A failing ciphertext is one such that the ciphertext is
+      |  greater than the n the client provides
+
+   Here is an abbreviated yet fully constructed example of the prompt
+
+   [
+       { "acvVersion": "{acvp-version}" },
+       {
+           "vsId": 1194,
+           "algorithm": "RSA",
+           "mode": "decryptionPrimitive",
+           "revision": "1.0",
+           "testGroups" : [
+               {
+                   "tgId": 1,
+                   "testType": "AFT",
+                   "totalTests": 2,
+                   "totalFailingTests": 1,
+                   "tests" : [
+                       {
+                           "tcId" : 1,
+                           "resultsArray": [
+                               {
+                                   "cipherText" : "097e82fec72465e..."
+                               },
+                               {
+                                   "cipherText" : "ffd5aa3f0c7c787..."
+                               }
+                           ]
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+
+
+Celi                       Expires 4 June 2026                 [Page 60]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+8.13.  Test Groups for RSA Decryption Primitive Sp800-56Br2
+
+   The testGroups element at the top level in the test vector JSON
+   object is an array of test groups.  Test vectors are grouped into
+   similar test cases to reduce the amount of data transmitted in the
+   vector set.  For instance, all test vectors that use the same key
+   size would be grouped together.  The Test Group JSON object contains
+   meta data that applies to all test vectors within the group.  The
+   following table describes the RSA JSON elements of the Test Group
+   JSON object
+
+   +============+===========================+==========================+
+   | JSON       | Description               | JSON Type                |
+   | Values     |                           |                          |
+   +============+===========================+==========================+
+   | tgId       | Test group identifier     | integer                  |
+   +------------+---------------------------+--------------------------+
+   | modulo     | The modulo to use in the  | integer                  |
+   |            | current test              |                          |
+   +------------+---------------------------+--------------------------+
+   | keyMode    | The mode to be used in    | string                   |
+   |            | current test (aft, crt)   |                          |
+   +------------+---------------------------+--------------------------+
+   | testType   | Describes the operation   | string                   |
+   |            | the client should perform |                          |
+   |            | on the tests data         |                          |
+   +------------+---------------------------+--------------------------+
+   | pubExpMode | Supports fixed or random  | string                   |
+   |            | public key exponent e     |                          |
+   |            | (random default if empty) |                          |
+   +------------+---------------------------+--------------------------+
+   | "fixed" or | fixedPubExp               | The value of the         |
+   | "random"   |                           | public key exponent e    |
+   |            |                           | in hex if pubExpMode     |
+   |            |                           | is "fixed"               |
+   +------------+---------------------------+--------------------------+
+   | hex        |                           | tests                    |
+   +------------+---------------------------+--------------------------+
+
+    Table 28: RSA Decryption Primitive Sp800-56Br2 Test Group Properties
+
+   The 'tgId', 'testType' and 'tests' objects MUST appear in every test
+   group element communicated from the server to the client as a part of
+   a prompt.  Other properties are dependent on which 'testType' (see
+   Section 6) the group is addressing.
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 61]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+8.14.  Test Cases for RSA Decryption Primitive Sp800-56Br2
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / DecryptionPrimitive / Sp800-56Br2 test
+   vector.
+
+      +=============+===================================+===========+
+      | JSON Values | Description                       | JSON Type |
+      +=============+===================================+===========+
+      | tcId        | Test case identifier              | integer   |
+      +-------------+-----------------------------------+-----------+
+      | plainText   | An individual plainText           | HEX       |
+      +-------------+-----------------------------------+-----------+
+      | ciphertext  | An individual ciphertext          | hex       |
+      +-------------+-----------------------------------+-----------+
+      | n           | Used by tests for calculation     | hex       |
+      +-------------+-----------------------------------+-----------+
+      | e           | Used by tests for calculation     | hex       |
+      +-------------+-----------------------------------+-----------+
+      | p           | Used by tests for calculation     | hex       |
+      +-------------+-----------------------------------+-----------+
+      | q           | Used by tests for calculation     | hex       |
+      +-------------+-----------------------------------+-----------+
+      | d           | Used by tests for calculation     | hex       |
+      +-------------+-----------------------------------+-----------+
+      | Dmp1        | Used by CRT tests for calculation | hex       |
+      +-------------+-----------------------------------+-----------+
+      | Dmp1        | Used by CRT tests for calculation | hex       |
+      +-------------+-----------------------------------+-----------+
+      | Iqmp        | Used by CRT tests for calculation | hex       |
+      +-------------+-----------------------------------+-----------+
+
+          Table 29: RSA Decryption Primitive Sp800-56Br2 Test Case
+                                 Properties
+
+      |  NOTE: A failing plainText is one such that does not match what
+      |  the client provides
+
+   Here is an abbreviated yet fully constructed example of the prompt
+
+   [
+       { "acvVersion": "{acvp-version}" },
+       {
+           "vsId": 0,
+           "algorithm": "RSA",
+           "mode": "DecryptionPrimitive",
+
+
+
+Celi                       Expires 4 June 2026                 [Page 62]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+           "revision": "Sp800-56Br2",
+           "isSample": false,
+           "testGroups": [
+               {
+                   "tgId": 1,
+                   "modulo": 2048,
+                   "testType": "AFT",
+                   "keyMode": "standard",
+                   "pubExpMode": "random",
+                   "tests": [
+                       {
+                           "tcId": 1,
+                           "ct": "610EB23035CBF80373F282D9FCD8FCDAA411519BD9C2C889A6CDE09C1C8D4A188DF9781F1AA14...",
+                           "p": "EC7C9A50B4C9DC6D5CBED336D42FCB0F669A5D98EE16F01A2BE8AB5EDACADEAC5827F30E50AA4CC9C6F...",
+                           "q": "E1905BABFCA4135C62F4457FA9BD2ABA93FE1CE9401BF2F5708081752E8C962DE94CDCF9A35748DB4820...",
+                           "d": "0167BACAD1034759CF8B36C19C1B92A50E37703208E9F75291383478A58A65879A6578938B4FBBF80015BA3...",
+                           "n": "A267B19CA3573AA9392B6D75EF5A38D1AC99982B8B2ED79B399BC80842C85ABCACD2A9A0F849AC0FDCD4...",
+                           "e": "2BEE9C8C06B5"
+                       }
+                   ]
+               },
+               {
+                   "tgId": 2,
+                   "modulo": 4096,
+                   "testType": "AFT",
+                   "keyMode": "crt",
+                   "pubExpMode": "random",
+                   "tests": [
+                       {
+                           "tcId": 2,
+                           "ct": "95B5BCDCCAE9802BFFB562D5CA8CC027C33178952CD02AECCA122D1AAF24CD703930EA511E27BD1393C...",
+                           "dmp1": "D69E5464B2DFD07BBA23B90684BAEC522EE997F3F805077EB00BB76FFD3FF5D053C39384035C75D6CDA6FC0...",
+                           "dmq1": "A5A23DC4E454DEB6CB2466910BB65BAD1EA65FD2E1CAADD3FB83AB0DCE407B25F4257A038EACC5909AD...",
+                           "iqmp": "4B3702BB2BDAD984047633F0B0DD4C6C619791CD7B280D15E1DADB08FDDBFFA546EC926F40A54D38E682B90B...",
+                           "p": "F244D4C2D0C82F3E4C3D20965D418E3AD5D62FCB0F669A5D98EE16F01A2BE8AB5EDACADEAC5827F30E50AA4CC9C6F...",
+                           "q": "D85F808CCCEC37B5B08B2067046BC0E9CA32ABA93FE1CE9401BF2F5708081752E8C962DE94CDCF9A35748DB4820...",
+                           "d": "0E24211348C0DA791CCB9E9F55FEFAD0303208E9F75291383478A58A65879A6578938B4FBBF80015BA3...",
+                           "n": "CCC474B6FE688ACC7AF61D7797DDB240735CF5A38D1AC99982B8B2ED79B399BC80842C85ABCACD2A9A0F849AC0FDCD4...",
+                           "e": "02FC20D82B"
+                       }
+                   ]
+               }
+           ]
+       }
+   ]
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 63]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+9.  Test Vector Responses
+
+   After the ACVP client downloads and processes a vector set, it must
+   send the response vectors back to the ACVP server.  The following
+   table describes the JSON object that represents a vector set
+   response.
+
+     +===============+===================================+===========+
+     | JSON Property | Description                       | JSON Type |
+     +===============+===================================+===========+
+     | acvVersion    | The version of the protocol       | string    |
+     +---------------+-----------------------------------+-----------+
+     | vsId          | The vector set identifier         | integer   |
+     +---------------+-----------------------------------+-----------+
+     | testGroups    | The test group data, see Table 31 | array     |
+     +---------------+-----------------------------------+-----------+
+
+                       Table 30: Response JSON Object
+
+   An example of this is the following
+
+   {
+           "acvVersion": "version",
+           "vsId": 1,
+           "testGroups": [ ... ]
+   }
+
+   The testGroups section is used to organize the ACVP client response
+   in a similar manner to how it receives vectors.  Several algorithms
+   SHALL require the client to send back group level properties in their
+   response.  This structure helps accommodate that.  The following is a
+   skeleton for the test group structure.  Additional properties may be
+   included at this level depending on the algorithm, mode and revision.
+
+   +==========+=============================================+=========+
+   | JSON     | Description                                 | JSON    |
+   | Property |                                             | Type    |
+   +==========+=============================================+=========+
+   | tgId     | The test group identifier                   | integer |
+   +----------+---------------------------------------------+---------+
+   | tests    | The test case data, depending on the        | array   |
+   |          | algorithm see Table 32, Table 34, Table 36, |         |
+   |          | Table 37, Table 38, Table 39 or Table 40    |         |
+   +----------+---------------------------------------------+---------+
+
+                Table 31: Response Test Group JSON Objects
+
+   An example of this is the following
+
+
+
+Celi                       Expires 4 June 2026                 [Page 64]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+           "tgId": 1,
+           "tests": [ ... ]
+   }
+
+9.1.  RSA keyGen Test Group Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / keyGen / * test vector.
+
+   The following table describes the JSON elements for the response to a
+   RSA / keyGen / * test vector.
+
+       +============+===================================+==========+
+       | JSON Value | Description                       | JSON     |
+       |            |                                   | type     |
+       +============+===================================+==========+
+       | tcId       | Numeric identifier for the test   | integer  |
+       |            | case, unique across the entire    |          |
+       |            | vector set                        |          |
+       +------------+-----------------------------------+----------+
+       | e          | the public exponent               | hex      |
+       +------------+-----------------------------------+----------+
+       | testPassed | the verdict on the prime          | boolean  |
+       |            | generation testing for the        |          |
+       |            | supplied pRand/qRand combination, |          |
+       |            | see [FIPS186-4], Appendix B.3.3.  |          |
+       +------------+-----------------------------------+----------+
+       | seed       | the seed used in prime generation | hex      |
+       |            | according to [FIPS186-4],         |          |
+       |            | Appendix B.3.2, B.3.4, or B.3.5   |          |
+       +------------+-----------------------------------+----------+
+       | bitlens    | the length of p1, p2, q1, and q2  | array of |
+       |            | for prime generation according to | integers |
+       |            | [FIPS186-4], Appendix B.3.2,      |          |
+       |            | B.3.4, B.3.5 or the length of     |          |
+       |            | xP1, xP2, xQ1, and xQ2 for B.3.6  |          |
+       +------------+-----------------------------------+----------+
+       | xP1        | xP1 from [FIPS186-4] B.3.6, step  | hex      |
+       |            | 4, if applicable                  |          |
+       +------------+-----------------------------------+----------+
+       | xP2        | xP2 from [FIPS186-4] B.3.6, step  | hex      |
+       |            | 4, if applicable                  |          |
+       +------------+-----------------------------------+----------+
+       | xP         | the random number used in Step 3  | hex      |
+       |            | of the algorithm in [FIPS186-4],  |          |
+
+
+
+Celi                       Expires 4 June 2026                 [Page 65]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+       |            | Appendix C.9 to generate the      |          |
+       |            | prime P, if applicable            |          |
+       +------------+-----------------------------------+----------+
+       | p          | the private prime factor p        | hex      |
+       +------------+-----------------------------------+----------+
+       | xQ1        | xQ1 from [FIPS186-4] B.3.6, step  | hex      |
+       |            | 5, if applicable                  |          |
+       +------------+-----------------------------------+----------+
+       | xQ2        | xQ2 from [FIPS186-4] B.3.6, step  | hex      |
+       |            | 5, if applicable                  |          |
+       +------------+-----------------------------------+----------+
+       | xQ         | the random number used in Step 3  | hex      |
+       |            | of the algorithm in [FIPS186-4],  |          |
+       |            | Appendix C.9 to generate the      |          |
+       |            | prime Q, if applicable            |          |
+       +------------+-----------------------------------+----------+
+       | q          | the private prime factor q        | hex      |
+       +------------+-----------------------------------+----------+
+       | n          | the modulus                       | hex      |
+       +------------+-----------------------------------+----------+
+       | d          | the private exponent d            | hex      |
+       +------------+-----------------------------------+----------+
+       | dmp1       | the private exponent d modulo (p  | hex      |
+       |            | - 1) used in a Chinese Remainder  |          |
+       |            | Theorem private key               |          |
+       +------------+-----------------------------------+----------+
+       | dmq1       | the private exponent d modulo (q  | hex      |
+       |            | - 1) used in a Chinese Remainder  |          |
+       |            | Theorem private key               |          |
+       +------------+-----------------------------------+----------+
+       | iqmp       | the multiplicative inverse of q   | hex      |
+       |            | modulo p used in a Chinese        |          |
+       |            | Remainder Theorem private key     |          |
+       +------------+-----------------------------------+----------+
+
+                Table 32: RSA Test Case Results JSON Object
+
+      |  NOTE 1: If the 'keyFormat' of the test group is 'standard',
+      |  then the client SHALL not include the 'dmp1', 'dmq1' and 'iqmp'
+      |  properties.  Those properties SHALL only be included if the
+      |  'keyFormat' is set to 'crt' for the Chinese Remainder Theorem.
+
+      |  NOTE 2: The 'testPassed' property is only valid for 'KAT' test
+      |  type groups.
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 66]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+      |  NOTE 3: If the 'infoGeneratedByServer' test group property is
+      |  true, then the only response from the client SHALL be the
+      |  values that directly correspond to the key when appropriate,
+      |  'p', 'q', 'n', and 'd' (or 'dmp1', 'dmq1', 'iqmp').
+
+      |  NOTE 4: The 'e' property SHALL only be included when the
+      |  'infoGeneratedByServer' is false and the 'pubExpMode' is
+      |  "random".
+
+   Use the following applicability grid to determine which properties
+   should be present based on the 'randPQ' test group property.  The
+   'randPQ' property values for RSA / keyGen / FIPS186-4 are based on
+   the section numbers in Appendix B in [FIPS186-4].  For RSA / keyGen /
+   FIPS186-5, the property values are based on the true names of the
+   generation methods.  The RSA / keyGen / FIPS186-5 names will be
+   listed in the grid.  This grid only applies to 'AFT' test types.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 67]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +=======+=========+==========+============+============+============+
+   |JSON   |Provable | Probable |Provable    |Provable    |Probable    |
+   |Value  |         |          |Primes With |Primes With |Primes With |
+   |       |         |          |Conditions  |Probable    |Conditions  |
+   |       |         |          |            |Conditions  |            |
+   +=======+=========+==========+============+============+============+
+   |p      |yes      | yes      |yes         |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |q      |yes      | yes      |yes         |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |e      |yes      | yes      |yes         |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |n      |yes      | yes      |yes         |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |d      |yes      | yes      |yes         |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |seed   |yes      | no       |yes         |yes         |no          |
+   +-------+---------+----------+------------+------------+------------+
+   |xP     |no       | no       |no          |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |xP1    |no       | no       |no          |no          |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |xP2    |no       | no       |no          |no          |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |xQ     |no       | no       |no          |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |xQ1    |no       | no       |no          |no          |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |xQ2    |no       | no       |no          |no          |yes         |
+   +-------+---------+----------+------------+------------+------------+
+   |bitlens|no       | no       |yes         |yes         |yes         |
+   +-------+---------+----------+------------+------------+------------+
+
+        Table 33: RSA Test Case Applicability Grid For AFT Responses
+
+      |  NOTE: If the 'crt' key format is used for the group, substitute
+      |  'd' with the appropriate values from Table 32.
+
+   The following is an example of an RSA / keyGen / * response.  Test
+   group 1 uses the provable prime (B.3.2) generation method.  Test
+   group 2 uses the provable prime with conditions (B.3.4) generation
+   method.  Test group 3 uses the provable prime with probable
+   conditions (B.3.5) generation method.  Test group 4 uses the probable
+   prime with conditions (B.3.6) generation method.  Test group 5 is for
+   the 'KAT' test type for probable prime (B.3.3) generation method.
+   Test group 6 uses the probable prime (B.3.3) generation method.  In
+   this example, 'infoGeneratedByServer' is set to true.
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 68]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   [
+     {
+       "acvVersion": "<acvp-version>"
+     },
+     {
+       "vsId": 1133,
+       "algorithm": "RSA",
+       "mode": "keyGen",
+       "revision": "FIPS186-4",
+       "testGroups": [
+         {
+           "tgId": 1,
+           "tests": [
+             {
+               "tcId": 1,
+               "seed": "5B174CA16001BE8...",
+               "n": "8099A2B6C63B2CB2A0...",
+               "e": "07D196B84395",
+               "p": "B5A06A623B5C7EC4A0...",
+               "q": "B5428D256885A767B4...",
+               "d": "0A6D3A7F37453EF9EB..."
+             }
+           ]
+         },
+         {
+           "tgId": 2,
+           "tests": [
+             {
+               "tcId": 1111,
+               "e": "10000021",
+               "seed": "af152e46b479af8...",
+               "bitlens": [
+                 312,
+                 145,
+                 144,
+                 338
+               ],
+               "p": "e2ab16d3026db341223...",
+               "q": "d13c3209bbc1bfa27c9...",
+               "n": "b942fa09a727ab488f8...",
+               "d": "6b56ee657ebf6a54b35..."
+             }
+           ]
+         },
+         {
+           "tgId": 3,
+           "tests": [
+             {
+
+
+
+Celi                       Expires 4 June 2026                 [Page 69]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+               "tcId": 1115,
+               "e": "10000021",
+               "seed": "e664bc8c8e09ca23...",
+               "bitlens": [
+                 232,
+                 220,
+                 336,
+                 141
+               ],
+               "xP": "e7b2b10bb6c975ef79...",
+               "p": "e7b2b10bb6c975ef794...",
+               "xQ": "c3ce8bfcb6fb40bdaf...",
+               "q": "c3ce8bfcb6fb40bdafd...",
+               "n": "b1380d59234c9f63e63...",
+               "d": "bec8baec7da0634211e..."
+             }
+           ]
+         },
+         {
+           "tgId": 4,
+           "tests": [
+             {
+               "tcId": 1135,
+               "e": "10000021",
+               "bitlens": [
+                 224,
+                 195,
+                 352,
+                 142
+               ],
+               "xP1": "57c9a2986fc7e69e83...",
+               "xP2": "7254d6c998a84230ff...",
+               "xP": "c32cccd930ab2c107b3...",
+               "p": "c32cccd930ab2c107b3f...",
+               "xQ1": "7468d10e69a14b00ec...",
+               "xQ2": "20b8c2bae262b13e91...",
+               "xQ": "fa97b510539a102879a...",
+               "q": "fa97b510539a102879a7...",
+               "n": "bf0d69840d0236aa74ea...",
+               "d": "166bed3734b922f07446..."
+             }
+           ]
+         },
+         {
+           "tgId": 5,
+           "tests": [
+             {
+               "tcId": 1119,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 70]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+               "testPassed": true
+             }
+           ]
+         },
+         {
+           "tgId": 6,
+           "tests": [
+             {
+               "tcId": 1129,
+               "e": "df28ab",
+               "p": "e021757c777288dac...",
+               "q": "ed1571a9e0cd4a425...",
+               "n": "cf91c0065d8e5797f...",
+               "d": "1f5201b880a206cb1..."
+             }
+           ]
+         }
+       ]
+     }
+   ]
+
+9.2.  RSA sigGen Test Group Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / sigGen / * test vector.
+
+   The following table describes the JSON elements for the test group
+   responses to a RSA / sigGen / * test vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 71]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+      +=============+=====================================+=========+
+      | JSON Value  | Description                         | JSON    |
+      |             |                                     | type    |
+      +=============+=====================================+=========+
+      | tgId        | Numeric identifier for the test     | integer |
+      |             | group                               |         |
+      +-------------+-------------------------------------+---------+
+      | conformance | Signifies all test cases within the | string  |
+      |             | group should utilize random message |         |
+      |             | hashing as described in [SP800-106] |         |
+      +-------------+-------------------------------------+---------+
+      | n           | The generated modulus for the group | hex     |
+      +-------------+-------------------------------------+---------+
+      | e           | The generated public exponent for   | hex     |
+      |             | the group                           |         |
+      +-------------+-------------------------------------+---------+
+      | tests       | The individual test cases for the   | array   |
+      |             | group                               |         |
+      +-------------+-------------------------------------+---------+
+
+            Table 34: RSA sigGen Test Group Results JSON Object
+
+   The following table describes the JSON elements for the test case
+   responses for RSA / sigGen / * .
+
+    +================+======================================+=========+
+    | JSON Value     | Description                          | JSON    |
+    |                |                                      | type    |
+    +================+======================================+=========+
+    | tcId           | Numeric identifier for the test case | integer |
+    +----------------+--------------------------------------+---------+
+    | randomValue    | The random value to be used as an    | hex     |
+    |                | input into the message randomization |         |
+    |                | function as described in [SP800-106] |         |
+    +----------------+--------------------------------------+---------+
+    | randomValueLen | The random value's bit length        | integer |
+    +----------------+--------------------------------------+---------+
+    | signature      | The computed signature               | hex     |
+    +----------------+--------------------------------------+---------+
+
+             Table 35: RSA sigGen Test Case Results JSON Object
+
+      |  NOTE: The 'randomValue' and 'randomValueLen' properties will
+      |  only be present in test groups for the SP800-106 conformance.
+
+   The following is an example of the response for RSA / sigGen / * .
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 72]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+     "vsId": 0,
+     "algorithm": "RSA",
+     "mode": "sigGen",
+     "revision": "FIPS186-4",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "n": "A31AFF9A3266E5A215C487...",
+         "e": "CC288CE6A02AFD",
+         "tests": [
+           {
+             "tcId": 1,
+             "signature": "053F1CBA53..."
+           },
+           {
+             "tcId": 2,
+             "signature": "04236E8357..."
+           },
+           {
+             "tcId": 3,
+             "signature": "4A45C5E696..."
+           }
+         ]
+       },
+           {
+         "tgId": 2,
+         "conformance": "SP800-106",
+         "n": "A730E346899141F8B550C...",
+         "e": "302D7F30CFCE55",
+         "tests": [
+           {
+             "tcId": 4,
+             "randomValue": "C44BAE0830813A8E8F989217C967E68A74EDADD9B14128EC877685E6CB631E5F",
+             "randomValueLen": 256,
+             "signature": "1612B11D9C..."
+           },
+           {
+             "tcId": 5,
+             "randomValue": "7FBB4BDA3C7C2F67E04583A631000EF783D67ED1BFE7620E9BE897A0270E411C",
+             "randomValueLen": 256,
+             "signature": "37387D5C64..."
+           },
+           {
+             "tcId": 6,
+             "randomValue": "8EF77DED2EB53357BAD523AD16C171221FCF24C0CE15E2FC7F9FBE589A64BEFC",
+             "randomValueLen": 256,
+
+
+
+Celi                       Expires 4 June 2026                 [Page 73]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+             "signature": "4114A93A82..."
+           }
+         ]
+       }
+     ]
+   }
+
+9.3.  RSA sigVer Test Group Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / sigVer / * test vector.
+
+   The following table describes the JSON elements for the test case
+   responses for RSA / sigVer / * .
+
+     +============+======================================+===========+
+     | JSON Value | Description                          | JSON type |
+     +============+======================================+===========+
+     | tcId       | Numeric identifier for the test case | integer   |
+     +------------+--------------------------------------+-----------+
+     | testPassed | Whether or not the signature         | boolean   |
+     |            | provided was valid                   |           |
+     +------------+--------------------------------------+-----------+
+
+             Table 36: RSA sigVer Test Case Results JSON Object
+
+   The following is an example of the response for RSA / sigVer / *
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 74]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+     "vsId": 0,
+     "algorithm": "RSA",
+     "mode": "sigVer",
+     "revision": "FIPS186-4",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "testPassed": true
+           },
+           {
+             "tcId": 2,
+             "testPassed": false
+           },
+           {
+             "tcId": 3,
+             "testPassed": false
+           }
+         ]
+       }
+     ]
+   }
+
+9.4.  RSA Signature Primitive Test Group Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / Signature Primitive / * test vector.
+
+   The following tables describe the JSON elements for the test case
+   responses for RSA / Signature Primitive / v1.0 .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 75]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+    +============+=========================================+=========+
+    | JSON Value | Description                             | JSON    |
+    |            |                                         | type    |
+    +============+=========================================+=========+
+    | tcId       | Numeric identifier for the test case    | integer |
+    +------------+-----------------------------------------+---------+
+    | signature  | If the message can be signed, the       | hex     |
+    |            | signature.  If the encoded value is     |         |
+    |            | shorter than the key modulus it should  |         |
+    |            | be padded at the front with zero bytes. |         |
+    +------------+-----------------------------------------+---------+
+    | testPassed | If the message could not be signed      | boolean |
+    +------------+-----------------------------------------+---------+
+
+      Table 37: RSA Signature Primitive v1.0 Test Case Results JSON
+                                  Object
+
+   The following is an example of the response for RSA / Signature
+   Primitive / v1.0.
+
+   {
+     "vsId": 0,
+     "algorithm": "RSA",
+     "mode": "signaturePrimitive",
+     "revision": "1.0",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "testPassed": true,
+             "signature": "a60b879a8fa382fdf4..."
+           },
+           {
+             "tcId": 2,
+             "testPassed": false
+           },
+           {
+             "tcId": 3,
+             "testPassed": false
+           }
+         ]
+       }
+     ]
+   }
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 76]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+    +============+=========================================+=========+
+    | JSON Value | Description                             | JSON    |
+    |            |                                         | type    |
+    +============+=========================================+=========+
+    | tcId       | Numeric identifier for the test case    | integer |
+    +------------+-----------------------------------------+---------+
+    | testPassed | If the message could not be signed      | boolean |
+    +------------+-----------------------------------------+---------+
+    | signature  | If the message can be signed, the       | hex     |
+    |            | signature.  If the encoded value is     |         |
+    |            | shorter than the key modulus it should  |         |
+    |            | be padded at the front with zero bytes. |         |
+    +------------+-----------------------------------------+---------+
+
+      Table 38: RSA Signature Primitive v2.0 Test Case Results JSON
+                                  Object
+
+   The following is an example of the response for RSA / Signature
+   Primitive / v2.0.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 77]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+     "vsId": 0,
+     "algorithm": "RSA",
+     "mode": "signaturePrimitive",
+     "revision": "2.0",
+     "isSample": true,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "testPassed": true,
+             "signature": "a60b879a8fa382fdf4..."
+           },
+           {
+             "tcId": 2,
+             "testPassed": false
+           },
+           {
+             "tcId": 3,
+             "testPassed": false
+           },
+           {
+             "tcId": 4,
+             "testPassed": true,
+             "signature": "a60b879a8fa382fdf4..."
+           }
+         ]
+       }
+     ]
+   }
+
+9.5.  RSA Decryption Primitive Test Group Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / Decryption Primitive / * test vector.
+
+   The following table describes the JSON elements for the test case
+   responses for RSA / Decryption Primitive / * .
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 78]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+     +============+======================================+===========+
+     | JSON Value | Description                          | JSON type |
+     +============+======================================+===========+
+     | tcId       | Numeric identifier for the test case | integer   |
+     +------------+--------------------------------------+-----------+
+     | e          | The public exponent                  | hex       |
+     +------------+--------------------------------------+-----------+
+     | n          | The modulus                          | hex       |
+     +------------+--------------------------------------+-----------+
+     | plainText  | If the ciphertext could be           | hex       |
+     |            | decrypted, the result                |           |
+     +------------+--------------------------------------+-----------+
+     | testPassed | If the ciphertext could not be       | boolean   |
+     |            | decrypted                            |           |
+     +------------+--------------------------------------+-----------+
+
+         Table 39: RSA Decryption Primitive v1.0 Test Case Results
+                                JSON Object
+
+   The following is an example of the response for RSA / Decryption
+   Primitive / * .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 79]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   {
+     "vsId": 0,
+     "algorithm": "RSA",
+     "mode": "decryptionPrimitive",
+     "revision": "1.0",
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "resultsArray": [
+               {
+                 "e": "60BDBEF656869D",
+                 "n": "8FA73CF9CAD37456B...",
+                 "testPassed": false
+               },
+               {
+                 "plainText": "009EDAE2D5934F...",
+                 "e": "D6AA5EF807",
+                 "n": "A86A73D47F605DCF...",
+                 "testPassed": true
+               }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+
+9.6.  RSA Decryption Primitive Sp800-56Br2 Test Group Responses
+
+   Each test group contains an array of one or more test cases.  Each
+   test case is a JSON object that represents a single test vector to be
+   processed by the ACVP client.  The following table describes the JSON
+   elements for each RSA / Decryption Primitive Sp800-56Br2 / * test
+   vector.
+
+   The following table describes the JSON elements for the test case
+   responses for RSA / Decryption Primitive / * .
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 80]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   +============+==========================================+===========+
+   | JSON Value | Description                              | JSON type |
+   +============+==========================================+===========+
+   | tcId       | Numeric identifier for the test case     | integer   |
+   +------------+------------------------------------------+-----------+
+   | testPassed | If the ciphertext could not be           | boolean   |
+   |            | decrypted                                |           |
+   +------------+------------------------------------------+-----------+
+   | plainText  | If the ciphertext could be               | hex       |
+   |            | decrypted, the result                    |           |
+   +------------+------------------------------------------+-----------+
+
+      Table 40: RSA Decryption Primitive Sp800-56Br2 Test Case Results
+                                JSON Object
+
+   The following is an example of the response for RSA / Decryption
+   Primitive / * .
+
+   {
+     "vsId": 0,
+     "algorithm": "RSA",
+     "mode": "DecryptionPrimitive",
+     "revision": "Sp800-56Br2",
+     "isSample": false,
+     "testGroups": [
+       {
+         "tgId": 1,
+         "tests": [
+           {
+             "tcId": 1,
+             "testPassed": true,
+             "pt": "0098C4B9AC11B94F1625F7C75318AB84F130013CE8157915824D64..."
+           },
+           {
+             "tcId": 3,
+             "testPassed": false,
+           },
+           {
+             "tcId": 2,
+             "testPassed": true,
+             "pt": "7DC72AEE9BEA72A52386FC325EBEFD2E20BC8BF9AE4856AF5C36E2D8..."
+           },
+         ]
+       }
+     ]
+   }
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 81]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+10.  Security Considerations
+
+   There are no additional security considerations outside of those
+   outlined in the ACVP document.
+
+11.  IANA Considerations
+
+   This document does not require any action by IANA.
+
+12.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7991]  Hoffman, P., "The "xml2rfc" Version 3 Vocabulary", RFC
+              7991, RFC 7991, DOI 10.17487/RFC7991, December 2016,
+              <https://www.rfc-editor.org/info/rfc7991>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", RFC 8174, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC3447]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
+              Standards (PKCS) #1: RSA Cryptography Specifications
+              Version 2.1", RFC 3447, RFC 3447, DOI 10.17487/RFC3447,
+              February 2003, <https://www.rfc-editor.org/info/rfc3447>.
+
+   [FIPS186-2]
+              National Institute of Standards and Technology, "Digital
+              Signature Standard (DSS)", NIST FIPS 186-2, October 2001,
+              <https://csrc.nist.gov/pubs/fips/186-2/upd1/final>.
+
+   [FIPS186-4]
+              National Institute of Standards and Technology, "Digital
+              Signature Standard (DSS)", NIST FIPS 186-4, July 2013,
+              <https://csrc.nist.gov/pubs/fips/186-4/final>.
+
+   [FIPS186-5]
+              National Institute of Standards and Technology, "Digital
+              Signature Standard (DSS)", NIST FIPS 186-5, February 2023,
+              <https://csrc.nist.gov/pubs/fips/186-5/final>.
+
+   [SP800-106]
+              Dang, Q. H., "Randomized Hashing for Digital Signatures",
+              NIST SP 800-106, February 2009,
+              <https://csrc.nist.gov/pubs/sp/800/106/final>.
+
+
+
+Celi                       Expires 4 June 2026                 [Page 82]
+
+Internet-Draft                  ACVP RSA                   December 2025
+
+
+   [SP800-131A]
+              Barker, E. B. and A. Roginsky, "Transitions -
+              Recommendation for Transitioning the Use of Cryptographic
+              Algorithms and Key Lengths", NIST SP 800-131A, January
+              2011, <https://csrc.nist.gov/pubs/sp/800/131/a/final>.
+
+   [SP800-56B]
+              Barker, E. B., Chen, L., Regenscheid, A. R., and M. E.
+              Smid, "Recommendation for Pair-Wise Key Establishment
+              Schemes Using Integer Factorization Cryptography", NIST SP
+              800-56B, August 2009,
+              <https://csrc.nist.gov/pubs/sp/800/56/b/final>.
+
+   [SP800-56Br2]
+              Barker, E. B., Chen, L., Regenscheid, A. R., and M. E.
+              Smid, "Recommendation for Pair-Wise Key Establishment
+              Schemes Using Integer Factorization Cryptography", NIST SP
+              800-56B, August 2009,
+              <https://csrc.nist.gov/pubs/sp/800/56/b/final>.
+
+   [ACVP]     Fussell, B., Vassilev, A., and H. Booth, "Automatic
+              Cryptographic Validation Protocol", ACVP, 1 July 2019.
+
+Author's Address
+
+   Christopher Celi (editor)
+   Email: christopher.celi@nist.gov
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Celi                       Expires 4 June 2026                 [Page 83]

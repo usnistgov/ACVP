@@ -1,0 +1,3791 @@
+<!DOCTYPE html>
+<html lang="en" class=" Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>ACVP Deterministic Random Bit Generator (DRBG) Algorithm JSON Specification</title>
+<meta content="Apostol Vassilev" name="author">
+<meta content="xml2rfc 3.12.3" name="generator">
+<meta content="draft-vassilev-acvp-drbg-00" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.12.3
+    Python 3.9.2
+    appdirs 1.4.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 2.5.0
+    html5lib 1.1
+    intervaltree 3.1.0
+    Jinja2 2.11.3
+    kitchen 1.2.6
+    lxml 4.8.0
+    MarkupSafe 2.0.1
+    pycountry 22.3.5
+    pyflakes 2.4.0
+    PyYAML 6.0
+    requests 2.27.1
+    setuptools 60.10.0
+    six 1.16.0
+-->
+<link href="/__w/ACVP/ACVP/src/draft-vassilev-acvp-drbg.rfc.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necssary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans'); /* Sans-serif */
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif'); /* Serif (print) */
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono'); /* Monospace */
+
+@viewport {
+  zoom: 1.0;
+  width: extend-to-zoom;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre, code {
+  background-color: #f9f9f9;
+  font-family: 'Roboto Mono', monospace;
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    float: none;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: "Noto Sans",Arial,Helvetica,sans-serif;
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The follwing is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre, code {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+pre.sourcecode,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact informatio look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: lower-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background sligthtly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottim margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the comact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div:first-child > pre.sourcecode,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type {
+  margin-bottom: 0;
+}
+</style>
+<link href="rfc-local.css" rel="stylesheet" type="text/css">
+<script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
+</head>
+<body>
+<script src="metadata.min.js"></script>
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">ACVP DRBG</td>
+<td class="right">December 2025</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Vassilev</td>
+<td class="center">Expires 4 June 2026</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-vassilev-acvp-drbg-00</dd>
+<dt class="label-">:</dt>
+<dd></dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2025-12-01" class="published">1 December 2025</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2026-06-04">4 June 2026</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">A. Vassilev</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">ACVP Deterministic Random Bit Generator (DRBG) Algorithm JSON Specification</h1>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 4 June 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2025 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-acknowledgements" class="xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-abstract" class="xref">Abstract</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-conventions" class="xref">Conventions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-notation-conventions" class="xref">Notation conventions</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-terms-and-definitions" class="xref">Terms and Definitions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="xref">4.2.1</a>.  <a href="#name-prompt" class="xref">Prompt</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.2">
+                    <p id="section-toc.1-1.4.2.2.2.2.1"><a href="#section-4.2.2" class="xref">4.2.2</a>.  <a href="#name-registration" class="xref">Registration</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.3">
+                    <p id="section-toc.1-1.4.2.2.2.3.1"><a href="#section-4.2.3" class="xref">4.2.3</a>.  <a href="#name-response" class="xref">Response</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.4">
+                    <p id="section-toc.1-1.4.2.2.2.4.1"><a href="#section-4.2.4" class="xref">4.2.4</a>.  <a href="#name-test-case" class="xref">Test Case</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.5">
+                    <p id="section-toc.1-1.4.2.2.2.5.1"><a href="#section-4.2.5" class="xref">4.2.5</a>.  <a href="#name-test-group" class="xref">Test Group</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.6">
+                    <p id="section-toc.1-1.4.2.2.2.6.1"><a href="#section-4.2.6" class="xref">4.2.6</a>.  <a href="#name-test-vector-set" class="xref">Test Vector Set</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.7">
+                    <p id="section-toc.1-1.4.2.2.2.7.1"><a href="#section-4.2.7" class="xref">4.2.7</a>.  <a href="#name-validation" class="xref">Validation</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-supported-drbgs" class="xref">Supported DRBGs</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-counter-drbg-triple-des" class="xref">Counter DRBG Triple-DES</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-test-types-and-test-coverag" class="xref">Test Types and Test Coverage</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="xref">6.1</a>.  <a href="#name-test-coverage" class="xref">Test Coverage</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.1">
+                    <p id="section-toc.1-1.6.2.1.2.1.1"><a href="#section-6.1.1" class="xref">6.1.1</a>.  <a href="#name-requirements-covered" class="xref">Requirements Covered</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.2">
+                    <p id="section-toc.1-1.6.2.1.2.2.1"><a href="#section-6.1.2" class="xref">6.1.2</a>.  <a href="#name-requirements-not-covered" class="xref">Requirements Not Covered</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-capabilities-registration" class="xref">Capabilities Registration</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>.  <a href="#name-prerequisites" class="xref">Prerequisites</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>.  <a href="#name-drbg-algorithm-registration" class="xref">DRBG Algorithm Registration Properties</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="xref">7.3</a>.  <a href="#name-drbg-capabilities-json-valu" class="xref">DRBG Capabilities JSON Values</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="xref">7.4</a>.  <a href="#name-supported-values-per-drbg-o" class="xref">Supported values per DRBG option</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="xref">7.5</a>.  <a href="#name-drbg-registration-example" class="xref">DRBG Registration Example</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-test-vectors" class="xref">Test Vectors</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="xref">8.1</a>.  <a href="#name-test-groups" class="xref">Test Groups</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="xref">8.2</a>.  <a href="#name-test-cases" class="xref">Test Cases</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>.  <a href="#name-responses" class="xref">Responses</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="xref">11</a>. <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="xref">12</a>. <a href="#name-example-drbg-capabilities-j" class="xref">Example DRBG Capabilities JSON Object</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="xref">13</a>. <a href="#name-example-test-vectors-json-o" class="xref">Example Test Vectors JSON Object</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="xref">14</a>. <a href="#name-example-test-results-json-o" class="xref">Example Test Results JSON Object</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#section-15" class="xref">15</a>. <a href="#name-normative-references" class="xref">Normative References</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="xref"></a><a href="#name-authors-address" class="xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="acknowledgements">
+<section id="section-1">
+      <h2 id="name-acknowledgements">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      </h2>
+<div id="_d2e0b14a-cab8-c2e5-5cf6-9d1f8d7e58b6">
+<p id="section-1-1">There are no acknowledgements.<a href="#section-1-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="abstract">
+<section id="section-2">
+      <h2 id="name-abstract">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-abstract" class="section-name selfRef">Abstract</a>
+      </h2>
+<div id="_62fd48ea-c245-3a00-9288-ca31252f85a7">
+<p id="section-2-1">This document defines the JSON schema for testing SP800-90A DRBG implementations with the ACVP specification.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="introduction">
+<section id="section-3">
+      <h2 id="name-introduction">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<div id="_c830735b-31ba-d02e-0504-1327c50d256d">
+<p id="section-3-1">The Automated Crypto Validation Protocol (ACVP) defines a mechanism to automatically verify the cryptographic implementation of a software or hardware crypto module. The ACVP specification defines how a crypto module communicates with an ACVP server, including crypto capabilities negotiation, session management, authentication, vector processing and more. The ACVP specification does not define algorithm specific JSON constructs for performing the crypto validation. A series of ACVP sub-specifications define the constructs for testing individual crypto algorithms. Each sub-specification addresses a specific class of crypto algorithms. This sub-specification defines the JSON constructs for testing SP800-90A DRBG implementations using ACVP.<a href="#section-3-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_acd664f6-0546-9f88-417c-2692bf6040ef">
+<p id="section-3-2">This document is a work-product of the <a href="https://www.nist.gov/">NIST</a> <a href="https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program">Cryptographic Algorithm Validation Program</a> (CAVP). Please communicate questions and feedback concerning this document to the CAVP by opening an issue on the usnistgov/ACVP GitHub repository at <span><a href="https://github.com/usnistgov/ACVP/issues">https://github.com/usnistgov/ACVP/issues</a></span>.<a href="#section-3-2" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="conventions">
+<section id="section-4">
+      <h2 id="name-conventions">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-conventions" class="section-name selfRef">Conventions</a>
+      </h2>
+<div id="_notation_conventions">
+<section id="section-4.1">
+        <h3 id="name-notation-conventions">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-notation-conventions" class="section-name selfRef">Notation conventions</a>
+        </h3>
+<div id="_b7e183d7-7dba-8732-8609-26c81e45cbb5">
+<p id="section-4.1-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<strong>NOT RECOMMENDED</strong>", "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as described in BCP 14 of <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> and <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they appear in all capitals, as shown here.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="_terms_and_definitions">
+<section id="section-4.2">
+        <h3 id="name-terms-and-definitions">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-terms-and-definitions" class="section-name selfRef">Terms and Definitions</a>
+        </h3>
+<div id="_prompt">
+<section id="section-4.2.1">
+          <h4 id="name-prompt">
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-prompt" class="section-name selfRef">Prompt</a>
+          </h4>
+<div id="_6f238797-cfc8-f52a-3b19-07ca13d66db8">
+<p id="section-4.2.1-1">JSON sent from the server to the client describing the tests the client performs<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="_registration">
+<section id="section-4.2.2">
+          <h4 id="name-registration">
+<a href="#section-4.2.2" class="section-number selfRef">4.2.2. </a><a href="#name-registration" class="section-name selfRef">Registration</a>
+          </h4>
+<div id="_b86783ee-42ab-1523-d0f8-546e2acff429">
+<p id="section-4.2.2-1">The initial request from the client to the server describing the capabilities of one or several algorithm, mode and revision combinations<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="_response">
+<section id="section-4.2.3">
+          <h4 id="name-response">
+<a href="#section-4.2.3" class="section-number selfRef">4.2.3. </a><a href="#name-response" class="section-name selfRef">Response</a>
+          </h4>
+<div id="_8dac5260-e375-ce9d-a4b9-23ecf3a053d6">
+<p id="section-4.2.3-1">JSON sent from the client to the server in response to the prompt<a href="#section-4.2.3-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="_test_case">
+<section id="section-4.2.4">
+          <h4 id="name-test-case">
+<a href="#section-4.2.4" class="section-number selfRef">4.2.4. </a><a href="#name-test-case" class="section-name selfRef">Test Case</a>
+          </h4>
+<div id="_d5a5d975-dc72-0412-2c93-0de35a83a631">
+<p id="section-4.2.4-1">An individual unit of work within a prompt or response<a href="#section-4.2.4-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="_test_group">
+<section id="section-4.2.5">
+          <h4 id="name-test-group">
+<a href="#section-4.2.5" class="section-number selfRef">4.2.5. </a><a href="#name-test-group" class="section-name selfRef">Test Group</a>
+          </h4>
+<div id="_fbcbad3a-1d4d-7f83-aff6-d2103da16add">
+<p id="section-4.2.5-1">A collection of test cases that share similar properties within a prompt or response<a href="#section-4.2.5-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="_test_vector_set">
+<section id="section-4.2.6">
+          <h4 id="name-test-vector-set">
+<a href="#section-4.2.6" class="section-number selfRef">4.2.6. </a><a href="#name-test-vector-set" class="section-name selfRef">Test Vector Set</a>
+          </h4>
+<div id="_02b39c81-ec2d-cb7c-5fd8-08f7a534d615">
+<p id="section-4.2.6-1">A collection of test groups under a specific algorithm, mode, and revision<a href="#section-4.2.6-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="_validation">
+<section id="section-4.2.7">
+          <h4 id="name-validation">
+<a href="#section-4.2.7" class="section-number selfRef">4.2.7. </a><a href="#name-validation" class="section-name selfRef">Validation</a>
+          </h4>
+<div id="_ab5c70bb-8e81-4914-a1b4-51bde0127284">
+<p id="section-4.2.7-1">JSON sent from the server to the client that specifies the correctness of the response<a href="#section-4.2.7-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="supported">
+<section id="section-5">
+      <h2 id="name-supported-drbgs">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-supported-drbgs" class="section-name selfRef">Supported DRBGs</a>
+      </h2>
+<div id="_a1dfcd18-4fc0-aa11-7d65-f88a5e12b512">
+<p id="section-5-1">The following deterministic random bit generator algorithms <span class="bcp14">MAY</span> be advertised by the ACVP compliant cryptographic module:<a href="#section-5-1" class="pilcrow">¶</a></p>
+</div>
+<ul class="normal">
+<li class="normal" id="section-5-2.1">hashDRBG<a href="#section-5-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-5-2.2">hmacDRBG<a href="#section-5-2.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-5-2.3">ctrDRBG<a href="#section-5-2.3" class="pilcrow">¶</a>
+</li>
+      </ul>
+<div id="_counter_drbg_triple_des">
+<section id="section-5.1">
+        <h3 id="name-counter-drbg-triple-des">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-counter-drbg-triple-des" class="section-name selfRef">Counter DRBG Triple-DES</a>
+        </h3>
+<div id="_dccf196e-95b3-9ee8-c3ac-ee4281fa3b24">
+<p id="section-5.1-1">The "ctrDRBG-TDES" mode shall only be used with the three-key option of the Triple-DES algorithm.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="testtypes">
+<section id="section-6">
+      <h2 id="name-test-types-and-test-coverag">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-test-types-and-test-coverag" class="section-name selfRef">Test Types and Test Coverage</a>
+      </h2>
+<div id="_34577bb0-62a0-3cf5-713d-c1e218ca23a8">
+<p id="section-6-1">The ACVP server performs a set of tests on the IUT's DRBG in order to assess the correctness and robustness of the implementation. A typical ACVP validation session would require multiple tests to be performed for every supported permutation of DRBG capabilities. This section describes the design of the tests used to validate implementations of the DRBG algorithms. There is a single test type for DRBG testing:<a href="#section-6-1" class="pilcrow">¶</a></p>
+</div>
+<ul class="normal">
+<li class="normal" id="section-6-2.1">"AFT" - Algorithm Function Test. In the AFT test mode, the IUT <span class="bcp14">MUST</span> be capable of injecting the values provided by the ACVP server, into their IUT's implementation. The IUT is <span class="bcp14">REQUIRED</span> to run the DRBG function calls, depending on registration options, as defined in <a href="#tests_table" class="xref">Table 7</a><a href="#section-6-2.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+<div id="test_coverage">
+<section id="section-6.1">
+        <h3 id="name-test-coverage">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-test-coverage" class="section-name selfRef">Test Coverage</a>
+        </h3>
+<div id="_23bf90e6-4b30-94ea-3628-bb30755ae6ff">
+<p id="section-6.1-1">The tests described in this document have the intention of ensuring an implementation is conformant to <span>[<a href="#SP800-90A" class="xref">SP800-90A</a>]</span>.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+</div>
+<div id="requirements_covered">
+<section id="section-6.1.1">
+          <h4 id="name-requirements-covered">
+<a href="#section-6.1.1" class="section-number selfRef">6.1.1. </a><a href="#name-requirements-covered" class="section-name selfRef">Requirements Covered</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="section-6.1.1-1.1">SP 800-90A - 7.1 Entropy Input. The IUT is <span class="bcp14">REQUIRED</span> to inject the ACVP server's provided entropy for testing.<a href="#section-6.1.1-1.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.1-1.2">SP 800-90A - 7.2 Other Inputs. The IUT is <span class="bcp14">REQUIRED</span> to inject the ACVP server's provided other input information for testing.<a href="#section-6.1.1-1.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.1-1.3">SP 800-90A - 7.3 Internal State. Indirect testing of the IUT's DRBG internal state <span class="bcp14">SHALL</span> be inferred through multiple calls to the DRBG "generate" function.  Multiple calls <span class="bcp14">SHALL</span> ensure the internal state is successfully mutated for each "generate" invocation.<a href="#section-6.1.1-1.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.1-1.4">SP 800-90A - 7.4 The DRBG Mechanism Functions. "Instantiate", "Generate", and "Reseed" DRBG functions <span class="bcp14">SHALL</span> be tested within the ACVP server's provided tests.<a href="#section-6.1.1-1.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.1-1.5">SP 800-90A - 8 DRBG Mechanism Concepts and General Requirements. The ACVP server <span class="bcp14">SHALL</span> validate "Instantiate", "Generate", and "Reseed" are properly implemented. Reseeding is partially tested through ACVP test vectors through an explicit reseed operation.<a href="#section-6.1.1-1.5" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.1-1.6">SP 800-90A - 9 DRBG Mechanism Functions. "Instantiate", "Generate", and "Reseed" <span class="bcp14">SHALL</span> be evaluated as a part of ACVP generated tests.<a href="#section-6.1.1-1.6" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.1-1.7">SP 800-90A - 10 DRBG Algorithm Specifications. "Instantiate", "Generate", and "Reseed" DRBG functions in scope <span class="bcp14">SHALL</span> be tested as per the specifications in this section.<a href="#section-6.1.1-1.7" class="pilcrow">¶</a>
+</li>
+          </ul>
+</section>
+</div>
+<div id="requirements_not_covered">
+<section id="section-6.1.2">
+          <h4 id="name-requirements-not-covered">
+<a href="#section-6.1.2" class="section-number selfRef">6.1.2. </a><a href="#name-requirements-not-covered" class="section-name selfRef">Requirements Not Covered</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="section-6.1.2-1.1">SP 800-90A - 7.1 Entropy Input. The ACVP Server <span class="bcp14">SHALL</span> provide all instances of randomness to utilize from the IUT's perspective.  Implementation of the IUT's RBG <span class="bcp14">SHALL NOT</span> be in scope of testing.<a href="#section-6.1.2-1.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.2-1.2">SP 800-90A - 7.2 Other Inputs. The ACVP server <span class="bcp14">SHALL</span> provide all instances of randomness throughout the IUT's testing of the DRBG.<a href="#section-6.1.2-1.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.2-1.3">SP 800-90A - 7.3 Internal State. Though direct testing of the IUT's internal state <span class="bcp14">SHALL NOT</span> be not performed, the act of testing multiple "generate" outputs from the IUT DRBG helps to ensure a successful IUT implementation.<a href="#section-6.1.2-1.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.2-1.4">SP 800-90A - 7.4 The DRBG Mechanism Functions. "Uninstantiate", "Health Test" <span class="bcp14">SHALL NOT</span> be in scope of testing.<a href="#section-6.1.2-1.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.2-1.5">SP 800-90A - 8 DRBG Mechanism Concepts and General Requirements. The ACVP server <span class="bcp14">SHALL NOT</span> directly validate internal DRBG state. Additionally, DRBG boundaries are out of scope of ACVP testing. Seed construction is performed by the ACVP server, the IUT is <span class="bcp14">REQUIRED</span> to utilize the ACVP provided seed (via entropy, inputs, etc) to perform validation testing. Reseeds operations that are performed automatically due to a large number of generate operations, <span class="bcp14">SHALL NOT</span> be in scope of ACVP testing.<a href="#section-6.1.2-1.5" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.2-1.6">SP 800-90A - 9 DRBG Mechanism Functions. Error conditions (CATASTROPHIC_ERROR_FLAG or otherwise), reseeding due to end of seed life, uninstantiation, and health checks are out of scope of ACVP tests.<a href="#section-6.1.2-1.6" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.2-1.7">SP 800-90A - 10 DRBG Algorithm Specifications. All previously mentioned DRBG functions that are not in scope - Uninstantiate, Health check, automatic reseed, error conditions - <span class="bcp14">SHALL NOT</span> be tested as part of testing.<a href="#section-6.1.2-1.7" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.1.2-1.8">SP 800-90A - 11 Assurances. Health check and error handling testing <span class="bcp14">SHALL NOT</span> be performed within the scope of ACVP testing.<a href="#section-6.1.2-1.8" class="pilcrow">¶</a>
+</li>
+          </ul>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="capabilities">
+<section id="section-7">
+      <h2 id="name-capabilities-registration">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-capabilities-registration" class="section-name selfRef">Capabilities Registration</a>
+      </h2>
+<div id="_7e3b0e5e-d25c-9459-0835-24beadaaba90">
+<p id="section-7-1">ACVP requires crypto modules to register their capabilities. This allows the crypto module to advertise support for specific algorithms, notifying the ACVP server which algorithms need test vectors generated for the validation process.  This section describes the constructs for advertising support of DRBG algorithms to the ACVP server.<a href="#section-7-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_1ddb662f-1868-f9d8-9e11-084484362e77">
+<p id="section-7-2">The algorithm capabilities <span class="bcp14">MUST</span> be advertised as JSON objects within the 'algorithms' value of the ACVP registration message. The 'algorithms' value is an array, where each array element is an individual JSON object defined in this section. The 'algorithms' value is part of the 'capability_exchange' element of the ACVP JSON registration message. See the ACVP specification <span>[<a href="#ACVP" class="xref">ACVP</a>]</span> for more details on the registration message.<a href="#section-7-2" class="pilcrow">¶</a></p>
+</div>
+<div id="prerequisites">
+<section id="section-7.1">
+        <h3 id="name-prerequisites">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-prerequisites" class="section-name selfRef">Prerequisites</a>
+        </h3>
+<div id="_4890da51-a67d-09d4-48f9-fb08f86cddde">
+<p id="section-7.1-1">Each algorithm implementation <span class="bcp14">MAY</span> rely on other cryptographic primitives. For example, RSA Signature algorithms depend on an underlying hash function. Each of these underlying algorithm primitives must be validated, either separately or as part of the same submission. ACVP provides a mechanism for specifying the required prerequisites:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_3e953257-7272-2b33-c00a-2bed9af95c9a">
+<p id="section-7.1-2">Prerequisites, if applicable, <span class="bcp14">MUST</span> be submitted in the registration as the <code>prereqVals</code> JSON property array inside each element of the <code>algorithms</code> array. Each element in the <code>prereqVals</code> array <span class="bcp14">MUST</span> contain the following properties<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+</div>
+<span id="name-prerequisite-properties"></span><div id="_d03e6fdc-e7b6-4139-dcfd-db8660c4e235">
+<table class="center" id="table-1">
+          <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-prerequisite-properties" class="selfRef">Prerequisite Properties</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">JSON Property</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">JSON Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">algorithm</td>
+              <td class="text-left" rowspan="1" colspan="1">a prerequisite algorithm</td>
+              <td class="text-left" rowspan="1" colspan="1">string</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">valValue</td>
+              <td class="text-left" rowspan="1" colspan="1">algorithm validation number</td>
+              <td class="text-left" rowspan="1" colspan="1">string</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<div id="_0a72cea6-ccf9-7153-e4ee-49ea901b3f48">
+<p id="section-7.1-4">A "valValue" of "same" <span class="bcp14">SHALL</span> be used to indicate that the prerequisite is being met by a different algorithm in the capability exchange in the same registration.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+</div>
+<div id="_ac2e6dd1-1c21-2697-62f4-ac6a61395255">
+<p id="section-7.1-5">An example description of prerequisites within a single algorithm capability exchange looks like this<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+</div>
+<div id="_be77c0e0-11e6-738f-d7b1-e662ff2b9968">
+<div id="section-7.1-6">
+<pre class="lang-json sourcecode">"prereqVals":
+[
+  {
+    "algorithm": "Alg1",
+    "valValue": "Val-1234"
+  },
+  {
+    "algorithm": "Alg2",
+    "valValue": "same"
+  }
+]</pre><a href="#section-7.1-6" class="pilcrow">¶</a>
+</div>
+</div>
+</section>
+</div>
+<div id="properties">
+<section id="section-7.2">
+        <h3 id="name-drbg-algorithm-registration">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-drbg-algorithm-registration" class="section-name selfRef">DRBG Algorithm Registration Properties</a>
+        </h3>
+<div id="_8019d45a-3364-9fc4-8c08-36a4f58d1b00">
+<p id="section-7.2-1">Each SP800-90A DRBG algorithm capability advertised is a self-contained JSON object using the following values.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+</div>
+<span id="name-drbg-algorithm-capabilities"></span><div id="caps-table">
+<table class="center" id="table-2">
+          <caption>
+<a href="#table-2" class="selfRef">Table 2</a>:
+<a href="#name-drbg-algorithm-capabilities" class="selfRef">DRBG Algorithm Capabilities JSON Values</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">JSON Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">JSON type</th>
+              <th class="text-left" rowspan="1" colspan="1">Valid Values</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">algorithm</td>
+              <td class="text-left" rowspan="1" colspan="1">The DRBG algorithm to be validated</td>
+              <td class="text-left" rowspan="1" colspan="1">string</td>
+              <td class="text-left" rowspan="1" colspan="1">See <a href="#supported" class="xref">Section 5</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">revision</td>
+              <td class="text-left" rowspan="1" colspan="1">ACVP Test version</td>
+              <td class="text-left" rowspan="1" colspan="1">string</td>
+              <td class="text-left" rowspan="1" colspan="1">"1.0"</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">prereqVals</td>
+              <td class="text-left" rowspan="1" colspan="1">Prerequisite algorithm validations</td>
+              <td class="text-left" rowspan="1" colspan="1">object with algorithm and valValue properties</td>
+              <td class="text-left" rowspan="1" colspan="1">See above</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">predResistanceEnabled</td>
+              <td class="text-left" rowspan="1" colspan="1">An implementation that can be used with prediction resistance. See the notes in <a href="#caps_sec" class="xref">Section 7.3</a>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">array of boolean containing one or two distinct values</td>
+              <td class="text-left" rowspan="1" colspan="1">[true], [true, false], or [false]</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">reseedImplemented</td>
+              <td class="text-left" rowspan="1" colspan="1">Reseeding of the DRBG shall be performed in accordance with the specification for the given DRBG mechanism. See the notes in <a href="#caps_sec" class="xref">Section 7.3</a>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">boolean</td>
+              <td class="text-left" rowspan="1" colspan="1">true or false</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">capabilities</td>
+              <td class="text-left" rowspan="1" colspan="1">The individual DRBG capabilities</td>
+              <td class="text-left" rowspan="1" colspan="1">array of capability objects</td>
+              <td class="text-left" rowspan="1" colspan="1">See <a href="#capabilities-table" class="xref">Table 3</a>
+</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="caps_sec">
+<section id="section-7.3">
+        <h3 id="name-drbg-capabilities-json-valu">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-drbg-capabilities-json-valu" class="section-name selfRef">DRBG Capabilities JSON Values</a>
+        </h3>
+<div id="_3ee6f8f4-81fd-c0f0-806c-f9d314b10c58">
+<p id="section-7.3-1">ACVP has default values for many of the input parameters for testing the DRBG algorithms. For example, the Entropy Input, Nonce, Personalization String, and Addtional Input parameters have default values. The specific details and restrictions on each of these input lengths is specified in this section and in <a href="#value_req_per_option" class="xref">Section 7.4</a>. To indicate a preference for using a default value for any of these parameters, the value zero (0) should be set. If the implementation does not support one of these defaults, the corresponding supported bit length values shall be set explicitly.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_aec8be5e-6daf-dcb9-0365-8991ae6bcb09">
+<p id="section-7.3-2">Each DRBG algorithm capability advertised is a self-contained JSON object. A registration <span class="bcp14">SHALL</span> use these properties within each object within the 'capabilities' property.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+</div>
+<span id="name-registration-capability-jso"></span><div id="capabilities-table">
+<table class="center" id="table-3">
+          <caption>
+<a href="#table-3" class="selfRef">Table 3</a>:
+<a href="#name-registration-capability-jso" class="selfRef">Registration Capability JSON Values</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">JSON Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">JSON type</th>
+              <th class="text-left" rowspan="1" colspan="1">Valid Values</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">mode</td>
+              <td class="text-left" rowspan="1" colspan="1">The algorithm mode to be validated</td>
+              <td class="text-left" rowspan="1" colspan="1">string</td>
+              <td class="text-left" rowspan="1" colspan="1">See the mode column of <a href="#supported_values" class="xref">Table 4</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">derFuncEnabled</td>
+              <td class="text-left" rowspan="1" colspan="1">Derivation function option. See the notes below.</td>
+              <td class="text-left" rowspan="1" colspan="1">boolean</td>
+              <td class="text-left" rowspan="1" colspan="1">true/false</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">entropyInputLen</td>
+              <td class="text-left" rowspan="1" colspan="1">See the notes below.</td>
+              <td class="text-left" rowspan="1" colspan="1">domain</td>
+              <td class="text-left" rowspan="1" colspan="1">Min: maximum security strength (see <a href="#supported_values" class="xref">Table 4</a>), Max: See <a href="#supported_values" class="xref">Table 4</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">nonceLen</td>
+              <td class="text-left" rowspan="1" colspan="1">See the notes below.</td>
+              <td class="text-left" rowspan="1" colspan="1">domain</td>
+              <td class="text-left" rowspan="1" colspan="1">Min: half the maximum security strength (see <a href="#supported_values" class="xref">Table 4</a>), Max: See <a href="#supported_values" class="xref">Table 4</a>. Set to 0 if not supported.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">persoStringLen</td>
+              <td class="text-left" rowspan="1" colspan="1">Personalization string length. See the notes below.</td>
+              <td class="text-left" rowspan="1" colspan="1">domain</td>
+              <td class="text-left" rowspan="1" colspan="1">Min: maximum security strength (see <a href="#supported_values" class="xref">Table 4</a>), Max: See <a href="#supported_values" class="xref">Table 4</a>. Set to 0 if not supported</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">additionalInputLen</td>
+              <td class="text-left" rowspan="1" colspan="1">See the notes below.</td>
+              <td class="text-left" rowspan="1" colspan="1">domain</td>
+              <td class="text-left" rowspan="1" colspan="1">Min: maximum security strength (see <a href="#supported_values" class="xref">Table 4</a>), Max: See <a href="#supported_values" class="xref">Table 4</a>. Set to 0 if not supported</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">returnedBitsLen</td>
+              <td class="text-left" rowspan="1" colspan="1">Returned bits length</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+              <td class="text-left" rowspan="1" colspan="1">Min: See <a href="#supported_values" class="xref">Table 4</a>, Max: 4096.</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<div id="_0edb3265-4b4b-4e17-4ea2-8427af38a392">
+<aside id="section-7.3-4">
+          <p id="section-7.3-4.1">NOTE  1: If an implementation utilizes a nonce in the construction of a seed during instantiation, the length of the nonce shall be at least half the maximum security strength supported. See Tables 2 and 3 in <span>[<a href="#SP800-90A" class="xref">SP800-90A</a>]</span> for help on choosing appropriate parameter values for the tested DRBG implementation. Per allowances in <span>[<a href="#SP800-90A" class="xref">SP800-90A</a>]</span>, the length of the nonce may be less than 1/2 the maximum security strength supported as long as the entropy input length + the nonce length &gt;= 3/2 security strength.<a href="#section-7.3-4.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+<div id="_97e6a506-a1e4-5760-da8d-716a63af74f9">
+<aside id="section-7.3-5">
+          <p id="section-7.3-5.1">NOTE  2: If an implementation can only be used without prediction resistance, the array 'predResistanceEnabled' shall only contain a single 'false' element. Implementations that either have prediction resistance always ON or always OFF, the array 'predResistanceEnabled' shall contain two distinct elements, 'true' and 'false'. Implementations containing multiple equal array elements for 'predResistanceEnabled' will be rejected.<a href="#section-7.3-5.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+<div id="_6b1335e9-821a-0738-b0e4-3cfb4527ce45">
+<aside id="section-7.3-6">
+          <p id="section-7.3-6.1">NOTE  3: For 'ctrDRBG' implementations, the 'derFuncEnabled' property must be included. For 'hashDRBG' or 'hmacDRBG' implementations, the 'derFuncEnabled' property must be omitted or set to false.<a href="#section-7.3-6.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+<div id="_04899943-5caa-235e-c9e1-89f90374bd56">
+<aside id="section-7.3-7">
+          <p id="section-7.3-7.1">NOTE  4: All DRBGs are tested at their maximum supported security strength so this is the minimum bit length of the entropy input that ACVP will accept. The maximum supported security strength is also the default value for this input. Longer entropy inputs are permitted, with the following exception: for 'ctrDRBG' with 'derFuncEnabled' set to 'false', the 'entropyInputLen' must equal the seed length. See Tables 2 and 3 in <span>[<a href="#SP800-90A" class="xref">SP800-90A</a>]</span> for help on choosing appropriate parameter values for the DRBG being tested.<a href="#section-7.3-7.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+<div id="_7763d34e-6cc2-7985-6478-43240987bde9">
+<aside id="section-7.3-8">
+          <p id="section-7.3-8.1">NOTE  5: 'ctrDRBG' with 'derFuncEnabled' set to 'false' does not use a nonce; A value of 0 shall be provided for nonceLen when testing 'ctrDRBG' with 'derFuncEnabled' set to 'false'.<a href="#section-7.3-8.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+<div id="_f83c6380-750e-1daa-de72-a0ec2198f12c">
+<aside id="section-7.3-9">
+          <p id="section-7.3-9.1">NOTE  6: ACVP allows bit length values for 'persoString' ranging from the maximum supported security strength except in the case of 'derFuncEnabled' set to 'false', where the second personalization string length must be less than or equal to the seed length. If the implementation only supports one personalization string length, then set only that value as the range min and max and set the step to 0. If the implementation does not use a 'persoString', set all range parameters (min, max, step) to 0. If the implementation can work with and without 'persoString', set the min to 0, set the max to at least the maximum supported strength and set the step equal to at least the maximum supported strength to avoid testing lengths less than that. See Tables 2 and 3 in <span>[<a href="#SP800-90A" class="xref">SP800-90A</a>]</span> for help on choosing appropriate parameter values for the tested DRBG implementation.<a href="#section-7.3-9.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+<div id="_9a9afb7e-e501-4f0f-2620-564535a36937">
+<aside id="section-7.3-10">
+          <p id="section-7.3-10.1">NOTE  7: The 'addtionalInput' configuration and restrictions are the same as those for the 'persoString'.<a href="#section-7.3-10.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+</section>
+</div>
+<div id="value_req_per_option">
+<section id="section-7.4">
+        <h3 id="name-supported-values-per-drbg-o">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-supported-values-per-drbg-o" class="section-name selfRef">Supported values per DRBG option</a>
+        </h3>
+<div id="_b551a74b-5efe-0980-ac5a-e7825ad5593c">
+<p id="section-7.4-1">DRBG minimum/maximum values for the properties listed in <a href="#capabilities-table" class="xref">Table 3</a> vary depending on the DRBG capabilities registered. The following table lists those values.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+</div>
+<span id="name-supported-drbg-values"></span><div id="supported_values">
+<table class="center" id="table-4">
+          <caption>
+<a href="#table-4" class="selfRef">Table 4</a>:
+<a href="#name-supported-drbg-values" class="selfRef">Supported DRBG Values</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">DRBG Algorithm</th>
+              <th class="text-left" rowspan="1" colspan="1">Mode</th>
+              <th class="text-left" rowspan="1" colspan="1">Derivation Function</th>
+              <th class="text-left" rowspan="1" colspan="1">Max Security Strength</th>
+              <th class="text-left" rowspan="1" colspan="1">Min Entropy Len</th>
+              <th class="text-left" rowspan="1" colspan="1">Max Entropy Len</th>
+              <th class="text-left" rowspan="1" colspan="1">Max PersoString</th>
+              <th class="text-left" rowspan="1" colspan="1">Max Addl String</th>
+              <th class="text-left" rowspan="1" colspan="1">Min Nonce Len (please see the note following this table)</th>
+              <th class="text-left" rowspan="1" colspan="1">Max Nonce Len</th>
+              <th class="text-left" rowspan="1" colspan="1">Min returnedBits Len</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"AES-128"</td>
+              <td class="text-left" rowspan="1" colspan="1">TRUE</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">64</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"AES-192"</td>
+              <td class="text-left" rowspan="1" colspan="1">TRUE</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">96</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"AES-256"</td>
+              <td class="text-left" rowspan="1" colspan="1">TRUE</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"TDES"</td>
+              <td class="text-left" rowspan="1" colspan="1">TRUE</td>
+              <td class="text-left" rowspan="1" colspan="1">112</td>
+              <td class="text-left" rowspan="1" colspan="1">112</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">56</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">64</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"AES-128"</td>
+              <td class="text-left" rowspan="1" colspan="1">FALSE</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"AES-192"</td>
+              <td class="text-left" rowspan="1" colspan="1">FALSE</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">320</td>
+              <td class="text-left" rowspan="1" colspan="1">320</td>
+              <td class="text-left" rowspan="1" colspan="1">320</td>
+              <td class="text-left" rowspan="1" colspan="1">320</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"AES-256"</td>
+              <td class="text-left" rowspan="1" colspan="1">FALSE</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ctrDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"TDES"</td>
+              <td class="text-left" rowspan="1" colspan="1">FALSE</td>
+              <td class="text-left" rowspan="1" colspan="1">112</td>
+              <td class="text-left" rowspan="1" colspan="1">232</td>
+              <td class="text-left" rowspan="1" colspan="1">232</td>
+              <td class="text-left" rowspan="1" colspan="1">232</td>
+              <td class="text-left" rowspan="1" colspan="1">232</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">64</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA-1"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">64</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">160</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-224"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">96</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">224</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-256"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-384"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-512"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">512</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-512/224"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">96</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">224</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-512/256"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-224"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">96</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">224</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-256"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-384"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hashDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-512"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">512</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA-1"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">64</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">160</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-224"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">96</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">224</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-256"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-384"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-512"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">512</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-512/224"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">96</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">224</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA2-512/256"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-224"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">192</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">96</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">224</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-256"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-384"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">384</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">hmacDRBG</td>
+              <td class="text-left" rowspan="1" colspan="1">"SHA3-512"</td>
+              <td class="text-left" rowspan="1" colspan="1">N/A</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">128</td>
+              <td class="text-left" rowspan="1" colspan="1">65536</td>
+              <td class="text-left" rowspan="1" colspan="1">512</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<div id="_cf0ebc1a-89ce-aa58-3877-27f1bf60b3fb">
+<aside id="section-7.4-3">
+          <p id="section-7.4-3.1">NOTE: If an implementation utilizes a nonce in the construction of a seed during instantiation, the length of the nonce shall be at least half the maximum security strength supported. The values listed in the Min Nonce Len column of <a href="#supported_values" class="xref">Table 4</a> are the maximum security strength / 2. Per allowances in <span>[<a href="#SP800-90A" class="xref">SP800-90A</a>]</span>, the length of a nonce may be less than 1/2 the maximum security strength supported as long as the entropy input length + the nonce length &gt;= 3/2 security strength. If the entropy input length is &gt;= 3/2 security strength the minimum nonce length will be 0.<a href="#section-7.4-3.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+</section>
+</div>
+<div id="_drbg_registration_example">
+<section id="section-7.5">
+        <h3 id="name-drbg-registration-example">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-drbg-registration-example" class="section-name selfRef">DRBG Registration Example</a>
+        </h3>
+<div id="_92ed017f-0d19-b4ba-235e-1a9eb45b5453">
+<p id="section-7.5-1">The following is an example registration.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_d3a13cf4-071a-4c34-df05-787f86e73832">
+<div id="section-7.5-2">
+<pre class="lang-json sourcecode">{
+  "algorithm": "ctrDRBG",
+  "revision": "1.0",
+  "predResistanceEnabled": [
+    true,
+    false
+  ],
+  "reseedImplemented": true,
+  "capabilities": [
+    {
+      "mode": "TDES",
+      "derFuncEnabled": true,
+      "entropyInputLen": [
+        232
+      ],
+      "nonceLen": [
+        232
+      ],
+      "persoStringLen": [
+        232
+      ],
+      "additionalInputLen": [
+        232
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "AES-128",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        256
+      ],
+      "nonceLen": [
+        256
+      ],
+      "persoStringLen": [
+        256
+      ],
+      "additionalInputLen": [
+        256
+      ],
+      "returnedBitsLen": 512
+    }
+  ]
+}</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="test-vectors">
+<section id="section-8">
+      <h2 id="name-test-vectors">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-test-vectors" class="section-name selfRef">Test Vectors</a>
+      </h2>
+<div id="_112e0b64-4d3c-5aa5-6f52-8b4539b17511">
+<p id="section-8-1">The ACVP server provides test vectors to the ACVP client, which are then processed and returned to the ACVP server for validation. A typical ACVP validation test session would require multiple test vector sets to be downloaded and processed by the ACVP client. Each test vector set represents an individual cryptographic algorithm defined during the capability exchange. This section describes the JSON schema for a test vector set used with SP800-90A DRBG algorithms.<a href="#section-8-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_782c16c8-c3eb-e7fb-fee8-194bf0546cb0">
+<p id="section-8-2">The test vector set JSON schema is a multi-level hierarchy that contains meta data for the entire vector set as well as individual test vectors to be processed by the ACVP client. The following table describes the JSON elements at the top level of the hierarchy.<a href="#section-8-2" class="pilcrow">¶</a></p>
+</div>
+<span id="name-top-level-test-vector-json-"></span><div id="_0bfe0a60-36d9-ab75-25e3-8d777d6e5f2c">
+<table class="center" id="table-5">
+        <caption>
+<a href="#table-5" class="selfRef">Table 5</a>:
+<a href="#name-top-level-test-vector-json-" class="selfRef">Top Level Test Vector JSON Elements</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">JSON Values</th>
+            <th class="text-left" rowspan="1" colspan="1">Description</th>
+            <th class="text-left" rowspan="1" colspan="1">JSON Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">acvVersion</td>
+            <td class="text-left" rowspan="1" colspan="1">Protocol version identifier</td>
+            <td class="text-left" rowspan="1" colspan="1">string</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">vsId</td>
+            <td class="text-left" rowspan="1" colspan="1">Unique numeric vector set identifier</td>
+            <td class="text-left" rowspan="1" colspan="1">integer</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">algorithm</td>
+            <td class="text-left" rowspan="1" colspan="1">Algorithm defined in the capability exchange</td>
+            <td class="text-left" rowspan="1" colspan="1">string</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">mode</td>
+            <td class="text-left" rowspan="1" colspan="1">Mode defined in the capability exchange</td>
+            <td class="text-left" rowspan="1" colspan="1">string</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">revision</td>
+            <td class="text-left" rowspan="1" colspan="1">Protocol test revision selected</td>
+            <td class="text-left" rowspan="1" colspan="1">string</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">testGroups</td>
+            <td class="text-left" rowspan="1" colspan="1">Array of test group JSON objects, which are defined in <a href="#tgjs" class="xref">Section 8.1</a>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">array</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<div id="_407c784d-e345-056e-2cf0-5378c7323eee">
+<p id="section-8-4">An example of this would look like this<a href="#section-8-4" class="pilcrow">¶</a></p>
+</div>
+<div id="_a54a4f88-23f4-db57-b118-fa996dac9cf2">
+<div id="section-8-5">
+<pre class="lang-json sourcecode">[
+  {
+    "acvVersion": &lt;version&gt;
+  },
+  {
+    "vsId": 1,
+    "algorithm": "Alg1",
+    "mode": "Mode1",
+    "revision": "Revision1.0",
+    "testGroups": [ ... ]
+  }
+]</pre><a href="#section-8-5" class="pilcrow">¶</a>
+</div>
+</div>
+<div id="tgjs">
+<section id="section-8.1">
+        <h3 id="name-test-groups">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-test-groups" class="section-name selfRef">Test Groups</a>
+        </h3>
+<div id="_f16b40bb-49f7-3603-43f4-0ad2cc9e34a5">
+<p id="section-8.1-1">The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the SP800-90A DRBG JSON elements of the Test Group JSON object<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+</div>
+<span id="name-test-group-json-object"></span><div id="prompt_group_table">
+<table class="center" id="table-6">
+          <caption>
+<a href="#table-6" class="selfRef">Table 6</a>:
+<a href="#name-test-group-json-object" class="selfRef">Test Group JSON Object</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">JSON Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">JSON type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">tgId</td>
+              <td class="text-left" rowspan="1" colspan="1">Test group identifier</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">mode</td>
+              <td class="text-left" rowspan="1" colspan="1">The mode of the DRBG, see <a href="#supported" class="xref">Section 5</a>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">string</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">derFunc</td>
+              <td class="text-left" rowspan="1" colspan="1">Use derivation function or not</td>
+              <td class="text-left" rowspan="1" colspan="1">boolean</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">predResistance</td>
+              <td class="text-left" rowspan="1" colspan="1">Use prediction resistance</td>
+              <td class="text-left" rowspan="1" colspan="1">boolean</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">reSeed</td>
+              <td class="text-left" rowspan="1" colspan="1">Use reseeding</td>
+              <td class="text-left" rowspan="1" colspan="1">boolean</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">entropyInputLen</td>
+              <td class="text-left" rowspan="1" colspan="1">Entropy length</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">nonceLen</td>
+              <td class="text-left" rowspan="1" colspan="1">Nonce length; set to 0 if not used/supported. See also notes after <a href="#capabilities-table" class="xref">Table 3</a> above</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">persoStringLen</td>
+              <td class="text-left" rowspan="1" colspan="1">Personalization string length; set to 0 if not used/supported. See also notes after <a href="#capabilities-table" class="xref">Table 3</a> above</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">additonalInputLen</td>
+              <td class="text-left" rowspan="1" colspan="1">Additional input length; set to 0 if not used/supported. See also notes after <a href="#capabilities-table" class="xref">Table 3</a> above</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">returnedBitsLen</td>
+              <td class="text-left" rowspan="1" colspan="1">returned bits length</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">tests</td>
+              <td class="text-left" rowspan="1" colspan="1">Array of individual test cases</td>
+              <td class="text-left" rowspan="1" colspan="1">array</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<div id="_f191e042-9014-199c-980b-642ad3e7be88">
+<p id="section-8.1-3">The 'tgId', 'testType' and 'tests' objects <span class="bcp14">MUST</span> appear in every test group element communicated from the server to the client as a part of a prompt. Other properties are dependent on which 'testType' (see <a href="#testtypes" class="xref">Section 6</a>) the group is addressing.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+</div>
+<div id="_8432b81e-cf9c-e91b-6c6e-f1b6d487fb8c">
+<aside id="section-8.1-4">
+          <p id="section-8.1-4.1">NOTE: 11 According to SP 800-90A <span>[<a href="#SP800-90A" class="xref">SP800-90A</a>]</span>, a DRBG implementation has two separate controls for determining the correct test procedure for handling addtional entropy and other data in providing prediction resistance assurances. Depending on the capabilities advertised by the predResistanceEnabled and reseedImplemented flags ACVP generates test data according to the following test scenarios:<a href="#section-8.1-4.1" class="pilcrow">¶</a></p>
+</aside>
+</div>
+<span id="name-generated-test-data-per-sce"></span><div id="tests_table">
+<table class="center" id="table-7">
+          <caption>
+<a href="#table-7" class="selfRef">Table 7</a>:
+<a href="#name-generated-test-data-per-sce" class="selfRef">Generated Test Data per Scenario</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Prediction Resistance Assurance Options</th>
+              <th class="text-left" rowspan="1" colspan="1">Test Procedure</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">"predResistanceEnabled" : true; "reseedImplemented": true</td>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Instantiate DRBG</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Generate but don't output</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Generate output</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Uninstantiate</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">"predResistanceEnabled" : false; "reseedImplemented" : true</td>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Instantiate DRBG</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Reseed</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Generate but don't output</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Generate output</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Uninstantiate</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">"predResistanceEnabled" : true/false; "reseedImplemented": false</td>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Instantiate DRBG</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Generate but don't output</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Generate output</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1"></td>
+              <td class="text-left" rowspan="1" colspan="1">Uninstantiate</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="_test_cases">
+<section id="section-8.2">
+        <h3 id="name-test-cases">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-test-cases" class="section-name selfRef">Test Cases</a>
+        </h3>
+<div id="_16924675-dd23-1cd3-b151-19cc92f6b235">
+<p id="section-8.2-1">Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each SP800-90A DRBG test vector.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+</div>
+<span id="name-test-case-json-object"></span><div id="cases_table">
+<table class="center" id="table-8">
+          <caption>
+<a href="#table-8" class="selfRef">Table 8</a>:
+<a href="#name-test-case-json-object" class="selfRef">Test Case JSON Object</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">JSON Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">JSON type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">tcId</td>
+              <td class="text-left" rowspan="1" colspan="1">Test case idenfitier</td>
+              <td class="text-left" rowspan="1" colspan="1">integer</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">entropyInput</td>
+              <td class="text-left" rowspan="1" colspan="1">Entropy value</td>
+              <td class="text-left" rowspan="1" colspan="1">hex</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">nonce</td>
+              <td class="text-left" rowspan="1" colspan="1">Value of the nonce</td>
+              <td class="text-left" rowspan="1" colspan="1">hex</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">persoString</td>
+              <td class="text-left" rowspan="1" colspan="1">value of the personlization string</td>
+              <td class="text-left" rowspan="1" colspan="1">hex</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">otherInput</td>
+              <td class="text-left" rowspan="1" colspan="1">array of additonal input/entropy input value pairs for testing. See <a href="#other_input_table" class="xref">Table 9</a>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">array</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<div id="_88365ef4-1af3-1240-07dc-8066c8561d9b">
+<p id="section-8.2-3">Each test group contains an array of one or more tests. Each test object contains an otherInput object, which is an array of objects, each with the intendedUse property indicating if the particular test data is to be used for reSeed or generate - see <a href="#tests_table" class="xref">Table 7</a>. Each test vector is a JSON object that represents a single test case to be processed by the ACVP client.  The following table describes the JSON elements for each DRBG predcition resistance test vector.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+</div>
+<span id="name-drbg-predictive-resistance-"></span><div id="other_input_table">
+<table class="center" id="table-9">
+          <caption>
+<a href="#table-9" class="selfRef">Table 9</a>:
+<a href="#name-drbg-predictive-resistance-" class="selfRef">DRBG Predictive Resistance JSON Elements</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">JSON Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">JSON type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">additionalInput</td>
+              <td class="text-left" rowspan="1" colspan="1">value of the additional input string to use in predition resistance tests</td>
+              <td class="text-left" rowspan="1" colspan="1">hex</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">entropyInput</td>
+              <td class="text-left" rowspan="1" colspan="1">value of the entropy input to use in prediction resistance tests</td>
+              <td class="text-left" rowspan="1" colspan="1">hex</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">intendedUse</td>
+              <td class="text-left" rowspan="1" colspan="1">"reSeed", "generate"</td>
+              <td class="text-left" rowspan="1" colspan="1">string</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<div id="_3234dcda-437e-f16c-10d8-b4371d754817">
+<p id="section-8.2-5">Here is an abbreviated yet fully constructed example of the prompt<a href="#section-8.2-5" class="pilcrow">¶</a></p>
+</div>
+<div id="_bfd691ea-7183-7c08-d765-86f2be37a19c">
+<div id="section-8.2-6">
+<pre class="lang-json sourcecode">{
+  "vsId": 1,
+  "algorithm": "ctrDRBG",
+  "revision": "1.0",
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "derFunc": true,
+      "reSeed": true,
+      "predResistance": true,
+      "entropyInputLen": 256,
+      "nonceLen": 256,
+      "persoStringLen": 256,
+      "additionalInputLen": 256,
+      "returnedBitsLen": 512,
+      "mode": "AES-128",
+      "tests": [
+        {
+          "tcId": 1,
+          "entropyInput": "E9EDA8BF1E6155BDF11AD74E2702004C20B39...",
+          "nonce": "D77D611F0665CBFD7E00D5E5118629F5F40996B764F0...",
+          "persoString": "E9ADEA726418EF002C03DC2196296D4B273AB6...",
+          "otherInput": [
+            {
+              "intendedUse": "generate",
+              "additionalInput": "52F47C6A1B12C202D309D062C3EE09...",
+              "entropyInput": "C30F4C916B90A79B5764DC6FA950B3F34..."
+            },
+            {
+              "intendedUse": "generate",
+              "additionalInput": "4FFDE712D249A99006F46D7070D5CA...",
+              "entropyInput": "8A4724F1514C480DE1604C5D870CFA464..."
+            }
+          ]
+        },
+        {
+          "tcId": 2,
+          "entropyInput": "DC1B4E9B1782A9E701CB2A74EDBDF483462E9...",
+          "nonce": "A5B7D117BDE77D46A65DBD0EBA085C4376C7B72F164E...",
+          "persoString": "D7FC54DD4E759C8D3FCE61463ED40BE130D2B4...",
+          "otherInput": [
+            {
+              "intendedUse": "generate",
+              "additionalInput": "28EFD5114D06D1A065863C50BDD2DE...",
+              "entropyInput": "F5C9DF132A4C066C5D0AFEE79FBC7EB07..."
+            },
+            {
+              "intendedUse": "generate",
+              "additionalInput": "D1AACBAE8BA37208161CBA9042BB92...",
+              "entropyInput": "5C6D2F80696D1691FCA40B0C3444CE927..."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}</pre><a href="#section-8.2-6" class="pilcrow">¶</a>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="responses">
+<section id="section-9">
+      <h2 id="name-responses">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-responses" class="section-name selfRef">Responses</a>
+      </h2>
+<div id="_571c6c3f-113c-7d84-4e22-151332feb6a0">
+<p id="section-9-1">After the ACVP client downloads and processes a vector set, it must send the response vectors back to the ACVP server. The following table describes the JSON object that represents a vector set response.<a href="#section-9-1" class="pilcrow">¶</a></p>
+</div>
+<span id="name-vector-set-response-json-ob"></span><div id="response_vector_set_table">
+<table class="center" id="table-10">
+        <caption>
+<a href="#table-10" class="selfRef">Table 10</a>:
+<a href="#name-vector-set-response-json-ob" class="selfRef">Vector Set Response JSON Object</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">JSON Property</th>
+            <th class="text-left" rowspan="1" colspan="1">Description</th>
+            <th class="text-left" rowspan="1" colspan="1">JSON Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">acvVersion</td>
+            <td class="text-left" rowspan="1" colspan="1">The version of the protocol</td>
+            <td class="text-left" rowspan="1" colspan="1">string</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">vsId</td>
+            <td class="text-left" rowspan="1" colspan="1">The vector set identifier</td>
+            <td class="text-left" rowspan="1" colspan="1">integer</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">testGroups</td>
+            <td class="text-left" rowspan="1" colspan="1">The test group data</td>
+            <td class="text-left" rowspan="1" colspan="1">array</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<div id="_e268bc1a-6e95-6811-34ce-c7dfced18dd0">
+<p id="section-9-3">An example of this is the following<a href="#section-9-3" class="pilcrow">¶</a></p>
+</div>
+<div id="_8dd077a2-d60d-383c-29bc-198548eb0568">
+<div id="section-9-4">
+<pre class="lang-json sourcecode">{
+        "acvVersion": "version",
+        "vsId": 1,
+        "testGroups": [ ... ]
+}</pre><a href="#section-9-4" class="pilcrow">¶</a>
+</div>
+</div>
+<div id="_15da3a1a-ff21-fad1-a0c6-d598fdb158e4">
+<p id="section-9-5">The testGroups section is used to organize the ACVP client response in a similar manner to how it receives vectors. Several algorithms <span class="bcp14">SHALL</span> require the client to send back group level properties in their response. This structure helps accommodate that.<a href="#section-9-5" class="pilcrow">¶</a></p>
+</div>
+<span id="name-vector-set-group-response-j"></span><div id="response_group_table">
+<table class="center" id="table-11">
+        <caption>
+<a href="#table-11" class="selfRef">Table 11</a>:
+<a href="#name-vector-set-group-response-j" class="selfRef">Vector Set Group Response JSON Object</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">JSON Property</th>
+            <th class="text-left" rowspan="1" colspan="1">Description</th>
+            <th class="text-left" rowspan="1" colspan="1">JSON Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">tgId</td>
+            <td class="text-left" rowspan="1" colspan="1">The test group identifier</td>
+            <td class="text-left" rowspan="1" colspan="1">integer</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">tests</td>
+            <td class="text-left" rowspan="1" colspan="1">The test case data</td>
+            <td class="text-left" rowspan="1" colspan="1">array</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<div id="_a0e8bfee-d640-d6dd-9b39-81c0c2ffe117">
+<p id="section-9-7">An example of this is the following<a href="#section-9-7" class="pilcrow">¶</a></p>
+</div>
+<div id="_b9b24664-8863-99e6-1bd9-9e4c2f1d15cc">
+<div id="section-9-8">
+<pre class="lang-json sourcecode">{
+        "tgId": 1,
+        "tests": [ ... ]
+}</pre><a href="#section-9-8" class="pilcrow">¶</a>
+</div>
+</div>
+<div id="_2f4c2679-c489-c6bd-2858-a60e9c2314fc">
+<p id="section-9-9">The following table describes the JSON object that represents a test case response for a SP800-90A DRBG.<a href="#section-9-9" class="pilcrow">¶</a></p>
+</div>
+<span id="name-test-case-results-json-obje"></span><div id="response_case_table">
+<table class="center" id="table-12">
+        <caption>
+<a href="#table-12" class="selfRef">Table 12</a>:
+<a href="#name-test-case-results-json-obje" class="selfRef">Test Case Results JSON Object</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">JSON Property</th>
+            <th class="text-left" rowspan="1" colspan="1">Description</th>
+            <th class="text-left" rowspan="1" colspan="1">JSON Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">tcId</td>
+            <td class="text-left" rowspan="1" colspan="1">The test case identifier</td>
+            <td class="text-left" rowspan="1" colspan="1">integer</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">returnedBits</td>
+            <td class="text-left" rowspan="1" colspan="1">The outputted bits from the DRBG</td>
+            <td class="text-left" rowspan="1" colspan="1">hex</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<div id="_53ab8e01-eca5-ed88-d580-2602fd669bfc">
+<p id="section-9-11">Here is an abbreviated example of the response<a href="#section-9-11" class="pilcrow">¶</a></p>
+</div>
+<div id="_26ee2d56-f058-e8e4-8c71-2f1b48d849a3">
+<div id="section-9-12">
+<pre class="lang-json sourcecode">{
+  "vsId": 1,
+  "algorithm": "ctrDRBG",
+  "revision": "1.0",
+  "testGroups": [
+    {
+      "tgId": 1,
+      "tests": [
+        {
+          "tcId": 1,
+          "returnedBits": "99F0D5740DCAA1ECC4E5329B38B..."
+        },
+        {
+          "tcId": 2,
+          "returnedBits": "62A458CA72C19316A1ECBC3211B..."
+        }
+      ]
+    }
+  ]
+}</pre><a href="#section-9-12" class="pilcrow">¶</a>
+</div>
+</div>
+</section>
+</div>
+<div id="security">
+<section id="section-10">
+      <h2 id="name-security-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<div id="_ff214069-79aa-4d78-9f72-47d7c41bddbf">
+<p id="section-10-1">There are no additional security considerations outside of those outlined in the ACVP document.<a href="#section-10-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="iana">
+<section id="section-11">
+      <h2 id="name-iana-considerations">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="_ca488b92-1b02-5a8a-a578-04f4b00f8066">
+<p id="section-11-1">This document does not require any action by IANA.<a href="#section-11-1" class="pilcrow">¶</a></p>
+</div>
+</section>
+</div>
+<div id="app-reg-ex">
+<section id="section-12">
+      <h2 id="name-example-drbg-capabilities-j">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-example-drbg-capabilities-j" class="section-name selfRef">Example DRBG Capabilities JSON Object</a>
+      </h2>
+<div id="_fad8045f-6a45-e2f9-8359-b5aa5bb44046">
+<p id="section-12-1">The following is a example JSON object advertising support for ctrDRBG with TDES and all key sizes of AES.<a href="#section-12-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_d94b666f-e462-1964-81a9-93a07e6d8507">
+<figure id="figure-1">
+        <div id="_87a3b54e-806e-c96a-1079-5df9a2941272">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-12-2.1">
+<pre>{
+  "algorithm": "ctrDRBG",
+  "revision": "1.0",
+  "prereqVals":
+  [
+    {
+      "algorithm": "AES",
+      "valValue": "1234"
+    },
+    {
+      "algorithm": "TDES",
+      "valValue": "5678"
+    }
+  ],
+  "predResistanceEnabled": [
+    true,
+    false
+  ],
+  "reseedImplemented": true,
+  "capabilities": [
+    {
+      "mode": "AES-128",
+      "derFuncEnabled": true,
+      "entropyInputLen": [
+        256
+      ],
+      "nonceLen": [
+        256
+      ],
+      "persoStringLen": [
+        256
+      ],
+      "additionalInputLen": [
+        256
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "AES-192",
+      "derFuncEnabled": true,
+      "entropyInputLen": [
+        320
+      ],
+      "nonceLen": [
+        320
+      ],
+      "persoStringLen": [
+        320
+      ],
+      "additionalInputLen": [
+        320
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "AES-256",
+      "derFuncEnabled": true,
+      "entropyInputLen": [
+        384
+      ],
+      "nonceLen": [
+        384
+      ],
+      "persoStringLen": [
+        384
+      ],
+      "additionalInputLen": [
+        384
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "TDES",
+      "derFuncEnabled": true,
+      "entropyInputLen": [
+        232
+      ],
+      "nonceLen": [
+        232
+      ],
+      "persoStringLen": [
+        232
+      ],
+      "additionalInputLen": [
+        232
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "AES-128",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        256
+      ],
+      "nonceLen": [
+        256
+      ],
+      "persoStringLen": [
+        256
+      ],
+      "additionalInputLen": [
+        256
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "AES-192",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        320
+      ],
+      "nonceLen": [
+        320
+      ],
+      "persoStringLen": [
+        320
+      ],
+      "additionalInputLen": [
+        320
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "AES-256",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        384
+      ],
+      "nonceLen": [
+        384
+      ],
+      "persoStringLen": [
+        384
+      ],
+      "additionalInputLen": [
+        384
+      ],
+      "returnedBitsLen": 512
+    },
+    {
+      "mode": "TDES",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        232
+      ],
+      "nonceLen": [
+        232
+      ],
+      "persoStringLen": [
+        232
+      ],
+      "additionalInputLen": [
+        232
+      ],
+      "returnedBitsLen": 512
+    }
+  ]
+}</pre>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a></figcaption></figure>
+</div>
+<div id="_f0f890ef-80f1-cd0f-e950-5a1a06a99423">
+<p id="section-12-3">The following is a example JSON object advertising support for hashDRBG with various SHA sizes. Note that in this example the implementation works with or without additional input and personalization data.<a href="#section-12-3" class="pilcrow">¶</a></p>
+</div>
+<div id="_46a78c07-ee1f-4f08-65fa-c3f89405c515">
+<figure id="figure-2">
+        <div id="_67bf8c2e-31a7-c015-af6c-0fcab12a7f07">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-12-4.1">
+<pre>{
+  "algorithm": "hashDRBG",
+  "revision": "1.0",
+  "prereqVals":
+  [
+    {
+      "algorithm": "AES",
+      "valValue": "1234"
+    },
+    {
+      "algorithm": "SHA",
+      "valValue": "5678"
+    }
+  ],
+  "predResistanceEnabled": [
+    true,
+    false
+  ],
+  "reseedImplemented": true,
+  "capabilities": [
+    {
+      "mode": "SHA-1",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        160
+      ],
+      "nonceLen": [
+        160
+      ],
+      "persoStringLen": [
+        160
+      ],
+      "additionalInputLen": [
+        160
+      ],
+      "returnedBitsLen": 640
+    },
+    {
+      "mode": "SHA2-224",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        224
+      ],
+      "nonceLen": [
+        224
+      ],
+      "persoStringLen": [
+        224
+      ],
+      "additionalInputLen": [
+        224
+      ],
+      "returnedBitsLen": 896
+    },
+    {
+      "mode": "SHA2-256",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        256
+      ],
+      "nonceLen": [
+        256
+      ],
+      "persoStringLen": [
+        256
+      ],
+      "additionalInputLen": [
+        256
+      ],
+      "returnedBitsLen": 1024
+    },
+    {
+      "mode": "SHA2-384",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        384
+      ],
+      "nonceLen": [
+        384
+      ],
+      "persoStringLen": [
+        384
+      ],
+      "additionalInputLen": [
+        384
+      ],
+      "returnedBitsLen": 1536
+    },
+    {
+      "mode": "SHA2-512",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        512
+      ],
+      "nonceLen": [
+        512
+      ],
+      "persoStringLen": [
+        512
+      ],
+      "additionalInputLen": [
+        512
+      ],
+      "returnedBitsLen": 2048
+    },
+    {
+      "mode": "SHA2-512/224",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        224
+      ],
+      "nonceLen": [
+        224
+      ],
+      "persoStringLen": [
+        224
+      ],
+      "additionalInputLen": [
+        224
+      ],
+      "returnedBitsLen": 896
+    },
+    {
+      "mode": "SHA2-512/256",
+      "derFuncEnabled": false,
+      "entropyInputLen": [
+        256
+      ],
+      "nonceLen": [
+        256
+      ],
+      "persoStringLen": [
+        256
+      ],
+      "additionalInputLen": [
+        256
+      ],
+      "returnedBitsLen": 1024
+    }
+  ]
+}</pre>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a></figcaption></figure>
+</div>
+</section>
+</div>
+<div id="app-vs-ex">
+<section id="section-13">
+      <h2 id="name-example-test-vectors-json-o">
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-example-test-vectors-json-o" class="section-name selfRef">Example Test Vectors JSON Object</a>
+      </h2>
+<div id="_66cfc4f0-292e-ec90-fc4a-7b4917fb6e7b">
+<p id="section-13-1">The following is a example JSON object for ctrDRBG test vectors sent from the ACVP server to the crypto module.<a href="#section-13-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_e798cc9e-3da4-f984-cbe6-f1c44dd2fc4e">
+<figure id="figure-3">
+        <div id="_49d62558-c64a-31cc-95e3-493a4ac1140c">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-13-2.1">
+<pre>[
+  { "acvVersion": &lt;acvp-version&gt; },
+  { "vectorSetId": 1133,
+    "algorithm": "ctrDRBG",
+    "mode": "TDES",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "derFunc": true,
+        "predResistance": true,
+        "reSeed": true,
+        "entropyInputLen": 112,
+        "nonceLen": 56,
+        "persoStringLen": 112,
+        "additionalInputLen": 112,
+        "returnedBitsLen": 256,
+        "tests": [
+          {
+            "tcId": 1815,
+            "entropyInput":"78aac2cb444594e2...",
+            "nonce":"41ef9c67ffe438",
+            "persoString":"b8e84de200a9239a0...",
+            "otherInput" : [
+               { "intendedUse" : "generate",
+                 "additionalInput":"f1e8edf0...",
+                 "entropyInput": "6cd4096638..."},
+              { "intendedUse" : "generate",
+                "additionalInput" : "f535773...",
+                "entropyInput" : "a0cdf5c1c6..."}
+              ]
+            },
+          {
+            "tcId": 1816,
+            "entropyInput" : "b8ab88b9c5fda8...",
+            "nonce": "f1bcc6ff60dd37",
+            "persoString" : "018c1f9d22f3c7f...",
+            "otherInput" : [
+               {"intendedUse" : "generate",
+                "additionalInput" : "356a6e9...",
+                "entropyInput" : "bed693401b..."},
+               {"intendedUse" : "generate",
+                "additionalInput" : "4321b3a...",
+                "entropyInput" : "a632ef16f2..."}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a></figcaption></figure>
+</div>
+<div id="_9d3e11f7-e7d9-a40e-5bfb-a2273fd72014">
+<p id="section-13-3">The following is a example JSON object for hmacDRBG test vectors sent from the ACVP server to the crypto module.<a href="#section-13-3" class="pilcrow">¶</a></p>
+</div>
+<div id="_6a1d0d50-037e-4ab6-a057-2896720f48be">
+<figure id="figure-4">
+        <div id="_15e35a6b-a095-c5e0-5931-5e9ea4e2c905">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-13-4.1">
+<pre>[
+  { "acvVersion": &lt;acvp-version&gt; },
+  { "vectorSetId": 1146,
+    "algorithm": "hmacDRBG",
+    "mode": "AES-256",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "predResistance": true,
+        "reSeed": false,
+        "entropyInputLen": 256,
+        "nonceLen": 128,
+        "persoStringLen": 256,
+        "additionalInputLen": 256,
+        "returnedBitsLen": 1024,
+        "tests": [
+          {
+            "tcId": 2111,
+            "entropyInput": "ee3392c5f3de6f3...",
+            "nonce": "b991a820fac75fd02642ad...",
+            "persoString": "30f3a50b0e2309da...",
+            "otherInput" : [
+               {"intendedUse" : "generate",
+                 "additionalInput":"4ea46abe...",
+                 "entropyInput": "e4413a2e40..."},
+               {"intendedUse" : "generate",
+                "additionalInput" : "61b7204...",
+                "entropyInput" : "968ea185d1..."}
+              ]
+            },
+          {
+            "tcId": 2112,
+            "entropyInput" : "a0ace75784b972...",
+            "nonce": "b671308068fc7909a360c7...",
+            "persoString" : "338d5f2bd93262d...",
+            "otherInput" : [
+               {"intendedUse" : "generate",
+                "additionalInput" : "7acd8bf...",
+                "entropyInput" : "47b26bbe93..."},
+               {"intendedUse" : "generate",
+                "additionalInput" : "d4b24c7...",
+                "entropyInput" : "acb63f3b59..."}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a></figcaption></figure>
+</div>
+<div id="_8ffdda82-7092-f2be-2ab2-19fb3d429df6">
+<p id="section-13-5">The following is a example JSON object for hashDRBG test vectors sent from the ACVP server to the crypto module. In this example the implementation is tested without additional input and personalization data.<a href="#section-13-5" class="pilcrow">¶</a></p>
+</div>
+<div id="_ad47dd6e-966b-397c-6483-0f67c6f4a5e0">
+<figure id="figure-5">
+        <div id="_530de0ce-8d4d-b149-c36d-99d51eb4952d">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-13-6.1">
+<pre>[
+  { "acvVersion": &lt;acvp-version&gt; },
+  { "vectorSetId": 1156,
+    "algorithm": "hashDRBG",
+    "mode": "SHA2-256",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "predResistance": true,
+        "reSeed": false,
+        "entropyInputLen": 256,
+        "nonceLen": 128,
+        "persoStringLen": 0,
+        "additionalInputLen": 0,
+        "returnedBitsLen": 1024,
+        "tests": [
+          {
+            "tcId": 2151,
+            "entropyInput": "ae0a3acd541d0d5...",
+            "nonce": "786f03ad697332d74fad7a...",
+            "persoString": "",
+            "otherInput" : [
+                 {"intendedUse" : "generate",
+                  "additionalInput": "",
+                  "entropyInput": "4852aed7c..."},
+                 {"intendedUse" : "generate",
+                  "additionalInput" : "",
+                  "entropyInput" : "8b8a35a1..."}
+              ]
+            },
+          {
+            "tcId": 2152,
+            "entropyInput" : "26d8c9a9b982cd...",
+            "nonce": "36dff124f908a95a022edf...",
+            "persoString" : "",
+            "otherInput" : [
+               {"intendedUse" : "generate",
+                "additionalInput" : "",
+                "entropyInput" : "648bbdc4d4..."},
+               {"intendedUse" : "generate",
+                "additionalInput" : "",
+                "entropyInput" : "fff51d05b1..."}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a></figcaption></figure>
+</div>
+<div id="_17d61525-29bd-dc94-3d01-bb61f4b72d5e">
+<p id="section-13-7">The following is a example JSON object for hashDRBG test vectors sent from the ACVP server to the crypto module. In this example the implementation is tested with "predResistance": false, "reSeed": true options.<a href="#section-13-7" class="pilcrow">¶</a></p>
+</div>
+<div id="_343f94fc-b09d-33cf-09b2-54860d1758bf">
+<figure id="figure-6">
+        <div id="_c9130fa4-9b86-2f79-a7c8-d7ce711eb7ab">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-13-8.1">
+<pre>[
+  { "acvVersion": &lt;acvp-version&gt; },
+  { "vectorSetId": 1157,
+    "algorithm": "hashDRBG",
+    "mode": "SHA2-256",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "predResistance": false,
+        "reSeed": true,
+        "entropyInputLen": 256,
+        "nonceLen": 128,
+        "persoStringLen": 256,
+        "additionalInputLen": 256,
+        "returnedBitsLen": 1024,
+        "tests": [
+          {
+            "tcId": 3151,
+            "entropyInput": "860d051cedbb935...",
+            "nonce": "5813070f9774d21e644d64...",
+            "persoString": "545ba29faf1bb1bf...",
+            "otherInput" : [
+                 {"intendedUse" : "reSeed",
+                   "additionalInput": "95b08...",
+                  "entropyInput": "2e92955b1..."},
+                 {"intendedUse" : "generate",
+                   "additionalInput" : "ddfa...",
+                  "entropyInput" : ""},
+                 {"intendedUse" : "generate",
+                  "additionalInput" : "edb88...",
+                  "entropyInput" : ""}
+              ]
+            },
+          {
+            "tcId": 3152,
+            "entropyInput" : "371d2944c9ace6...",
+            "nonce": "4bb34ab1e882d97687c3f8...",
+            "persoString" : "c5b03354a9fad34...",
+            "otherInput" : [
+               {"intendedUse" : "reSeed",
+                "additionalInput" : "6e3fa8e...",
+                "entropyInput" : "afd7e6b0b4..."},
+               {"intendedUse" : "generate",
+                "additionalInput" : "deb8ed5...",
+                "entropyInput" : ""},
+               {"intendedUse" : "generate",
+                "additionalInput" : "a554bb9...",
+                "entropyInput" : ""}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a></figcaption></figure>
+</div>
+<div id="_73d846ed-5b00-b23b-1360-6d94d57962b5">
+<p id="section-13-9">The following is a example JSON object for hashDRBG test vectors sent from the ACVP server to the crypto module. In this example the implementation is tested with "predResistance": false, "reSeed": false options.<a href="#section-13-9" class="pilcrow">¶</a></p>
+</div>
+<div id="_8b55ffa0-1961-4bb0-be2f-1ff4d9e88627">
+<figure id="figure-7">
+        <div id="_06bc9520-65b3-3c06-55f5-6250f7c34f73">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-13-10.1">
+<pre>[
+  { "acvVersion": &lt;acvp-version&gt; },
+  { "vectorSetId": 1167,
+    "algorithm": "hashDRBG",
+    "mode": "SHA2-256",
+    "revision": "1.0",
+    "testGroups": [
+      {
+        "tgId": 1,
+        "predResistance": false,
+        "reSeed": false,
+        "entropyInputLen": 256,
+        "nonceLen": 128,
+        "persoStringLen": 256,
+        "additionalInputLen": 256,
+        "returnedBitsLen": 1024,
+        "tests": [
+          {
+            "tcId": 4151,
+            "entropyInput": "090db63c22de171...",
+            "nonce": "6f7c6bec9825079cabd947...",
+            "persoString": "c2f1a59806197792...",
+            "otherInput" : [
+                 {"intendedUse" : "generate",
+                  "additionalInput": "3fc72d...",
+                  "entropyInput": ""},
+                 {"intendedUse" : "generate",
+                  "additionalInput" : "968a3...",
+                  "entropyInput" : ""}
+              ]
+            },
+          {
+            "tcId": 4152,
+            "entropyInput" : "bd0e2dbba872bb...",
+            "nonce": "a97dfbaea505a3e36210a8...",
+            "persoString" : "7d0de87d097551f...",
+            "otherInput" : [
+               {"intendedUse" : "generate",
+                "additionalInput" : "fe1adf1...",
+                "entropyInput" : ""},
+               {"intendedUse" : "generate",
+                "additionalInput" : "1df719a...",
+                "entropyInput" : ""}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a></figcaption></figure>
+</div>
+</section>
+</div>
+<div id="app-results-ex">
+<section id="section-14">
+      <h2 id="name-example-test-results-json-o">
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-example-test-results-json-o" class="section-name selfRef">Example Test Results JSON Object</a>
+      </h2>
+<div id="_55cc9e59-1f07-f751-d072-26cdbf084bf6">
+<p id="section-14-1">The following is a example JSON object for ctrDRBG with TDES test results sent from the crypto module to the ACVP server.<a href="#section-14-1" class="pilcrow">¶</a></p>
+</div>
+<div id="_5a89555d-fc6c-f304-a563-2ba521ed82b5">
+<figure id="figure-8">
+        <div id="_50fdd7dd-16f2-d79e-5eda-9193955af27c">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-14-2.1">
+<pre>[{
+    "acvVersion": &lt;acvp-version&gt;
+  },
+  {
+    "vectorSetId": 1133,
+    "testGroups": [{
+        "tgId": 1,
+        "tests": [{
+            "tcId": 1815,
+            "returnedBits ": "4565e85447af71..."
+          },
+          {
+            "tcId": 1816,
+            "returnedBits": "b67acc3b2231ec5..."
+          }
+        ]
+      }
+    ]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-8" class="selfRef">Figure 8</a></figcaption></figure>
+</div>
+<div id="_07a91902-e9f2-e7ee-b6f1-467008255abf">
+<p id="section-14-3">The following is a example JSON object for HMAC_DRBG test results sent from the crypto module to the ACVP server.<a href="#section-14-3" class="pilcrow">¶</a></p>
+</div>
+<div id="_12ea6490-7863-5235-9174-1c440504d45e">
+<figure id="figure-9">
+        <div id="_6a550f1c-c666-53a7-0db8-346d3b721689">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-14-4.1">
+<pre>[{
+    "acvVersion": &lt;acvp-version&gt;
+  },
+  {
+    "vectorSetId": 1146,
+    "testGroups": [{
+      "tgId": 1,
+      "tests": [{
+          "tcId": 2111,
+          "returnedBits": "e42130fd1d920a2bc..."
+        },
+        {
+          "tcId": 2112,
+          "returnedBits": "495b2a0de6b5fc454..."
+        }
+      ]
+    }]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-9" class="selfRef">Figure 9</a></figcaption></figure>
+</div>
+<div id="_5f85e92b-9723-0a0e-451c-035def9c018e">
+<p id="section-14-5">The following is a example JSON object for hashDRBG test results sent from the crypto module to the ACVP server.<a href="#section-14-5" class="pilcrow">¶</a></p>
+</div>
+<div id="_88a1e51f-4881-eb3d-f3e0-c3626c8caa27">
+<figure id="figure-10">
+        <div id="_800904d1-b7b7-5111-f176-224c44a54894">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-14-6.1">
+<pre>[{
+    "acvVersion": &lt;acvp-version&gt;
+  },
+  {
+    "vectorSetId": 1156,
+    "testGroups": [{
+      "tgId": 1,
+      "tests": [{
+          "tcId": 2151,
+          "returnedBits ": "1af967534c670271..."
+        },
+        {
+          "tcId": 2152,
+          "returnedBits": "8a74a8c31ea4e6e62..."
+        }
+      ]
+    }]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-10" class="selfRef">Figure 10</a></figcaption></figure>
+</div>
+<div id="_b3aca8ba-5a64-e3a9-9f24-60c40de49263">
+<p id="section-14-7">The following is a example JSON object for hashDRBG test results sent from the crypto module to the ACVP server.<a href="#section-14-7" class="pilcrow">¶</a></p>
+</div>
+<div id="_7afc3d7f-fa46-d749-4178-8776345c94ad">
+<figure id="figure-11">
+        <div id="_9c963db5-0d5b-8a0f-3900-559c5af81f75">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-14-8.1">
+<pre>[{
+    "acvVersion": &lt;acvp-version&gt;
+  },
+  {
+    "vectorSetId": 1157,
+    "testGroups": [{
+      "tgId": 1,
+      "tests": [{
+          "tcId": 3151,
+          "returnedBits ": "0eadc82746890ee0..."
+        },
+        {
+          "tcId": 3152,
+          "returnedBits": "6452be2ee730d7245..."
+        }
+      ]
+    }]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-11" class="selfRef">Figure 11</a></figcaption></figure>
+</div>
+<div id="_791c4c08-07ca-bc26-de4c-a63a0b2b5917">
+<p id="section-14-9">The following is a example JSON object for hashDRBG test results sent from the crypto module to the ACVP server.<a href="#section-14-9" class="pilcrow">¶</a></p>
+</div>
+<div id="_6438bc24-802c-1f32-f806-016659447011">
+<figure id="figure-12">
+        <div id="_55af4854-d72b-9d0d-5324-5e57d4918410">
+<div class="alignLeft art-ascii-art art-text artwork" id="section-14-10.1">
+<pre>[{
+    "acvVersion": &lt;acvp-version&gt;
+  },
+  {
+    "vectorSetId": 1167,
+    "testGroups": [{
+      "tgId": 1,
+      "tests": [{
+          "tcId": 4151,
+          "returnedBits ": "5dbfd26651bc7159..."
+        },
+        {
+          "tcId": 4152,
+          "returnedBits": "ff3cce0b5585172b1..."
+        }
+      ]
+    }]
+  }
+]</pre>
+</div>
+</div>
+<figcaption><a href="#figure-12" class="selfRef">Figure 12</a></figcaption></figure>
+</div>
+</section>
+</div>
+<div id="_normative_references">
+<section id="section-15">
+      <h2 id="name-normative-references">
+<a href="#section-15" class="section-number selfRef">15. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      </h2>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+      <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="refContent">RFC 2119</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7991">[RFC7991]</dt>
+      <dd>
+<span class="refAuthor">Hoffman, P.</span>, <span class="refTitle">"The "xml2rfc" Version 3 Vocabulary"</span>, <span class="refContent">RFC 7991</span>, <span class="seriesInfo">RFC 7991</span>, <span class="seriesInfo">DOI 10.17487/RFC7991</span>, <time datetime="2016-12" class="refDate">December 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7991">https://www.rfc-editor.org/info/rfc7991</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="refContent">RFC 8174</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SP800-90A">[SP800-90A]</dt>
+      <dd>
+<span class="refAuthor">Barker, E. B.</span> and <span class="refAuthor">J. M. Kelsey</span>, <span class="refTitle">"Recommendation for Random Number Generation Using Deterministic Random Bit Generators"</span>, <span class="refContent">NIST SP 800-90A</span>, <time datetime="2012-01" class="refDate">January 2012</time>, <span>&lt;<a href="https://csrc.nist.gov/pubs/sp/800/90/a/final">https://csrc.nist.gov/pubs/sp/800/90/a/final</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ACVP">[ACVP]</dt>
+    <dd>
+<span class="refAuthor">Fussell, B.</span>, <span class="refAuthor">Vassilev, A.</span>, and <span class="refAuthor">H. Booth</span>, <span class="refTitle">"Automatic Cryptographic Validation Protocol"</span>, <span class="refContent">ACVP</span>, <time datetime="2019-07-01" class="refDate">1 July 2019</time>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Apostol Vassilev</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:apostol.vassilev@nist.gov" class="email">apostol.vassilev@nist.gov</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
