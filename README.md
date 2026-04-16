@@ -21,6 +21,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [DRBG](#drbg)
   * [Digital Signature](#digital-signature)
   * [SP 800-56 Series Algorithms](#sp-800-56-series-algorithms)
+  * [RFC 7748 curve25519 and curve448](#rfc-7748-curve25519-and-curve448)
   * [KDFs](#kdfs)
   * [Safe Primes](#safe-primes)
   * [Conditioning Components](#conditioning-components)
@@ -327,6 +328,11 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 
 * [KAS KC Sp800-56 (Component)](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-kas-kc-sp800-56.html)
 
+### RFC 7748 curve25519 and curve448
+* [XECDH keyGen](https://pages.nist.gov/ACVP/draft-vandersmissen-acvp-xecdh.txt) - [HTML](https://pages.nist.gov/ACVP/draft-vandersmissen-acvp-xecdh.html)
+* [XECDH keyVer](https://pages.nist.gov/ACVP/draft-vandersmissen-acvp-xecdh.txt) - [HTML](https://pages.nist.gov/ACVP/draft-vandersmissen-acvp-xecdh.html)
+* [XECDH SSC](https://pages.nist.gov/ACVP/draft-vandersmissen-acvp-xecdh.txt) - [HTML](https://pages.nist.gov/ACVP/draft-vandersmissen-acvp-xecdh.html)
+ 
 ### KDFs
 * [Counter KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
 * [Feedback KDF](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kbkdf.html)
