@@ -10,7 +10,7 @@ Each SP800-90A DRBG algorithm capability advertised is a self-contained JSON obj
 | JSON Value | Description | JSON type | Valid Values
 
 | algorithm | The DRBG algorithm to be validated | string | See <<supported>>
-| revision | ACVP Test version | string | "1.0"
+| revision | ACVP Test version | string | See <<supported>>
 | prereqVals | Prerequisite algorithm validations | object with algorithm and valValue properties | See above
 | predResistanceEnabled | An implementation that can be used with prediction resistance. See the notes in <<caps_sec>> | array of boolean containing one or two distinct values | [true], [true, false], or [false]
 | reseedImplemented | Reseeding of the DRBG shall be performed in accordance with the specification for the given DRBG mechanism. See the notes in <<caps_sec>> | boolean | true or false
@@ -35,8 +35,8 @@ Each DRBG algorithm capability advertised is a self-contained JSON object. A reg
 | nonceLen | See the notes below. | domain | Min: half the maximum security strength (see <<supported_values>>), Max: See <<supported_values>>. Set to 0 if not supported.
 | persoStringLen | Personalization string length. See the notes below. | domain | Min: maximum security strength (see <<supported_values>>), Max: See <<supported_values>>. Set to 0 if not supported
 | additionalInputLen | See the notes below. | domain | Min: maximum security strength (see <<supported_values>>), Max: See <<supported_values>>. Set to 0 if not supported
-| returnedBitsLen | Returned bits length | integer | Min: See <<supported_values>>, Max: 4096.
-| counterFieldLen | The length of the counter field in bits. This property is 1) optional and 2) only available for the ctrDRBG algorithm and "AES-128", "AES-192", and "AES-256" modes. See the note below. If omitted, tests are generated using a 128-bit counter. | integer | Min: 4, Max: 128
+| returnedBitsLen | Returned bits length | integer for "1.0" test revision, domain for "SP800-90Ar1" revision | Min: See <<supported_values>>, Max: 4096.
+| counterFieldLen | The length of the counter field in bits. This property is only applicable to ctrDRBG / SP800-90Ar1 (algorithm / revision). | integer | Min: 4, Max: 128 for AES; 64 for TDES
 |===
 
  
@@ -53,8 +53,6 @@ NOTE: 'ctrDRBG' with 'derFuncEnabled' set to 'false' does not use a nonce; A val
 NOTE: ACVP allows bit length values for 'persoString' ranging from the maximum supported security strength except in the case of 'derFuncEnabled' set to 'false', where the second personalization string length must be less than or equal to the seed length. If the implementation only supports one personalization string length, then set only that value as the range min and max and set the step to 0. If the implementation does not use a 'persoString', set all range parameters (min, max, step) to 0. If the implementation can work with and without 'persoString', set the min to 0, set the max to at least the maximum supported strength and set the step equal to at least the maximum supported strength to avoid testing lengths less than that. See Tables 2 and 3 in <<SP800-90A>> for help on choosing appropriate parameter values for the tested DRBG implementation.
 
 NOTE: The 'addtionalInput' configuration and restrictions are the same as those for the 'persoString'.
-
-NOTE: The 'counterFieldLen' property was introduced to support the concept of counter field length as introduced in SP800-90Ar1. See SP800-90Ar1 Section 10.2.1, Table 3
 
 [[value_req_per_option]]
 === Supported values per DRBG option
@@ -100,7 +98,7 @@ DRBG minimum/maximum values for the properties listed in <<capabilities-table>> 
 
 NOTE: If an implementation utilizes a nonce in the construction of a seed during instantiation, the length of the nonce shall be at least half the maximum security strength supported. The values listed in the Min Nonce Len column of <<supported_values>> are the maximum security strength / 2. Per allowances in <<SP800-90A>>, the length of a nonce may be less than 1/2 the maximum security strength supported as long as the entropy input length + the nonce length >= 3/2 security strength. If the entropy input length is >= 3/2 security strength the minimum nonce length will be 0.
 
-NOTE: TDES is no longer supported and is end-of-life as of 1/1/2024; please refer to https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar2.pdf for more information.
+NOTE: TDES is no longer approved as of 1/1/2024; please refer to https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar2.pdf for more information.
 
 === DRBG Registration Example
 
@@ -110,7 +108,7 @@ The following is an example registration.
 ----
 {
   "algorithm": "ctrDRBG",
-  "revision": "1.0",
+  "revision": "SP800-90Ar1",
   "predResistanceEnabled": [
     true,
     false
@@ -132,7 +130,10 @@ The following is an example registration.
       "additionalInputLen": [
         232
       ],
-      "returnedBitsLen": 512
+      "returnedBitsLen": [
+        512
+      ],
+      "counterFieldLen": 64
     },
     {
       "mode": "AES-128",
@@ -149,7 +150,9 @@ The following is an example registration.
       "additionalInputLen": [
         256
       ],
-      "returnedBitsLen": 512,
+      "returnedBitsLen": [
+        512
+      ],
       "counterFieldLen": 100
     }
   ]
