@@ -6,7 +6,7 @@
 
 The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {algo-short-name} JSON elements of the Test Group JSON object.
 
-The test group for ML-KEM / encapDecap / FIPS203 is as follows:
+The test group for ML-KEM / encapDecap / FIPS203-tr1 is as follows:
 
 [[ML-KEM_encapDecap_vs_tg_table]]
 .ML-KEM encapDecap Test Group JSON Object
@@ -17,6 +17,7 @@ The test group for ML-KEM / encapDecap / FIPS203 is as follows:
 | testType | The test operation performed | string
 | parameterSet | The ML-KEM parameter set used | string
 | function | Whether the tests are running encapsulation or decapsulation, or a key check | string
+| keyFormat | The private key format used for decapsulation | string
 | tests | Array of individual test vector JSON objects, which are defined in <<ML-KEM_encapDecap_tvjs>> | array
 |===
 
@@ -31,13 +32,14 @@ Each test group contains an array of one or more test cases. Each test case is a
 | JSON Value | Description | JSON type
 
 | tcId | Numeric identifier for the test case, unique across the entire vector set | integer
-| dk | The decapsulation key when the function is "decapsulation" or "decapsulationKeyCheck" | hex
+| dk | The decapsulation key when the `"function": "decapsulation" or "decapsulationKeyCheck"` and `"keyFormat": "expanded"` | hex
+| seed | The decapsulation key as a seed when `"function": "decapsulation"` and `"keyFormat": "seed"` | hex
 | ek | The encapsulation key when the function is "encapsulation" or "encapsulationKeyCheck" | hex
 | m | The random value used to derive the shared key when the function is "encapsulation" | hex
 | c | The cipher text when the function is "decapsulation" | hex
 |===
 
-The following is an example JSON object sent from the server to the client for ML-KEM / encapDecap / FIPS203.
+The following is an example JSON object sent from the server to the client for ML-KEM / encapDecap / FIPS203-tr1.
 
 [source, json]
 ----
@@ -49,7 +51,7 @@ The following is an example JSON object sent from the server to the client for M
         "vsId": 0,
         "algorithm": "ML-KEM",
         "mode": "encapDecap",
-        "revision": "FIPS203",
+        "revision": "FIPS203-tr1",
         "testGroups": [
             {
                 "tgId": 1,
@@ -69,6 +71,21 @@ The following is an example JSON object sent from the server to the client for M
                 "testType": "VAL",
                 "parameterSet": "ML-KEM-512",
                 "function": "decapsulation",
+                "keyFormat": "seed",
+                "tests": [
+                    {
+                        "tcId": 76,
+                        "seed": "DF479939FAA...",
+                        "c": "49D873A9..."
+                    }
+                ]
+            },
+            {
+                "tgId": 3,
+                "testType": "VAL",
+                "parameterSet": "ML-KEM-512",
+                "function": "decapsulation",
+                "keyFormat": "expanded",
                 "tests": [
                     {
                         "tcId": 76,
@@ -78,7 +95,7 @@ The following is an example JSON object sent from the server to the client for M
                 ]
             },
             {
-                "tgId": 3,
+                "tgId": 4,
                 "testType": "VAL",
                 "parameterSet: "ML-KEM-512",
                 "function": "encapsulationKeyCheck",
@@ -90,7 +107,7 @@ The following is an example JSON object sent from the server to the client for M
                 ]
             },
             {
-                "tgId": 4,
+                "tgId": 5,
                 "testType": "VAL",
                 "parameterSet: "ML-KEM-512",
                 "function": "decapsulationKeyCheck",
