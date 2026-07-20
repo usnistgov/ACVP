@@ -350,6 +350,7 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [ANSX9.63 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x963.html)
 * [ANSX9.42 (Component)](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-kdf-ansi-x942.html)
 * [PBKDF](https://pages.nist.gov/ACVP/draft-celi-acvp-pbkdf.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-pbkdf.html)
+* [SPDM](https://pages.nist.gov/ACVP/draft-ross-acvp-kdf-spdm.txt) - [HTML](https://pages.nist.gov/ACVP/draft-ross-acvp-kdf-spdm.html)
 
 ### Safe Primes
 * [SafePrimes KeyGen](https://pages.nist.gov/ACVP/draft-hammett-acvp-safe-primes.txt) - [HTML](https://pages.nist.gov/ACVP/draft-hammett-acvp-safe-primes.html)
