@@ -44,7 +44,7 @@ text. | domain
 | aadLen| The supported AAD lengths in bits for AEAD algorithms| domain
 | tagLen| The supported Tag lengths in bits for AEAD algorithms, see <<property_grid_auth>>| array of integers
 | kwCipher| The cipher as defined in SP800-38F for key wrap mode| array of strings
-| tweakMode| Indicates the format(s) of the tweak value input for AES-XTS. A value of "hex" indicates that the IUT expects the tweak value input as a hexadecimal string. A value of "number" indicates that the IUT expects to receive a Data Unit Sequence Number.| array of strings
+| tweakMode| Indicates the format(s) of the tweak value input for AES-XTS. A value of "hex" indicates that the IUT expects the tweak value input as a hexadecimal string. A value of "number" indicates that the IUT expects to receive a Data Unit Sequence Number. A value of "iut" indicates that the IUT will provide a tweak value to the server.| array of strings
 | keyingOption| The Keying Option used in TDES.  Keying option 1 (1) is 3 distinct keys (K1, K2, K3).  Keying Option 2 (2) is 2 distinct keys only suitable for decrypt (K1, K2, K1). | array of integers
 | overflowCounter| Indicates if the implementation can handle a counter exceeding the maximum value| boolean
 | incrementalCounter| Indicates if the implementation increments the counter (versus decrementing the counter)| boolean
@@ -58,6 +58,8 @@ text. | domain
 NOTE: The 'conformances' property is only valid for algorithms listed in <<conformances>>. The valid values in the array are also listed in that section. The array is always optional.
 
 NOTE: Some optional values are required depending on the algorithm. For example, AES-GCM requires ivLen, ivGen, aadLen, and tagLen. Failure to provide these values will result in the ACVP server returning an error to the ACVP client during registration.
+
+NOTE: The 'iut' value for 'tweakMode' is provided to support AES-XTS implementations that exclusively generate / establish tweak values internally. It cannot be combined with other values. This option is available for both encryption and decryption.
 
 NOTE: The 'performCounterTests' option is provided for counter implementations such as linear-feedback shift registers which may not present an always increasing or decreasing counter while still ensuring the IV is unique. This value defaults to true if not present. If it is set to false, the 'overflowCounter' and 'incrementalCounter' values will not be used.
 
@@ -147,7 +149,7 @@ The following grid outlines which properties are *REQUIRED*, as well as the poss
 |===
 | algorithm| revision| direction| keyLen| payloadLen| tweakMode| dataUnitLen| dataUnitLenMatchesPayload
 | ACVP-AES-XTS| "1.0"| ["encrypt", "decrypt"]| [128, 256]| {"Min": 128, "Max": 65536, "Inc": 128}| ["hex", "number"]| |
-| ACVP-AES-XTS| "2.0"| ["encrypt", "decrypt"]| [128, 256]| {"Min": 128, "Max": 65536, "Inc": 8}| ["hex", "number"]| {"Min": 128, "Max": 65536, "Inc": 8}| true, false (if this value is true, the dataUnitLen parameter *SHALL* not be present; if this value is false, the dataUnitLen parameter *SHALL* be present)
+| ACVP-AES-XTS| "2.0"| ["encrypt", "decrypt"]| [128, 256]| {"Min": 128, "Max": 65536, "Inc": 8}| ["hex", "number", "iut"]| {"Min": 128, "Max": 65536, "Inc": 8}| true, false (if this value is true, the dataUnitLen parameter *SHALL* not be present; if this value is false, the dataUnitLen parameter *SHALL* be present)
 |===
 
 NOTE: The difference in testing between ACVP-AES-XTS / "1.0" and ACVP-AES-XTS / "2.0" is the inclusion of the data unit in the "2.0" revision. The <<AES-XTS>> standard provides the concept of a data unit as a means of logically breaking apart a data stream provided to the encryption algorithm. A data unit may be larger, smaller or equal to the payload being processed. In the case of the "1.0" revision, the data unit length always matches the payload length. Thus, the equivalent of the "1.0" revision can be accessed via the "2.0" revision by setting the 'dataUnitLenMatchesPayload' field to true. Within the prompt, in "1.0", the test group contains the payload length for the entire group. In "2.0" this is moved to the test case level and handled on a per case basis along with the data unit length. Both values may be provided in the test case JSON even when 'dataUnitLenMatchesPayload' is true.
