@@ -428,6 +428,7 @@ If you would like to talk to our developers, you may want to send email to our m
 - [Automated Module Validation Protocol](https://github.com/usnistgov/AMVP)
 - [ACVP Proxy](https://github.com/smuellerDD/acvpproxy)
 - [ACVP Parser](https://github.com/smuellerDD/acvpparser)
+- [ACVP Assay](https://github.com/Govardhan527/acvp-assay)
 
 # Licensing Terms
 
