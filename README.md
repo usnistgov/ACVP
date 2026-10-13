@@ -377,6 +377,11 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [ML-KEM keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.html)
 * [ML-KEM encapDecap](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.html)
 
+### Hybrid KEM
+* [X-WING keyGen](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.txt) - [HTML](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.html)
+* [X-WING encapDecap](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.txt) - [HTML](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.html)
+
+
 See [the algorithm endpoint](https://pages.nist.gov/ACVP/draft-fussell-acvp-spec.html#name-algorithms) to learn which algorithms are available on a given ACVP server.
 
 # Accessing the Demo Server
