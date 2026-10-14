@@ -28,6 +28,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [Stateful Hash-Based Signatures](#stateful-hash-based-signatures)
   * [Stateless Hash-Based Signatures](#stateless-hash-based-signatures)
   * [Module-Lattice Algorithms](#module-lattice-algorithms)
+  * [Hybrid KEM](#hybrid-kem)
 * [Accessing the Server](#accessing-the-demo-server)
 * [Contribution Guidelines](contribution-guidelines)
 * [Related Projects](#related-projects)
