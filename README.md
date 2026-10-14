@@ -28,7 +28,7 @@ For issues regarding the actual ACVP Server implementation, as well as pre-relea
   * [Stateful Hash-Based Signatures](#stateful-hash-based-signatures)
   * [Stateless Hash-Based Signatures](#stateless-hash-based-signatures)
   * [Module-Lattice Algorithms](#module-lattice-algorithms)
-  * [Hybrid KEM](#hybrid-kem)
+  * [Hybrid KEMs](#hybrid-kems)
 * [Accessing the Server](#accessing-the-demo-server)
 * [Contribution Guidelines](contribution-guidelines)
 * [Related Projects](#related-projects)
@@ -378,7 +378,7 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [ML-KEM keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.html)
 * [ML-KEM encapDecap](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-ml-kem.html)
 
-### Hybrid KEM
+### Hybrid KEMs
 * [X-WING keyGen](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.txt) - [HTML](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.html)
 * [X-WING encapDecap](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.txt) - [HTML](https://pages.nist.gov/ACVP/draft-miller-acvp-x-wing.html)
 
