@@ -365,6 +365,8 @@ Standalone KDA testing from SP800-56Cr1 or SP800-56Cr2. Can be used in conjuncti
 * [LMS keyGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
 * [LMS sigGen](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
 * [LMS sigVer](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.txt) - [HTML](https://pages.nist.gov/ACVP/draft-celi-acvp-lms.html)
+* [XMSS sigGen](https://pages.nist.gov/ACVP/draft-lee-acvp-xmss.txt) - [HTML](https://pages.nist.gov/ACVP/draft-lee-acvp-xmss.html)
+* [XMSS sigVer](https://pages.nist.gov/ACVP/draft-lee-acvp-xmss.txt) - [HTML](https://pages.nist.gov/ACVP/draft-lee-acvp-xmss.html)
 
 ### Stateless Hash-Based Signatures
 * [SLH-DSA keyGen](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.txt) - [HTML](https://pages.nist.gov/ACVP/draft-livelsberger-acvp-slh-dsa.html)
