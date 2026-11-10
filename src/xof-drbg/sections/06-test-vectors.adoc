@@ -1,0 +1,110 @@
+[[tgjs]]
+=== Test Groups
+
+The testGroups element at the top level in the test vector JSON object is an array of test	groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped	together. The Test Group JSON object contains meta data that applies to all test vectors within	the group. The following table describes the {spec-algorithm} JSON elements of the Test Group JSON object
+
+[[prompt_group_table]]
+.Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | Test group identifier | integer
+| testType | The type of test being performed | string
+| tests | Array of individual test cases | array
+|===
+
+The 'tgId', 'testType' and 'tests' objects *MUST* appear in every test group element communicated from the server to the client as a part of a prompt.
+
+=== Test Cases
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each {spec-algorithm} test vector.
+
+[[cases_table]]
+.Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Test case idenfitier | integer
+| entropyInput | Entropy value | hex
+| persoString | Value of the personlization string | hex
+| otherInput | Array of additonal input/entropy input value pairs for testing. See <<other_input_table>> | array
+| outputLength | The number of bits of output expected | integer
+|===
+
+Each test group contains an array of one or more tests. Each test object contains an otherInput object, which is an array of objects, each with the intendedUse property indicating if the particular test data is to be used for reseed or generate - see <<other_input_table>>. Each test vector is a JSON object that represents a single test case to be processed by the ACVP client. 
+
+[[other_input_table]]
+.xofDRBG Other Input JSON Elements
+|===
+| JSON Value | Description | JSON type
+
+| intendedUse | "reseed", "generate" indicating what the implementation should do with the values in the same object | string
+| entropyInput | Value of the entropy input | hex
+| additionalInput | Value of the additional input string | hex
+|===
+
+Note: The "reseed" value for intendedUse will only appear if the registration included `true` in the `reseed` boolean array. 
+
+Here is an abbreviated yet fully constructed example of the prompt
+
+[source, json]
+----
+{
+  "vsId": 0,
+  "algorithm": "xofDRBG",
+  "mode": "SHAKE-256",
+  "revision": "SP800-90Ar2",
+  "isSample": false,
+  "testGroups": [
+    {
+      "tgId": 1,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 1,
+          "entropyInput": "DBE87D66B52569619357384FA93CB57E",
+          "persoString": "5695400493A103DCB4CD985557E88788D990953B63E671D82F0854614054A448D1",
+          "otherInput": [
+            {
+              "intendedUse": "reseed",
+              "entropyInput": "AF7C83FFF6DEDC95D4262F70C7767A34",
+              "additionalInput": "611CEE966AB58EAA"
+            },
+            {
+              "intendedUse": "generate",
+              "additionalInput": "982A74B25D63A0D7"
+            },
+            {
+              "intendedUse": "generate",
+              "additionalInput": "9A4226DFADB990DB"
+            }
+          ],
+          "outputLength": 288
+        }
+      ]
+    },
+    {
+      "tgId": 2,
+      "testType": "AFT",
+      "tests": [
+        {
+          "tcId": 2,
+          "entropyInput": "1BABB53C279285FD2F92A586E626510E9FF0EE35D5...",
+          "persoString": "",
+          "otherInput": [
+            {
+              "intendedUse": "generate",
+              "additionalInput": ""
+            },
+            {
+              "intendedUse": "generate",
+              "additionalInput": ""
+            }
+          ],
+          "outputLength": 1720
+        }
+      ]
+    }
+  ]
+}
+----
