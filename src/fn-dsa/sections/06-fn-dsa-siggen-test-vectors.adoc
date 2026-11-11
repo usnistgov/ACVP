@@ -1,0 +1,131 @@
+[[FN-DSA_sigGen_test_vectors]]
+=== FN-DSA sigGen Test Vectors
+
+[[FN-DSA_sigGen_tgjs]]
+==== FN-DSA sigGen Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {algo-short-name} JSON elements of the Test Group JSON object.
+
+The test group for FN-DSA / sigGen / FIPS206 is as follows:
+
+[[FN-DSA_sigGen_vs_tg_table]]
+.FN-DSA sigGen Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | Numeric identifier for the test group, unique across the entire vector set | integer
+| testType | The test operation performed | string
+| parameterSet | The FN-DSA parameter set used | string
+| deterministic | Whether the signatures should be generated using the deterministic or non-deterministic routine | boolean
+| signatureInterface | Whether the signature is generated using the internal or external routine | string
+| preHash | Whether the signature is generated using the prehash or pure routine | string
+| externalMu | Whether mu is computed internally or externally to the module under test | string
+| tests | Array of individual test vector JSON objects, which are defined in <<FN-DSA_sigGen_tvjs>> | array
+|===
+
+NOTE: The "preHash" property will only be present if "signatureInterface" is set to "external". The "externalMu" property will only be present if "signatureInterface" is set to "internal".
+
+[[FN-DSA_sigGen_tvjs]]
+==== FN-DSA sigGen Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each FN-DSA test vector.
+
+[[FN-DSA_sigGen_vs_tc_table]]
+.FN-DSA sigGen Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| message | The message used to generate the signature | hex
+| mu | The mu used to generate the signature | hex
+| sk | When the test group property `"testType": "AFT"`, the secret key that should be used to generate a signature | hex
+| rnd | When the test group properties `"testType": "AFT"` and `"deterministic": false`, the random value used to generate the signature | hex
+| context | When the test group property `"signatureInterface": "external"`, the context used to construct the signed message | hex
+| hashAlg | When the test group property `"preHash": "preHash"`, the hash function used to construct the signed message | string
+|===
+
+NOTE: When "signatureInterface" is set to "internal" for the test group, the "message" will only be present when "externalMu" is false, while "mu" will only be present when "externalMu" is true.
+
+The following is an example JSON object sent from the server to the client for FN-DSA / sigGen / FIPS206.
+
+[source, json]
+----
+[
+    {
+        "acvVersion": <acvp-version>
+    },
+    {
+        "vsId": 0,
+        "algorithm": "FN-DSA",
+        "mode": "sigGen",
+        "revision": "FIPS206",
+        "testGroups": [
+            {
+                "tgId": 1,
+                "testType": "AFT",
+                "parameterSet": "FN-DSA-512",
+                "signatureInterface": "internal",
+                "externalMu": false,
+                "deterministic": true,
+                "tests": [
+                    {
+                        "tcId": 1,
+                        "sk": "D4E36A5...",
+                        "message": "0D873AEFD..."
+                    }
+                ]
+            },
+            {
+                "tgId": 2,
+                "testType": "AFT",
+                "parameterSet": "FN-DSA-512",
+                "signatureInterface": "internal",
+                "externalMu": true,
+                "deterministic": false,
+                "tests": [
+                    {
+                        "tcId": 71,
+                        "sk": "D4E36A5...",
+                        "mu": "34F4B...",
+                        "rnd": "7AFF2F22A..."
+                    }
+                ]
+            },
+            {
+                "tgId": 3,
+                "testType": "AFT",
+                "parameterSet": "FN-DSA-512",
+                "signatureInterface": "external",
+                "preHash": "pure",
+                "deterministic": true,
+                "tests": [
+                    {
+                        "tcId": 71,
+                        "sk": "D4E36A5...",
+                        "message": "34F4B...",
+                        "context": "ABCD"
+                    }
+                ]
+            },
+            {
+                "tgId": 4,
+                "testType": "AFT",
+                "parameterSet": "FN-DSA-512",
+                "signatureInterface": "external",
+                "preHash": "preHash",
+                "deterministic": false,
+                "tests": [
+                    {
+                        "tcId": 71,
+                        "sk": "D4E36A5...",
+                        "message": "34F4B...",
+                        "rnd": "7AFF2F22A...",
+                        "context": "ABCD",
+                        "hashAlg": "SHA2-256"
+                    }
+                ]
+            }
+        ]
+    }
+]
+----

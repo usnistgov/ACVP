@@ -1,0 +1,134 @@
+[[FN-DSA_sigVer_test_vectors]]
+=== FN-DSA sigVer Test Vectors
+
+[[FN-DSA_sigVer_tgjs]]
+==== FN-DSA sigVer Test Groups JSON Schema
+
+The testGroups element at the top level in the test vector JSON object is an array of test groups. Test vectors are grouped into similar test cases to reduce the amount of data transmitted in the vector set. For instance, all test vectors that use the same key size would be grouped together. The Test Group JSON object contains meta data that applies to all test vectors within the group. The following table describes the {algo-short-name} JSON elements of the Test Group JSON object.
+
+The test group for FN-DSA / sigVer / FIPS206 is as follows:
+
+[[FN-DSA_sigVer_vs_tg_table]]
+.FN-DSA sigVer Test Group JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tgId | Numeric identifier for the test group, unique across the entire vector set | integer
+| testType | The test operation performed | string
+| parameterSet | The FN-DSA parameter set used | string
+| signatureInterface | Whether the signature is generated using the internal or external routine | string
+| preHash | Whether the signature is generated using the prehash or pure routine | string
+| tests | Array of individual test vector JSON objects, which are defined in <<FN-DSA_sigVer_tvjs>> | array
+|===
+
+NOTE: The "preHash" property will only be present if "signatureInterface" is set to "external". The "externalMu" property will only be present if "signatureInterface" is set to "internal".
+
+[[FN-DSA_sigVer_tvjs]]
+==== FN-DSA sigVer Test Case JSON Schema
+
+Each test group contains an array of one or more test cases. Each test case is a JSON object that represents a single test vector to be processed by the ACVP client. The following table describes the JSON elements for each FN-DSA test vector.
+
+[[FN-DSA_sigVer_vs_tc_table]]
+.FN-DSA sigVer Test Case JSON Object
+|===
+| JSON Value | Description | JSON type
+
+| tcId | Numeric identifier for the test case, unique across the entire vector set | integer
+| pk | The public key used to verify the signature | hex
+| message | The message used to verify with the signature | hex
+| mu | The mu used to generate the signature | hex
+| signature | The signature to verify | hex
+| context | When the test group property `"signatureInterface": "external"`, the context used to construct the signed message | hex
+| hashAlg | When the test group property `"preHash": "preHash"`, the hash function used to construct the signed message | string
+|===
+
+NOTE: When "signatureInterface" is set to "internal" for the test group, the "message" will only be present when "externalMu" is false, while "mu" will only be present when "externalMu" is true.
+
+The following is an example JSON object sent from the server to the client for FN-DSA / sigVer / FIPS206.
+
+[source, json]
+----
+[
+  {
+    "acvVersion": <acvp-version>
+  },
+  {
+    "vsId": 0,
+    "algorithm": "FN-DSA",
+    "mode": "sigVer",
+    "revision": "FIPS206",
+    "isSample": false,
+    "testGroups": [
+      {
+        "tgId": 1,
+        "testType": "AFT",
+        "parameterSet": "FN-DSA-512",
+        "signatureInterface": "internal",
+        "externalMu": false,
+        "tests": [
+          {
+            "tcId": 1,
+            "pk": "3FE65294...",
+            "message": "4F0D7...",
+            "signature": "C29A11B6C..."
+          },
+          {
+            "tcId": 2,
+            "pk": "3FE65294...",
+            "message": "84793...",
+            "signature": "6A99215FC2..."
+          }
+        ]
+      },
+      {
+        "tgId": 2,
+        "testType": "AFT",
+        "parameterSet": "FN-DSA-512",
+        "signatureInterface": "internal",
+        "externalMu": true,
+        "tests": [
+          {
+            "tcId": 3,
+            "pk": "3FE65294...",
+            "mu": "4F0D7...",
+            "signature": "C29A11B6C..."
+          }
+        ]
+      },
+      {
+        "tgId": 3,
+        "testType": "AFT",
+        "parameterSet": "FN-DSA-512",
+        "signatureInterface": "external",
+        "preHash": "pure",
+        "tests": [
+          {
+            "tcId": 4,
+            "pk": "4C7029A9...",
+            "message": "75E...",
+            "context": "548...",
+            "signature": "04D1B8..."
+          },
+        ]
+      },
+      {
+        "tgId": 4,
+        "testType": "AFT",
+        "parameterSet": "FN-DSA-512",
+        "signatureInterface": "external",
+        "preHash": "preHash",
+        "tests": [
+          {
+            "tcId": 5,
+            "pk": "5FB42D9CF5EE...",
+            "message": "8740606...",
+            "context": "0710CE7...",
+            "hashAlg": "SHA2-224",
+            "signature": "C0D60..."
+          }
+        ]
+      }
+    ]
+  }
+]
+----
