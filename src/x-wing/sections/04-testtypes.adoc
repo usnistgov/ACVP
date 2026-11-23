@@ -1,0 +1,37 @@
+﻿// Top lines of testTypes.adoc
+[#testtypes]
+== Test Types and Test Coverage
+
+[#ttypes]
+=== Test Types
+
+The ACVP server performs a set of tests on the specified X-WING algorithm in order to assess the correctness and robustness of the implementation. A typical ACVP validation session would require multiple tests to be performed for every supported permutation of X-WING capabilities. This section describes the design of the tests used to validate implementations of the X-WING algorithms.
+
+* X-WING / keyGen / * "AFT" - Algorithm Functional Test. The ACVP server provides the IUT with a 32-byte decapsulation key sk.  The IUT shall use the provided sk to perform the deterministic X-WING key-generation procedure, GenerateKeyPairDerand(sk), and return the resulting 1216-byte encapsulation key pk.  This test verifies that the IUT correctly implements the X-WING key derivation and key-generation procedure defined in sections 5.2 and 5.2.1 on the X-WING specification.
+
+* X-WING / encapDecap / * "AFT" - Algorithm Functional Test.  The IUT shall perform the X-WING encapsulation or decapsulation operation using the values provided by the ACVP server and return the resulting ciphertext and shared secret, as applicable, for validation.  The test verifies that the IUT correctly implements the X-WING EncapsulateDerand() and Decapsulate() procedures defined in Sections 5.4.1 and 5.5 of the X-WING specification.
+
+* X-WING / encapDecap / * "VAL" - Validation Test. There are variations for this test type depending on the ciphertext being tested.
+
+** For decapsulation, the server will generate an X-WING decapsulation key 'sk' and a valid or modified ciphertext 'ct'.  The IUT shall perform the X-WING Decapsulate(ct, sk) operation and return the resulting 32-byte shared secret 'ss'.  This tests the implementation of the X-WING decapsulation procedure defined in Section 5.5 of the X-WING specification.
+
+The decapsulation modifications are:
+
+* "valid decapsulation" - No modification to the ciphertext is made.  The IUT *SHALL* perform X-WING decapsulation using the provided ciphertext and return the resulting shared secret 'ss'.
+* "modified ML-KEM ciphertext" - The ML-KEM component, ct_M, of the X-WING ciphertext is modified before being provided to the IUT. The IUT *SHALL* perform X-WING decapsulation using the modified ciphertext and return the resulting shared secret 'ss'.
+* "modified X25519 ciphertext" - The X25519 component, ct_X, of the X-WING ciphertext is modified before being provided to the IUT. The IUT *SHALL* perform X-WING decapsulation using the modified ciphertext and return the resulting shared secret 'ss'.
+
+[[test_coverage]]
+=== Test Coverage
+
+The tests described in this document are intended to ensure that an implementation conforms to the X-WING specification.  X-WING relies on ML-KEM-768 as specified in the FIPS203 <<FIPS203>> as a cryptographic dependency.
+
+[[requirements_covered]]
+==== Requirements Covered
+
+* The test ensures the conformity and correctness of the X-WING key-generation, encapsulation, and decapsulation operations supported by the implementation.
+
+[[requirements_not_covered]]
+==== Requirements Not Covered
+
+* Requirements that cannot be verified through the ACVP testing interface are outside the scope of ACVP testing.  These include implementation-specific security requirements such as the secure generation of random values, protection of secret and intermediate values, and implementation characteristics intended to mitigate attacks.
